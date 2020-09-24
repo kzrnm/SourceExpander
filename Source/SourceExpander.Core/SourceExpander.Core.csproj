@@ -3,10 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 
+    <RootNamespace>SourceExpander</RootNamespace>
+
     <PackageId>SourceExpander.Core</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
-  
+
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
+
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
