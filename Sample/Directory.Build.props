@@ -1,0 +1,9 @@
+<Project>
+
+  <ItemGroup  Condition="'$(ProjectName)' != _SampleLibrary" >
+    <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
+    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
+    <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
+  </ItemGroup>
+
+</Project>
