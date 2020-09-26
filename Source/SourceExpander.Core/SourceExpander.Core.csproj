@@ -8,9 +8,10 @@
     <RootNamespace>SourceExpander</RootNamespace>
 
     <PackageId>SourceExpander.Core</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
 
+    <PackageTags>ac-library-cs</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>

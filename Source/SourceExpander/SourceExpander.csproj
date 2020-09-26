@@ -7,9 +7,10 @@
     <NoWarn>1701;1702;IDE0057</NoWarn>
 
     <PackageId>SourceExpander</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Description>A library that expanding embedded source code.</Description>
 
+    <PackageTags>ac-library-cs</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>

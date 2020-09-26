@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace SourceExpander.Expanders.Utils
 {
-    public static class ExpanderUtil
+    internal static class ExpanderUtil
     {
         public static string[] SortedUsings(IEnumerable<string> usings)
         {
