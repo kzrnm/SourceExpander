@@ -6,11 +6,12 @@
     <Nullable>enable</Nullable>
     <NoWarn>1701;1702;IDE0057</NoWarn>
 
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.4</Version>
     <Description>A library that expanding embedded source code.</Description>
 
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <Authors>naminodarie</Authors>
     <PackageTags>ac-library-cs</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
