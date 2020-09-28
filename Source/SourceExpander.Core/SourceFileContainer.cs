@@ -15,7 +15,8 @@ namespace SourceExpander
             _sourceFiles = new Dictionary<string, SourceFileInfo>();
             foreach (var sf in origs)
             {
-                if (_sourceFiles.ContainsKey(sf.FileName)) throw new ArgumentException($"duplicate FileName: {sf.FileName}");
+                if (sf.FileName == null) throw new ArgumentException($"({nameof(sf.FileName)} is null");
+                if (_sourceFiles.ContainsKey(sf.FileName)) throw new ArgumentException($"duplicate {nameof(sf.FileName)}: {sf.FileName}");
                 _sourceFiles.Add(sf.FileName, sf);
             }
         }
@@ -37,6 +38,7 @@ namespace SourceExpander
 
             foreach (var s in origs)
             {
+                if (s.FileName == null) throw new ArgumentException($"({nameof(s.FileName)} is null");
                 usedFileName.Add(s.FileName);
                 result.Add(s);
             }
@@ -50,6 +52,7 @@ namespace SourceExpander
                 if (_sourceFiles.TryGetValue(dep, out var s))
                 {
                     result.Add(s);
+                    if (s.Dependencies == null) throw new ArgumentException($"({nameof(s.Dependencies)} is null");
                     foreach (var d in s.Dependencies)
                         if (usedFileName.Add(d))
                             fileNameQueue.Enqueue(d);

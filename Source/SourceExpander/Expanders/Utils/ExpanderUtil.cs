@@ -14,8 +14,9 @@ namespace SourceExpander.Expanders.Utils
             Array.Sort(arr, (a, b) => StringComparer.Ordinal.Compare(a.TrimEnd(';'), b.TrimEnd(';')));
             return arr;
         }
-        public static IEnumerable<string> ToLines(string str)
+        public static IEnumerable<string> ToLines(string? str)
         {
+            if (str == null) yield break;
             using var sr = new StringReader(str);
             for (var line = sr.ReadLine(); line != null; line = sr.ReadLine())
                 yield return line;

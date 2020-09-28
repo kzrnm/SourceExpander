@@ -7,18 +7,21 @@ namespace SourceExpander.Expanders
     {
         public static SourceFileContainer SourceFiles => new SourceFileContainer(new[]
         {
-            new SourceFileInfo(
-                "Put.cs",
-                new[] { "Test.Put" },
-                new[] { "using System.Diagnostics;" },
-                Array.Empty<string>(),
-                @"namespace Test{static class Put{public static void Write(string v){Debug.WriteLine(v);}}}"),
-            new SourceFileInfo(
-                "I/D.cs",
-                new[] { "Test.I.D<T>" },
-                new[] { "using System.Diagnostics;", "using System;" },
-                new[] { "Put.cs" },
-                @"namespace Test.I
+            new SourceFileInfo
+            {
+                FileName = "Put.cs",
+                TypeNames = new[] { "Test.Put" },
+                Usings = new[] { "using System.Diagnostics;" },
+                Dependencies = Array.Empty<string>(),
+                CodeBody = @"namespace Test{static class Put{public static void Write(string v){Debug.WriteLine(v);}}}"
+            },
+            new SourceFileInfo
+            {
+                FileName = "I/D.cs",
+                TypeNames = new[] { "Test.I.D<T>" },
+                Usings = new[] { "using System.Diagnostics;", "using System;" },
+                Dependencies = new[] { "Put.cs" },
+                CodeBody = @"namespace Test.I
 {
     class D<T>
     {
@@ -29,13 +32,14 @@ namespace SourceExpander.Expanders
             Put.Write(typeof(T).FullName);
         }
     }
-}"),
-            new SourceFileInfo(
-                "F/N.cs",
-                new[] { "Test.F.N" },
-                new[] { "using System.Diagnostics;", "using System;" },
-                new[] { "Put.cs" },
-                @"namespace Test.F
+}" },
+            new SourceFileInfo
+            {
+                FileName = "F/N.cs",
+                TypeNames = new[] { "Test.F.N" },
+                Usings = new[] { "using System.Diagnostics;", "using System;" },
+                Dependencies = new[] { "Put.cs" },
+                CodeBody = @"namespace Test.F
 {
     class N
     {
@@ -46,7 +50,7 @@ namespace SourceExpander.Expanders
             Put.Write(""N"");
         }
     }
-}")
+}" }
             });
     }
 }

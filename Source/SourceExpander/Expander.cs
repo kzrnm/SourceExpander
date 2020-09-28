@@ -52,12 +52,13 @@ namespace SourceExpander
 
 
         internal static readonly SourceFileInfo s_expanderFileInfo
-         = new SourceFileInfo(
-             "Expander",
-             new string[] { nameof(SourceExpander) + "." + nameof(Expander) },
-             new string[] { "using System.Diagnostics;", },
-             Array.Empty<string>(),
-             "namespace " +
+            = new SourceFileInfo
+            {
+                FileName = "<Expander>",
+                TypeNames = new string[] { nameof(SourceExpander) + "." + nameof(Expander) },
+                Usings = new string[] { "using System.Diagnostics;", },
+                Dependencies = Array.Empty<string>(),
+                CodeBody = "namespace " +
              nameof(SourceExpander) +
              " { public static class " +
              nameof(Expander) +
@@ -66,6 +67,7 @@ namespace SourceExpander
              " string outputFilePath = \"\", " +
              nameof(ExpandMethod) + " expandMethod = " + nameof(ExpandMethod) + "." + nameof(ExpandMethod.All) + ") { } } " +
              "public enum " +
-             nameof(ExpandMethod) + " { " + string.Join(", ", typeof(ExpandMethod).GetEnumNames()) + " } }");
+             nameof(ExpandMethod) + " { " + string.Join(", ", typeof(ExpandMethod).GetEnumNames()) + " } }"
+            };
     }
 }

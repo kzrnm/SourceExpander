@@ -10,6 +10,7 @@
     <Version>1.0.2</Version>
     <Description>A library that expanding embedded source code.</Description>
 
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageTags>ac-library-cs</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>

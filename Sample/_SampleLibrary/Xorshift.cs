@@ -2,7 +2,6 @@
 
 namespace SampleLibrary
 {
-    [ToString]
     public class Xorshift : Random
     {
         private uint x = 123456789;
