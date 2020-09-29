@@ -9,15 +9,8 @@
 
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Core</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
-
-    <Authors>naminodarie</Authors>
-    <PackageTags>ac-library-cs</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>

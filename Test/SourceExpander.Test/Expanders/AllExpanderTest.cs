@@ -93,7 +93,7 @@ namespace Test.I{}
             }
 
             var gotCode = expander.ExpandedString();
-            TestUtil.TestCompile( gotCode);
+            TestUtil.TestCompile(gotCode);
         }
     }
 }

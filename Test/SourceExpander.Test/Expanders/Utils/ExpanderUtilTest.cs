@@ -40,7 +40,7 @@ namespace SourceExpander.Expanders.Utils
         [MemberData(nameof(ToSimpleClassNameData))]
         public void ToSimpleClassNameTest(string input, string expected)
         {
-            
+
             ExpanderUtil.ToSimpleClassName(input).Should().Be(expected);
         }
     }

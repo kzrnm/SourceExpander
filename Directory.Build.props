@@ -1,0 +1,12 @@
+<Project>
+
+  <PropertyGroup>
+    <Authors>naminodarie</Authors>
+    <PackageTags>SourceExpander;ac-library-csharp</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
+  </PropertyGroup>
+
+</Project>
