@@ -9,7 +9,7 @@
 
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
-    <PackageId>SouceExpander.Embedder</PackageId>
+    <PackageId>SourceExpander.Embedder</PackageId>
     <Version>1.0.6-alpha</Version>
     <Description>A source generator that embedding source code.</Description>
 
