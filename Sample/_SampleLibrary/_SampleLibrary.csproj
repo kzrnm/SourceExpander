@@ -3,18 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SampleLibrary</RootNamespace>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.2.6">
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="3.8.0-4.20480.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ModuleInit.Fody" Version="2.1.1" PrivateAssets="all" />
-    <PackageReference Include="BasicFodyAddin.Fody" Version="1.2.0" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
   </ItemGroup>
 

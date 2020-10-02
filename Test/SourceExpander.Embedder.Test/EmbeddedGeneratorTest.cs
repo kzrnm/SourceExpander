@@ -65,10 +65,11 @@ namespace SourceExpander.Embedder.Test
                 .Should().HaveCount(TestSyntaxes.Length);
 
             var diagnostic = diagnostics.Should().ContainSingle().Which;
-            diagnostic.Id.Should().Be("CS8785");
-            diagnostic.Descriptor.Description.ToString()
+            diagnostic.Id.Should().Be("EMBED0001");
+            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Error);
+            diagnostic.Descriptor.Title.ToString()
                 .Should()
-                .ContainAll("InvalidOperation", "need class SourceExpander.SourceFileInfo");
+                .Contain("need class SourceExpander.SourceFileInfo");
         }
 
         static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();

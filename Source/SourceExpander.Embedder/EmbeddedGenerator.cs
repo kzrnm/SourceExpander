@@ -3,42 +3,57 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace SourceExpander
 {
+    [Generator]
     public class EmbeddedGenerator : ISourceGenerator
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var compilation = context.Compilation;
+            var compilation = (CSharpCompilation)context.Compilation;
             if (!compilation.HasType("SourceExpander.SourceFileInfo"))
             {
-                throw new InvalidOperationException("need class SourceExpander.SourceFileInfo");
+                var desc = new DiagnosticDescriptor("EMBED0001",
+                    "need class SourceExpander.SourceFileInfo",
+                    "need class SourceExpander.SourceFileInfo",
+                    "EmbeddedGenerator",
+                    DiagnosticSeverity.Error,
+                    true);
+                context.ReportDiagnostic(Diagnostic.Create(desc, Location.None));
+                return;
             }
+
+            var useInternalModuleInitializer = compilation.LanguageVersion.MapSpecifiedToEffectiveVersion() >= LanguageVersion.CSharp9 && !compilation.HasType("System.Runtime.CompilerServices.ModuleInitializerAttribute");
 
             var infos = ResolveRaw(compilation,
                 compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree)).ToArray()
                 ).ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
-
             var sb = new StringBuilder();
             sb.AppendLine("using SourceExpander;");
             sb.AppendLine("internal static class ModuleInitializer{");
-            sb.AppendLine("private static bool s_initialized;");
+            sb.AppendLine("const string paths = @\"" + string.Join(", ", compilation.SyntaxTrees.Select(s => s.FilePath)) + "\";");
+            sb.AppendLine("private static bool s_initialized = false;");
+            if (useInternalModuleInitializer)
+                sb.AppendLine("[System.Runtime.CompilerServices.ModuleInitializer]");
             sb.AppendLine("public static void Initialize(){");
             sb.AppendLine("if(s_initialized) return;");
             sb.AppendLine("s_initialized = true;");
             foreach (var info in infos)
             {
-                sb.AppendLine("GlobalSourceFileContainer.Add(" + info.ToInitializeString() + ");");
+                if (info.TypeNames.Any())
+                    sb.AppendLine("GlobalSourceFileContainer.Instance.Add(" + info.ToInitializeString() + ");");
             }
             sb.AppendLine("}}");
 
-            if (!compilation.HasType("System.Runtime.CompilerServices.ModuleInitializerAttribute"))
+            if (useInternalModuleInitializer)
             {
+                const string ModuleInitializerAttributeDefinition = @"namespace System.Runtime.CompilerServices { internal class ModuleInitializerAttribute : System.Attribute { } }";
                 sb.AppendLine(ModuleInitializerAttributeDefinition);
             }
             context.AddSource("SourceExpander.Embedded.Generated.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
@@ -113,7 +128,6 @@ namespace SourceExpander
             return symbol.ContainingType?.ConstructedFrom?.ToDisplayString() ?? symbol.ToDisplayString();
         }
 
-        public const string ModuleInitializerAttributeDefinition = @"namespace System.Runtime.CompilerServices { internal class ModuleInitializerAttribute : System.Attribute { } }";
         public void Initialize(GeneratorInitializationContext context) { }
     }
 }

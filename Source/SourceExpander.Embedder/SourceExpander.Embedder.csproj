@@ -7,10 +7,11 @@
     <Nullable>enable</Nullable>
     <NoWarn>1701;1702;IDE0057</NoWarn>
 
+    <IncludeSymbols>false</IncludeSymbols>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Embedder</PackageId>
-    <Version>1.0.6-alpha</Version>
+    <Version>1.0.6-beta1</Version>
     <Description>A source generator that embedding source code.</Description>
 
     <SignAssembly>true</SignAssembly>
@@ -23,15 +24,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.0">
+    <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
+  </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <PackageReference>
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0-3.final" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
