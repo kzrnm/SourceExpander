@@ -31,24 +31,25 @@ namespace SourceExpander
 
             var infos = ResolveRaw(compilation,
                 compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree)).ToArray()
-                ).ToArray();
+                )
+                .Where(info => info.TypeNames.Any())
+                .ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
             var sb = new StringBuilder();
             sb.AppendLine("using SourceExpander;");
             sb.AppendLine("internal static class ModuleInitializer{");
-            sb.AppendLine("const string paths = @\"" + string.Join(", ", compilation.SyntaxTrees.Select(s => s.FilePath)) + "\";");
+            sb.AppendLine("public static SourceFileInfo[] sourceFileInfos = new SourceFileInfo[]{");
+            foreach (var info in infos)
+                sb.AppendLine(info.ToInitializeString() + ",");
+            sb.AppendLine("};");
             sb.AppendLine("private static bool s_initialized = false;");
             if (useInternalModuleInitializer)
                 sb.AppendLine("[System.Runtime.CompilerServices.ModuleInitializer]");
             sb.AppendLine("public static void Initialize(){");
             sb.AppendLine("if(s_initialized) return;");
             sb.AppendLine("s_initialized = true;");
-            foreach (var info in infos)
-            {
-                if (info.TypeNames.Any())
-                    sb.AppendLine("GlobalSourceFileContainer.Instance.Add(" + info.ToInitializeString() + ");");
-            }
+            sb.AppendLine("foreach(var s in sourceFileInfos) GlobalSourceFileContainer.Instance.Add(s);");
             sb.AppendLine("}}");
 
             if (useInternalModuleInitializer)

@@ -8,7 +8,6 @@
 
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander</PackageId>
-    <Version>1.0.5</Version>
     <Description>A library that expanding embedded source code.</Description>
     
     <SignAssembly>true</SignAssembly>

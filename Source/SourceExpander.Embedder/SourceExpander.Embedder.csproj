@@ -7,16 +7,18 @@
     <Nullable>enable</Nullable>
     <NoWarn>1701;1702;IDE0057</NoWarn>
 
-    <IncludeSymbols>false</IncludeSymbols>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Embedder</PackageId>
-    <Version>1.0.6-beta1</Version>
     <Description>A source generator that embedding source code.</Description>
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>SourceExpander</RootNamespace>
+
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,8 +42,11 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0-3.final" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-  </ItemGroup>
-
+  <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\dotnet\" />
+      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+    </ItemGroup>
+  </Target>
+  
 </Project>

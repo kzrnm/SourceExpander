@@ -9,7 +9,6 @@
 
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Core</PackageId>
-    <Version>1.0.5</Version>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
 
     <SignAssembly>true</SignAssembly>

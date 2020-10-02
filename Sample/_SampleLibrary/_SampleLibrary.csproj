@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="3.8.0-4.20480.4">
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="3.8.0-4.20480.4"> <!-- LangVersion < 9 -->
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
