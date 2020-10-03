@@ -8,7 +8,13 @@
     <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>
     <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
 
-    <Version>1.0.6-beta4</Version>
+    <Version>1.1.0-alpha.1</Version>
+
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
+
+    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(MSBuildThisFileDirectory)bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
   </PropertyGroup>
 
 </Project>

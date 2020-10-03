@@ -11,8 +11,6 @@
     <PackageId>SourceExpander.Core</PackageId>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
 
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>

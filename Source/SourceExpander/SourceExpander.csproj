@@ -10,8 +10,6 @@
     <PackageId>SourceExpander</PackageId>
     <Description>A library that expanding embedded source code.</Description>
     
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,10 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SourceExpander
 {
-    internal class UsingDirectiveRemover : CSharpSyntaxRewriter
+    internal class MinifyRewriter : CSharpSyntaxRewriter
     {
         public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia) => SyntaxFactory.Space;
         public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)

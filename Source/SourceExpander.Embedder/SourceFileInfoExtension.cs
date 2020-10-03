@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Json;
+using System.Text;
 
 namespace SourceExpander
 {
@@ -27,6 +30,13 @@ namespace SourceExpander
             }
             static string Quote(string str) => $"@\"{str.Replace("\"", "\"\"")}\"";
             static string QuoteArray(IEnumerable<string> strs) => $"new string[]{{{string.Join(",", strs.Select(Quote))}}}";
+        }
+        public static string ToJson(this IEnumerable<SourceFileInfo> infos)
+        {
+            var serializer = new DataContractJsonSerializer(typeof(IEnumerable<SourceFileInfo>));
+            using var ms = new MemoryStream();
+            serializer.WriteObject(ms, infos);
+            return Encoding.UTF8.GetString(ms.ToArray());
         }
     }
 }

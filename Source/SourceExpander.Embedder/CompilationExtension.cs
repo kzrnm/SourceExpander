@@ -10,7 +10,7 @@ namespace SourceExpander
         public static bool HasType(this Compilation compilation, string typeFullName)
             => compilation.GetTypeByMetadataName(typeFullName) != null;
 
-        private static Dictionary<object, string> _commomPrefixCache = new Dictionary<object, string>();
+        private static readonly Dictionary<object, string> _commomPrefixCache = new Dictionary<object, string>();
         public static string ResolveCommomPrefix(this Compilation compilation)
         {
             if (_commomPrefixCache.TryGetValue(compilation, out var val)) return val;

@@ -7,8 +7,8 @@
     <Nullable>enable</Nullable>
     <NoWarn>1701;1702;IDE0057</NoWarn>
 
-    <PackageId>SourceExpander.Embedder</PackageId>
-    <Description>A source generator that embedding source code.</Description>
+    <PackageId>SourceExpander.Generator</PackageId>
+    <Description>A source generator that expanding source code.</Description>
 
     <RootNamespace>SourceExpander</RootNamespace>
 

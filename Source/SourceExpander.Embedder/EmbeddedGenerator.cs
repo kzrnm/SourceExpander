@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -26,18 +28,14 @@ namespace SourceExpander
                 context.ReportDiagnostic(Diagnostic.Create(desc, Location.None));
                 return;
             }
-
             var useInternalModuleInitializer = compilation.LanguageVersion.MapSpecifiedToEffectiveVersion() >= LanguageVersion.CSharp9 && !compilation.HasType("System.Runtime.CompilerServices.ModuleInitializerAttribute");
+            var infos = ResolveFiles(compilation);
 
-            var infos = ResolveRaw(compilation,
-                compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree)).ToArray()
-                )
-                .Where(info => info.TypeNames.Any())
-                .ToArray();
-            Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
+            var json = infos.ToJson();
 
             var sb = new StringBuilder();
             sb.AppendLine("using SourceExpander;");
+            sb.AppendLine($"[assembly: System.Reflection.AssemblyMetadataAttribute(\"EmbeddedSourceCode\", @\"{json.Replace("\"", "\"\"")}\")]");
             sb.AppendLine("internal static class ModuleInitializer{");
             sb.AppendLine("public static SourceFileInfo[] sourceFileInfos = new SourceFileInfo[]{");
             foreach (var info in infos)
@@ -59,6 +57,17 @@ namespace SourceExpander
             }
             context.AddSource("SourceExpander.Embedded.Generated.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
         }
+        public SourceFileInfo[] ResolveFiles(Compilation compilation)
+        {
+            var infos = ResolveRaw(compilation,
+                compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree)).ToArray()
+                )
+                .Where(info => info.TypeNames.Any())
+                .ToArray();
+            Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
+            return infos;
+        }
+
         private IEnumerable<SourceFileInfo> ResolveRaw(Compilation compilation, SourceFileInfoRaw[] infos)
         {
             static IEnumerable<string> GetDependencies(Compilation compilation, SourceFileInfoRaw[] infos, SourceFileInfoRaw raw)
@@ -101,7 +110,7 @@ namespace SourceExpander
             var root = (CompilationUnitSyntax)tree.GetRoot();
             var usings = root.Usings.Select(u => u.ToString().Trim()).ToArray();
 
-            var remover = new UsingDirectiveRemover();
+            var remover = new MinifyRewriter();
             var newRoot = (CompilationUnitSyntax)remover.Visit(root)!;
 
             var prefix = $"{compilation.AssemblyName}>";
@@ -116,7 +125,25 @@ namespace SourceExpander
 
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings, MinifySpace(newRoot.ToString()));
 
-            static string MinifySpace(string str) => System.Text.RegularExpressions.Regex.Replace(str, " +", " ");
+            static string MinifySpace(string str)
+            {
+                bool inWhiteSpace = false;
+                var sb = new StringBuilder(str.Length);
+                for (int i = 0; i < str.Length; i++)
+                {
+                    if (str[i] == ' ')
+                    {
+                        if (!inWhiteSpace) sb.Append(str[i]);
+                        inWhiteSpace = true;
+                    }
+                    else
+                    {
+                        sb.Append(str[i]);
+                        inWhiteSpace = false;
+                    }
+                }
+                return sb.ToString();
+            }
         }
 
         private static string? GetTypeNameFromSymbol(ISymbol? symbol)
