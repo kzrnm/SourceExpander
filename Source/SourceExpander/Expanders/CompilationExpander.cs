@@ -13,20 +13,30 @@ namespace SourceExpander.Expanders
     internal class CompilationExpander : Expander
     {
         public CompilationExpander(string code, SourceFileContainer sourceFileContainer)
-            : base(code, sourceFileContainer) { }
+            : base(sourceFileContainer)
+        {
+            var dllPathes = Directory.EnumerateFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "*.dll");
+            Compilation = CSharpCompilation.Create("compilation",
+               syntaxTrees: SourceFileContainer.Select(s => CSharpSyntaxTree.ParseText(s.RestoredCode)).Append(OrigTree),
+               references: dllPathes.Select(p => MetadataReference.CreateFromFile(p)));
 
-        private SyntaxTree? _origTree;
-        protected SyntaxTree OrigTree => _origTree ??= CSharpSyntaxTree.ParseText(OrigCode);
+            OrigTree = CSharpSyntaxTree.ParseText(code);
+        }
+        public CompilationExpander(SyntaxTree tree, Compilation compilation, SourceFileContainer sourceFileContainer)
+            : base(sourceFileContainer)
+        {
+            Compilation = compilation;
+            OrigTree = tree;
+        }
+
+        private Compilation Compilation { get; }
+        protected SyntaxTree OrigTree { get; }
         private ReadOnlyCollection<string>? linesCache;
         public override IEnumerable<string> ExpandedLines()
         {
             IEnumerable<string> Impl()
             {
-                var dllPathes = Directory.EnumerateFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "*.dll");
-                var compilation = CSharpCompilation.Create("compilation",
-                    syntaxTrees: SourceFileContainer.Select(s => CSharpSyntaxTree.ParseText(s.RestoredCode)).Append(OrigTree),
-                    references: dllPathes.Select(p => MetadataReference.CreateFromFile(p)));
-                var semanticModel = compilation.GetSemanticModel(OrigTree);
+                var semanticModel = Compilation.GetSemanticModel(OrigTree);
 
                 var origRoot = OrigTree.GetRoot();
                 var requiedFiles = SourceFileContainer.ResolveDependency(GetRequiredSources(semanticModel, origRoot));

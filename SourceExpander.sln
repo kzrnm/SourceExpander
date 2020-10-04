@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Test", "Test\SourceExpander.Embedder.Test\SourceExpander.Embedder.Test.csproj", "{524F5B6A-7ECB-4822-9761-0F79638B936D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceExpander.Generator", "Source\SourceExpander.Generator\SourceExpander.Generator.csproj", "{131AD198-BA14-4459-A820-1C50E8013995}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator", "Source\SourceExpander.Generator\SourceExpander.Generator.csproj", "{131AD198-BA14-4459-A820-1C50E8013995}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceExpander.Generator.Test", "Test\SourceExpander.Generator.Test\SourceExpander.Generator.Test.csproj", "{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{131AD198-BA14-4459-A820-1C50E8013995}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{131AD198-BA14-4459-A820-1C50E8013995}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{131AD198-BA14-4459-A820-1C50E8013995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

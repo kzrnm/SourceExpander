@@ -10,11 +10,9 @@ namespace SourceExpander
 {
     public abstract class Expander
     {
-        public string OrigCode { get; }
         protected SourceFileContainer SourceFileContainer { get; }
-        protected Expander(string code, SourceFileContainer sourceFileContainer)
+        protected Expander(SourceFileContainer sourceFileContainer)
         {
-            OrigCode = code;
             SourceFileContainer = sourceFileContainer;
         }
 

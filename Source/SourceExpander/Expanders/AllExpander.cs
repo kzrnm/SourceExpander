@@ -9,8 +9,13 @@ namespace SourceExpander.Expanders
 {
     internal class AllExpander : Expander
     {
+        public string OrigCode { get; }
         public AllExpander(string code, SourceFileContainer sourceFileContainer)
-            : base(code, sourceFileContainer) { }
+            : base(sourceFileContainer)
+        {
+            OrigCode = code;
+        }
+
         private ReadOnlyCollection<string>? linesCache;
         public override IEnumerable<string> ExpandedLines()
         {

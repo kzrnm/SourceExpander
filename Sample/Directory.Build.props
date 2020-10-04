@@ -1,9 +1,10 @@
 <Project>
 
-  <ItemGroup  Condition="'$(ProjectName)' != _SampleLibrary" >
-    <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
-    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
+  <ItemGroup  Condition="$(ProjectName.StartsWith('Sample'))" >
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
+  </ItemGroup>
+  <ItemGroup  Condition="$(ProjectName.StartsWith('Sample')) And !$(ProjectName.EndsWith('Generator'))" >
+    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
   </ItemGroup>
 
 </Project>

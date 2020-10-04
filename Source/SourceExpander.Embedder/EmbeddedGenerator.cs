@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,46 +15,58 @@ namespace SourceExpander
         public void Execute(GeneratorExecutionContext context)
         {
             var compilation = (CSharpCompilation)context.Compilation;
+            var infos = ResolveFiles(compilation);
+
+            var json = infos.ToJson();
+            context.AddSource("EmbeddedSourceCode.Metadata.Generated.cs",
+                SourceText.From($"[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\", @\"{json.Replace("\"", "\"\"")}\")]", Encoding.UTF8));
+
+            // embedding code
             if (!compilation.HasType("SourceExpander.SourceFileInfo"))
             {
                 var desc = new DiagnosticDescriptor("EMBED0001",
                     "need class SourceExpander.SourceFileInfo",
                     "need class SourceExpander.SourceFileInfo",
                     "EmbeddedGenerator",
-                    DiagnosticSeverity.Error,
+                    DiagnosticSeverity.Info,
                     true);
                 context.ReportDiagnostic(Diagnostic.Create(desc, Location.None));
-                return;
             }
-            var useInternalModuleInitializer = compilation.LanguageVersion.MapSpecifiedToEffectiveVersion() >= LanguageVersion.CSharp9 && !compilation.HasType("System.Runtime.CompilerServices.ModuleInitializerAttribute");
-            var infos = ResolveFiles(compilation);
-
-            var json = infos.ToJson();
-
-            var sb = new StringBuilder();
-            sb.AppendLine("using SourceExpander;");
-            sb.AppendLine($"[assembly: System.Reflection.AssemblyMetadataAttribute(\"EmbeddedSourceCode\", @\"{json.Replace("\"", "\"\"")}\")]");
-            sb.AppendLine("internal static class ModuleInitializer{");
-            sb.AppendLine("public static SourceFileInfo[] sourceFileInfos = new SourceFileInfo[]{");
-            foreach (var info in infos)
-                sb.AppendLine(info.ToInitializeString() + ",");
-            sb.AppendLine("};");
-            sb.AppendLine("private static bool s_initialized = false;");
-            if (useInternalModuleInitializer)
-                sb.AppendLine("[System.Runtime.CompilerServices.ModuleInitializer]");
-            sb.AppendLine("public static void Initialize(){");
-            sb.AppendLine("if(s_initialized) return;");
-            sb.AppendLine("s_initialized = true;");
-            sb.AppendLine("foreach(var s in sourceFileInfos) GlobalSourceFileContainer.Instance.Add(s);");
-            sb.AppendLine("}}");
-
-            if (useInternalModuleInitializer)
+            else
             {
-                const string ModuleInitializerAttributeDefinition = @"namespace System.Runtime.CompilerServices { internal class ModuleInitializerAttribute : System.Attribute { } }";
-                sb.AppendLine(ModuleInitializerAttributeDefinition);
+                context.AddSource("SourceExpander.Embedded.Generated.cs", CreateModuleInitializer(compilation, infos));
             }
-            context.AddSource("SourceExpander.Embedded.Generated.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+
+
+            static SourceText CreateModuleInitializer(CSharpCompilation compilation, SourceFileInfo[] infos)
+            {
+                var useInternalModuleInitializer = compilation.LanguageVersion.MapSpecifiedToEffectiveVersion() >= LanguageVersion.CSharp9 && !compilation.HasType("System.Runtime.CompilerServices.ModuleInitializerAttribute");
+                var sb = new StringBuilder();
+                sb.AppendLine("using SourceExpander;");
+                sb.AppendLine("namespace SourceExpander.EmbeddedGenerator{");
+                sb.AppendLine("internal static class ModuleInitializer{");
+                sb.AppendLine("public static SourceFileInfo[] sourceFileInfos = new SourceFileInfo[]{");
+                foreach (var info in infos)
+                    sb.AppendLine(info.ToInitializeString() + ",");
+                sb.AppendLine("};");
+                sb.AppendLine("private static bool s_initialized = false;");
+                if (useInternalModuleInitializer)
+                    sb.AppendLine("[System.Runtime.CompilerServices.ModuleInitializer]");
+                sb.AppendLine("public static void Initialize(){");
+                sb.AppendLine("if(s_initialized) return;");
+                sb.AppendLine("s_initialized = true;");
+                sb.AppendLine("GlobalSourceFileContainer.Instance.AddLazy(() => sourceFileInfos);");
+                sb.AppendLine("}}}");
+
+                if (useInternalModuleInitializer)
+                {
+                    const string ModuleInitializerAttributeDefinition = @"namespace System.Runtime.CompilerServices { internal class ModuleInitializerAttribute : System.Attribute { } }";
+                    sb.AppendLine(ModuleInitializerAttributeDefinition);
+                }
+                return SourceText.From(sb.ToString(), Encoding.UTF8);
+            }
         }
+
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
         {
             var infos = ResolveRaw(compilation,
@@ -67,7 +77,6 @@ namespace SourceExpander
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
             return infos;
         }
-
         private IEnumerable<SourceFileInfo> ResolveRaw(Compilation compilation, SourceFileInfoRaw[] infos)
         {
             static IEnumerable<string> GetDependencies(Compilation compilation, SourceFileInfoRaw[] infos, SourceFileInfoRaw raw)

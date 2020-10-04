@@ -20,8 +20,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../SourceExpander.Core/SourceFileInfo.cs" />
+    <Compile Include="../SourceExpander/**/*.cs" Visible="false" />
+    <Compile Include="../SourceExpander.Core/*.cs" Visible="false" />
+    <Compile Remove="../SourceExpander/obj/**/*.cs" />
+    <Compile Remove="../SourceExpander/**/AssemblyInfo.cs" />
   </ItemGroup>
+
 
   <ItemGroup>
     <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
@@ -37,7 +41,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0-3.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0-3.final"/>
   </ItemGroup>
 
   <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
@@ -46,5 +50,5 @@
       <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
     </ItemGroup>
   </Target>
-  
+
 </Project>

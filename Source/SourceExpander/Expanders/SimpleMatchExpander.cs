@@ -12,8 +12,13 @@ namespace SourceExpander.Expanders
 {
     internal class SimpleMatchExpander : Expander
     {
+        public string OrigCode { get; }
+
         public SimpleMatchExpander(string code, SourceFileContainer sourceFileContainer)
-            : base(code, sourceFileContainer) { }
+            : base(sourceFileContainer)
+        {
+            OrigCode = code;
+        }
 
         private SyntaxTree? _origTree;
         protected SyntaxTree OrigTree => _origTree ??= CSharpSyntaxTree.ParseText(OrigCode);
