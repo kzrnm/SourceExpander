@@ -41,7 +41,7 @@ namespace SourceExpander.Expanders.Utils
         }
 
 
-        private static readonly Regex usingRegex = new Regex(@"using\s+(.+);", RegexOptions.Compiled);
+        private static readonly Regex usingRegex = new Regex(@"using\s+(\S+);", RegexOptions.Compiled);
         public static string? ParseNamespace(string usingDirective)
         {
             var g = usingRegex.Match(usingDirective).Groups;

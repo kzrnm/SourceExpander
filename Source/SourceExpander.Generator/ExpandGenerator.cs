@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -18,14 +15,7 @@ namespace SourceExpander
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var embeddeds = context.Compilation.References
-                .Select(context.Compilation.GetAssemblyOrModuleSymbol)
-                .OfType<ISymbol>()
-                .SelectMany(symbol => symbol.GetAttributes())
-                .Select(GetAttributeSourceCode)
-                .OfType<string>()
-                .SelectMany(ParseEmbeddedJson)
-                .ToArray();
+            var (compilation, embeddeds) = Build((CSharpCompilation)context.Compilation);
             if (embeddeds.Length == 0)
             {
                 var diagnosticDescriptor = new DiagnosticDescriptor("EXPAND0001", "not found embedded source", "not found embedded source", "ExpandGenerator", DiagnosticSeverity.Info, true);
@@ -35,11 +25,32 @@ namespace SourceExpander
 
             context.AddSource("SourceExpander.Expanded.cs",
                 SourceText.From(
-                    MakeExpanded(context.Compilation.SyntaxTrees.OfType<CSharpSyntaxTree>(), context.Compilation, embeddeds),
+                    MakeExpanded(compilation.SyntaxTrees.OfType<CSharpSyntaxTree>(), compilation, embeddeds),
                     Encoding.UTF8));
         }
+        static (CSharpCompilation, SourceFileInfo[]) Build(CSharpCompilation compilation)
+        {
+            var result = new List<SourceFileInfo>();
+            foreach (var reference in compilation.References)
+            {
+                var symbol = compilation.GetAssemblyOrModuleSymbol(reference);
+                if (symbol is null) continue;
+                foreach (var info in symbol.GetAttributes().Select(GetAttributeSourceCode).OfType<string>().SelectMany(ParseEmbeddedJson))
+                {
+                    result.Add(info);
+                }
+            }
 
-        static string MakeExpanded(IEnumerable<CSharpSyntaxTree> trees, Compilation compilation, SourceFileInfo[] infos)
+            var trees = compilation.SyntaxTrees;
+            foreach (var tree in trees)
+            {
+                var opts = tree.Options.WithDocumentationMode(DocumentationMode.Diagnose);
+                compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), opts));
+            }
+
+            return (compilation, result.ToArray());
+        }
+        static string MakeExpanded(IEnumerable<CSharpSyntaxTree> trees, CSharpCompilation compilation, SourceFileInfo[] infos)
         {
             var sb = new StringBuilder();
             sb.AppendLine("using System.Collections.Generic;");

@@ -25,14 +25,21 @@ namespace SourceExpander.Expanders
                .OfType<CSharpSyntaxTree>(),
                references: dllPathes.Select(p => MetadataReference.CreateFromFile(p)));
         }
-        public CompilationExpander(SyntaxTree tree, Compilation compilation, SourceFileContainer sourceFileContainer)
+        public CompilationExpander(SyntaxTree tree, CSharpCompilation compilation, SourceFileContainer sourceFileContainer)
             : base(sourceFileContainer)
         {
-            Compilation = compilation;
+            var specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>
+            {
+                { "CS8019", ReportDiagnostic.Error },
+                { "CS0105", ReportDiagnostic.Error },
+            };
+            var opts = compilation.Options
+                .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
+            Compilation = compilation.WithOptions(opts);
             OrigTree = tree;
         }
 
-        private Compilation Compilation { get; }
+        private CSharpCompilation Compilation { get; }
         protected SyntaxTree OrigTree { get; }
         private ReadOnlyCollection<string>? linesCache;
         public override IEnumerable<string> ExpandedLines()
@@ -40,13 +47,13 @@ namespace SourceExpander.Expanders
             IEnumerable<string> Impl()
             {
                 var semanticModel = Compilation.GetSemanticModel(OrigTree);
-
                 var origRoot = OrigTree.GetRoot();
                 var requiedFiles = SourceFileContainer.ResolveDependency(GetRequiredSources(semanticModel, origRoot));
 
-                var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(semanticModel
+                var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(
+                    semanticModel
                     .GetDiagnostics(null)
-                    .Where(d => d.Id == "CS8019" || d.Id == "CS0105")
+                    .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
                     .Select(d => origRoot.FindNode(d.Location.SourceSpan))
                     .OfType<UsingDirectiveSyntax>())
                     .Visit(origRoot) ?? throw new InvalidOperationException());
