@@ -21,7 +21,7 @@ namespace SourceExpander.Test
         [Fact]
         public void ExpandedTest()
         {
-            var expander = new TestExpander("", new SourceFileContainer(Array.Empty<SourceFileInfo>()));
+            var expander = new TestExpander();
             expander.ExpandedLines().Should().Equal(new string[]
             {
             "class Program{",
@@ -43,8 +43,7 @@ namespace SourceExpander.Test
 
         private class TestExpander : Expander
         {
-            public TestExpander(string code, SourceFileContainer sourceFileContainer)
-                : base(code, sourceFileContainer) { }
+            public TestExpander() : base(new SourceFileContainer(Array.Empty<SourceFileInfo>())) { }
             public override IEnumerable<string> ExpandedLines() => new string[]
             {
             "class Program{",

@@ -15,12 +15,15 @@ namespace SourceExpander.Expanders
         public CompilationExpander(string code, SourceFileContainer sourceFileContainer)
             : base(sourceFileContainer)
         {
+            OrigTree = CSharpSyntaxTree.ParseText(code);
+
             var dllPathes = Directory.EnumerateFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "*.dll");
             Compilation = CSharpCompilation.Create("compilation",
-               syntaxTrees: SourceFileContainer.Select(s => CSharpSyntaxTree.ParseText(s.RestoredCode)).Append(OrigTree),
+               syntaxTrees: SourceFileContainer
+               .Select(s => CSharpSyntaxTree.ParseText(s.RestoredCode))
+               .Append(OrigTree)
+               .OfType<CSharpSyntaxTree>(),
                references: dllPathes.Select(p => MetadataReference.CreateFromFile(p)));
-
-            OrigTree = CSharpSyntaxTree.ParseText(code);
         }
         public CompilationExpander(SyntaxTree tree, Compilation compilation, SourceFileContainer sourceFileContainer)
             : base(sourceFileContainer)
