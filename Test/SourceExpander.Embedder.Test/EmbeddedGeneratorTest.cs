@@ -2,13 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Xunit;
+using static SourceExpander.Embedder.Test.Util;
 
 namespace SourceExpander.Embedder.Test
 {
@@ -149,18 +149,6 @@ namespace SourceExpander.Embedder.Test
             diagnostic.Descriptor.Title.ToString()
                 .Should()
                 .Contain("need class SourceExpander.SourceFileInfo");
-        }
-
-        static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
-        static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(Core.SourceExpander.SourceFileInfo).Assembly.Location);
-
-        static IEnumerable<MetadataReference> GetDefaulMetadatas()
-        {
-            var directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
-            foreach (var file in Directory.EnumerateFiles(directory, "System*.dll"))
-            {
-                yield return MetadataReference.CreateFromFile(file);
-            }
         }
 
         static readonly SyntaxTree[] TestSyntaxes = GetSyntaxes().ToArray();

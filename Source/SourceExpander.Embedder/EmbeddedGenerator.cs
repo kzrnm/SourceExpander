@@ -123,7 +123,10 @@ namespace SourceExpander
             var newRoot = (CompilationUnitSyntax)remover.Visit(root)!;
 
             var prefix = $"{compilation.AssemblyName}>";
-            var fileName = tree.FilePath.Replace(compilation.ResolveCommomPrefix(), prefix);
+            var commonPrefix = compilation.ResolveCommomPrefix();
+            var fileName = string.IsNullOrEmpty(commonPrefix) ? 
+                prefix + tree.FilePath :
+                tree.FilePath.Replace(commonPrefix, prefix);
 
             var typeNames = root.DescendantNodes()
                 .Where(s => s is BaseTypeDeclarationSyntax || s is DelegateDeclarationSyntax)
