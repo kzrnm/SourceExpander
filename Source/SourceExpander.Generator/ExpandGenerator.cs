@@ -20,7 +20,6 @@ namespace SourceExpander
             {
                 var diagnosticDescriptor = new DiagnosticDescriptor("EXPAND0001", "not found embedded source", "not found embedded source", "ExpandGenerator", DiagnosticSeverity.Info, true);
                 context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, Location.None));
-                return;
             }
 
             context.AddSource("SourceExpander.Expanded.cs",
