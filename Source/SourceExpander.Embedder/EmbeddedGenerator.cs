@@ -124,7 +124,7 @@ namespace SourceExpander
 
             var prefix = $"{compilation.AssemblyName}>";
             var commonPrefix = compilation.ResolveCommomPrefix();
-            var fileName = string.IsNullOrEmpty(commonPrefix) ? 
+            var fileName = string.IsNullOrEmpty(commonPrefix) ?
                 prefix + tree.FilePath :
                 tree.FilePath.Replace(commonPrefix, prefix);
 
@@ -135,27 +135,8 @@ namespace SourceExpander
                 .Distinct()
                 .ToArray();
 
-            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, MinifySpace(newRoot.ToString()));
-
-            static string MinifySpace(string str)
-            {
-                bool inWhiteSpace = false;
-                var sb = new StringBuilder(str.Length);
-                for (int i = 0; i < str.Length; i++)
-                {
-                    if (str[i] == ' ')
-                    {
-                        if (!inWhiteSpace) sb.Append(str[i]);
-                        inWhiteSpace = true;
-                    }
-                    else
-                    {
-                        sb.Append(str[i]);
-                        inWhiteSpace = false;
-                    }
-                }
-                return sb.ToString();
-            }
+            return new SourceFileInfoRaw(tree, fileName, typeNames, usings,
+                remover.Visit(CSharpSyntaxTree.ParseText(newRoot.ToString()).GetRoot())!.ToString());
         }
 
         private static string? GetTypeNameFromSymbol(ISymbol? symbol)
