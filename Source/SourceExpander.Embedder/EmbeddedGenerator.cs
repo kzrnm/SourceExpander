@@ -69,17 +69,19 @@ namespace SourceExpander
 
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
         {
+            var embedded = SourceFileInfoUtil.GetEmbeddedSourceFiles(compilation);
+            var commonPrefix = compilation.ResolveCommomPrefix();
             var infos = ResolveRaw(compilation,
-                compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree)).ToArray()
-                )
+                compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree, commonPrefix)).ToArray(),
+                embedded)
                 .Where(info => info.TypeNames.Any())
                 .ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
             return infos;
         }
-        private IEnumerable<SourceFileInfo> ResolveRaw(Compilation compilation, SourceFileInfoRaw[] infos)
+        private IEnumerable<SourceFileInfo> ResolveRaw(Compilation compilation, SourceFileInfoRaw[] infos, SourceFileInfo[] otherInfos)
         {
-            static IEnumerable<string> GetDependencies(Compilation compilation, SourceFileInfoRaw[] infos, SourceFileInfoRaw raw)
+            IEnumerable<string> GetDependencies(SourceFileInfoRaw raw)
             {
                 var tree = raw.SyntaxTree;
                 var root = (CompilationUnitSyntax)tree.GetRoot();
@@ -98,6 +100,7 @@ namespace SourceExpander
                     if (!added.Add(typeName)) continue;
 
                     dependencies.UnionWith(infos.Where(s => s.TypeNames != null && s.TypeNames.Contains(typeName)).Select(s => s.FileName));
+                    dependencies.UnionWith(otherInfos.Where(s => s.TypeNames?.Contains(typeName) == true).Select(s => s.FileName).OfType<string>());
                 }
 
                 return dependencies;
@@ -110,10 +113,10 @@ namespace SourceExpander
                     TypeNames = raw.TypeNames,
                     Usings = raw.Usings,
                     CodeBody = raw.CodeBody,
-                    Dependencies = GetDependencies(compilation, infos, raw),
+                    Dependencies = GetDependencies(raw),
                 };
         }
-        private SourceFileInfoRaw ParseSource(Compilation compilation, SyntaxTree tree)
+        private SourceFileInfoRaw ParseSource(Compilation compilation, SyntaxTree tree, string commonPrefix)
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var root = (CompilationUnitSyntax)tree.GetRoot();
@@ -123,7 +126,6 @@ namespace SourceExpander
             var newRoot = (CompilationUnitSyntax)remover.Visit(root)!;
 
             var prefix = $"{compilation.AssemblyName}>";
-            var commonPrefix = compilation.ResolveCommomPrefix();
             var fileName = string.IsNullOrEmpty(commonPrefix) ?
                 prefix + tree.FilePath :
                 tree.FilePath.Replace(commonPrefix, prefix);

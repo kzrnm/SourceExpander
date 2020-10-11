@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../SourceExpander.Core/SourceFileInfo.cs" />
+    <Compile Include="../SourceExpander.Share/**/*.cs" />
   </ItemGroup>
 
   <ItemGroup>

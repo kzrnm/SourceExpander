@@ -19,17 +19,17 @@ namespace SourceExpander.Embedder.Test
         {
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
-                syntaxTrees: TestSyntaxes,
+                syntaxTrees: GetTestSyntaxes(),
                 references: defaultMetadatas.Append(expanderCoreReference),
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
+            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbeddedGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 2);
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 2);
 
             generator.ResolveFiles(compilation)
                 .Should()
@@ -130,10 +130,10 @@ namespace SourceExpander.Embedder.Test
         {
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
-                syntaxTrees: TestSyntaxes,
+                syntaxTrees: GetTestSyntaxes(),
                 references: defaultMetadatas,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
+            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
             compilation.GetDiagnostics()
                 .Should().BeEmpty();
 
@@ -141,7 +141,7 @@ namespace SourceExpander.Embedder.Test
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             outputCompilation.SyntaxTrees
-                .Should().HaveCount(TestSyntaxes.Length + 1);
+                .Should().HaveCount(TestSyntaxesCount + 1);
 
             var diagnostic = diagnostics.Should().ContainSingle().Which;
             diagnostic.Id.Should().Be("EMBED0001");
@@ -151,8 +151,8 @@ namespace SourceExpander.Embedder.Test
                 .Contain("need class SourceExpander.SourceFileInfo");
         }
 
-        static readonly SyntaxTree[] TestSyntaxes = GetSyntaxes().ToArray();
-        static IEnumerable<SyntaxTree> GetSyntaxes()
+        static readonly int TestSyntaxesCount = GetTestSyntaxes().Count();
+        static IEnumerable<SyntaxTree> GetTestSyntaxes()
         {
             yield return CSharpSyntaxTree.ParseText(
                 @"using System.Diagnostics;namespace Test{static class Put{public class Nested{ public static void Write(string v){Debug.WriteLine(v);}}}}",

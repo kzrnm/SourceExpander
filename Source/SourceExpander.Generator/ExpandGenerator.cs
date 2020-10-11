@@ -29,17 +29,6 @@ namespace SourceExpander
         }
         static (CSharpCompilation, SourceFileInfo[]) Build(CSharpCompilation compilation)
         {
-            var result = new List<SourceFileInfo>();
-            foreach (var reference in compilation.References)
-            {
-                var symbol = compilation.GetAssemblyOrModuleSymbol(reference);
-                if (symbol is null) continue;
-                foreach (var info in symbol.GetAttributes().Select(GetAttributeSourceCode).OfType<string>().SelectMany(ParseEmbeddedJson))
-                {
-                    result.Add(info);
-                }
-            }
-
             var trees = compilation.SyntaxTrees;
             foreach (var tree in trees)
             {
@@ -47,7 +36,7 @@ namespace SourceExpander
                 compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), opts));
             }
 
-            return (compilation, result.ToArray());
+            return (compilation, SourceFileInfoUtil.GetEmbeddedSourceFiles(compilation));
         }
         static string MakeExpanded(IEnumerable<CSharpSyntaxTree> trees, CSharpCompilation compilation, SourceFileInfo[] infos)
         {
@@ -67,24 +56,7 @@ namespace SourceExpander
             return sb.ToString();
         }
         static string Quote(string str) => $"@\"{str.Replace("\"", "\"\"")}\"";
-        static List<SourceFileInfo> ParseEmbeddedJson(string json)
-        {
-            using var ms = new MemoryStream(new UTF8Encoding(false).GetBytes(json));
-            var serializer = new DataContractJsonSerializer(typeof(List<SourceFileInfo>));
-            return (List<SourceFileInfo>)serializer.ReadObject(ms);
-
-        }
-
-        static string? GetAttributeSourceCode(AttributeData attr)
-        {
-            if (attr.AttributeClass?.ToString() != "System.Reflection.AssemblyMetadataAttribute")
-                return null;
-            var args = attr.ConstructorArguments;
-            if (!(args.Length == 2 && args[0].Value is string key && args[1].Value is string val)) return null;
-            if (key != "SourceExpander.EmbeddedSourceCode") return null;
-            return val;
-        }
-
+  
         public void Initialize(GeneratorInitializationContext context) { }
     }
 }

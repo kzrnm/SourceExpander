@@ -28,6 +28,14 @@ namespace SourceExpander.Embedder.Test
                 new []{"/home/Foo.cs", "/mnt/c/source/test/Bar.cs"},
                 "/"
             },
+            {
+                new []{"/home/Foo.cs"},
+                "/home/"
+            },
+            {
+                new []{"/Foo.cs"},
+                "/"
+            },
         };
 
         [Theory]

@@ -13,4 +13,8 @@
 
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="../SourceExpander.Share/SourceFileInfo.cs" />
+  </ItemGroup>
+
 </Project>

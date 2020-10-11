@@ -24,8 +24,8 @@
     <Compile Include="../SourceExpander.Core/*.cs" Visible="false" />
     <Compile Remove="../SourceExpander/obj/**/*.cs" />
     <Compile Remove="../SourceExpander/**/AssemblyInfo.cs" />
+    <Compile Include="../SourceExpander.Share/**/*.cs" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />

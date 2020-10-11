@@ -12,7 +12,7 @@ namespace SourceExpander.Embedder.Test
         public static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
         public static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(Core.SourceExpander.SourceFileInfo).Assembly.Location);
 
-        public static IEnumerable<MetadataReference> GetDefaulMetadatas()
+        private static IEnumerable<MetadataReference> GetDefaulMetadatas()
         {
             var directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             foreach (var file in Directory.EnumerateFiles(directory, "System*.dll"))
