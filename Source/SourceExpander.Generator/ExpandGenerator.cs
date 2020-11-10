@@ -43,13 +43,13 @@ namespace SourceExpander
             var sb = new StringBuilder();
             sb.AppendLine("using System.Collections.Generic;");
             sb.AppendLine("namespace Expanded{");
-            sb.AppendLine("public class SourceCode{ public string Code; }");
+            sb.AppendLine("public class SourceCode{ public string Path; public string Code; }");
             sb.AppendLine("public static class Expanded{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{");
             foreach (var tree in trees)
             {
                 var newCode = new CompilationExpander(tree, compilation, new SourceFileContainer(infos)).ExpandedString();
-                sb.AppendLine($"{{{Quote(tree.FilePath)}, new SourceCode{{ Code={Quote(newCode)} }} }},");
+                sb.AppendLine($"{{{Quote(tree.FilePath)}, new SourceCode{{ Path={Quote(tree.FilePath)}, Code={Quote(newCode)} }} }},");
             }
             sb.AppendLine("};");
             sb.AppendLine("}}");
