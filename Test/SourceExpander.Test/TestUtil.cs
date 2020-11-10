@@ -6,12 +6,13 @@ using System.Threading;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Xunit;
 
 namespace SourceExpander
 {
     public static class TestUtil
     {
-        public static IEnumerable<(T First, T Second)> ZipAndFill<T>(this IEnumerable<T> first, IEnumerable<T> second, T defaultValue = default)
+        public static IEnumerable<(T? First, T? Second)> ZipAndFill<T>(this IEnumerable<T> first, IEnumerable<T> second, T defaultValue = default)
         {
             bool m1, m2;
             var e1 = first.GetEnumerator();
@@ -26,9 +27,10 @@ namespace SourceExpander
 
         public static void TestCompile(string code, CancellationToken cancellationToken = default)
         {
-            var tree = CSharpSyntaxTree.ParseText(code);
+            var tree = CSharpSyntaxTree.ParseText(code, cancellationToken: cancellationToken);
             tree.GetDiagnostics(cancellationToken).Should().BeEmpty();
-            var pathes = Directory.EnumerateFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "*.dll");
+            var dir = Path.GetDirectoryName(typeof(object).Assembly.Location) ?? throw new InvalidOperationException();
+            var pathes = Directory.EnumerateFiles(dir, "*.dll");
             var compilation = CSharpCompilation.Create("compilation",
                 syntaxTrees: new[] { tree },
                 references: pathes.Select(p => MetadataReference.CreateFromFile(p)));
