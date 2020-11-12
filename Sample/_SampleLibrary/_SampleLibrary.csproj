@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="3.8.0-5.final"> <!-- LangVersion < 9 -->
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="ModuleInit.Fody" Version="2.1.1" PrivateAssets="all" />
     <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
   </ItemGroup>

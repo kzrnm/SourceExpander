@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using SourceExpander.Expanders;
 
 namespace SourceExpander
@@ -16,8 +19,22 @@ namespace SourceExpander
             SourceFileContainer = sourceFileContainer;
         }
 
+        private static IEnumerable<SourceFileInfo> GetEmbeddedSourceFiles()
+             => AppDomain.CurrentDomain.GetAssemblies()
+             .SelectMany(a => a.GetCustomAttributes<AssemblyMetadataAttribute>())
+             .SelectMany(ParseEmbeddedJson);
+
+        private static IEnumerable<SourceFileInfo> ParseEmbeddedJson(AssemblyMetadataAttribute metadata)
+        {
+            if (metadata.Key != "SourceExpander.EmbeddedSourceCode")
+                return Array.Empty<SourceFileInfo>();
+            using var ms = new MemoryStream(new UTF8Encoding(false).GetBytes(metadata.Value));
+            var serializer = new DataContractJsonSerializer(typeof(List<SourceFileInfo>));
+            return (List<SourceFileInfo>)serializer.ReadObject(ms);
+        }
+
         public static Expander Create(string code, ExpandMethod expandMethod)
-            => Create(code, expandMethod, GlobalSourceFileContainer.Instance.Append(s_expanderFileInfo));
+            => Create(code, expandMethod, GetEmbeddedSourceFiles().Append(s_expanderFileInfo));
         internal static Expander Create(string code, ExpandMethod expandMethod, IEnumerable<SourceFileInfo> sourceFileInfos)
             => expandMethod switch
             {

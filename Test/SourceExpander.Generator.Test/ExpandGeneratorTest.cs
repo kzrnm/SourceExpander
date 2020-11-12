@@ -27,6 +27,9 @@ class Program
     {
         Console.WriteLine(42);
         Put.WriteRandom();
+#if !EXPAND_GENERATOR
+        Console.WriteLine(24);
+#end if
     }
 }",
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None),

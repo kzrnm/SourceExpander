@@ -40,13 +40,13 @@ path: "Program.cs") },
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(3);
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
 
             var newTree = outputCompilation.SyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.FilePath.Contains("SourceExpander.Embedded.Generated.cs"))
+                .ContainSingle(tree => tree.FilePath.Contains("EmbeddedSourceCode.Metadata.Generated.cs"))
                 .Which;
-            newTree.ToString().Should().Contain("class Program { static void Main() => Console.WriteLine(1); }");
+            newTree.ToString().Should().StartWith("[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\", ");
             newTree.GetDiagnostics().Should().BeEmpty();
         }
     }

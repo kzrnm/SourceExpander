@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        Expander.Expand();
+        Expander.Expand(expandMethod: ExpandMethod.All);
         Console.WriteLine(42);
         Put.WriteRandom();
     }

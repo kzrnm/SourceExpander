@@ -29,7 +29,7 @@ namespace SourceExpander.Embedder.Test
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 2);
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
             generator.ResolveFiles(compilation)
                 .Should()
@@ -101,25 +101,9 @@ namespace SourceExpander.Embedder.Test
                     CodeBody = "namespace Test{static class Put{public class Nested{ public static void Write(string v){Debug.WriteLine(v);}}}}",
                 });
 
-            outputCompilation
-                .GetTypeByMetadataName("System.Runtime.CompilerServices.ModuleInitializerAttribute")
-                .Should()
-                .NotBeNull();
-
-            outputCompilation
-                .GetTypeByMetadataName("SourceExpander.EmbeddedGenerator.ModuleInitializer")
-                .Should()
-                .NotBeNull();
-
-            outputCompilation
-                .GetTypeByMetadataName("SourceExpander.EmbeddedGenerator.ModuleInitializer")
-                .GetMembers("sourceFileInfos")
-                .Should()
-                .ContainSingle();
-
             var newTree = outputCompilation.SyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("internal static class ModuleInitializer"))
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: System.Reflection.AssemblyMetadataAttribute"))
                 .Which;
 
             newTree.GetDiagnostics().Should().BeEmpty();
@@ -143,12 +127,7 @@ namespace SourceExpander.Embedder.Test
             outputCompilation.SyntaxTrees
                 .Should().HaveCount(TestSyntaxesCount + 1);
 
-            var diagnostic = diagnostics.Should().ContainSingle().Which;
-            diagnostic.Id.Should().Be("EMBED0001");
-            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Info);
-            diagnostic.Descriptor.Title.ToString()
-                .Should()
-                .Contain("need class SourceExpander.SourceFileInfo");
+            diagnostics.Should().BeEmpty();
         }
 
         static readonly int TestSyntaxesCount = GetTestSyntaxes().Count();
