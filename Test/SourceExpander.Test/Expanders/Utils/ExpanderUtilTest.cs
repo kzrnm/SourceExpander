@@ -5,7 +5,7 @@ namespace SourceExpander.Expanders.Utils
 {
     public class ExpanderUtilTest
     {
-        public static TheoryData ToLinesData = new TheoryData<string, string[]>
+        public static readonly TheoryData ToLinesData = new TheoryData<string, string[]>
         {
             {
                 "abc\r\ndef\nghi\rjkl\nmnopq\r\n\r\nrstuvwxyz",
@@ -21,7 +21,7 @@ namespace SourceExpander.Expanders.Utils
         }
 
 
-        public static TheoryData ToSimpleClassNameData = new TheoryData<string, string>
+        public static readonly TheoryData ToSimpleClassNameData = new TheoryData<string, string>
         {
             {
                 "System.Console",
