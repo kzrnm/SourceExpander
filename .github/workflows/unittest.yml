@@ -1,0 +1,59 @@
+name: test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/**"
+      - "Base32768.Test/test-data/**"
+      - "**.cs"
+      - "!**.md"
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "Base32768.Test/test-data/**"
+      - "**.cs"
+      - "!**.md"
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  NUGET_XMLDOC_MODE: skip
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+      - name: Install dotnet-format
+        run: dotnet tool install --global dotnet-format
+      - name: Format
+        run: dotnet format SourceExpander.sln --check --dry-run
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+      - uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      - name: Install dependencies
+        run: dotnet restore SourceExpander.sln
+      - name: Build
+        run: dotnet build SourceExpander.sln --no-restore
+      - name: Test
+        run: dotnet test SourceExpander.sln --no-restore --verbosity normal
