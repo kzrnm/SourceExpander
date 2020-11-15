@@ -6,14 +6,12 @@ on:
       - master
     paths:
       - ".github/workflows/**"
-      - "Base32768.Test/test-data/**"
-      - "**.cs"
+      - "**"
       - "!**.md"
   pull_request:
     paths:
       - ".github/workflows/**"
-      - "Base32768.Test/test-data/**"
-      - "**.cs"
+      - "**"
       - "!**.md"
 
 env:
