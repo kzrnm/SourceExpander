@@ -21,10 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../SourceExpander/**/*.cs" Visible="false" />
+    <Compile Include="../SourceExpander.Cli/**/*.cs" Visible="false" />
     <Compile Include="../SourceExpander.Core/*.cs" Visible="false" />
-    <Compile Remove="../SourceExpander/obj/**/*.cs" />
-    <Compile Remove="../SourceExpander/**/AssemblyInfo.cs" />
+    <Compile Remove="../SourceExpander.Cli/obj/**/*.cs" />
+    <Compile Remove="../SourceExpander.Cli/**/AssemblyInfo.cs" />
     <Compile Include="../SourceExpander.Share/**/*.cs" />
   </ItemGroup>
 

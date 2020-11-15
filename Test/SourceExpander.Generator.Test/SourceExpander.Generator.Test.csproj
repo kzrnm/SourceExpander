@@ -39,7 +39,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="SampleLibrary.dll">
+    <None Update="SampleLibrary.Old.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

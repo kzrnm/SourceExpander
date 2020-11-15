@@ -2,9 +2,7 @@
 
   <ItemGroup  Condition="$(ProjectName.StartsWith('Sample'))" >
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
-  </ItemGroup>
-  <ItemGroup  Condition="$(ProjectName.StartsWith('Sample')) And !$(ProjectName.EndsWith('Generator'))" >
-    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
+    <ProjectReference Include="..\_SampleLibrary2\_SampleLibrary2.csproj" />
   </ItemGroup>
 
 </Project>

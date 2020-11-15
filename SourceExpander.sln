@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Core", "Source\SourceExpander.Core\SourceExpander.Core.csproj", "{B0FE8EDC-D4AF-4325-9C76-A1B378BBA761}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Cli", "Source\SourceExpander\SourceExpander.Cli.csproj", "{E6A37C11-E09F-4ADB-BEE5-34B0F944C2E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Cli", "Source\SourceExpander.Cli\SourceExpander.Cli.csproj", "{E6A37C11-E09F-4ADB-BEE5-34B0F944C2E0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Cli.Test", "Test\SourceExpander.Test\SourceExpander.Cli.Test.csproj", "{ACC304CF-8094-41AC-97D0-C67103132C8C}"
 EndProject

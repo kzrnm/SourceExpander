@@ -1,4 +1,4 @@
-using SampleLibrary;
+﻿using SampleLibrary;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -20,6 +20,6 @@ class Program
     {
         Expand();
         Console.WriteLine(42);
-        Put.WriteRandom();
+        Put2.Write();
     }
 }

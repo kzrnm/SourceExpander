@@ -53,11 +53,13 @@ class Program2
                     path: "/home/source/Program2.cs"),
             };
 
-            var sampleReference = MetadataReference.CreateFromFile(GetSampleDllPath());
+            var sampleReferences = new[] {
+                MetadataReference.CreateFromFile(GetSampleDllPath()),
+            };
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
-                references: defaultMetadatas.Append(sampleReference),
+                references: defaultMetadatas.Concat(sampleReferences),
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                     { "CS8019", ReportDiagnostic.Suppress },
@@ -98,7 +100,6 @@ class Program
                     path: "/home/source/Program.cs"),
             };
 
-            var sampleReference = MetadataReference.CreateFromFile(GetSampleDllPath());
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
@@ -127,7 +128,7 @@ class Program
         }
 
         static string GetSampleDllPath()
-            => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SampleLibrary.dll");
+            => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SampleLibrary.Old.dll");
 
         static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
         static IEnumerable<MetadataReference> GetDefaulMetadatas()

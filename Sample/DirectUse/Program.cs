@@ -8,6 +8,6 @@ class Program
     {
         Expander.Expand(expandMethod: ExpandMethod.All);
         Console.WriteLine(42);
-        Put.WriteRandom();
+        Put2.Write();
     }
 }
