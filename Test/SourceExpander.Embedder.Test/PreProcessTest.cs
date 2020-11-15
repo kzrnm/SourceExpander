@@ -1,11 +1,8 @@
 ﻿extern alias Core;
-
-using System;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Newtonsoft.Json;
 using Xunit;
 using static SourceExpander.Embedder.Test.Util;
 
@@ -46,7 +43,7 @@ path: "Program.cs") },
                 .Should()
                 .ContainSingle(tree => tree.FilePath.Contains("EmbeddedSourceCode.Metadata.Generated.cs"))
                 .Which;
-            newTree.ToString().Should().StartWith("[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\", ");
+            newTree.ToString().Should().StartWith("[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",");
             newTree.GetDiagnostics().Should().BeEmpty();
         }
     }

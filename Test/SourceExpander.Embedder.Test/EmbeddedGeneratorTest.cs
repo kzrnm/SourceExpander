@@ -67,8 +67,9 @@ namespace SourceExpander.Embedder.Test
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
-            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode");
-            JsonConvert.DeserializeObject<SourceFileInfo[]>(metadata["SourceExpander.EmbeddedSourceCode"])
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            JsonConvert.DeserializeObject<SourceFileInfo[]>(SourceFileInfoUtil.FromGZipBase32768(metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"]))
                 .Should()
                 .BeEquivalentTo(
                 new SourceFileInfo

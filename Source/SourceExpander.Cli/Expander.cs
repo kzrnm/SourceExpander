@@ -24,13 +24,10 @@ namespace SourceExpander
              .SelectMany(a => a.GetCustomAttributes<AssemblyMetadataAttribute>())
              .SelectMany(ParseEmbeddedJson);
 
-        private static IEnumerable<SourceFileInfo> ParseEmbeddedJson(AssemblyMetadataAttribute metadata)
+        internal static IEnumerable<SourceFileInfo> ParseEmbeddedJson(AssemblyMetadataAttribute metadata)
         {
-            if (metadata.Key != "SourceExpander.EmbeddedSourceCode")
-                return Array.Empty<SourceFileInfo>();
-            using var ms = new MemoryStream(new UTF8Encoding(false).GetBytes(metadata.Value));
-            var serializer = new DataContractJsonSerializer(typeof(List<SourceFileInfo>));
-            return (List<SourceFileInfo>)serializer.ReadObject(ms);
+            var list = SourceFileInfoUtil.GetAttributeSourceFileInfos(new KeyValuePair<string, string>(metadata.Key, metadata.Value));
+            return ((IEnumerable<SourceFileInfo>?)list) ?? Array.Empty<SourceFileInfo>();
         }
 
         public static Expander Create(string code, ExpandMethod expandMethod)

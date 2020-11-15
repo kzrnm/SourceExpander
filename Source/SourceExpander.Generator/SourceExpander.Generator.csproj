@@ -5,7 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;IDE0057</NoWarn>
+    <NoWarn>1701;1702;IDE0056;IDE0057</NoWarn>
 
     <PackageId>SourceExpander.Generator</PackageId>
     <Description>A source generator that expanding source code.</Description>

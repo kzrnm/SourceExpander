@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
   </ItemGroup>
 
 </Project>

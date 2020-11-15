@@ -11,32 +11,49 @@ namespace SourceExpander.Embedder.Test
 {
     public class OtherDependecyTest
     {
-        private static Lazy<CompilationReference> OtherDependecy = new Lazy<CompilationReference>(() =>
+        private readonly Dictionary<string, CompilationReference> otherDependecies = new Dictionary<string, CompilationReference>();
+        public OtherDependecyTest()
         {
-            var syntax = CSharpSyntaxTree.ParseText(@"
-namespace Other{
-    public static class C{
-        public static void P() => System.Console.WriteLine();
-    }
-}", path: @"/home/other/C.cs");
-            var compilation = CSharpCompilation.Create("OtherDependecy",
-                syntaxTrees: new[] { syntax },
-                references: Util.defaultMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            var syntax = CSharpSyntaxTree.ParseText(
+                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}",
+                path: @"/home/other/C.cs");
 
-            var generator = new EmbeddedGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var di);
+            {
+                var compilation = CSharpCompilation.Create("OtherDependecy",
+                    syntaxTrees: new[] {
+                        syntax,
+                    },
+                    references: Util.defaultMetadatas,
+                    options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                );
 
-            return outputCompilation.ToMetadataReference();
-        });
+                var generator = new EmbeddedGenerator();
+                var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+                driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+                otherDependecies["current"] = outputCompilation.ToMetadataReference();
+            }
+            {
+                var compilation = CSharpCompilation.Create("OtherDependecy",
+                    syntaxTrees: new[] {
+                        syntax,
+                        CSharpSyntaxTree.ParseText(
+                        @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependecy>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
+                        path: @"/home/other/AssemblyInfo.cs")
+                    },
+                    references: Util.defaultMetadatas,
+                    options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                );
+                otherDependecies["old"] = compilation.ToMetadataReference();
+            }
+        }
 
-        [Fact]
-        public void OtherTest()
+
+        [Theory]
+        [InlineData("old")]
+        [InlineData("current")]
+        public void OtherTest(string name)
         {
-            var otherRef = OtherDependecy.Value;
-
-
+            var otherDependecy = otherDependecies[name];
             var compilation = CSharpCompilation.Create("Mine",
                 syntaxTrees: new[] {
                     CSharpSyntaxTree.ParseText(@"
@@ -60,7 +77,7 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: Util.defaultMetadatas.Append(OtherDependecy.Value),
+                references: Util.defaultMetadatas.Append(otherDependecy),
                 options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
 
@@ -69,7 +86,7 @@ namespace Mine{
 
             var generator = new EmbeddedGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
 
             generator.ResolveFiles(compilation)
                 .Should()

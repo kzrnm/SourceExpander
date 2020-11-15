@@ -18,13 +18,17 @@ namespace SourceExpander
             var infos = ResolveFiles(compilation);
 
             var json = infos.ToJson();
+            var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
             context.AddSource("EmbeddedSourceCode.Metadata.Generated.cs",
-                SourceText.From($"[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\", @\"{json.Replace("\"", "\"\"")}\")]", Encoding.UTF8));
+                SourceText.From(
+                    "[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",@\"" +
+                    gZipBase32768 +
+                    "\")]", Encoding.UTF8));
         }
 
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
         {
-            var embedded = SourceFileInfoUtil.GetEmbeddedSourceFiles(compilation);
+            var embedded = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
             var commonPrefix = compilation.ResolveCommomPrefix();
             var infos = ResolveRaw(compilation,
                 compilation.SyntaxTrees.Select(tree => ParseSource(compilation, tree, commonPrefix)).ToArray(),

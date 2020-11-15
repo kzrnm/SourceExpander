@@ -33,7 +33,7 @@ namespace SourceExpander
                 compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), opts));
             }
 
-            return (compilation, SourceFileInfoUtil.GetEmbeddedSourceFiles(compilation));
+            return (compilation, AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation));
         }
         static string MakeExpanded(IEnumerable<CSharpSyntaxTree> trees, CSharpCompilation compilation, SourceFileInfo[] infos)
         {

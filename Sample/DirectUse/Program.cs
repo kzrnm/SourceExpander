@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        Expander.Expand(expandMethod: ExpandMethod.All);
         Console.WriteLine(42);
         Put2.Write();
+        Expander.Expand(expandMethod: ExpandMethod.All);
     }
 }
