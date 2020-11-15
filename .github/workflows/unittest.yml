@@ -26,23 +26,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1
       - name: Install dotnet-format
         run: dotnet tool install --global dotnet-format
       - name: Format
         run: dotnet format SourceExpander.sln --check --dry-run
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1
+          dotnet-version: 3.1.x
+      - name: Setup .NET Core SDK 5.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
       - uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/.nuget/packages
