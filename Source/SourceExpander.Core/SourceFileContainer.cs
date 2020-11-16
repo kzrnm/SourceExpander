@@ -16,7 +16,8 @@ namespace SourceExpander
             foreach (var sf in origs)
             {
                 if (sf.FileName == null) throw new ArgumentException($"({nameof(sf.FileName)} is null");
-                if (_sourceFiles.ContainsKey(sf.FileName)) throw new ArgumentException($"duplicate {nameof(sf.FileName)}: {sf.FileName}");
+                if (_sourceFiles.ContainsKey(sf.FileName))
+                    throw new ArgumentException($"duplicate {nameof(sf.FileName)}: {sf.FileName}");
                 _sourceFiles.Add(sf.FileName, sf);
             }
         }

@@ -34,4 +34,10 @@
     <ProjectReference Include="..\..\Source\SourceExpander.Cli\SourceExpander.Cli.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="testdata\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

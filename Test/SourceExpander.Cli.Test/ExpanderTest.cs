@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using SourceExpander.Expanders;
 using Xunit;
@@ -52,6 +55,27 @@ namespace SourceExpander.Test
             "}",
             "}",
             };
+        }
+
+
+        [Fact]
+        public void LoadEmbedded()
+        {
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException();
+
+            var sourceFileInfos = Assembly.LoadFile(Path.Combine(dir, "testdata", "SampleLibrary.Old.dll"))
+                       .GetCustomAttributes<AssemblyMetadataAttribute>()
+                       .SelectMany(Expander.ParseEmbeddedJson);
+            sourceFileInfos.Select(s => s.FileName)
+                .Should()
+                .BeEquivalentTo("_SampleLibrary>Bit.cs", "_SampleLibrary>Put.cs", "_SampleLibrary>Xorshift.cs");
+
+            var sourceFileInfos2 = Assembly.LoadFile(Path.Combine(dir, "testdata", "SampleLibrary2.dll"))
+           .GetCustomAttributes<AssemblyMetadataAttribute>()
+           .SelectMany(Expander.ParseEmbeddedJson);
+            sourceFileInfos2.Select(s => s.FileName)
+                .Should()
+                .BeEquivalentTo("_SampleLibrary2>Put2.cs");
         }
     }
 }

@@ -46,16 +46,14 @@ class Program2
     static void Main()
     {
         Console.WriteLine(42);
-        Put.WriteRandom();
+        Put2.Write();
     }
 }",
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
                     path: "/home/source/Program2.cs"),
             };
 
-            var sampleReferences = new[] {
-                MetadataReference.CreateFromFile(GetSampleDllPath()),
-            };
+            var sampleReferences = GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
@@ -77,7 +75,11 @@ class Program2
                 .Should()
                 .NotContain("System.Reflection")
                 .And
-                .NotContain("System.Math");
+                .NotContain("System.Math")
+                .And
+                .Contain("class Xorshift")
+                .And
+                .Contain("class Put2");
         }
         [Fact]
         public void GenerateNotFoundTest()
@@ -124,11 +126,19 @@ class Program
                 .Should()
                 .NotContain("System.Reflection")
                 .And
-                .NotContain("System.Math");
+                .NotContain("System.Math")
+                .And
+                .NotContain("class Xorshift")
+                .And
+                .NotContain("class Put2");
         }
 
-        static string GetSampleDllPath()
-            => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SampleLibrary.Old.dll");
+        static IEnumerable<string> GetSampleDllPaths()
+        {
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            yield return Path.Combine(dir, "testdata", "SampleLibrary.Old.dll");
+            yield return Path.Combine(dir, "testdata", "SampleLibrary2.dll");
+        }
 
         static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
         static IEnumerable<MetadataReference> GetDefaulMetadatas()
