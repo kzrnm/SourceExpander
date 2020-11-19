@@ -29,7 +29,9 @@ jobs:
           $ver = ([string]$doc.Project.PropertyGroup.Version).Trim()
           echo "::set-output name=version::$ver"
           $vx = [version]::new()
-          echo "::set-output name=valid::$([version]::TryParse($ver, [ref]$vx).ToString().ToLower())"
+          echo "${GITHUB_REF#refs/tags/}"
+          $valid = [version]::TryParse($ver, [ref]$vx)
+          echo "::set-output name=valid::$($valid.ToString().ToLower())"
       - name: Check tag
         uses: mukunku/tag-exists-action@v1.0.0
         id: check-tag
@@ -37,8 +39,8 @@ jobs:
           tag: ${{ steps.get-version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo " exists? -- ${{ steps.check-tag.outputs.exists }}"
-      - run: echo " valid? -- ${{ steps.get-version.outputs.valid }}"
+      - run: echo "exists? -- ${{ steps.check-tag.outputs.exists }}"
+      - run: echo "valid? -- ${{ steps.get-version.outputs.valid }}"
 
   new-version-only:
     runs-on: ubuntu-latest
