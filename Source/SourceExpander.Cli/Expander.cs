@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using SourceExpander.Expanders;
 
 namespace SourceExpander
