@@ -119,7 +119,7 @@ jobs:
           artifacts: "./dist/*.nupkg"
           prerelease: ${{ needs.get-version.outputs.is-prerelease }}
   publish:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: [build]
     steps:
       - name: Download artifact
@@ -129,7 +129,3 @@ jobs:
           path: dist
       - name: Upload nuget
         run: dotnet nuget push **/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
-      - name: Setup GitHub nuget
-        run: dotnet nuget add source https://nuget.pkg.github.com/${{ github.actor }}/index.json -n github -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload GitHub nuget
-        run: dotnet nuget push **/*.nupkg --skip-duplicate --source "github"
