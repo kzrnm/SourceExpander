@@ -101,33 +101,31 @@ namespace SourceExpander.Embedder.Test
                     Dependencies = Array.Empty<string>(),
                     CodeBody = "namespace Test{static class Put{public class Nested{ public static void Write(string v){Debug.WriteLine(v);}}}}",
                 });
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
+            diagnostics.Should().BeEmpty();
 
-            var newTree = outputCompilation.SyntaxTrees
+            outputCompilation.SyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: System.Reflection.AssemblyMetadataAttribute"))
-                .Which;
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","));
 
-            newTree.GetDiagnostics().Should().BeEmpty();
         }
 
         [Fact]
-        public void GenerateNoSourceInfoClassTest()
+        public void GenerateNoSyntaxesTest()
         {
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
-                syntaxTrees: GetTestSyntaxes(),
+                syntaxTrees: Array.Empty<SyntaxTree>(),
                 references: defaultMetadatas,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
+            compilation.SyntaxTrees.Should().BeEmpty();
             compilation.GetDiagnostics()
                 .Should().BeEmpty();
 
             var generator = new EmbeddedGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            outputCompilation.SyntaxTrees
-                .Should().HaveCount(TestSyntaxesCount + 1);
-
+            outputCompilation.SyntaxTrees.Should().BeEmpty();
             diagnostics.Should().BeEmpty();
         }
 

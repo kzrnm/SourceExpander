@@ -16,16 +16,19 @@ namespace SourceExpander
         {
             var compilation = (CSharpCompilation)context.Compilation;
             var infos = ResolveFiles(compilation);
+            if (infos.Length == 0)
+                return;
 
             var json = infos.ToJson();
             var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
             context.AddSource("EmbeddedSourceCode.Metadata.Generated.cs",
                 SourceText.From(
-                    "[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",@\"" +
-                    gZipBase32768 +
-                    "\")]", Encoding.UTF8));
+                    "[assembly: System.Reflection.AssemblyMetadataAttribute(" +
+                    ToLiteral("SourceExpander.EmbeddedSourceCode.GZipBase32768") +
+                    "," +
+                    ToLiteral(gZipBase32768) +
+                    ")]", Encoding.UTF8));
         }
-
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
         {
             var embedded = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
@@ -109,6 +112,9 @@ namespace SourceExpander
             }
             return symbol.ContainingType?.ConstructedFrom?.ToDisplayString() ?? symbol.ToDisplayString();
         }
+
+        private static string ToLiteral(string str)
+            => SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(str)).ToFullString();
 
         public void Initialize(GeneratorInitializationContext context) { }
     }
