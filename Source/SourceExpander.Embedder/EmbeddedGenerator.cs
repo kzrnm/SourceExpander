@@ -24,9 +24,9 @@ namespace SourceExpander
             context.AddSource("EmbeddedSourceCode.Metadata.Generated.cs",
                 SourceText.From(
                     "[assembly: System.Reflection.AssemblyMetadataAttribute(" +
-                    ToLiteral("SourceExpander.EmbeddedSourceCode.GZipBase32768") +
+                    "SourceExpander.EmbeddedSourceCode.GZipBase32768".ToLiteral() +
                     "," +
-                    ToLiteral(gZipBase32768) +
+                    gZipBase32768.ToLiteral() +
                     ")]", Encoding.UTF8));
         }
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
@@ -112,9 +112,6 @@ namespace SourceExpander
             }
             return symbol.ContainingType?.ConstructedFrom?.ToDisplayString() ?? symbol.ToDisplayString();
         }
-
-        private static string ToLiteral(string str)
-            => SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(str)).ToFullString();
 
         public void Initialize(GeneratorInitializationContext context) { }
     }

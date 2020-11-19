@@ -46,16 +46,14 @@ namespace SourceExpander
             foreach (var tree in trees)
             {
                 var newCode = new CompilationExpander(tree, compilation, new SourceFileContainer(infos)).ExpandedString();
-                sb.AppendLine($"{{{ToLiteral(tree.FilePath)}, new SourceCode{{ Path={ToLiteral(tree.FilePath)}, Code={ToLiteral(newCode)} }} }},");
+                var filePathLiteral = tree.FilePath.ToLiteral();
+                sb.AppendLine($"{{{filePathLiteral}, new SourceCode{{ Path={filePathLiteral}, Code={newCode.ToLiteral()} }} }},");
             }
             sb.AppendLine("};");
             sb.AppendLine("}}");
 
             return sb.ToString();
         }
-
-        private static string ToLiteral(string str)
-            => SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(str)).ToFullString();
 
         public void Initialize(GeneratorInitializationContext context) { }
     }
