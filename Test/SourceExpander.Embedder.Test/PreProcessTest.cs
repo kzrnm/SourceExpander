@@ -43,7 +43,10 @@ path: "Program.cs") },
                 .Should()
                 .ContainSingle(tree => tree.FilePath.Contains("EmbeddedSourceCode.Metadata.Generated.cs"))
                 .Which;
-            newTree.ToString().Should().StartWith("[assembly: System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",");
+            newTree.ToString().Should().ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                );
             newTree.GetDiagnostics().Should().BeEmpty();
         }
     }

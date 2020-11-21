@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -21,13 +22,17 @@ namespace SourceExpander
 
             var json = infos.ToJson();
             var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
+
+            static string MakeAssemblyMetadataAttribute(string key, string value)
+                => $"[assembly: AssemblyMetadataAttribute({key.ToLiteral()},{value.ToLiteral()})]";
+
+
             context.AddSource("EmbeddedSourceCode.Metadata.Generated.cs",
                 SourceText.From(
-                    "[assembly: System.Reflection.AssemblyMetadataAttribute(" +
-                    "SourceExpander.EmbeddedSourceCode.GZipBase32768".ToLiteral() +
-                    "," +
-                    gZipBase32768.ToLiteral() +
-                    ")]", Encoding.UTF8));
+                    "using System.Reflection;" +
+                    MakeAssemblyMetadataAttribute("SourceExpander.EmbedderVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()) +
+                    MakeAssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768)
+                , Encoding.UTF8));
         }
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
         {
