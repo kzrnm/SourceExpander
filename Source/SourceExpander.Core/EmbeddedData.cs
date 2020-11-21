@@ -32,7 +32,5 @@ namespace SourceExpander
             }
             return new EmbeddedData(assemblyName, version, list.ToArray());
         }
-
-
     }
 }

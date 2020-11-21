@@ -49,7 +49,7 @@ namespace SourceExpander
         public IEnumerable<string> Keys => _sourceFiles.Keys;
         public IEnumerable<SourceFileInfo> Values => _sourceFiles.Values;
         public bool ContainsKey(string fileName) => _sourceFiles.ContainsKey(fileName);
-        public bool TryGetValue(string fileName, out SourceFileInfo value) => _sourceFiles.TryGetValue(fileName, out value);
+        public bool TryGetValue(string fileName, out SourceFileInfo? value) => _sourceFiles.TryGetValue(fileName, out value);
         public Dictionary<string, SourceFileInfo>.ValueCollection.Enumerator GetEnumerator() => _sourceFiles.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _sourceFiles.Values.GetEnumerator();
         IEnumerator<SourceFileInfo> IEnumerable<SourceFileInfo>.GetEnumerator() => _sourceFiles.Values.GetEnumerator();
