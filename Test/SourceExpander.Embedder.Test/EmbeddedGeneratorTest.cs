@@ -44,6 +44,10 @@ namespace SourceExpander.Embedder.Test
                 SourceFileInfoUtil.FromGZipBase32768(embedded))
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
 
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
             diagnostics.Should().BeEmpty();
