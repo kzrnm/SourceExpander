@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);IDE0022</NoWarn>
+    <NoWarn>$(NoWarn);IDE0022;CA2211</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj">
-      <Aliases>Core</Aliases>
-    </ProjectReference>
+    <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
     <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj" />
   </ItemGroup>
 

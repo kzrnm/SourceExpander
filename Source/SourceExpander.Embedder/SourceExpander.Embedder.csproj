@@ -38,6 +38,7 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" GeneratePathProperty="true" />
     <PackageReference Include="Base32768" Version="1.0.3" GeneratePathProperty="true" />
   </ItemGroup>
 
@@ -52,6 +53,7 @@
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PkgSourceExpander_Core)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
 
@@ -59,6 +61,7 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\dotnet\" />
       <TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\" />
+      <TfmSpecificPackageFile Include="$(PkgSourceExpander_Core)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\" />
       <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
     </ItemGroup>
   </Target>

@@ -12,9 +12,9 @@
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
 
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <Compile Include="../SourceExpander.Share/SourceExpander.Core/SourceFileInfo.cs" />
+    <PackageReference Include="Base32768" Version="1.0.3" />
   </ItemGroup>
 
 </Project>

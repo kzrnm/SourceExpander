@@ -1,6 +1,4 @@
-﻿extern alias Core;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -10,7 +8,7 @@ namespace SourceExpander.Embedder.Test
     class Util
     {
         public static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
-        public static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(Core.SourceExpander.SourceFileInfo).Assembly.Location);
+        public static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(SourceFileInfo).Assembly.Location);
 
         private static IEnumerable<MetadataReference> GetDefaulMetadatas()
         {

@@ -1,5 +1,4 @@
-﻿extern alias Core;
-using System.Linq;
+﻿using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
