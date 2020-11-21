@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -8,7 +7,6 @@ using System.Runtime.Serialization;
 namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
     [DataContract]
     public class SourceFileInfo
     {
