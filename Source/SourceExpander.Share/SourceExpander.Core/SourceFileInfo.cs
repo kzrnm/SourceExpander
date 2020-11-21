@@ -23,7 +23,6 @@ namespace SourceExpander
         [DataMember]
         public string? CodeBody { get; set; }
 
-        [IgnoreDataMember]
-        public string RestoredCode => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
+        public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
     }
 }

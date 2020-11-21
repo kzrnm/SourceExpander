@@ -20,7 +20,7 @@ namespace SourceExpander.Expanders
             var dllPathes = Directory.EnumerateFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "*.dll");
             Compilation = CSharpCompilation.Create("compilation",
                syntaxTrees: SourceFileContainer
-               .Select(s => CSharpSyntaxTree.ParseText(s.RestoredCode))
+               .Select(s => CSharpSyntaxTree.ParseText(s.Restore()))
                .Append(OrigTree)
                .OfType<CSharpSyntaxTree>(),
                references: dllPathes.Select(p => MetadataReference.CreateFromFile(p)));
