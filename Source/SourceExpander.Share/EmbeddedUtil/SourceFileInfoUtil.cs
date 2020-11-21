@@ -42,13 +42,10 @@ namespace SourceExpander
         }
         public static string FromGZipBase32768(string compressed)
         {
-            using var msIn = new MemoryStream(Base32768.Decode(compressed));
-            using var msOut = new MemoryStream();
-            using (var gz = new GZipStream(msIn, CompressionMode.Decompress))
-                gz.CopyTo(msOut);
-            return new UTF8Encoding(false).GetString(msOut.ToArray());
+            using var ms = FromGZipBase32768Stream(compressed);
+            return new UTF8Encoding(false).GetString(ms.ToArray());
         }
-        public static Stream FromGZipBase32768Stream(string compressed)
+        public static MemoryStream FromGZipBase32768Stream(string compressed)
         {
             using var msIn = new MemoryStream(Base32768.Decode(compressed));
             var msOut = new MemoryStream();
