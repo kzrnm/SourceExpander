@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator.Test", "Test\SourceExpander.Generator.Test\SourceExpander.Generator.Test.csproj", "{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceExpander.Core.Test", "Test\SourceExpander.Core.Test\SourceExpander.Core.Test.csproj", "{DF67761D-B14E-46FB-8904-BC44399ABEC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF67761D-B14E-46FB-8904-BC44399ABEC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF67761D-B14E-46FB-8904-BC44399ABEC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF67761D-B14E-46FB-8904-BC44399ABEC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF67761D-B14E-46FB-8904-BC44399ABEC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

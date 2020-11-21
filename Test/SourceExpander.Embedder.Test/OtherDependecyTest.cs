@@ -92,21 +92,21 @@ namespace Mine{
                 .Should()
                 .BeEquivalentTo(
                 new SourceFileInfo
-                {
-                    FileName = "Mine>Program.cs",
-                    TypeNames = new string[] { "Mine.Program" },
-                    Usings = new string[] { "using OC = Other.C;" },
-                    Dependencies = new string[] { "OtherDependecy>C.cs", "Mine>C.cs" },
-                    CodeBody = "namespace Mine{ public static class Program { public static void Main() { OC.P(); C.P(); } } }",
-                },
+                (
+                    "Mine>Program.cs",
+                    new string[] { "Mine.Program" },
+                    new string[] { "using OC = Other.C;" },
+                    new string[] { "OtherDependecy>C.cs", "Mine>C.cs" },
+                    "namespace Mine{ public static class Program { public static void Main() { OC.P(); C.P(); } } }"
+                ),
                 new SourceFileInfo
-                {
-                    FileName = "Mine>C.cs",
-                    TypeNames = new string[] { "Mine.C" },
-                    Usings = Array.Empty<string>(),
-                    Dependencies = Array.Empty<string>(),
-                    CodeBody = "namespace Mine{ public static class C { public static void P() => System.Console.WriteLine(); } }",
-                });
+                (
+                    "Mine>C.cs",
+                    new string[] { "Mine.C" },
+                    Array.Empty<string>(),
+                    Array.Empty<string>(),
+                    "namespace Mine{ public static class C { public static void P() => System.Console.WriteLine(); } }"
+                ));
         }
     }
 }

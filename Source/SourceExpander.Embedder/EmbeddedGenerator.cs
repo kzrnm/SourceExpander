@@ -75,13 +75,13 @@ namespace SourceExpander
 
             foreach (var raw in infos)
                 yield return new SourceFileInfo
-                {
-                    FileName = raw.FileName,
-                    TypeNames = raw.TypeNames,
-                    Usings = raw.Usings,
-                    CodeBody = raw.CodeBody,
-                    Dependencies = GetDependencies(raw),
-                };
+                (
+                    raw.FileName,
+                    raw.TypeNames,
+                    raw.Usings,
+                    GetDependencies(raw),
+                    raw.CodeBody
+                );
         }
         private SourceFileInfoRaw ParseSource(Compilation compilation, SyntaxTree tree, string commonPrefix)
         {

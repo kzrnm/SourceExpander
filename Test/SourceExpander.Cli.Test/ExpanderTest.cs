@@ -63,16 +63,12 @@ namespace SourceExpander.Test
         {
             var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException();
 
-            var sourceFileInfos = Assembly.LoadFile(Path.Combine(dir, "testdata", "SampleLibrary.Old.dll"))
-                       .GetCustomAttributes<AssemblyMetadataAttribute>()
-                       .SelectMany(Expander.ParseEmbeddedJson);
+            var sourceFileInfos = Expander.ParseEmbeddedJson(Assembly.LoadFile(Path.Combine(dir, "testdata", "SampleLibrary.Old.dll")));
             sourceFileInfos.Select(s => s.FileName)
                 .Should()
                 .BeEquivalentTo("_SampleLibrary>Bit.cs", "_SampleLibrary>Put.cs", "_SampleLibrary>Xorshift.cs");
 
-            var sourceFileInfos2 = Assembly.LoadFile(Path.Combine(dir, "testdata", "SampleLibrary2.dll"))
-           .GetCustomAttributes<AssemblyMetadataAttribute>()
-           .SelectMany(Expander.ParseEmbeddedJson);
+            var sourceFileInfos2 = Expander.ParseEmbeddedJson(Assembly.LoadFile(Path.Combine(dir, "testdata", "SampleLibrary2.dll")));
             sourceFileInfos2.Select(s => s.FileName)
                 .Should()
                 .BeEquivalentTo("_SampleLibrary2>Put2.cs");

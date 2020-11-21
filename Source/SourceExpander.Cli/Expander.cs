@@ -19,13 +19,12 @@ namespace SourceExpander
 
         private static IEnumerable<SourceFileInfo> GetEmbeddedSourceFiles()
              => AppDomain.CurrentDomain.GetAssemblies()
-             .SelectMany(a => a.GetCustomAttributes<AssemblyMetadataAttribute>())
              .SelectMany(ParseEmbeddedJson);
 
-        internal static IEnumerable<SourceFileInfo> ParseEmbeddedJson(AssemblyMetadataAttribute metadata)
+        internal static IEnumerable<SourceFileInfo> ParseEmbeddedJson(Assembly assembly)
         {
-            var list = SourceFileInfoUtil.GetAttributeSourceFileInfos(new KeyValuePair<string, string>(metadata.Key, metadata.Value));
-            return ((IEnumerable<SourceFileInfo>?)list) ?? Array.Empty<SourceFileInfo>();
+            return EmbeddedData.Create(assembly.FullName, assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                .Select(metadata => new KeyValuePair<string, string>(metadata.Key, metadata.Value))).Sources;
         }
 
         public static Expander Create(string code, ExpandMethod expandMethod)
@@ -62,13 +61,12 @@ namespace SourceExpander
 
 
         internal static readonly SourceFileInfo s_expanderFileInfo
-            = new SourceFileInfo
-            {
-                FileName = "<Expander>",
-                TypeNames = new string[] { nameof(SourceExpander) + "." + nameof(Expander) },
-                Usings = new string[] { "using System.Diagnostics;", },
-                Dependencies = Array.Empty<string>(),
-                CodeBody = "namespace " +
+            = new SourceFileInfo(
+                "<Expander>",
+                new string[] { nameof(SourceExpander) + "." + nameof(Expander) },
+                new string[] { "using System.Diagnostics;", },
+                Array.Empty<string>(),
+                "namespace " +
              nameof(SourceExpander) +
              " { public static class " +
              nameof(Expander) +
@@ -78,6 +76,6 @@ namespace SourceExpander
              nameof(ExpandMethod) + " expandMethod = " + nameof(ExpandMethod) + "." + nameof(ExpandMethod.All) + ") { } } " +
              "public enum " +
              nameof(ExpandMethod) + " { " + string.Join(", ", typeof(ExpandMethod).GetEnumNames()) + " } }"
-            };
+            );
     }
 }
