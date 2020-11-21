@@ -10,6 +10,7 @@ namespace SourceExpander
     public class SourceFileContainer : IEnumerable<SourceFileInfo>, IEnumerable, IReadOnlyCollection<SourceFileInfo>
     {
         private readonly Dictionary<string, SourceFileInfo> _sourceFiles;
+        // TODO: DELETE
         public SourceFileContainer(IEnumerable<SourceFileInfo> origs)
         {
             _sourceFiles = new Dictionary<string, SourceFileInfo>();
@@ -21,8 +22,30 @@ namespace SourceExpander
                 _sourceFiles.Add(sf.FileName, sf);
             }
         }
+        public SourceFileContainer(IEnumerable<EmbeddedData> embeddedDatas)
+        {
+            _sourceFiles = new Dictionary<string, SourceFileInfo>();
+            foreach (var embedded in embeddedDatas)
+                foreach (var sf in embedded.Sources)
+                {
+                    if (sf.FileName == null) throw new ArgumentException($"({nameof(sf.FileName)} is null");
+                    if (_sourceFiles.ContainsKey(sf.FileName))
+                        throw new ArgumentException($"duplicate {nameof(sf.FileName)}: {sf.FileName}");
+                    _sourceFiles.Add(sf.FileName, sf);
+                }
+        }
+
         public int Count => _sourceFiles.Count;
-        public SourceFileInfo this[string key] => _sourceFiles[key];
+        public SourceFileInfo this[string key]
+        {
+            set
+            {
+                if (_sourceFiles.ContainsKey(key))
+                    throw new ArgumentException($"duplicate {nameof(key)}: {key}");
+                _sourceFiles.Add(key, value);
+            }
+            get => _sourceFiles[key];
+        }
         public IEnumerable<string> Keys => _sourceFiles.Keys;
         public IEnumerable<SourceFileInfo> Values => _sourceFiles.Values;
         public bool ContainsKey(string fileName) => _sourceFiles.ContainsKey(fileName);

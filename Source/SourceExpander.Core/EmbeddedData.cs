@@ -19,23 +19,16 @@ namespace SourceExpander
         public bool IsEmpty => Sources.Count == 0;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static EmbeddedData Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> keyValuePairs)
+        public static EmbeddedData Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
         {
             Version version = new Version(1, 0, 0);
             var list = new List<SourceFileInfo>();
-            foreach (var pair in keyValuePairs)
+            foreach (var pair in assemblyMetadatas)
             {
-                var attVer = SourceFileInfoUtil.GetAttributeEmbedderVersion(pair);
-                if (attVer != null)
-                {
+                if (SourceFileInfoUtil.GetAttributeEmbedderVersion(pair) is { } attVer)
                     version = attVer;
-                }
-
-                var attinfos = SourceFileInfoUtil.GetAttributeSourceFileInfos(pair);
-                if (attinfos is null)
-                    continue;
-
-                list.AddRange(attinfos);
+                else if (SourceFileInfoUtil.GetAttributeSourceFileInfos(pair) is { } attinfos)
+                    list.AddRange(attinfos);
             }
             return new EmbeddedData(assemblyName, version, list.ToArray());
         }
