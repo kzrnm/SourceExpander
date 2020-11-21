@@ -22,10 +22,9 @@ namespace SourceExpander
              .SelectMany(ParseEmbeddedJson);
 
         internal static IEnumerable<SourceFileInfo> ParseEmbeddedJson(Assembly assembly)
-        {
-            return EmbeddedData.Create(assembly.FullName, assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+            => EmbeddedData.Create(assembly.FullName,
+                assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
                 .Select(metadata => new KeyValuePair<string, string>(metadata.Key, metadata.Value))).Sources;
-        }
 
         public static Expander Create(string code, ExpandMethod expandMethod)
             => Create(code, expandMethod, GetEmbeddedSourceFiles().Append(s_expanderFileInfo));

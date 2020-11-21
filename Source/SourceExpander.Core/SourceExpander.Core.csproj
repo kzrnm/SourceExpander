@@ -11,8 +11,9 @@
     <PackageId>SourceExpander.Core</PackageId>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
 
+    <NoWarn>$(NoWarn);IDE0057</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Base32768" Version="1.0.3" />
   </ItemGroup>

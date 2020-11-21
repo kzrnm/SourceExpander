@@ -54,7 +54,55 @@ namespace SourceExpander
         IEnumerator IEnumerable.GetEnumerator() => _sourceFiles.Values.GetEnumerator();
         IEnumerator<SourceFileInfo> IEnumerable<SourceFileInfo>.GetEnumerator() => _sourceFiles.Values.GetEnumerator();
 
-        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs)
+        /// <summary>
+        /// <para>return <see cref="SourceFileInfo"/> that has TypeNames that overlaps <paramref name="typeNames"/>.</para>
+        /// <para>if <paramref name="typeNameMatch"/> is true, <paramref name="typeNames"/> and <see cref="SourceFileInfo"/> is compared without namespace and type arguments.</para>
+        /// <para>ex. AtCoder.INumOperator&lt;T&gt; → INumOperator</para>
+        /// </summary>
+        /// <param name="typeNames"></param>
+        /// <param name="typeNameMatch"></param>
+        /// <returns></returns>
+        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames, bool typeNameMatch)
+        {
+            static string ToSimpleClassName(string typeName)
+            {
+                int l, r;
+                // AtCoder.INumOperator<T> → INumOperator<T>
+                for (l = typeName.Length - 1; l >= 0; l--)
+                    if (typeName[l] == '.')
+                        break;
+                ++l;
+
+
+                // INumOperator<T> → INumOperator
+                for (r = l; r < typeName.Length; r++)
+                    if (typeName[r] == '<')
+                        break;
+
+                return typeName.Substring(l, r - l);
+            }
+            IEnumerable<SourceFileInfo> ResolveSimpleName(IEnumerable<string> typeNames)
+            {
+                typeNames = typeNames.Select(ToSimpleClassName);
+                var hs = new HashSet<string>(typeNames);
+                foreach (var s in _sourceFiles.Values)
+                    if (hs.Overlaps(s.TypeNames.Select(ToSimpleClassName)))
+                        yield return s;
+            }
+            IEnumerable<SourceFileInfo> ResolveFullName(IEnumerable<string> typeNames)
+            {
+                var hs = new HashSet<string>(typeNames);
+                foreach (var s in _sourceFiles.Values)
+                    if (hs.Overlaps(s.TypeNames))
+                        yield return s;
+            }
+
+            if (typeNameMatch)
+                return ResolveDependency(ResolveSimpleName(typeNames));
+            else
+                return ResolveDependency(ResolveFullName(typeNames));
+        }
+        private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs)
         {
             var result = new List<SourceFileInfo>();
             var fileNameQueue = new Queue<string>();

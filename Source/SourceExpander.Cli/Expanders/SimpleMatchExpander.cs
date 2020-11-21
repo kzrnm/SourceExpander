@@ -34,7 +34,11 @@ namespace SourceExpander.Expanders
                 var remover = new UsingRemover();
                 var newBody = remover.Visit(origRoot).ToString();
 
-                var requiedFiles = SourceFileContainer.ResolveDependency(GetRequiredSources());
+                var requiedFiles = SourceFileContainer.ResolveDependency(
+                    OrigTree.GetRoot().DescendantNodes()
+                    .OfType<SimpleNameSyntax>()
+                    .Select(s => s.Identifier.ToString()),
+                    true);
                 usings.UnionWith(requiedFiles.SelectMany(s => s.Usings));
 
 
@@ -66,18 +70,6 @@ namespace SourceExpander.Expanders
                 yield return "#endregion Expanded";
             }
             return linesCache ??= Array.AsReadOnly(Impl().ToArray());
-        }
-
-        private IEnumerable<SourceFileInfo> GetRequiredSources()
-        {
-            var simpleNames = OrigTree.GetRoot().DescendantNodes()
-                .OfType<SimpleNameSyntax>()
-                .Select(s => s.Identifier.ToString())
-                .Distinct()
-                .ToArray();
-            return SourceFileContainer
-                .Where(s => s.TypeNames.Select(ExpanderUtil.ToSimpleClassName).Intersect(simpleNames).Any())
-                .ToArray();
         }
     }
 }

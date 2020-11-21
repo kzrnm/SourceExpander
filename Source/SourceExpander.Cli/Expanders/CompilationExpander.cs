@@ -48,7 +48,11 @@ namespace SourceExpander.Expanders
             {
                 var semanticModel = Compilation.GetSemanticModel(OrigTree);
                 var origRoot = OrigTree.GetRoot();
-                var requiedFiles = SourceFileContainer.ResolveDependency(GetRequiredSources(semanticModel, origRoot));
+                var requiedFiles = SourceFileContainer.ResolveDependency(
+                    origRoot.DescendantNodes()
+                    .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s).Symbol))
+                    .OfType<string>(),
+                    false);
 
                 var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(
                     semanticModel
@@ -86,18 +90,6 @@ namespace SourceExpander.Expanders
             return linesCache ??= Array.AsReadOnly(Impl().ToArray());
         }
 
-
-        private IEnumerable<SourceFileInfo> GetRequiredSources(SemanticModel semanticModel, SyntaxNode root)
-        {
-            var typeNames = root.DescendantNodes()
-                .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s).Symbol))
-                .OfType<string>()
-                .Distinct()
-                .ToArray();
-            return SourceFileContainer
-                .Where(s => s.TypeNames.Intersect(typeNames).Any())
-                .ToArray();
-        }
         private static string? GetTypeNameFromSymbol(ISymbol? symbol)
         {
             if (symbol == null) return null;
