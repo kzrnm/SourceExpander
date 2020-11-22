@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using SourceExpander.Expanders;
 
 namespace SourceExpander
 {
@@ -46,7 +45,7 @@ namespace SourceExpander
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{");
             foreach (var tree in trees)
             {
-                var newCode = new CompilationExpander(tree, compilation, new SourceFileContainer(infos)).ExpandedString();
+                var newCode = new CompilationExpander(tree, compilation, new SourceFileContainer(infos)).ExpandedCode;
                 var filePathLiteral = tree.FilePath.ToLiteral();
                 sb.AppendLine($"{{{filePathLiteral}, new SourceCode{{ Path={filePathLiteral}, Code={newCode.ToLiteral()} }} }},");
             }

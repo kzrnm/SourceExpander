@@ -25,9 +25,6 @@
 
 
   <ItemGroup>
-    <Compile Include="../SourceExpander.Cli/**/*.cs" Visible="false" />
-    <Compile Remove="../SourceExpander.Cli/obj/**/*.cs" />
-    <Compile Remove="../SourceExpander.Cli/**/AssemblyInfo.cs" />
     <Compile Include="../SourceExpander.Share/**/*.cs" />
   </ItemGroup>
 
