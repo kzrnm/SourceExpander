@@ -29,9 +29,9 @@ namespace SourceExpander
 
             context.AddSource("EmbeddedSourceCode.Metadata.Generated.cs",
                 SourceText.From(
-                    "using System.Reflection;" +
-                    MakeAssemblyMetadataAttribute("SourceExpander.EmbedderVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()) +
-                    MakeAssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768)
+                    "using System.Reflection;"
+                    + MakeAssemblyMetadataAttribute("SourceExpander.EmbedderVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())
+                    + MakeAssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768)
                 , Encoding.UTF8));
         }
         public SourceFileInfo[] ResolveFiles(Compilation compilation)
