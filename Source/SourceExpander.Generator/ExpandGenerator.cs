@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -33,7 +34,7 @@ namespace SourceExpander
                 compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), opts));
             }
 
-            return (compilation, AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation));
+            return (compilation, AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation).SelectMany(e => e.Sources).ToArray());
         }
         static string MakeExpanded(IEnumerable<CSharpSyntaxTree> trees, CSharpCompilation compilation, SourceFileInfo[] infos)
         {

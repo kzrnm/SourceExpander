@@ -86,11 +86,9 @@ namespace Mine{
 
             var generator = new EmbeddedGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
 
-            generator.ResolveFiles(compilation)
-                .Should()
-                .BeEquivalentTo(
+            var expected = new[] {
                 new SourceFileInfo
                 (
                     "Mine>Program.cs",
@@ -106,7 +104,26 @@ namespace Mine{
                     Array.Empty<string>(),
                     Array.Empty<string>(),
                     "namespace Mine{ public static class C { public static void P() => System.Console.WriteLine(); } }"
-                ));
+                )
+            };
+
+            var reporter = new MockDiagnosticReporter();
+            new EmbeddingResolver(compilation, reporter).ResolveFiles()
+                .Should()
+                .BeEquivalentTo(expected);
+
+            reporter.Diagnostics.Should().BeEmpty();
+
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(expected);
+
         }
     }
 }

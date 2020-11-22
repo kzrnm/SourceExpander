@@ -29,9 +29,11 @@ namespace SourceExpander.Embedder.Test
             diagnostics.Should().BeEmpty();
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
-            generator.ResolveFiles(compilation)
+            var reporter = new MockDiagnosticReporter();
+            new EmbeddingResolver(compilation, reporter).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
+            reporter.Diagnostics.Should().BeEmpty();
 
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))

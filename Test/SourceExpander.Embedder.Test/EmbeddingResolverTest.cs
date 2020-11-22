@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Test
 {
-    public class CompilationExtensionTest
+    public class EmbeddingResolverTest
     {
         public static TheoryData ResolveCommomPrefixTestData = new TheoryData<string[], string>
         {
@@ -41,7 +41,7 @@ namespace SourceExpander.Embedder.Test
         [Theory]
         [MemberData(nameof(ResolveCommomPrefixTestData))]
         public void ResolveCommomPrefixTest(IEnumerable<string> strs, string expected)
-            => CompilationExtension.ResolveCommomPrefix(strs).Should().Be(expected);
+            => EmbeddingResolver.ResolveCommomPrefix(strs).Should().Be(expected);
 
     }
 }

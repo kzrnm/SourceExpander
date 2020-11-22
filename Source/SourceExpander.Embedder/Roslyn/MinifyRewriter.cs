@@ -1,9 +1,8 @@
-﻿using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SourceExpander
+namespace SourceExpander.Roslyn
 {
     internal class MinifyRewriter : CSharpSyntaxRewriter
     {

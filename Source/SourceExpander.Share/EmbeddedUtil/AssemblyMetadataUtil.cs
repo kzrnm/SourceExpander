@@ -6,25 +6,20 @@ namespace SourceExpander
 {
     public static class AssemblyMetadataUtil
     {
-        public static SourceFileInfo[] GetEmbeddedSourceFiles(Compilation compilation)
+        public static IEnumerable<EmbeddedData> GetEmbeddedSourceFiles(Compilation compilation)
         {
-            var result = new List<SourceFileInfo>();
             foreach (var reference in compilation.References)
             {
                 var symbol = compilation.GetAssemblyOrModuleSymbol(reference);
                 if (symbol is null)
                     continue;
 
-
-                var name = symbol.Name;
-                foreach (var source in EmbeddedData.Create(symbol.Name, symbol.GetAttributes()
+                yield return EmbeddedData.Create(
+                    symbol.Name,
+                    symbol.GetAttributes()
                     .Select(GetAttributeSourceCode)
-                    .OfType<KeyValuePair<string, string>>()).Sources)
-                {
-                    result.Add(source);
-                }
+                    .OfType<KeyValuePair<string, string>>());
             }
-            return result.ToArray();
         }
 
         static KeyValuePair<string, string>? GetAttributeSourceCode(AttributeData attr)
