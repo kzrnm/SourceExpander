@@ -40,7 +40,7 @@ namespace SourceExpander
         {
             var sb = new StringBuilder();
             sb.AppendLine("using System.Collections.Generic;");
-            sb.AppendLine("namespace Expanded{");
+            sb.AppendLine("namespace SourceExpander.Expanded{");
             sb.AppendLine("public class SourceCode{ public string Path; public string Code; }");
             sb.AppendLine("public static class Expanded{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{");

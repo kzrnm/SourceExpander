@@ -78,7 +78,7 @@ class Program2
                 .Replace("\\r\\n", "\\n")
                 .Should()
                 .Be("using System.Collections.Generic;\n" +
-                    "namespace Expanded{\n" +
+                    "namespace SourceExpander.Expanded{\n" +
                         "public class SourceCode{ public string Path; public string Code; }\n" +
                         "public static class Expanded{\n" +
                         "public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{\n" +
@@ -141,7 +141,7 @@ class Program
             .Replace("\\r\\n", "\\n")
             .Should()
             .Be("using System.Collections.Generic;\n" +
-                "namespace Expanded{\n" +
+                "namespace SourceExpander.Expanded{\n" +
                     "public class SourceCode{ public string Path; public string Code; }\n" +
                     "public static class Expanded{\n" +
                     "public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{\n" +
