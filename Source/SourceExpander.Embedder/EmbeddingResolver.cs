@@ -27,15 +27,8 @@ namespace SourceExpander
             {
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
-                    var diagnosticDescriptor = new DiagnosticDescriptor(
-                        "EMBED0001",
-                        "using older version embeder",
-                        "using older version embeder({0}) than {1}({2})",
-                        "EmbedderGenerator",
-                        DiagnosticSeverity.Warning,
-                        true);
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(diagnosticDescriptor, Location.None,
+                        Diagnostic.Create(DiagnosticDescriptors.EMBED0001, Location.None,
                         AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
                 }
                 sources.AddRange(embedded.Sources);
