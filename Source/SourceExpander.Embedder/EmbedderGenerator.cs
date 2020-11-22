@@ -11,7 +11,7 @@ using SourceExpander.Roslyn;
 namespace SourceExpander
 {
     [Generator]
-    public class EmbeddedGenerator : ISourceGenerator
+    public class EmbedderGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context) { }
         public void Execute(GeneratorExecutionContext context)
@@ -28,7 +28,7 @@ namespace SourceExpander
                 SourceText.From(
                     MakeAssemblyMetadataAttributes(new Dictionary<string, string>
                     {
-                        { "SourceExpander.EmbedderVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString() },
+                        { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
                         { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
                     })
                 , Encoding.UTF8));

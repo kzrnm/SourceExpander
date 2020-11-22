@@ -22,18 +22,40 @@ namespace SourceExpander
 
         public SourceFileInfo[] ResolveFiles()
         {
-            var embedded = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
+            var sources = new List<SourceFileInfo>();
+            foreach (var embedded in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
+            {
+                if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
+                {
+                    var diagnosticDescriptor = new DiagnosticDescriptor(
+                        "EMBED0001",
+                        "using older version embeder",
+                        "using older version embeder({0}) than {1}({2})",
+                        "EmbedderGenerator",
+                        DiagnosticSeverity.Warning,
+                        true);
+                    reporter.ReportDiagnostic(
+                        Diagnostic.Create(diagnosticDescriptor, Location.None,
+                        AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
+                }
+                sources.AddRange(embedded.Sources);
+            }
+
             var commonPrefix = ResolveCommomFileNamePrefix(compilation);
             var infos = ResolveRaw(
-                compilation.SyntaxTrees.Select(tree => ParseSource(tree, commonPrefix)).ToArray(),
-                embedded.SelectMany(e => e.Sources).ToArray())
+                compilation.SyntaxTrees.Select(tree => ParseSource(tree, commonPrefix)),
+                sources)
                 .Where(info => info.TypeNames.Any())
                 .ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
             return infos;
         }
-        private IEnumerable<SourceFileInfo> ResolveRaw(SourceFileInfoRaw[] infos, SourceFileInfo[] otherInfos)
+
+        private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
+            var dependencyInfo = infos.Select(s => new SourceFileInfoSlim(s))
+                .Concat(otherInfos.Select(s => new SourceFileInfoSlim(s)))
+                .ToArray();
             IEnumerable<string> GetDependencies(SourceFileInfoRaw raw)
             {
                 var tree = raw.SyntaxTree;
@@ -52,8 +74,10 @@ namespace SourceExpander
                     var typeName = typeQueue.Dequeue();
                     if (!added.Add(typeName)) continue;
 
-                    dependencies.UnionWith(infos.Where(s => s.TypeNames != null && s.TypeNames.Contains(typeName)).Select(s => s.FileName));
-                    dependencies.UnionWith(otherInfos.Where(s => s.TypeNames?.Contains(typeName) == true).Select(s => s.FileName).OfType<string>());
+                    dependencies.UnionWith(
+                        dependencyInfo
+                        .Where(s => s.TypeNames.Contains(typeName))
+                        .Select(s => s.FileName));
                 }
 
                 return dependencies;

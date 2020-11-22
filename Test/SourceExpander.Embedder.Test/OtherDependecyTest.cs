@@ -11,6 +11,39 @@ namespace SourceExpander.Embedder.Test
 {
     public class OtherDependecyTest
     {
+        private static CSharpCompilation MakeOtherCompilation(SyntaxTree syntax)
+        {
+            var compilation = CSharpCompilation.Create("OtherDependecy",
+                syntaxTrees: new[] {
+                        syntax,
+                },
+                references: Util.defaultMetadatas,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            );
+
+            var generator = new EmbedderGenerator();
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+            return (CSharpCompilation)outputCompilation;
+        }
+
+        private static CSharpCompilation MakeOldStyleCompilation()
+        {
+            var syntax = CSharpSyntaxTree.ParseText(
+                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}",
+                path: @"/home/other/C.cs");
+            return CSharpCompilation.Create("OtherDependecy",
+                syntaxTrees: new[] {
+                        syntax,
+                        CSharpSyntaxTree.ParseText(
+                        @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependecy>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
+                        path: @"/home/other/AssemblyInfo.cs")
+                },
+                references: Util.defaultMetadatas,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            );
+        }
+
         private readonly Dictionary<string, CompilationReference> otherDependecies = new Dictionary<string, CompilationReference>();
         public OtherDependecyTest()
         {
@@ -18,33 +51,8 @@ namespace SourceExpander.Embedder.Test
                 @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}",
                 path: @"/home/other/C.cs");
 
-            {
-                var compilation = CSharpCompilation.Create("OtherDependecy",
-                    syntaxTrees: new[] {
-                        syntax,
-                    },
-                    references: Util.defaultMetadatas,
-                    options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                );
-
-                var generator = new EmbeddedGenerator();
-                var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-                driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
-                otherDependecies["current"] = outputCompilation.ToMetadataReference();
-            }
-            {
-                var compilation = CSharpCompilation.Create("OtherDependecy",
-                    syntaxTrees: new[] {
-                        syntax,
-                        CSharpSyntaxTree.ParseText(
-                        @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependecy>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
-                        path: @"/home/other/AssemblyInfo.cs")
-                    },
-                    references: Util.defaultMetadatas,
-                    options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                );
-                otherDependecies["old"] = compilation.ToMetadataReference();
-            }
+            otherDependecies["current"] = MakeOtherCompilation(syntax).ToMetadataReference();
+            otherDependecies["old"] = MakeOldStyleCompilation().ToMetadataReference();
         }
 
 
@@ -84,7 +92,7 @@ namespace Mine{
             compilation.SyntaxTrees.Should().HaveCount(2);
             compilation.GetDiagnostics().Should().BeEmpty();
 
-            var generator = new EmbeddedGenerator();
+            var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
 
@@ -123,7 +131,96 @@ namespace Mine{
                 SourceFileInfoUtil.FromGZipBase32768(embedded))
                 .Should()
                 .BeEquivalentTo(expected);
+        }
 
+        [Fact]
+        public void UsingOlderVersion()
+        {
+            var otherCompilation = MakeOldStyleCompilation().AddSyntaxTrees(
+                CSharpSyntaxTree.ParseText(
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]",
+                path: @"/home/other/AssemblyInfo2.cs"));
+
+            var otherDependecy = otherCompilation.ToMetadataReference();
+
+            var compilation = CSharpCompilation.Create("Mine",
+                syntaxTrees: new[] {
+                    CSharpSyntaxTree.ParseText(@"
+namespace Mine{
+    public static class C
+    {
+        public static void P() => System.Console.WriteLine();
+    }
+}", path: @"/home/mine/C.cs"),
+                    CSharpSyntaxTree.ParseText(@"
+using OC = Other.C;
+
+namespace Mine{
+    public static class Program
+    {
+        public static void Main()
+        {
+            OC.P();
+            C.P();
+        }
+    }
+}", path: @"/home/mine/Program.cs"),
+        },
+                references: Util.defaultMetadatas.Append(otherDependecy),
+                options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+
+
+            compilation.SyntaxTrees.Should().HaveCount(2);
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var generator = new EmbedderGenerator();
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+
+            var expected = new[] {
+                new SourceFileInfo
+                (
+                    "Mine>Program.cs",
+                    new string[] { "Mine.Program" },
+                    new string[] { "using OC = Other.C;" },
+                    new string[] { "OtherDependecy>C.cs", "Mine>C.cs" },
+                    "namespace Mine{ public static class Program { public static void Main() { OC.P(); C.P(); } } }"
+                ),
+                new SourceFileInfo
+                (
+                    "Mine>C.cs",
+                    new string[] { "Mine.C" },
+                    Array.Empty<string>(),
+                    Array.Empty<string>(),
+                    "namespace Mine{ public static class C { public static void P() => System.Console.WriteLine(); } }"
+                )
+            };
+
+            var reporter = new MockDiagnosticReporter();
+            new EmbeddingResolver(compilation, reporter).ResolveFiles()
+                .Should()
+                .BeEquivalentTo(expected);
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                        .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                        .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(expected);
+
+            var diagnostic = reporter.Diagnostics
+                .Should()
+                .ContainSingle()
+                .Which;
+            diagnostic.Id.Should().Be("EMBED0001");
+            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Warning);
+            diagnostic.GetMessage()
+                .Should()
+                .StartWith("using older version embeder")
+                .And
+                .EndWith("OtherDependecy(2147483647.2147483647.2147483647.2147483647)");
         }
     }
 }

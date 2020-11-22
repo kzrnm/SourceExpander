@@ -14,11 +14,14 @@ namespace SourceExpander
                 if (symbol is null)
                     continue;
 
-                yield return EmbeddedData.Create(
+                var embedded = EmbeddedData.Create(
                     symbol.Name,
                     symbol.GetAttributes()
                     .Select(GetAttributeSourceCode)
                     .OfType<KeyValuePair<string, string>>());
+
+                if (!embedded.IsEmpty)
+                    yield return embedded;
             }
         }
 

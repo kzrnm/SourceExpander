@@ -10,7 +10,7 @@ using static SourceExpander.Embedder.Test.Util;
 
 namespace SourceExpander.Embedder.Test
 {
-    public class EmbeddedGeneratorTest
+    public class EmbedderGeneratorTest
     {
         [Fact]
         public void GenerateTest()
@@ -23,7 +23,7 @@ namespace SourceExpander.Embedder.Test
             compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
             compilation.GetDiagnostics().Should().BeEmpty();
 
-            var generator = new EmbeddedGenerator();
+            var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
@@ -79,7 +79,7 @@ namespace SourceExpander.Embedder.Test
             compilation.GetDiagnostics()
                 .Should().BeEmpty();
 
-            var generator = new EmbeddedGenerator();
+            var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             outputCompilation.SyntaxTrees.Should().BeEmpty();

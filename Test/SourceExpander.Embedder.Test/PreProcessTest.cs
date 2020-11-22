@@ -32,7 +32,7 @@ path: "Program.cs") },
             compilation.SyntaxTrees.Should().HaveCount(1);
             compilation.GetDiagnostics().Should().BeEmpty();
 
-            var generator = new EmbeddedGenerator();
+            var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
