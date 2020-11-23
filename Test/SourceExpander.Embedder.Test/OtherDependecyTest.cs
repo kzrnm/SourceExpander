@@ -9,11 +9,11 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Test
 {
-    public class OtherDependecyTest
+    public class OtherDependencyTest
     {
         private static CSharpCompilation MakeOtherCompilation(SyntaxTree syntax)
         {
-            var compilation = CSharpCompilation.Create("OtherDependecy",
+            var compilation = CSharpCompilation.Create("OtherDependency",
                 syntaxTrees: new[] {
                         syntax,
                 },
@@ -29,11 +29,11 @@ namespace SourceExpander.Embedder.Test
 
         private static CSharpCompilation MakeOldStyleCompilation(SyntaxTree syntax)
         {
-            return CSharpCompilation.Create("OtherDependecy",
+            return CSharpCompilation.Create("OtherDependency",
                 syntaxTrees: new[] {
                         syntax,
                         CSharpSyntaxTree.ParseText(
-                        @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependecy>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
+                        @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
                         path: @"/home/other/AssemblyInfo.cs")
                 },
                 references: Util.defaultMetadatas,
@@ -41,15 +41,15 @@ namespace SourceExpander.Embedder.Test
             );
         }
 
-        private readonly Dictionary<string, CompilationReference> otherDependecies = new Dictionary<string, CompilationReference>();
-        public OtherDependecyTest()
+        private readonly Dictionary<string, CompilationReference> otherDependencies = new Dictionary<string, CompilationReference>();
+        public OtherDependencyTest()
         {
             var syntax = CSharpSyntaxTree.ParseText(
                 @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}",
                 path: @"/home/other/C.cs");
 
-            otherDependecies["current"] = MakeOtherCompilation(syntax).ToMetadataReference();
-            otherDependecies["old"] = MakeOldStyleCompilation(syntax).ToMetadataReference();
+            otherDependencies["current"] = MakeOtherCompilation(syntax).ToMetadataReference();
+            otherDependencies["old"] = MakeOldStyleCompilation(syntax).ToMetadataReference();
         }
 
 
@@ -58,7 +58,7 @@ namespace SourceExpander.Embedder.Test
         [InlineData("current")]
         public void OtherTest(string name)
         {
-            var otherDependecy = otherDependecies[name];
+            var OtherDependency = otherDependencies[name];
             var compilation = CSharpCompilation.Create("Mine",
                 syntaxTrees: new[] {
                     CSharpSyntaxTree.ParseText(@"
@@ -82,7 +82,7 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: Util.defaultMetadatas.Append(otherDependecy),
+                references: Util.defaultMetadatas.Append(OtherDependency),
                 options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
 
@@ -99,7 +99,7 @@ namespace Mine{
                     "Mine>Program.cs",
                     new string[] { "Mine.Program" },
                     new string[] { "using OC = Other.C;" },
-                    new string[] { "OtherDependecy>C.cs", "Mine>C.cs" },
+                    new string[] { "OtherDependency>C.cs", "Mine>C.cs" },
                     "namespace Mine{ public static class Program { public static void Main() { OC.P(); C.P(); } } }"
                 ),
                 new SourceFileInfo
@@ -141,7 +141,7 @@ namespace Mine{
                 @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]",
                 path: @"/home/other/AssemblyInfo2.cs"));
 
-            var otherDependecy = otherCompilation.ToMetadataReference();
+            var OtherDependency = otherCompilation.ToMetadataReference();
 
             var compilation = CSharpCompilation.Create("Mine",
                 syntaxTrees: new[] {
@@ -166,7 +166,7 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: Util.defaultMetadatas.Append(otherDependecy),
+                references: Util.defaultMetadatas.Append(OtherDependency),
                 options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
 
@@ -183,7 +183,7 @@ namespace Mine{
                     "Mine>Program.cs",
                     new string[] { "Mine.Program" },
                     new string[] { "using OC = Other.C;" },
-                    new string[] { "OtherDependecy>C.cs", "Mine>C.cs" },
+                    new string[] { "OtherDependency>C.cs", "Mine>C.cs" },
                     "namespace Mine{ public static class Program { public static void Main() { OC.P(); C.P(); } } }"
                 ),
                 new SourceFileInfo
@@ -220,7 +220,7 @@ namespace Mine{
                 .Should()
                 .MatchRegex(
                     // language=regex
-                    @"embeder version\(\d+\.\d+\.\d+\.\d+\) is older than OtherDependecy\(2147483647\.2147483647\.2147483647\.2147483647\)");
+                    @"embeder version\(\d+\.\d+\.\d+\.\d+\) is older than OtherDependency\(2147483647\.2147483647\.2147483647\.2147483647\)");
         }
 
     }
