@@ -27,6 +27,7 @@ namespace SourceExpander.Embedder.Test
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
             var reporter = new MockDiagnosticReporter();
@@ -84,6 +85,7 @@ namespace SourceExpander.Embedder.Test
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             outputCompilation.SyntaxTrees.Should().BeEmpty();
             diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
         }
 
         static readonly int TestSyntaxesCount = GetTestSyntaxes().Count();

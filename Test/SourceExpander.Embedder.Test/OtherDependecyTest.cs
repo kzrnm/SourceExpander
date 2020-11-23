@@ -92,6 +92,7 @@ namespace Mine{
             var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
 
             var expected = new[] {
                 new SourceFileInfo
@@ -176,6 +177,7 @@ namespace Mine{
             var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
 
             var expected = new[] {
                 new SourceFileInfo

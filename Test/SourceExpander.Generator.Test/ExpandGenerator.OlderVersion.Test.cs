@@ -97,6 +97,7 @@ class Program2
                     "};\n" +
                 "}}\n");
 
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
             var diagnostic = diagnostics
                 .Should()
                 .ContainSingle()

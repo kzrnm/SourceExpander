@@ -65,6 +65,7 @@ class Program2
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
             outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
             var d = outputCompilation.SyntaxTrees
                 .Should()

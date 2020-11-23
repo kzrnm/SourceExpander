@@ -43,6 +43,7 @@ class Program
             var generator = new ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
             diagnostics.Should().ContainSingle()
                 .Which
                 .Id
