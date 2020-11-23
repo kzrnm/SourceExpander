@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
 
     <Version>2.0.0-beta.1</Version>
+    <AssemblyVersion>2.0.0.1</AssemblyVersion>
 
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
