@@ -28,6 +28,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
     <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj" />
   </ItemGroup>
   

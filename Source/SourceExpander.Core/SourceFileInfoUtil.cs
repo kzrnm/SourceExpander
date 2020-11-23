@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Kzrnm.Convert.Base32768;
-
+#nullable enable
 namespace SourceExpander
 {
     public static class SourceFileInfoUtil

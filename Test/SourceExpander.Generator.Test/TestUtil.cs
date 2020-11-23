@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander.Generator.Test
 {
@@ -16,8 +15,13 @@ namespace SourceExpander.Generator.Test
             yield return Path.Combine(dir, "testdata", "SampleLibrary2.dll");
         }
 
-        public static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
-        public static IEnumerable<MetadataReference> GetDefaulMetadatas()
+        private static readonly MetadataReference coreReference
+            = MetadataReference.CreateFromFile(typeof(Expanded.SourceCode).Assembly.Location);
+        public static readonly MetadataReference[] noCoreReferenceMetadatas = GetDefaulMetadatas().ToArray();
+        public static readonly MetadataReference[] withCoreReferenceMetadatas
+            = noCoreReferenceMetadatas.Append(coreReference).ToArray();
+
+        private static IEnumerable<MetadataReference> GetDefaulMetadatas()
         {
             var directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             foreach (var file in Directory.EnumerateFiles(directory, "System*.dll"))

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
-
+#nullable enable
 namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]

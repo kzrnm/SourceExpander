@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-
+#nullable enable
 namespace SourceExpander
 {
     public class EmbeddedData

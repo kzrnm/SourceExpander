@@ -56,7 +56,7 @@ class Program2
                         + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]",
                         path: @"/home/other/AssemblyInfo.cs"),
                 },
-                references: TestUtil.defaultMetadatas,
+                references: TestUtil.noCoreReferenceMetadatas,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
@@ -64,7 +64,7 @@ class Program2
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
-                references: TestUtil.defaultMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilation.ToMetadataReference()),
+                references: TestUtil.noCoreReferenceMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilation.ToMetadataReference()),
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                     { "CS8019", ReportDiagnostic.Suppress },

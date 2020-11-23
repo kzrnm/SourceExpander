@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SourceExpander.Generator.Test
 {
-    public class ExpandGeneratorTest
+    public class ExpandGeneratorNoCoreReferenceTest
     {
         [Fact]
         public void GenerateTest()
@@ -54,7 +54,7 @@ class Program2
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
-                references: TestUtil.defaultMetadatas.Concat(sampleReferences),
+                references: TestUtil.noCoreReferenceMetadatas.Concat(sampleReferences),
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                     { "CS8019", ReportDiagnostic.Suppress },
