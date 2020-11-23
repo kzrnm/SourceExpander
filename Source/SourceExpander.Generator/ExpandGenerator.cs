@@ -13,54 +13,28 @@ namespace SourceExpander
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var (compilation, embeddedDatas) = Build((CSharpCompilation)context.Compilation);
-            if (embeddedDatas.Length == 0)
-            {
+            var loader = new EmbeddedLoader((CSharpCompilation)context.Compilation, new DiagnosticReporter(context));
+            if (loader.IsEmbeddedEmpty)
                 context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001, Location.None));
-            }
-
-            var sources = new List<SourceFileInfo>();
-            foreach (var embedded in embeddedDatas)
-            {
-                if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
-                {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0002, Location.None,
-                        AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
-                }
-                sources.AddRange(embedded.Sources);
-            }
 
             context.AddSource("SourceExpander.Expanded.cs",
                 SourceText.From(
-                    MakeExpanded(compilation, sources),
+                    MakeExpanded(loader),
                     Encoding.UTF8));
         }
-        static (CSharpCompilation, EmbeddedData[]) Build(CSharpCompilation compilation)
-        {
-            var trees = compilation.SyntaxTrees;
-            foreach (var tree in trees)
-            {
-                var opts = tree.Options.WithDocumentationMode(DocumentationMode.Diagnose);
-                compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), opts));
-            }
 
-            return (compilation, AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation).ToArray());
-        }
-        static string MakeExpanded(CSharpCompilation compilation, IEnumerable<SourceFileInfo> infos)
+        static string MakeExpanded(EmbeddedLoader loader)//, bool hasCoreReference)
         {
-            var expander = new CompilationExpander(compilation, new SourceFileContainer(infos));
             var sb = new StringBuilder();
             sb.AppendLine("using System.Collections.Generic;");
             sb.AppendLine("namespace SourceExpander.Expanded{");
             sb.AppendLine("public class SourceCode{ public string Path; public string Code; }");
             sb.AppendLine("public static class Expanded{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{");
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var (path, code) in loader.EnumerateExpandedCodes())
             {
-                var newCode = expander.ExpandCode(tree);
-                var filePathLiteral = tree.FilePath.ToLiteral();
-                sb.AppendLine($"{{{filePathLiteral}, new SourceCode{{ Path={filePathLiteral}, Code={newCode.ToLiteral()} }} }},");
+                var filePathLiteral = path.ToLiteral();
+                sb.AppendLine($"{{{filePathLiteral}, new SourceCode{{ Path={filePathLiteral}, Code={code.ToLiteral()} }} }},");
             }
             sb.AppendLine("};");
             sb.AppendLine("}}");
