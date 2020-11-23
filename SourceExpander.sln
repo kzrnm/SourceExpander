@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator.Test", "Test\SourceExpander.Generator.Test\SourceExpander.Generator.Test.csproj", "{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceExpander.Core.Test", "Test\SourceExpander.Core.Test\SourceExpander.Core.Test.csproj", "{DF67761D-B14E-46FB-8904-BC44399ABEC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Core.Test", "Test\SourceExpander.Core.Test\SourceExpander.Core.Test.csproj", "{DF67761D-B14E-46FB-8904-BC44399ABEC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ACC304CF-8094-41AC-97D0-C67103132C8C} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
+		{524F5B6A-7ECB-4822-9761-0F79638B936D} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
+		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
+		{DF67761D-B14E-46FB-8904-BC44399ABEC1} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FF4EF7E5-692E-49A6-94AF-5B5B11FEF356}
