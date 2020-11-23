@@ -27,11 +27,8 @@ namespace SourceExpander.Embedder.Test
             return (CSharpCompilation)outputCompilation;
         }
 
-        private static CSharpCompilation MakeOldStyleCompilation()
+        private static CSharpCompilation MakeOldStyleCompilation(SyntaxTree syntax)
         {
-            var syntax = CSharpSyntaxTree.ParseText(
-                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}",
-                path: @"/home/other/C.cs");
             return CSharpCompilation.Create("OtherDependecy",
                 syntaxTrees: new[] {
                         syntax,
@@ -52,7 +49,7 @@ namespace SourceExpander.Embedder.Test
                 path: @"/home/other/C.cs");
 
             otherDependecies["current"] = MakeOtherCompilation(syntax).ToMetadataReference();
-            otherDependecies["old"] = MakeOldStyleCompilation().ToMetadataReference();
+            otherDependecies["old"] = MakeOldStyleCompilation(syntax).ToMetadataReference();
         }
 
 
@@ -136,7 +133,10 @@ namespace Mine{
         [Fact]
         public void UsingOlderVersion()
         {
-            var otherCompilation = MakeOldStyleCompilation().AddSyntaxTrees(
+            var syntax = CSharpSyntaxTree.ParseText(
+                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}",
+                path: @"/home/other/C.cs");
+            var otherCompilation = MakeOldStyleCompilation(syntax).AddSyntaxTrees(
                 CSharpSyntaxTree.ParseText(
                 @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]",
                 path: @"/home/other/AssemblyInfo2.cs"));
@@ -218,9 +218,10 @@ namespace Mine{
             diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Warning);
             diagnostic.GetMessage()
                 .Should()
-                .StartWith("using older version embeder")
-                .And
-                .EndWith("OtherDependecy(2147483647.2147483647.2147483647.2147483647)");
+                .MatchRegex(
+                    // language=regex
+                    @"embeder version\(\d+\.\d+\.\d+\.\d+\) is older than OtherDependecy\(2147483647\.2147483647\.2147483647\.2147483647\)");
         }
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +13,7 @@ namespace SourceExpander
     internal class CompilationExpander
     {
         private readonly SourceFileContainer sourceFileContainer;
-        public CompilationExpander(SyntaxTree tree, CSharpCompilation compilation, SourceFileContainer sourceFileContainer)
+        public CompilationExpander(CSharpCompilation compilation, SourceFileContainer sourceFileContainer)
         {
             this.sourceFileContainer = sourceFileContainer;
             var specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>
@@ -25,19 +24,15 @@ namespace SourceExpander
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
             Compilation = compilation.WithOptions(opts);
-            OrigTree = tree;
         }
 
         private CSharpCompilation Compilation { get; }
-        protected SyntaxTree OrigTree { get; }
 
-        private string? _expandedCode;
-        public string ExpandedCode => _expandedCode ??= ExpandCode();
-        private string ExpandCode()
+        public string ExpandCode(SyntaxTree origTree)
         {
             var sb = new StringBuilder();
-            var semanticModel = Compilation.GetSemanticModel(OrigTree);
-            var origRoot = OrigTree.GetRoot();
+            var semanticModel = Compilation.GetSemanticModel(origTree);
+            var origRoot = origTree.GetRoot();
             var requiedFiles = sourceFileContainer.ResolveDependency(
                 origRoot.DescendantNodes()
                 .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s).Symbol))

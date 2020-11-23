@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +11,22 @@ namespace SourceExpander.Generator.Test
 {
     public class ExpandGeneratorTest
     {
+        static IEnumerable<string> GetSampleDllPaths()
+        {
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            yield return Path.Combine(dir, "testdata", "SampleLibrary.Old.dll");
+            yield return Path.Combine(dir, "testdata", "SampleLibrary2.dll");
+        }
+
+        static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
+        static IEnumerable<MetadataReference> GetDefaulMetadatas()
+        {
+            var directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+            foreach (var file in Directory.EnumerateFiles(directory, "System*.dll"))
+            {
+                yield return MetadataReference.CreateFromFile(file);
+            }
+        }
         [Fact]
         public void GenerateTest()
         {
@@ -149,23 +164,6 @@ class Program
                     "class Program\\n{\\n    static void Main()\\n    {\\n        Console.WriteLine(42);\\n    }\\n}\\n#region Expanded\\n#endregion Expanded\\n\" } },\n" +
                 "};\n" +
             "}}\n");
-        }
-
-        static IEnumerable<string> GetSampleDllPaths()
-        {
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            yield return Path.Combine(dir, "testdata", "SampleLibrary.Old.dll");
-            yield return Path.Combine(dir, "testdata", "SampleLibrary2.dll");
-        }
-
-        static readonly MetadataReference[] defaultMetadatas = GetDefaulMetadatas().ToArray();
-        static IEnumerable<MetadataReference> GetDefaulMetadatas()
-        {
-            var directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
-            foreach (var file in Directory.EnumerateFiles(directory, "System*.dll"))
-            {
-                yield return MetadataReference.CreateFromFile(file);
-            }
         }
     }
 }
