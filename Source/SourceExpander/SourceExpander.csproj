@@ -3,18 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
     <NoWarn>1701;1702;IDE0057</NoWarn>
-
+    <!--
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    -->
     <PackageId>SourceExpander</PackageId>
     <Description>A library that expanding embedded source code.</Description>
-    
+
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
