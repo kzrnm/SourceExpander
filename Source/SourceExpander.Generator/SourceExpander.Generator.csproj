@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Compile Include="../SourceExpander.Share/**/*.cs" />
+    <EmbeddedResource Include="../SourceExpander.Core/Expanded/SourceCode.cs" LogicalName="SourceCode.cs" />
   </ItemGroup>
 
   <ItemGroup>

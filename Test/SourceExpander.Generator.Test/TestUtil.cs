@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,11 +9,20 @@ namespace SourceExpander.Generator.Test
 {
     internal class TestUtil
     {
+        private static readonly string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static string GetTestDataPath(params string[] paths)
+        {
+            var withDir = new string[paths.Length + 2];
+            withDir[0] = dir;
+            withDir[1] = "testdata";
+            Array.Copy(paths, 0, withDir, 2, paths.Length);
+            return Path.Combine(withDir);
+        }
+
         public static IEnumerable<string> GetSampleDllPaths()
         {
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            yield return Path.Combine(dir, "testdata", "SampleLibrary.Old.dll");
-            yield return Path.Combine(dir, "testdata", "SampleLibrary2.dll");
+            yield return GetTestDataPath("SampleLibrary.Old.dll");
+            yield return GetTestDataPath("SampleLibrary2.dll");
         }
 
         private static readonly MetadataReference coreReference

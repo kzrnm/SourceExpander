@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SourceExpander.Generator.Test
 {
-    public class ExpandGeneratorOlderVersionTest
+    public class ExpandGeneratorWithCoreReferenceTest
     {
         [Fact]
         public void GenerateTest()
@@ -50,22 +50,12 @@ class Program2
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
                     path: "/home/source/Program2.cs"),
             };
-            var newerEmbedderCompilation = CSharpCompilation.Create("OtherDependency",
-                syntaxTrees: new[] {
-                    CSharpSyntaxTree.ParseText(
-                        @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
-                        + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]",
-                        path: @"/home/other/AssemblyInfo.cs"),
-                },
-                references: TestUtil.withCoreReferenceMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-            );
 
             var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
             var compilation = CSharpCompilation.Create(
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilation.ToMetadataReference()),
+                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences),
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                     { "CS8019", ReportDiagnostic.Suppress },
@@ -75,9 +65,10 @@ class Program2
             var generator = new ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
             outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-
-            var d = outputCompilation.SyntaxTrees
+            outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"))
                 .Which
@@ -85,21 +76,7 @@ class Program2
                 .Replace("\r\n", "\n")
                 .Replace("\\r\\n", "\\n")
                 .Should()
-                .Be(File.ReadAllText(TestUtil.GetTestDataPath("wants", "olderversion.test.txt")));
-
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            var diagnostic = diagnostics
-                .Should()
-                .ContainSingle()
-                .Which;
-            diagnostic.Id.Should().Be("EXPAND0002");
-            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Warning);
-            diagnostic.GetMessage()
-                .Should()
-                .MatchRegex(
-                    // language=regex
-                    @"expander version\(\d+\.\d+\.\d+\.\d+\) is older than embedder of OtherDependency\(2147483647\.2147483647\.2147483647\.2147483647\)");
-
+                .Be(File.ReadAllText(TestUtil.GetTestDataPath("wants", "default.test.txt")));
         }
     }
 }

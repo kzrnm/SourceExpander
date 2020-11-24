@@ -1,0 +1,7 @@
+using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{
+{"/home/source/Program.cs", new SourceCode(path: "/home/source/Program.cs", code: "using System;\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(42);\n    }\n}\n#region Expanded\n#endregion Expanded\n") },
+};
+}}

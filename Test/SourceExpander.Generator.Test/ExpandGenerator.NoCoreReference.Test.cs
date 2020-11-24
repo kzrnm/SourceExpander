@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
@@ -66,8 +67,11 @@ class Program2
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            var d = outputCompilation.SyntaxTrees
+            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
+            outputCompilation.SyntaxTrees
+                .Should()
+                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.SourceCode.cs"));
+            outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"))
                 .Which
@@ -75,19 +79,7 @@ class Program2
                 .Replace("\r\n", "\n")
                 .Replace("\\r\\n", "\\n")
                 .Should()
-                .Be("using System.Collections.Generic;\n" +
-                    "namespace SourceExpander.Expanded{\n" +
-                        "public class SourceCode{ public string Path; public string Code; }\n" +
-                        "public static class Expanded{\n" +
-                        "public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{\n" +
-                        "{\"/home/source/Program.cs\", new SourceCode{ Path=\"/home/source/Program.cs\", " +
-                            "Code=\"using SampleLibrary;\\nusing System;\\nusing System.Diagnostics;\\nclass Program\\n{\\n    static void Main()\\n    {\\n        Console.WriteLine(42);\\n        Put.WriteRandom();\\n#if !EXPAND_GENERATOR\\n        Console.WriteLine(24);\\n#endif\\n    }\\n}\\n" +
-                                "#region Expanded\\nnamespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } \\nnamespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } \\n#endregion Expanded\\n\" } },\n" +
-                        "{\"/home/source/Program2.cs\", new SourceCode{ Path=\"/home/source/Program2.cs\", " +
-                            "Code=\"using SampleLibrary;\\nusing System;\\nusing System.Diagnostics;\\nclass Program2\\n{\\n    static void Main()\\n    {\\n        Console.WriteLine(42);\\n        Put2.Write();\\n    }\\n}\\n" +
-                                "#region Expanded\\nnamespace SampleLibrary { public static class Put2 { public static void Write() => Put.WriteRandom(); } } \\nnamespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } \\nnamespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } \\n#endregion Expanded\\n\" } },\n" +
-                    "};\n" +
-                "}}\n");
+                .Be(File.ReadAllText(TestUtil.GetTestDataPath("wants", "default.test.txt")));
         }
     }
 }
