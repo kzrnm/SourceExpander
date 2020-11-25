@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -30,17 +30,21 @@ namespace SourceExpander
 
             context.AddSource("SourceExpander.Expanded.cs",
                 SourceText.From(
-                    MakeExpanded(loader),
+                    CreateExpanded(loader),
                     Encoding.UTF8));
         }
         static bool HasCoreReference(IEnumerable<AssemblyIdentity> referencedAssemblyNames)
             => referencedAssemblyNames.Any(a => a.Name.Equals("SourceExpander.Core", StringComparison.OrdinalIgnoreCase));
 
-        static string MakeSourceCodeLiteral(string pathLiteral, string codeLiteral)
-            => $"new SourceCode(path: {pathLiteral}, code: {codeLiteral})";
 
-        static string MakeExpanded(EmbeddedLoader loader)//, bool hasCoreReference)
+        static string CreateExpanded(EmbeddedLoader loader)
         {
+            static void CreateSourceCodeLiteral(StringBuilder sb, string pathLiteral, string codeLiteral)
+                => sb.Append("SourceCode.FromDictionary(new Dictionary<string,object>{")
+                  .AppendDicElement("\"path\"", pathLiteral)
+                  .AppendDicElement("\"code\"", codeLiteral)
+                  .Append("})");
+
             var sb = new StringBuilder();
             sb.AppendLine("using System.Collections.Generic;");
             sb.AppendLine("namespace SourceExpander.Expanded{");
@@ -49,10 +53,8 @@ namespace SourceExpander
             foreach (var (path, code) in loader.EnumerateExpandedCodes())
             {
                 var filePathLiteral = path.ToLiteral();
-                sb.AppendLine("{"
-                    + filePathLiteral + ", "
-                    + MakeSourceCodeLiteral(filePathLiteral, code.ToLiteral())
-                    + " },");
+                sb.AppendDicElement(filePathLiteral, sb => CreateSourceCodeLiteral(sb, filePathLiteral, code.ToLiteral()));
+                sb.AppendLine();
             }
             sb.AppendLine("};");
             sb.AppendLine("}}");
