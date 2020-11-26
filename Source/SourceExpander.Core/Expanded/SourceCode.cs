@@ -1,27 +1,31 @@
 ﻿using System.Collections.Generic;
+#pragma warning disable IDE0018,IDE0034,IDE0038
 namespace SourceExpander.Expanded
 {
     public class SourceCode
     {
-        private SourceCode(string path, string code)
+        public SourceCode(string path, string code)
         {
             Path = path;
             Code = code;
         }
+        private static bool TryGet<T>(Dictionary<string, object> dic, string key, out T val)
+        {
+            object obj;
+            if (dic.TryGetValue(key, out obj) && obj is T)
+            {
+                val = (T)obj;
+                return true;
+            }
+            val = default(T);
+            return false;
+        }
         public static SourceCode FromDictionary(Dictionary<string, object> dic)
         {
-            static bool TryGet<T>(Dictionary<string, object> dic, string key, out T val)
-            {
-                if (dic.TryGetValue(key, out var obj) && obj is T v)
-                {
-                    val = v;
-                    return true;
-                }
-                val = default;
-                return false;
-            }
-            TryGet<string>(dic, "path", out var path);
-            TryGet<string>(dic, "code", out var code);
+            string path;
+            string code;
+            TryGet<string>(dic, "path", out path);
+            TryGet<string>(dic, "code", out code);
             return new SourceCode(path, code);
         }
         public string Path { get; }

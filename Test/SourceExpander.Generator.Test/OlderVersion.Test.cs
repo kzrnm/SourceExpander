@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using SourceExpander.Expanded;
 using Xunit;
 
 namespace SourceExpander.Generator.Test
 {
-    public class ExpandGeneratorOlderVersionTest
+    public class OlderVersionTest
     {
         [Fact]
         public void GenerateTest()
@@ -32,23 +32,6 @@ class Program
 }",
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
                     path: "/home/source/Program.cs"),
-                CSharpSyntaxTree.ParseText(
-                    @"using System;
-using System.Reflection;
-using SampleLibrary;
-using static System.MathF;
-using M = System.Math;
-
-class Program2
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        Put2.Write();
-    }
-}",
-                    options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
-                    path: "/home/source/Program2.cs"),
             };
             var newerEmbedderCompilation = CSharpCompilation.Create("OtherDependency",
                 syntaxTrees: new[] {
@@ -77,15 +60,35 @@ class Program2
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
 
-            var d = outputCompilation.SyntaxTrees
+            outputCompilation.SyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"))
-                .Which
-                .ToString()
-                .Replace("\r\n", "\n")
-                .Replace("\\r\\n", "\\n")
-                .Should()
-                .Be(File.ReadAllText(TestUtil.GetTestDataPath("wants", "olderversion.test.txt")));
+                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
+            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            files.Should().HaveCount(1);
+            files["/home/source/Program.cs"].Should()
+                .BeEquivalentTo(
+                new SourceCode(
+                    path: "/home/source/Program.cs",
+                    code: @"using SampleLibrary;
+using System;
+using System.Diagnostics;
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        Put.WriteRandom();
+#if !EXPAND_GENERATOR
+        Console.WriteLine(24);
+#endif
+    }
+}
+#region Expanded
+namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
+namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
+#endregion Expanded
+")
+                );
 
             outputCompilation.GetDiagnostics().Should().BeEmpty();
             var diagnostic = diagnostics
@@ -99,7 +102,6 @@ class Program2
                 .MatchRegex(
                     // language=regex
                     @"expander version\(\d+\.\d+\.\d+\.\d+\) is older than embedder of OtherDependency\(2147483647\.2147483647\.2147483647\.2147483647\)");
-
         }
     }
 }

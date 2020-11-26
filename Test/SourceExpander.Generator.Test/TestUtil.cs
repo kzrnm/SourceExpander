@@ -1,14 +1,38 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
+using SourceExpander.Expanded;
 
 namespace SourceExpander.Generator.Test
 {
-    internal class TestUtil
+    internal static class TestUtil
     {
+        public static object GetExpandedFiles(Compilation compilation)
+        {
+            using var ms = new MemoryStream();
+            if (!compilation.Emit(ms).Success)
+                throw new ArgumentException("compilation is failed", nameof(compilation));
+            ms.Position = 0;
+            var alc = new AssemblyLoadContext("GetExpandedFiles", true);
+            try
+            {
+                return alc.LoadFromStream(ms)
+                    .GetType("SourceExpander.Expanded.ExpandedContainer")
+                    .GetProperty("Files").GetValue(null);
+            }
+            finally
+            {
+                alc.Unload();
+            }
+        }
+        public static IReadOnlyDictionary<string, SourceCode> GetExpandedFilesWithCore(Compilation compilation)
+            => (IReadOnlyDictionary<string, SourceCode>)GetExpandedFiles(compilation);
+
         private static readonly string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string GetTestDataPath(params string[] paths)
         {
