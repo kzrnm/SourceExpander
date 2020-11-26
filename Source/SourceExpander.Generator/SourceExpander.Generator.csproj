@@ -59,9 +59,8 @@
   
   <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\dotnet\" />
+      <TfmSpecificPackageFile Include="$(TargetDir)\*.dll" PackagePath="analyzers\dotnet\" />
       <TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\" />
-      <TfmSpecificPackageFile Include="$(PkgSourceExpander_Core)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\" />
       <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
     </ItemGroup>
   </Target>
