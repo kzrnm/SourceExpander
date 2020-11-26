@@ -4,26 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AFAE54D6-A794-42BF-96B7-4BFEBF33B62F}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		Sample\Directory.Build.props = Sample\Directory.Build.props
-	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Core", "Source\SourceExpander.Core\SourceExpander.Core.csproj", "{B0FE8EDC-D4AF-4325-9C76-A1B378BBA761}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Core", "..\Source\SourceExpander.Core\SourceExpander.Core.csproj", "{B0FE8EDC-D4AF-4325-9C76-A1B378BBA761}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander", "Source\SourceExpander\SourceExpander.csproj", "{E6A37C11-E09F-4ADB-BEE5-34B0F944C2E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander", "..\Source\SourceExpander\SourceExpander.csproj", "{E6A37C11-E09F-4ADB-BEE5-34B0F944C2E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.DirectUse", "Sample\DirectUse\Sample.DirectUse.csproj", "{5B0072BD-C380-40C1-AB17-50E82A098EEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleProject", "SampleProject\SampleProject.csproj", "{5B0072BD-C380-40C1-AB17-50E82A098EEE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_SampleLibrary", "Sample\_SampleLibrary\_SampleLibrary.csproj", "{D99689F1-550D-4682-94AB-B7F904BB3A85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_SampleLibrary", "_SampleLibrary\_SampleLibrary.csproj", "{D99689F1-550D-4682-94AB-B7F904BB3A85}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder", "Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj", "{29D1E53B-7A6A-4C2C-88F6-48D7E2E9860D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.Generator", "Sample\Generator\Sample.Generator.csproj", "{F9F679D4-A4C6-4D84-833D-181839C53927}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator", "Source\SourceExpander.Generator\SourceExpander.Generator.csproj", "{3E9D413F-AB1B-4622-8AE1-FAE0605754E5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_SampleLibrary2", "Sample\_SampleLibrary2\_SampleLibrary2.csproj", "{BDAFE8D4-AEED-4A9D-A976-E828E1874105}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_SampleLibrary2", "_SampleLibrary2\_SampleLibrary2.csproj", "{BDAFE8D4-AEED-4A9D-A976-E828E1874105}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D99689F1-550D-4682-94AB-B7F904BB3A85} = {D99689F1-550D-4682-94AB-B7F904BB3A85}
 	EndProjectSection
@@ -50,18 +40,6 @@ Global
 		{D99689F1-550D-4682-94AB-B7F904BB3A85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D99689F1-550D-4682-94AB-B7F904BB3A85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D99689F1-550D-4682-94AB-B7F904BB3A85}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29D1E53B-7A6A-4C2C-88F6-48D7E2E9860D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29D1E53B-7A6A-4C2C-88F6-48D7E2E9860D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29D1E53B-7A6A-4C2C-88F6-48D7E2E9860D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29D1E53B-7A6A-4C2C-88F6-48D7E2E9860D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F9F679D4-A4C6-4D84-833D-181839C53927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9F679D4-A4C6-4D84-833D-181839C53927}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9F679D4-A4C6-4D84-833D-181839C53927}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9F679D4-A4C6-4D84-833D-181839C53927}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E9D413F-AB1B-4622-8AE1-FAE0605754E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E9D413F-AB1B-4622-8AE1-FAE0605754E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E9D413F-AB1B-4622-8AE1-FAE0605754E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E9D413F-AB1B-4622-8AE1-FAE0605754E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BDAFE8D4-AEED-4A9D-A976-E828E1874105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BDAFE8D4-AEED-4A9D-A976-E828E1874105}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDAFE8D4-AEED-4A9D-A976-E828E1874105}.Release|Any CPU.ActiveCfg = Release|Any CPU

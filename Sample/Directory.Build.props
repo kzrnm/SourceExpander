@@ -1,8 +1,0 @@
-<Project>
-
-  <ItemGroup  Condition="$(ProjectName.StartsWith('Sample'))" >
-    <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
-    <ProjectReference Include="..\_SampleLibrary2\_SampleLibrary2.csproj" />
-  </ItemGroup>
-
-</Project>
