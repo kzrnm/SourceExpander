@@ -22,7 +22,7 @@ using SampleLibrary;
 
 class Program
 {
-    static void Main()
+    static void P()
     {
         Console.WriteLine(42);
         Put.WriteRandom();
@@ -40,21 +40,16 @@ using SampleLibrary;
 using static System.MathF;
 using M = System.Math;
 
-class Program2
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        Put2.Write();
-    }
-}",
+
+Console.WriteLine(42);
+Put2.Write();",
                     options: opts,
                     path: "/home/source/Program2.cs"),
             };
         }
 
         [Fact]
-        public void Success()
+        public void SuccessConsoleApp()
         {
             var version = LanguageVersion.Latest;
             var syntaxTrees = CreateTrees(version);
@@ -63,14 +58,15 @@ class Program2
                 assemblyName: "TestAssembly",
                 syntaxTrees: syntaxTrees,
                 references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                options: new CSharpCompilationOptions(OutputKind.ConsoleApplication)
                 .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                     { "CS8019", ReportDiagnostic.Suppress },
                 }));
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
@@ -89,7 +85,7 @@ using System;
 using System.Diagnostics;
 class Program
 {
-    static void Main()
+    static void P()
     {
         Console.WriteLine(42);
         Put.WriteRandom();
@@ -111,14 +107,8 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
                     code: @"using SampleLibrary;
 using System;
 using System.Diagnostics;
-class Program2
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        Put2.Write();
-    }
-}
+Console.WriteLine(42);
+Put2.Write();
 #region Expanded
 namespace SampleLibrary { public static class Put2 { public static void Write() => Put.WriteRandom(); } } 
 namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
@@ -166,7 +156,7 @@ using System;
 using System.Diagnostics;
 class Program
 {
-    static void Main()
+    static void P()
     {
         Console.WriteLine(42);
         Put.WriteRandom();
