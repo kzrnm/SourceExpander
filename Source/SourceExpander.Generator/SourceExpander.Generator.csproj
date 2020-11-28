@@ -51,7 +51,7 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <PackageReference Include="Base32768" Version="1.0.3" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" Version="1.0.5" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
