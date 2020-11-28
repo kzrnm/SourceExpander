@@ -24,8 +24,8 @@ namespace SourceExpander.Expanded
         {
             string path;
             string code;
-            TryGet<string>(dic, "path", out path);
-            TryGet<string>(dic, "code", out code);
+            TryGet(dic, "path", out path);
+            TryGet(dic, "code", out code);
             return new SourceCode(path, code);
         }
         public string Path { get; }
