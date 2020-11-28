@@ -38,7 +38,6 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" GeneratePathProperty="true" />
     <PackageReference Include="Base32768" Version="1.0.3" GeneratePathProperty="true" />
   </ItemGroup>
 

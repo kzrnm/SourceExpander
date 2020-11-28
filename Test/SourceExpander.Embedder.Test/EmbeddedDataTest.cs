@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
 
-namespace SourceExpander.Core.Test
+namespace SourceExpander.Embedder.Test
 {
     public class EmbeddedDataTest
     {
