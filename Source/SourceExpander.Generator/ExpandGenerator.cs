@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -22,10 +21,8 @@ namespace SourceExpander
 
             if (!HasCoreReference(context.Compilation.ReferencedAssemblyNames))
             {
-                var assembly = Assembly.GetExecutingAssembly();
-                using var stream = assembly.GetManifestResourceStream("SourceCode.cs");
                 context.AddSource("SourceExpander.SourceCode.cs",
-                   SourceText.From(stream, Encoding.UTF8));
+                   SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
             }
 
             context.AddSource("SourceExpander.Expanded.cs",
