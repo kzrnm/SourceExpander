@@ -9,10 +9,6 @@
     <IsPackable>false</IsPackable>
 
     <RootNamespace>SourceExpander</RootNamespace>
-
-    <SignAssembly>true</SignAssembly>
-
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
