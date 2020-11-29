@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -90,7 +89,8 @@ namespace Mine{
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
             outputCompilation.GetDiagnostics().Should().BeEmpty();
 
@@ -114,7 +114,7 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, reporter).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 
@@ -175,7 +175,8 @@ namespace Mine{
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
             outputCompilation.GetDiagnostics().Should().BeEmpty();
 
@@ -199,7 +200,7 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, reporter).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 

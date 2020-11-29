@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
 namespace SourceExpander
@@ -12,12 +15,35 @@ namespace SourceExpander
     public class EmbeddingResolver
     {
         private readonly CSharpCompilation compilation;
+        private readonly CSharpParseOptions parseOptions;
         private readonly IDiagnosticReporter reporter;
 
-        public EmbeddingResolver(CSharpCompilation compilation, IDiagnosticReporter reporter)
+        public EmbeddingResolver(CSharpCompilation compilation, CSharpParseOptions parseOptions, IDiagnosticReporter reporter)
         {
             this.compilation = compilation;
+            this.parseOptions = parseOptions;
             this.reporter = reporter;
+        }
+
+        public IEnumerable<(string name, SourceText sourceText)> EnumerateEmbeddingSources()
+        {
+            var infos = ResolveFiles();
+            if (infos.Length == 0)
+                yield break;
+
+            var json = ToJson(infos);
+            var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
+            yield return (
+                "EmbeddedSourceCode.Metadata.Generated.cs",
+                SourceText.From(
+                 MakeAssemblyMetadataAttributes(new Dictionary<string, string>
+                 {
+                        { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
+                        { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
+                        { "SourceExpander.EmbeddedLanguageVersion", parseOptions.SpecifiedLanguageVersion.ToDisplayString()},
+                 })
+                 , Encoding.UTF8)
+            );
         }
 
         public SourceFileInfo[] ResolveFiles()
@@ -149,6 +175,28 @@ namespace SourceExpander
                     return min.Substring(0, i);
             }
             return min;
+        }
+
+
+        static string ToJson(IEnumerable<SourceFileInfo> infos)
+        {
+            var serializer = new DataContractJsonSerializer(typeof(IEnumerable<SourceFileInfo>));
+            using var ms = new MemoryStream();
+            serializer.WriteObject(ms, infos);
+            return Encoding.UTF8.GetString(ms.ToArray());
+        }
+        static string MakeAssemblyMetadataAttributes(IEnumerable<KeyValuePair<string, string>> dic)
+        {
+            var sb = new StringBuilder("using System.Reflection;");
+            foreach (var p in dic)
+            {
+                sb.Append("[assembly: AssemblyMetadataAttribute(");
+                sb.Append(p.Key.ToLiteral());
+                sb.Append(",");
+                sb.Append(p.Value.ToLiteral());
+                sb.AppendLine(")]");
+            }
+            return sb.ToString();
         }
     }
 }
