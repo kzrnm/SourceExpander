@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,14 +18,18 @@ namespace SourceExpander
         private readonly CSharpCompilation compilation;
         private readonly CSharpParseOptions parseOptions;
         private readonly IDiagnosticReporter reporter;
-
-        public EmbeddingResolver(CSharpCompilation compilation, CSharpParseOptions parseOptions, IDiagnosticReporter reporter)
+        private readonly CancellationToken cancellationToken;
+        public EmbeddingResolver(
+            CSharpCompilation compilation,
+            CSharpParseOptions parseOptions,
+            IDiagnosticReporter reporter,
+            CancellationToken cancellationToken = default)
         {
             this.compilation = compilation;
             this.parseOptions = parseOptions;
             this.reporter = reporter;
+            this.cancellationToken = cancellationToken;
         }
-
         public IEnumerable<(string name, SourceText sourceText)> EnumerateEmbeddingSources()
         {
             var infos = ResolveFiles();
@@ -78,11 +83,11 @@ namespace SourceExpander
             IEnumerable<string> GetDependencies(SourceFileInfoRaw raw)
             {
                 var tree = raw.SyntaxTree;
-                var root = (CompilationUnitSyntax)tree.GetRoot();
+                var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
 
                 var semanticModel = compilation.GetSemanticModel(tree, true);
                 var typeQueue = new Queue<string>(root.DescendantNodes()
-                    .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s).Symbol?.OriginalDefinition))
+                    .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s, cancellationToken).Symbol?.OriginalDefinition))
                     .OfType<string>()
                     .Distinct());
 
@@ -115,7 +120,7 @@ namespace SourceExpander
         private SourceFileInfoRaw ParseSource(SyntaxTree tree, string commonPrefix)
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
-            var root = (CompilationUnitSyntax)tree.GetRoot();
+            var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
             var usings = root.Usings.Select(u => u.ToString().Trim()).ToArray();
 
             var remover = new MinifyRewriter();
@@ -128,13 +133,14 @@ namespace SourceExpander
 
             var typeNames = root.DescendantNodes()
                 .Where(s => s is BaseTypeDeclarationSyntax || s is DelegateDeclarationSyntax)
-                .Select(syntax => semanticModel.GetDeclaredSymbol(syntax)?.ToDisplayString())
+                .Select(syntax => semanticModel.GetDeclaredSymbol(syntax, cancellationToken)?.ToDisplayString())
                 .OfType<string>()
                 .Distinct()
                 .ToArray();
 
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings,
-                remover.Visit(CSharpSyntaxTree.ParseText(newRoot.ToString()).GetRoot())!.ToString());
+                remover.Visit(CSharpSyntaxTree.ParseText(newRoot.ToString(), cancellationToken: cancellationToken)
+                .GetRoot(cancellationToken))!.ToString());
         }
 
         public bool HasType(string typeFullName)

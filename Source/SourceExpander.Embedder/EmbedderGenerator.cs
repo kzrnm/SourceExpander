@@ -13,7 +13,8 @@ namespace SourceExpander
             var resolver = new EmbeddingResolver(
                 (CSharpCompilation)context.Compilation,
                 (CSharpParseOptions)context.ParseOptions,
-                new DiagnosticReporter(context));
+                new DiagnosticReporter(context),
+                context.CancellationToken);
 
             foreach (var (path, source) in resolver.EnumerateEmbeddingSources())
             {
