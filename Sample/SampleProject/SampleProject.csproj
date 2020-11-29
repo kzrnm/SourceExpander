@@ -7,8 +7,8 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj"/>
-    <PackageReference Include="SourceExpander.Generator" Version="2.0.0-beta.6">
+    <PackageReference Include="SourceExpander" Version="2.0.0" />
+    <PackageReference Include="SourceExpander.Generator" Version="2.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -8,5 +8,6 @@ class Program
     {
         Expander.Expand();
         Put2.Write();
+        Console.WriteLine("foo");
     }
 }
