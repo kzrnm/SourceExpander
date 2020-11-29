@@ -37,6 +37,25 @@ namespace SourceExpander.Embedder.Test
                     ));
         }
 
+
+        [Theory]
+        [InlineData("5", LanguageVersion.CSharp5)]
+        [InlineData("7.3", LanguageVersion.CSharp7_3)]
+        [InlineData("9.0", LanguageVersion.CSharp9)]
+        public void CSharpLanguageVersion(string embbeddedVersion, LanguageVersion expectedVersion)
+        {
+            EmbeddedData.Create("CSharpLanguageVersion", new Dictionary<string, string> {
+                { "SourceExpander.EmbeddedLanguageVersion",embbeddedVersion },
+            })
+                .Should()
+                .BeEquivalentTo(new EmbeddedData(
+                    "CSharpLanguageVersion",
+                    Array.Empty<SourceFileInfo>(),
+                    new Version(1, 0, 0),
+                    expectedVersion
+                    ));
+        }
+
         [Fact]
         public void RawJson()
         {
