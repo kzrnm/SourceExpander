@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Kzrnm.Convert.Base32768;
+using Microsoft.CodeAnalysis.CSharp;
 #nullable enable
 namespace SourceExpander
 {
@@ -31,44 +32,22 @@ namespace SourceExpander
             msOut.Position = 0;
             return msOut;
         }
-
-        internal static Version? GetAttributeEmbedderVersion(KeyValuePair<string, string> attr)
-        {
-            if (attr.Key == "SourceExpander.EmbedderVersion")
-            {
-                Version.TryParse(attr.Value, out var ver);
-                return ver;
-            }
-            return null;
-        }
-
-        internal static List<SourceFileInfo>? GetAttributeSourceFileInfos(KeyValuePair<string, string> attr)
-        {
-            var key = attr.Key;
-            var val = attr.Value;
-            if (!key.StartsWith("SourceExpander.EmbeddedSourceCode"))
-                return null;
-            var exts = new HashSet<string>(key.Substring("SourceExpander.EmbeddedSourceCode".Length).Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries));
-            if (exts.Contains("GZipBase32768"))
-                return ParseEmbeddedJson(FromGZipBase32768ToStream(val));
-            return ParseEmbeddedJson(val);
-        }
 #if NETSTANDARD2_0
-        private static List<SourceFileInfo> ParseEmbeddedJson(string json)
+        internal static List<SourceFileInfo> ParseEmbeddedJson(string json)
         {
-            using var ms = new MemoryStream(new System.Text.UTF8Encoding(false).GetBytes(json));
+            using var ms = new MemoryStream(new UTF8Encoding(false).GetBytes(json));
             return ParseEmbeddedJson(ms);
         }
-        private static List<SourceFileInfo> ParseEmbeddedJson(Stream stream)
+        internal static List<SourceFileInfo> ParseEmbeddedJson(Stream stream)
         {
             var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<SourceFileInfo>));
             return (List<SourceFileInfo>)serializer.ReadObject(stream);
         }
 #else
-        private static List<SourceFileInfo> ParseEmbeddedJson(string json)
+        internal static List<SourceFileInfo> ParseEmbeddedJson(string json)
             => System.Text.Json.JsonSerializer.Deserialize<List<SourceFileInfo>>(json);
 
-        private static List<SourceFileInfo> ParseEmbeddedJson(Stream stream)
+        internal static List<SourceFileInfo> ParseEmbeddedJson(Stream stream)
             => System.Text.Json.JsonSerializer.DeserializeAsync<List<SourceFileInfo>>(stream).Result;
 #endif
     }

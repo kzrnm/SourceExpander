@@ -11,5 +11,12 @@ namespace SourceExpander.Roslyn
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
             true);
+        public static readonly DiagnosticDescriptor EMBED0002 = new DiagnosticDescriptor(
+            "EMBED0002",
+            "Compilation must be C#",
+            "Compilation must be C#",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Error,
+            true);
     }
 }

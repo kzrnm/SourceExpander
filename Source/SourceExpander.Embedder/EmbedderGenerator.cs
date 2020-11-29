@@ -21,6 +21,13 @@ namespace SourceExpander
             if (infos.Length == 0)
                 return;
 
+            if(context.ParseOptions is not CSharpParseOptions parseOptions)
+            {
+                context.ReportDiagnostic(
+                        Diagnostic.Create(DiagnosticDescriptors.EMBED0002, Location.None));
+                return;
+            }
+
             var json = ToJson(infos);
             var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
 
@@ -30,6 +37,7 @@ namespace SourceExpander
                     {
                         { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
                         { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
+                        { "SourceExpander.EmbeddedLanguageVersion", parseOptions.SpecifiedLanguageVersion.ToDisplayString()},
                     })
                 , Encoding.UTF8));
         }
