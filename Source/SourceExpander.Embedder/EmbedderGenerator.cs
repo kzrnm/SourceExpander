@@ -17,7 +17,7 @@ namespace SourceExpander
         public void Execute(GeneratorExecutionContext context)
         {
             var infos = new EmbeddingResolver((CSharpCompilation)context.Compilation, new DiagnosticReporter(context))
-                .ResolveFiles(); 
+                .ResolveFiles();
             if (infos.Length == 0)
                 return;
 
