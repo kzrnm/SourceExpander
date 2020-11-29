@@ -7,17 +7,11 @@
 
 
   <ItemGroup>
-    <PackageReference Include="SourceExpander.Core" Version="2.0.0-beta.6"/>
+    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj"/>
     <PackageReference Include="SourceExpander.Generator" Version="2.0.0-beta.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!--
-    <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Analyzer</OutputItemType>
-    </ProjectReference>
-    -->
   </ItemGroup>
   
   

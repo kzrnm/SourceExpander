@@ -2,11 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>8</LangVersion>
-    <NoWarn>1701;1702;IDE0057</NoWarn>
-    <!--
+    <LangVersion>9</LangVersion>
+    <NoWarn>$(NoWarn);IDE0057</NoWarn>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
-    -->
     <PackageId>SourceExpander</PackageId>
     <Description>A library that expanding embedded source code.</Description>
 

@@ -1,3 +1,3 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Reflection;
 
-[assembly: InternalsVisibleTo("SourceExpander.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6")]
+[assembly: AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace SourceExpander { public static class Expander { [Conditional(\\\"EXP\\\")]public static void Expand(string inputFilePath = null, string outputFilePath = null){} public static string ExpandString(string inputFilePath = null) => \\\"\\\"; } } \",\"Dependencies\":[],\"FileName\":\"SourceExpander>Expander.cs\",\"TypeNames\":[\"SourceExpander.Expander\"],\"Usings\":[\"using System;\",\"using System.Collections.Generic;\",\"using System.IO;\",\"using System.Reflection;\",\"using System.Runtime.CompilerServices;\",\"using System.Diagnostics;\"]}]")]

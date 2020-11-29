@@ -1,13 +1,12 @@
 ﻿using System;
 using SampleLibrary;
-
+using SourceExpander;
 
 class Program
 {
     static void Main()
     {
-        Console.WriteLine(typeof(SourceExpander.Expanded.SourceCode));
-        Console.WriteLine(SourceExpander.Expanded.ExpandedContainer.Files);
+        Expander.Expand();
         Put2.Write();
     }
 }
