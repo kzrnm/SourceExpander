@@ -1,0 +1,3 @@
+﻿using System.Reflection;
+
+[assembly: AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace SourceExpander { public static class Expander { [Conditional(\\\"EXP\\\")]public static void Expand(string inputFilePath = null, string outputFilePath = null){} public static string ExpandString(string inputFilePath = null) => \\\"\\\"; } } \",\"Dependencies\":[],\"FileName\":\"SourceExpander>Expander.cs\",\"TypeNames\":[\"SourceExpander.Expander\"],\"Usings\":[\"using System;\",\"using System.Collections.Generic;\",\"using System.IO;\",\"using System.Reflection;\",\"using System.Runtime.CompilerServices;\",\"using System.Diagnostics;\"]}]")]

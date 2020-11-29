@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using SourceExpander.Expanders;
+using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
@@ -12,42 +14,44 @@ namespace SourceExpander
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var (compilation, embeddeds) = Build((CSharpCompilation)context.Compilation);
-            if (embeddeds.Length == 0)
+            var loader = new EmbeddedLoader((CSharpCompilation)context.Compilation, new DiagnosticReporter(context));
+            if (loader.IsEmbeddedEmpty)
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001, Location.None));
+
+
+            if (!HasCoreReference(context.Compilation.ReferencedAssemblyNames))
             {
-                var diagnosticDescriptor = new DiagnosticDescriptor("EXPAND0001", "not found embedded source", "not found embedded source", "ExpandGenerator", DiagnosticSeverity.Info, true);
-                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, Location.None));
+                context.AddSource("SourceExpander.SourceCode.cs",
+                   SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
             }
 
             context.AddSource("SourceExpander.Expanded.cs",
                 SourceText.From(
-                    MakeExpanded(compilation.SyntaxTrees.OfType<CSharpSyntaxTree>(), compilation, embeddeds),
+                    CreateExpanded(loader),
                     Encoding.UTF8));
         }
-        static (CSharpCompilation, SourceFileInfo[]) Build(CSharpCompilation compilation)
-        {
-            var trees = compilation.SyntaxTrees;
-            foreach (var tree in trees)
-            {
-                var opts = tree.Options.WithDocumentationMode(DocumentationMode.Diagnose);
-                compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), opts));
-            }
+        static bool HasCoreReference(IEnumerable<AssemblyIdentity> referencedAssemblyNames)
+            => referencedAssemblyNames.Any(a => a.Name.Equals("SourceExpander.Core", StringComparison.OrdinalIgnoreCase));
 
-            return (compilation, AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation));
-        }
-        static string MakeExpanded(IEnumerable<CSharpSyntaxTree> trees, CSharpCompilation compilation, SourceFileInfo[] infos)
+
+        static string CreateExpanded(EmbeddedLoader loader)
         {
+            static void CreateSourceCodeLiteral(StringBuilder sb, string pathLiteral, string codeLiteral)
+                => sb.Append("SourceCode.FromDictionary(new Dictionary<string,object>{")
+                  .AppendDicElement("\"path\"", pathLiteral)
+                  .AppendDicElement("\"code\"", codeLiteral)
+                  .Append("})");
+
             var sb = new StringBuilder();
             sb.AppendLine("using System.Collections.Generic;");
-            sb.AppendLine("namespace Expanded{");
-            sb.AppendLine("public class SourceCode{ public string Path; public string Code; }");
-            sb.AppendLine("public static class Expanded{");
+            sb.AppendLine("namespace SourceExpander.Expanded{");
+            sb.AppendLine("public static class ExpandedContainer{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{");
-            foreach (var tree in trees)
+            foreach (var (path, code) in loader.EnumerateExpandedCodes())
             {
-                var newCode = new CompilationExpander(tree, compilation, new SourceFileContainer(infos)).ExpandedString();
-                var filePathLiteral = tree.FilePath.ToLiteral();
-                sb.AppendLine($"{{{filePathLiteral}, new SourceCode{{ Path={filePathLiteral}, Code={newCode.ToLiteral()} }} }},");
+                var filePathLiteral = path.ToLiteral();
+                sb.AppendDicElement(filePathLiteral, sb => CreateSourceCodeLiteral(sb, filePathLiteral, code.ToLiteral()));
+                sb.AppendLine();
             }
             sb.AppendLine("};");
             sb.AppendLine("}}");

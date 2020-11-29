@@ -14,6 +14,7 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   WORKFLOW_VERSION_PROJ: Directory.Build.props
   WORKFLOW_BUILD_SLN: SourceExpander.sln
+  GIT_COMMIT: ${{ github.sha }}
 
 jobs:
   get-version:
@@ -128,4 +129,4 @@ jobs:
           name: dist
           path: dist
       - name: Upload nuget
-        run: dotnet nuget push **/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
+        run: dotnet nuget push "./dist/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}

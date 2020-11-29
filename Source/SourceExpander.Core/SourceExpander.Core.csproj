@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
     <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
 
     <RootNamespace>SourceExpander</RootNamespace>
 
@@ -11,10 +10,7 @@
     <PackageId>SourceExpander.Core</PackageId>
     <Description>SourceExpander.Core define SourceFileInfo class.</Description>
 
+    <NoWarn>$(NoWarn);IDE0057</NoWarn>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Base32768" Version="1.0.3" />
-  </ItemGroup>
 
 </Project>

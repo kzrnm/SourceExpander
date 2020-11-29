@@ -1,20 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>SampleLibrary</RootNamespace>
-    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
+
   <ItemGroup>
-    <PackageReference Include="SourceExpander.Embedder" Version="2.0.0-beta.6">
+    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj"/>
+    <PackageReference Include="SourceExpander.Generator" Version="2.0.0-beta.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+  
+  
   <ItemGroup>
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
+    <ProjectReference Include="..\_SampleLibrary2\_SampleLibrary2.csproj" />
   </ItemGroup>
 
 </Project>

@@ -23,11 +23,20 @@
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <None Update="EmbeddingCore.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>EmbeddingCore.cs</LastGenOutput>
+    </None>
+    <None Include="EmbeddingCore.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EmbeddingCore.tt</DependentUpon>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../SourceExpander.Cli/**/*.cs" Visible="false" />
-    <Compile Remove="../SourceExpander.Cli/obj/**/*.cs" />
-    <Compile Remove="../SourceExpander.Cli/**/AssemblyInfo.cs" />
     <Compile Include="../SourceExpander.Share/**/*.cs" />
   </ItemGroup>
 
@@ -42,8 +51,7 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" GeneratePathProperty="true" />
-    <PackageReference Include="Base32768" Version="1.0.3" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" Version="1.0.5" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -51,19 +59,35 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Embedding.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Embedding.tt</DependentUpon>
+    </Compile>
+    <Compile Update="EmbeddingCore.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EmbeddingCore.tt</DependentUpon>
+    </Compile>
+    <Compile Update="EmbeddingSourceCodeClass.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EmbeddingSourceCodeClass.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PkgSourceExpander_Core)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
   
   <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\dotnet\" />
+      <TfmSpecificPackageFile Include="$(TargetDir)\*.dll" PackagePath="analyzers\dotnet\" />
       <TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\" />
-      <TfmSpecificPackageFile Include="$(PkgSourceExpander_Core)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\" />
       <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
     </ItemGroup>
   </Target>
