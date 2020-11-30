@@ -2,18 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <LangVersion>9</LangVersion>
-    <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;IDE0022</NoWarn>
-
     <IsPackable>false</IsPackable>
-
-    <RootNamespace>SourceExpander</RootNamespace>
+    <NoWarn>$(NoWarn);IDE0022</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -27,13 +21,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <None Update="testdata\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
+    <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj" />
   </ItemGroup>
 
 </Project>

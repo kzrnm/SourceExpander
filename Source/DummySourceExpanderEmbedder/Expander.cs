@@ -2,10 +2,10 @@
 
 namespace SourceExpander
 {
-    public static class Expander
+    public class Expander
     {
         [Conditional("EXPANDER")]
-        public static void Expand(string inputFilePath = null, string outputFilePath = null) { }
-        public static string ExpandString(string inputFilePath = null) { return ""; }
+        public static void Expand(string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true) { }
+        public static string ExpandString(string inputFilePath = null, bool ignoreAnyError = true) { return ""; }
     }
 }

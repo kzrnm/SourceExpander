@@ -14,19 +14,27 @@ namespace SourceExpander
         /// <para>if <paramref name="outputFilePath"/> is null, write the code to Combined.csx in <paramref name="inputFilePath"/>'s directory.</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static void Expand([CallerFilePath] string inputFilePath = null, string outputFilePath = null)
+        public static void Expand([CallerFilePath] string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true)
         {
-            if (inputFilePath is null)
-                throw new ArgumentNullException(nameof(inputFilePath));
-
-            var combinedCode = ExpandString(inputFilePath, Assembly.GetCallingAssembly());
-            if (outputFilePath is null)
+            try
             {
-                var directoryName = Path.GetDirectoryName(inputFilePath);
-                outputFilePath = Path.Combine(directoryName, "Combined.csx");
-            }
+                if (inputFilePath is null)
+                    throw new ArgumentNullException(nameof(inputFilePath));
 
-            File.WriteAllText(outputFilePath, combinedCode);
+                var combinedCode = ExpandString(inputFilePath, Assembly.GetCallingAssembly());
+                if (outputFilePath is null)
+                {
+                    var directoryName = Path.GetDirectoryName(inputFilePath);
+                    outputFilePath = Path.Combine(directoryName, "Combined.csx");
+                }
+
+                File.WriteAllText(outputFilePath, combinedCode);
+            }
+            catch
+            {
+                if (!ignoreAnyError)
+                    throw;
+            }
         }
 
         /// <summary>
@@ -34,8 +42,19 @@ namespace SourceExpander
         /// </summary>
         /// <returns>combined code</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static string ExpandString([CallerFilePath] string inputFilePath = null)
-            => ExpandString(inputFilePath, Assembly.GetCallingAssembly());
+        public static string ExpandString([CallerFilePath] string inputFilePath = null, bool ignoreAnyError = true)
+        {
+            try
+            {
+                return ExpandString(inputFilePath, Assembly.GetCallingAssembly());
+            }
+            catch
+            {
+                if (!ignoreAnyError)
+                    throw;
+                return "";
+            }
+        }
 
 
         private static string ExpandString(string inputFilePath, Assembly callingAssembly)
