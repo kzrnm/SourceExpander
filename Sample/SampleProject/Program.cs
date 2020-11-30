@@ -8,6 +8,7 @@ class Program
     {
         Expander.Expand();
         Put2.Write();
-        Console.WriteLine("foo");
+        Console.WriteLine("fofao");
+        Console.WriteLine(SampleLibrary.Bit.ExtractLowestSetBit(13));
     }
 }

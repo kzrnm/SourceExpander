@@ -24,14 +24,15 @@ namespace SourceExpander.Embedder.Test
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, reporter).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();

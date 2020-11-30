@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SampleLibrary</RootNamespace>
-    <LangVersion>8</LangVersion>
+    <LangVersion>2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,18 @@
 
 AtCoderLibrary を提出できる形式に加工するライブラリ。
 
+## Status
+
+![test](https://github.com/naminodarie/SourceExpander/workflows/test/badge.svg?branch=master)
+![test](https://github.com/naminodarie/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
+
+|Library|NuGet|
+|:---|:---|
+|SourceExpander|[![NuGet version (SourceExpander)](https://img.shields.io/nuget/v/SourceExpander.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander/)|
+|SourceExpander.Core|[![NuGet version (SourceExpander.Core)](https://img.shields.io/nuget/v/SourceExpander.Core.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Core/)|
+|SourceExpander.Embedder|[![NuGet version (SourceExpander.Embedder)](https://img.shields.io/nuget/v/SourceExpander.Embedder.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder/)|
+|SourceExpander.Generator|[![NuGet version (SourceExpander.Generator)](https://img.shields.io/nuget/v/SourceExpander.Generator.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Generator/)|
+
 ## 使用方法
 
 `Main` メソッドの中で `AtCoder.Expander.Expand();` を呼び出します。

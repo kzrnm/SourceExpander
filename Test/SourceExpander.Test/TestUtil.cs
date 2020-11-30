@@ -7,7 +7,7 @@ using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using SourceExpander.Expanded;
 
-namespace SourceExpander.Generator.Test
+namespace SourceExpander.Test
 {
     internal static class TestUtil
     {
@@ -32,27 +32,9 @@ namespace SourceExpander.Generator.Test
         public static IReadOnlyDictionary<string, SourceCode> GetExpandedFilesWithCore(Compilation compilation)
             => (IReadOnlyDictionary<string, SourceCode>)GetExpandedFiles(compilation);
 
-        private static readonly string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static string GetTestDataPath(params string[] paths)
-        {
-            var withDir = new string[paths.Length + 2];
-            withDir[0] = dir;
-            withDir[1] = "testdata";
-            Array.Copy(paths, 0, withDir, 2, paths.Length);
-            return Path.Combine(withDir);
-        }
 
-        public static IEnumerable<string> GetSampleDllPaths()
-        {
-            yield return GetTestDataPath("SampleLibrary.Old.dll");
-            yield return GetTestDataPath("SampleLibrary2.dll");
-        }
-
-        private static readonly MetadataReference coreReference
-            = MetadataReference.CreateFromFile(typeof(SourceCode).Assembly.Location);
-        public static readonly MetadataReference[] noCoreReferenceMetadatas = GetDefaulMetadatas().ToArray();
-        public static readonly MetadataReference[] withCoreReferenceMetadatas
-            = noCoreReferenceMetadatas.Append(coreReference).ToArray();
+        public static readonly MetadataReference[] DefaulMetadatas
+            = GetDefaulMetadatas().ToArray();
 
         private static IEnumerable<MetadataReference> GetDefaulMetadatas()
         {
@@ -61,6 +43,9 @@ namespace SourceExpander.Generator.Test
             {
                 yield return MetadataReference.CreateFromFile(file);
             }
+            yield return MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0").Location);
+            yield return MetadataReference.CreateFromFile(typeof(SourceCode).GetTypeInfo().Assembly.Location);
+            yield return MetadataReference.CreateFromFile(typeof(Expander).GetTypeInfo().Assembly.Location);
         }
     }
 }

@@ -101,7 +101,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
                 .Should()
                 .MatchRegex(
                     // language=regex
-                    @"expander version\(\d+\.\d+\.\d+\.\d+\) is older than embedder of OtherDependency\(2147483647\.2147483647\.2147483647\.2147483647\)");
+                    @"Expander version\(\d+\.\d+\.\d+\.\d+\) is older than embedder of OtherDependency\(2147483647\.2147483647\.2147483647\.2147483647\)");
         }
     }
 }
