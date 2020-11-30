@@ -14,8 +14,8 @@ namespace SourceExpander
         private readonly IDiagnosticReporter reporter;
 
         public EmbeddedLoader(
-            CSharpCompilation compilation, 
-            CSharpParseOptions parseOptions, 
+            CSharpCompilation compilation,
+            CSharpParseOptions parseOptions,
             IDiagnosticReporter reporter)
         {
             var trees = compilation.SyntaxTrees;
