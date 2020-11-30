@@ -8,7 +8,7 @@
 
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Core</PackageId>
-    <Description>SourceExpander.Core define SourceFileInfo class.</Description>
+    <Description>SourceExpander.Core define SourceCode class.</Description>
 
     <NoWarn>$(NoWarn);IDE0057</NoWarn>
   </PropertyGroup>
