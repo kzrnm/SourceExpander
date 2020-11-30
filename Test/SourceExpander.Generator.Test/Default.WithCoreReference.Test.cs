@@ -120,7 +120,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
 
 
         [Theory]
-        [InlineData(LanguageVersion.CSharp6)]
+        [InlineData(LanguageVersion.CSharp4)]
         [InlineData(LanguageVersion.Latest)]
         public void SuccessVersion(LanguageVersion version)
         {
@@ -137,7 +137,8 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
@@ -174,9 +175,12 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
         }
 
         [Theory]
-        [InlineData(LanguageVersion.CSharp5)]
+        [InlineData(LanguageVersion.CSharp1)]
+        [InlineData(LanguageVersion.CSharp2)]
+        [InlineData(LanguageVersion.CSharp3)]
         public void FailureVersion(LanguageVersion version)
         {
+
             var syntaxTrees = CreateTrees(version).Take(1).ToArray();
             var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
             var compilation = CSharpCompilation.Create(
@@ -190,14 +194,15 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().NotBeEmpty("used readonly automatically implemented properties in expanded code");
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            outputCompilation.SyntaxTrees
+            diagnostics.Should()
+                .ContainSingle()
+                .Which
+                .Id
                 .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
+                .Be("EXPAND0004");
         }
     }
 }

@@ -6,17 +6,31 @@ namespace SourceExpander.Roslyn
     {
         public static readonly DiagnosticDescriptor EXPAND0001 = new DiagnosticDescriptor(
             "EXPAND0001",
-            "not found embedded source",
-            "not found embedded source",
+            "Not found embedded source",
+            "Not found embedded source",
             "ExpandGenerator",
             DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EXPAND0002 = new DiagnosticDescriptor(
             "EXPAND0002",
-            "expander version is older",
-            "expander version({0}) is older than embedder of {1}({2})",
+            "Expander version is older",
+            "Expander version({0}) is older than embedder of {1}({2})",
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
+            true);
+        public static readonly DiagnosticDescriptor EXPAND0003 = new DiagnosticDescriptor(
+            "EXPAND0003",
+            "Compilation must be C#",
+            "Compilation must be C#. Compilation is {0}.",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Error,
+            true);
+        public static readonly DiagnosticDescriptor EXPAND0004 = new DiagnosticDescriptor(
+            "EXPAND0004",
+            "C# version must be newer than C# 3",
+            "C# version must be newer than C# 3. Compilation's C# version is {0}.",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Error,
             true);
     }
 }

@@ -45,7 +45,7 @@ namespace SourceExpander
                  {
                         { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
                         { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
-                        { "SourceExpander.EmbeddedLanguageVersion", parseOptions.SpecifiedLanguageVersion.ToDisplayString()},
+                        { "SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString()},
                  })
                  , Encoding.UTF8)
             );

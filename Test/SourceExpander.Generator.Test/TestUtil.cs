@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,7 +49,7 @@ namespace SourceExpander.Generator.Test
         }
 
         private static readonly MetadataReference coreReference
-            = MetadataReference.CreateFromFile(typeof(Expanded.SourceCode).Assembly.Location);
+            = MetadataReference.CreateFromFile(typeof(SourceCode).Assembly.Location);
         public static readonly MetadataReference[] noCoreReferenceMetadatas = GetDefaulMetadatas().ToArray();
         public static readonly MetadataReference[] withCoreReferenceMetadatas
             = noCoreReferenceMetadatas.Append(coreReference).ToArray();

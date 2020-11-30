@@ -14,7 +14,22 @@ namespace SourceExpander
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var loader = new EmbeddedLoader((CSharpCompilation)context.Compilation, new DiagnosticReporter(context));
+            if (context.Compilation is not CSharpCompilation compilation
+                || context.ParseOptions is not CSharpParseOptions opts)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0003,
+                    Location.None, context.ParseOptions.Language));
+                return;
+            }
+
+            if ((int)opts.LanguageVersion  <= (int)LanguageVersion.CSharp3)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0004,
+                    Location.None, opts.LanguageVersion.ToDisplayString()));
+                return;
+            }
+
+            var loader = new EmbeddedLoader(compilation, new DiagnosticReporter(context));
             if (loader.IsEmbeddedEmpty)
                 context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001, Location.None));
 
@@ -46,7 +61,8 @@ namespace SourceExpander
             sb.AppendLine("using System.Collections.Generic;");
             sb.AppendLine("namespace SourceExpander.Expanded{");
             sb.AppendLine("public static class ExpandedContainer{");
-            sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files { get; } = new Dictionary<string, SourceCode>{");
+            sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}");
+            sb.AppendLine("private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{");
             foreach (var (path, code) in loader.EnumerateExpandedCodes())
             {
                 var filePathLiteral = path.ToLiteral();

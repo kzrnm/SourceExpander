@@ -13,7 +13,7 @@ namespace SampleLibrary
         public Xorshift() : this(rnd.Next()) { }
         public Xorshift(int seed) { w = (uint)seed; }
 
-        protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue);
+        protected override double Sample() { return InternalSample() * (1.0 / uint.MaxValue); }
         private uint InternalSample()
         {
             uint t = x ^ (x << 11);
