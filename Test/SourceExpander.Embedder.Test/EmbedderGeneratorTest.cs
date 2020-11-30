@@ -65,8 +65,67 @@ namespace SourceExpander.Embedder.Test
                 .ContainAll(
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
-                );
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
+        }
 
+        [Fact]
+        public void GenerateAllowUnsafeTest()
+        {
+            var compilation = CSharpCompilation.Create(
+                assemblyName: "TestAssembly",
+                syntaxTrees: GetTestSyntaxes(),
+                references: defaultMetadatas.Append(expanderCoreReference),
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithAllowUnsafe(true)
+                );
+            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var generator = new EmbedderGenerator();
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
+
+            var reporter = new MockDiagnosticReporter();
+            new EmbeddingResolver(compilation, opts, reporter).ResolveFiles()
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            reporter.Diagnostics.Should().BeEmpty();
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
+            diagnostics.Should().BeEmpty();
+
+            outputCompilation.SyntaxTrees
+                .Should()
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","))
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")");
         }
 
         [Fact]

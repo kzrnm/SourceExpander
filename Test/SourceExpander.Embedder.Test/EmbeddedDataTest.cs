@@ -18,6 +18,7 @@ namespace SourceExpander.Embedder.Test
                     Array.Empty<SourceFileInfo>(),
                     new Version(1, 0, 0),
                     LanguageVersion.CSharp1
+                    , false
                     ));
         }
 
@@ -33,7 +34,8 @@ namespace SourceExpander.Embedder.Test
                     "Version",
                     Array.Empty<SourceFileInfo>(),
                     new Version(3, 4, 0, 0),
-                    LanguageVersion.CSharp1
+                    LanguageVersion.CSharp1,
+                    false
                     ));
         }
 
@@ -52,7 +54,8 @@ namespace SourceExpander.Embedder.Test
                     "CSharpLanguageVersion",
                     Array.Empty<SourceFileInfo>(),
                     new Version(1, 0, 0),
-                    expectedVersion
+                    expectedVersion,
+                    false
                     ));
         }
 
@@ -87,7 +90,8 @@ namespace SourceExpander.Embedder.Test
                     ),
                 },
                 new Version(3, 4, 0, 0),
-                LanguageVersion.CSharp7_3
+                LanguageVersion.CSharp7_3,
+                false
                 );
             EmbeddedData.Create("RawJson", new Dictionary<string, string>
             {
@@ -123,7 +127,8 @@ namespace SourceExpander.Embedder.Test
                     ),
                 },
                 new Version(3, 4, 0, 0),
-                LanguageVersion.CSharp1
+                LanguageVersion.CSharp1,
+                false
                 );
             EmbeddedData.Create("GZipBase32768", new Dictionary<string, string>
             {

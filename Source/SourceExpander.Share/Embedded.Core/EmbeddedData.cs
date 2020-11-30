@@ -10,18 +10,24 @@ namespace SourceExpander
         public Version EmbedderVersion { get; }
         public LanguageVersion CSharpVersion { get; }
         public IReadOnlyList<SourceFileInfo> Sources { get; }
+        public bool AllowUnsafe { get; }
         public bool IsEmpty => Sources.Count == 0;
-        internal EmbeddedData(string assemblyName, IReadOnlyList<SourceFileInfo> sources, Version embedderVersion, LanguageVersion csharpVersion)
+        internal EmbeddedData(string assemblyName, IReadOnlyList<SourceFileInfo> sources,
+            Version embedderVersion,
+            LanguageVersion csharpVersion,
+            bool allowUnsafe)
         {
             AssemblyName = assemblyName;
+            Sources = sources;
             EmbedderVersion = embedderVersion;
             CSharpVersion = csharpVersion;
-            Sources = sources;
+            AllowUnsafe = allowUnsafe;
         }
         public static EmbeddedData Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
         {
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
             Version? version = new Version(1, 0, 0);
+            bool allowUnsafe = false;
             var list = new List<SourceFileInfo>();
             foreach (var pair in assemblyMetadatas)
             {
@@ -34,8 +40,10 @@ namespace SourceExpander
                     version = attrVersion;
                 else if (TryGetEmbeddedLanguageVersion(keyArray, pair.Value, out var attrCSharpVersion))
                     csharpVersion = attrCSharpVersion;
+                else if (TryGetEmbeddedAllowUnsafe(keyArray, pair.Value, out var attrAllowUnsafe))
+                    allowUnsafe = attrAllowUnsafe;
             }
-            return new EmbeddedData(assemblyName, list, version, csharpVersion);
+            return new EmbeddedData(assemblyName, list, version, csharpVersion, allowUnsafe);
         }
         private static bool TryAddSourceFileInfos(string[] keyArray, string value, List<SourceFileInfo> list)
         {
@@ -74,6 +82,18 @@ namespace SourceExpander
                 return true;
             }
             version = LanguageVersion.Default;
+            return false;
+        }
+        private static bool TryGetEmbeddedAllowUnsafe(string[] keyArray, string value, out bool allowUnsafe)
+        {
+            if (keyArray.Length == 2
+                && keyArray[1] == "EmbeddedAllowUnsafe"
+                && bool.TryParse(value, out var embeddedAllowUnsafe))
+            {
+                allowUnsafe = embeddedAllowUnsafe;
+                return true;
+            }
+            allowUnsafe = false;
             return false;
         }
     }

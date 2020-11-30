@@ -38,16 +38,21 @@ namespace SourceExpander
 
             var json = ToJson(infos);
             var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
+            var embbeddingMetadata = new Dictionary<string, string>
+            {
+                { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
+                { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
+                { "SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString()},
+            };
+
+            if (compilation.Options.AllowUnsafe)
+            {
+                embbeddingMetadata["SourceExpander.EmbeddedAllowUnsafe"] = "true";
+            }
+
             yield return (
                 "EmbeddedSourceCode.Metadata.Generated.cs",
-                SourceText.From(
-                 MakeAssemblyMetadataAttributes(new Dictionary<string, string>
-                 {
-                        { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
-                        { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
-                        { "SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString()},
-                 })
-                 , Encoding.UTF8)
+                SourceText.From(MakeAssemblyMetadataAttributes(embbeddingMetadata), Encoding.UTF8)
             );
         }
 
