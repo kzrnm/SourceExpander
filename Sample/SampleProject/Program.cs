@@ -1,12 +1,11 @@
 ﻿using System;
 using SampleLibrary;
-using SourceExpander;
 
 class Program
 {
     static void Main()
     {
-        Expander.Expand();
+        SourceExpander.Expander.Expand(ignoreAnyError: false);
         Put2.Write();
         Console.WriteLine("fofao");
         Console.WriteLine(SampleLibrary.Bit.ExtractLowestSetBit(13));
