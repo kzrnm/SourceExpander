@@ -17,21 +17,21 @@ namespace SourceExpander
             if (context.Compilation is not CSharpCompilation compilation
                 || context.ParseOptions is not CSharpParseOptions opts)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0003,
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0003_MustBeCSharp,
                     Location.None, context.ParseOptions.Language));
                 return;
             }
 
-            if ((int)opts.LanguageVersion  <= (int)LanguageVersion.CSharp3)
+            if ((int)opts.LanguageVersion <= (int)LanguageVersion.CSharp3)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0004,
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3,
                     Location.None, opts.LanguageVersion.ToDisplayString()));
                 return;
             }
 
-            var loader = new EmbeddedLoader(compilation, new DiagnosticReporter(context));
+            var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context));
             if (loader.IsEmbeddedEmpty)
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001, Location.None));
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001_NotFoundEmbedded, Location.None));
 
 
             if (!HasCoreReference(context.Compilation.ReferencedAssemblyNames))
