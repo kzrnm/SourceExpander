@@ -48,6 +48,12 @@ namespace SourceExpander
                         Diagnostic.Create(DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion, Location.None,
                         parseOptions.LanguageVersion.ToDisplayString(), embedded.AssemblyName, embedded.CSharpVersion.ToDisplayString()));
                 }
+                if (embedded.AllowUnsafe && !compilation.Options.AllowUnsafe)
+                {
+                    reporter.ReportDiagnostic(
+                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0006_AllowUnsafe, Location.None,
+                        embedded.AssemblyName));
+                }
                 yield return embedded;
             }
         }

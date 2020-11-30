@@ -39,5 +39,12 @@ namespace SourceExpander.Roslyn
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
             true);
+        public static readonly DiagnosticDescriptor EXPAND0006_AllowUnsafe = new DiagnosticDescriptor(
+            "EXPAND0006",
+            "maybe needs AllowUnsafeBlocks",
+            "maybe needs AllowUnsafeBlocks because {0} has AllowUnsafeBlocks",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }
