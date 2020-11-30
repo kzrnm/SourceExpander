@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,7 +12,22 @@ namespace SourceExpander.Test
     public class ExpandTest
     {
         [Fact]
-        public void DummyExpand()
+        public void AssemblyMetadata()
+        {
+            var embedded = typeof(Expander).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                .Where(attr => attr.Key.StartsWith("SourceExpander"))
+                .ToDictionary(attr => attr.Key, attr => attr.Value);
+            embedded.Should()
+                .ContainKey("SourceExpander.EmbeddedLanguageVersion")
+                .WhichValue.Should().Be("4");
+            embedded.Should()
+                .ContainKey("SourceExpander.EmbedderVersion")
+                .WhichValue.Should()
+                .Be(Assembly.GetExecutingAssembly().GetName().Version.ToString());
+        }
+
+        [Fact]
+        public void Expand()
         {
             const string code = @"using System;
 using SourceExpander;
