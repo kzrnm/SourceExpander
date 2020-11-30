@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
+    <ProjectReference Include="..\SourceExpander.Generator\SourceExpander.Generator.csproj" />
   </ItemGroup>
 
 </Project>
