@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DummySourceExpanderEmbedder\DummySourceExpanderEmbedder.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Analyzer</OutputItemType>
-    </ProjectReference>
     <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
   </ItemGroup>
 

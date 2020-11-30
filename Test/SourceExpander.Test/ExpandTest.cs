@@ -21,9 +21,7 @@ namespace SourceExpander.Test
                 .ContainKey("SourceExpander.EmbeddedLanguageVersion")
                 .WhichValue.Should().Be("4");
             embedded.Should()
-                .ContainKey("SourceExpander.EmbedderVersion")
-                .WhichValue.Should()
-                .Be(Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                .ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
         }
 
         [Fact]
