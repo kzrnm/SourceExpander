@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Kzrnm.Convert.Base32768;
-using Microsoft.CodeAnalysis.CSharp;
 #nullable enable
 namespace SourceExpander
 {
