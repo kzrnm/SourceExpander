@@ -1,6 +1,42 @@
-# AtCoderLibrary.Expander
+# SourceExpander
 
-AtCoderLibrary を提出できる形式に加工するライブラリ。
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Packages](#packages)
+  - [SourceExpander(library)](#sourceexpanderlibrary)
+  - [SourceExpander.Generator](#sourceexpandergenerator)
+  - [SourceExpander.Embedder](#sourceexpanderembedder)
+- [Status](#status)
+- [Getting started](#getting-started)
+  - [For library user](#for-library-user)
+  - [For library developer](#for-library-developer)
+- [Embedded data](#embedded-data)
+  - [EmbedderVersion](#embedderversion)
+  - [EmbeddedLanguageVersion](#embeddedlanguageversion)
+  - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
+  - [EmbeddedSourceCode](#embeddedsourcecode)
+    - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Packages
+
+### SourceExpander(library)
+
+Library that expanding embedded source code.
+
+
+### SourceExpander.Generator
+
+Source generator that embedding source code.
+
+
+### SourceExpander.Embedder
+
+Source generator that embedding source code.
 
 ## Status
 
@@ -14,84 +50,121 @@ AtCoderLibrary を提出できる形式に加工するライブラリ。
 |SourceExpander.Embedder|[![NuGet version (SourceExpander.Embedder)](https://img.shields.io/nuget/v/SourceExpander.Embedder.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder/)|
 |SourceExpander.Generator|[![NuGet version (SourceExpander.Generator)](https://img.shields.io/nuget/v/SourceExpander.Generator.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Generator/)|
 
-## 使用方法
+## Getting started
 
-`Main` メソッドの中で `AtCoder.Expander.Expand();` を呼び出します。
+This library require **.NET 5 SDK** or **Visual Studio 16.8** or later because this library use Source Generators.
 
-`Main` メソッドがあるファイルと同じ階層に `Combined.csx` が生成されます。
+### For library user
+
+see [Sample](/Sample) or https://github.com/naminodarie/ac-library-csharp
+
+```
+Install-Package SourceExpander
+Install-Package <A library with embedded source>
+```
 
 ```C#
+using System;
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        Expander.Expand();
-        var fw = new FenwickTree(5);
-        for (int i = 0; i < 5; i++) fw.Add(i, i + 1);
-        Console.WriteLine(fw.Sum(0, 5));
+        SourceExpander.Expander.Expand();
+        // Your code
     }
 }
 ```
 
+When you run the code, `SourceExpander.Expander.Expand()` create new file that combined library code.
 
 ```C#
-// ExpandMethod.All
-// AtCoderLibrary のすべての型を書き出す。比較的高速に動作する。
-Expander.Expand(expandMethod: ExpandMethod.All);
+using System;
+class Program
+{
+    static void Main()
+    {
+        SourceExpander.Expander.Expand();
+        // Your code
+    }
+}
 
-// 引数なし
-// ExpandMethod.All と同じ
-Expander.Expand();
-
-// ExpandMethod.NameSyntax
-// Roslyn で NameSyntax を検索して、AtCoderLibrary の型と一致する名称があったらその型を書き出す。
-// Roslyn のDLL読み込みのため少し時間がかかる。
-Expander.Expand(expandMethod: ExpandMethod.NameSyntax);
-
-// ExpandMethod.Strict
-// Roslyn でコンパイルして、AtCoderLibrary の型を厳密に検索する。
-// Roslyn のDLL読み込みのため時間に加えて、コンパイル時間もかかるので非常に遅い。
-Expander.Expand(expandMethod: ExpandMethod.Strict);
+#region Expanded
+namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] public static void Expand(string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true) { } public static string ExpandString(string inputFilePath = null, bool ignoreAnyError = true) { return ""; } } } 
+// library code
+#endregion Expanded
 ```
 
-**注意事項**
+### For library developer
 
-`Combined.csx` はビルドしたときに `Main` メソッドが記載されていたファイルのパスに出力されます。
+Just install `SourceExpander.Embedder`.
 
-ビルド済みDLLを移動して実行すると想定外の結果につながるので、開発環境での実行を推奨します。
+```
+Install-Package SourceExpander.Embedder
+```
 
-### その他の使用方法
+## Embedded data
 
-#### 別ファイルへ書き出す
+`SourceExpander.Embedder` embed some data like below.
 
 ```C#
-Expander.Expand(@"foo/bar.cs", @"foo/baz.cs", expandMethod: ExpandMethod.Strict);
+using System.Reflection;
+[assembly: AssemblyMetadata("SourceExpander.EmbedderVersion", "2.2.0.101")]
+[assembly: AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion", "2")]
+[assembly: AssemblyMetadata("SourceExpander.EmbeddedAllowUnsafe", "true")]
+[assembly: AssemblyMetadata("SourceExpander.EmbeddedSourceCode.GZipBase32768", "㘅桠ҠҠԀᏕ䴾阺㹈斪筟楸厮嫉盆炚磈臤梽胍㦬竂帙詪煩㔬樄ᗗ踜鲯诇ᠩ珱䪜䐽闾鱏珣茙灸䏙⨧㤄寨砳⬅ស䮙松Ꝉ㥅䱀餯ꃣ虱嫁榏㪰糰蝃技夛䥘谼礞䐿斄禕蚷屔彺㪪賳鱥䝢鰨覶⬴誼⬼獬鞨胒宝䭴摺眚䅗䃝䚏隻嫻痛簴Ꜿ変⇣㇋聼欈Ꭽ墷霶勎嶐窢銖㤁┠䁺⠛缧䋹凬☂䁸栣僼邐䑹瘜蛭諠賿㨚咈鍂ꄱ禱唨毊崨叼緭䥜榄闺䦖麷䘘㨵ᖶ琜鎎ᰇ髎飭㪬採ꅈ㥞盧䢽䃘煃⬘喔渻莖案ᯋ硟ꋛ叝谴缄ꍢ⋗溁ᣒ颂浢ꍈꉭ㑆焤鹠杳煄㾳䴡䂱㙽楯裦鷬梙掫取颤⩑㰑㕋ꂤ碎麓㾕昖啘繅餬簚盎鍣䨽籭詽绑襌硲❞擧ꌥ膩辪聫㭒珥㴟囓䓖焜铽痢ꊆꍼᓥ囦纇維Ⲡ㤬垇螇感縋㼎砾褳強襓瀕樥阵瀭蜺兔峃絻藈萢饑㶬櫊綖嶅鏕㻶坶禵䓓Ⴐ咇詤煑⬐毱㱒獅鐥椳䖑ᙋ冄㴼㗭隯顑命貽职葅苫⢸栚䀹䢳噂槝䲰䰮⇷ᔈ⎙䕪絑㝖垿䞉場珟䉛㰭䵶日憭蕼馣㸩涴䓋䃇懚鹯琥镌ⴊ電萞猛流癊⏔恚Ԉң")]
+//[assembly: AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace SampleLibrary { public static class Bit { [MethodImpl(MethodImplOptions.AggressiveInlining)] public static int ExtractLowestSetBit(int n) { if (Bmi1.IsSupported) { return (int)Bmi1.ExtractLowestSetBit((uint)n); } return n & -n; } } } \",\"Dependencies\":[],\"FileName\":\"_SampleLibrary>Bit.cs\",\"TypeNames\":[\"SampleLibrary.Bit\"],\"Usings\":[\"using System.Runtime.CompilerServices;\",\"using System.Runtime.Intrinsics.X86;\"]},{\"CodeBody\":\"namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() { Trace.WriteLine(rnd.Next()); } } } \",\"Dependencies\":[\"_SampleLibrary>Xorshift.cs\"],\"FileName\":\"_SampleLibrary>Put.cs\",\"TypeNames\":[\"SampleLibrary.Put\"],\"Usings\":[\"using System.Diagnostics;\"]},{\"CodeBody\":\"namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() { return InternalSample() * (1.0 \\/ uint.MaxValue); } private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } \",\"Dependencies\":[],\"FileName\":\"_SampleLibrary>Xorshift.cs\",\"TypeNames\":[\"SampleLibrary.Xorshift\"],\"Usings\":[\"using System;\"]}]")]
 ```
 
-のようにすると `foo/bar.cs` を元に `foo/baz.cs` を作成します。
 
-#### コード上で処理する
+### EmbedderVersion
+
+AssemblyVersion of `SourceExpander.Embedder`.
+
+### EmbeddedLanguageVersion
+
+C# version of embbeded source code.
+
+### EmbeddedAllowUnsafe
+
+if `true`, embbeded source code allow unsafe code.
+
+### EmbeddedSourceCode
+
+Actually, this metadata does not embedded. for explanation.
+
+json seriarized array of `SourceFileInfo`.
 
 ```C#
-string outputCode = CodeExpander.Expand(File.ReadAllText(path), expandMethod: ExpandMethod.Strict);
+public class SourceFileInfo
+{
+    /// <summary>
+    /// Unique name of file
+    /// </summary>
+    public string FileName { get; set; }
+    /// <summary>
+    /// Defined types like class, struct, record, enum, delegate
+    /// </summary>
+    public IEnumerable<string> TypeNames { get; set; }
+    /// <summary>
+    /// Using directives
+    /// </summary>
+    public IEnumerable<string> Usings { get; set; }
+    /// <summary>
+    /// FileNames that the this depending on
+    /// </summary>
+    public IEnumerable<string> Dependencies { get; set; }
+    /// <summary>
+    /// Code body that removed using directives
+    /// </summary>
+    public string CodeBody { get; set; }
+}
 ```
 
-のように、`string`→`string` の変換にも対応しています。
+#### EmbeddedSourceCode.GZipBase32768
+
+gzip and [base32768](https://github.com/naminodarie/Base32768/) encoded json.
 
 
+## License
 
-## ファイル構成
-
-### Expander
-
-ライブラリ本体
-
-#### Samples
-
-Expander を使用する際のサンプル。
-
-## Lisence
-
-本ライブラリは MIT Licenseで提供しています。
-
-ただし、`Sample` ディレクトリ以下のファイルは CC0 ライセンスで提供しています。
+MIT
