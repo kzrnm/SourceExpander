@@ -1,7 +1,26 @@
 # SourceExpander
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Packages](#packages)
+  - [SourceExpander(library)](#sourceexpanderlibrary)
+  - [SourceExpander.Generator](#sourceexpandergenerator)
+  - [SourceExpander.Embedder](#sourceexpanderembedder)
+- [Status](#status)
+- [Getting started](#getting-started)
+  - [For library user](#for-library-user)
+  - [For library developer](#for-library-developer)
+- [Embedded data](#embedded-data)
+  - [EmbedderVersion](#embedderversion)
+  - [EmbeddedLanguageVersion](#embeddedlanguageversion)
+  - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
+  - [EmbeddedSourceCode](#embeddedsourcecode)
+    - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Packages
 
