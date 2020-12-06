@@ -26,17 +26,17 @@
 
 ### SourceExpander(library)
 
-Library that expanding embedded source code.
+Library that expand embedded source codes.
 
 
 ### SourceExpander.Generator
 
-Source generator that embedding source code.
+Source generator that expand embedded source codes.
 
 
 ### SourceExpander.Embedder
 
-Source generator that embedding source code.
+Source generator that embed source codes.
 
 ## Status
 
