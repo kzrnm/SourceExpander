@@ -21,14 +21,14 @@ namespace SourceExpander.Embedder.Test
                 references: defaultMetadatas.Append(expanderCoreReference),
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
-            compilation.GetDiagnostics().Should().BeEmpty();
+            compilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
 
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
             var reporter = new MockDiagnosticReporter();
@@ -81,14 +81,14 @@ namespace SourceExpander.Embedder.Test
                     .WithAllowUnsafe(true)
                 );
             compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
-            compilation.GetDiagnostics().Should().BeEmpty();
+            compilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
 
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
             var reporter = new MockDiagnosticReporter();
@@ -188,6 +188,7 @@ namespace SourceExpander.Embedder.Test
             yield return CSharpSyntaxTree.ParseText(
                 @"using System.Diagnostics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 namespace Test.I
 {
