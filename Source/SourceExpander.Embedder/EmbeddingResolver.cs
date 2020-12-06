@@ -25,7 +25,14 @@ namespace SourceExpander
             IDiagnosticReporter reporter,
             CancellationToken cancellationToken = default)
         {
-            this.compilation = compilation;
+            var specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>
+            {
+                { "CS8019", ReportDiagnostic.Error },
+                { "CS0105", ReportDiagnostic.Error },
+            };
+            var opts = compilation.Options
+                .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
+            this.compilation = compilation.WithOptions(opts);
             this.parseOptions = parseOptions;
             this.reporter = reporter;
             this.cancellationToken = cancellationToken;
@@ -126,7 +133,11 @@ namespace SourceExpander
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
-            var usings = root.Usings.Select(u => u.ToString().Trim()).ToArray();
+            var unusedUsingsSpans = new HashSet<TextSpan>(semanticModel
+                .GetDiagnostics(null)
+                .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
+                .Select(d => d.Location.SourceSpan));
+            var usings = root.Usings.Where(u => !unusedUsingsSpans.Contains(u.Span)).Select(u => u.ToString().Trim()).ToArray();
 
             var remover = new MinifyRewriter();
             var newRoot = (CompilationUnitSyntax)remover.Visit(root)!;
