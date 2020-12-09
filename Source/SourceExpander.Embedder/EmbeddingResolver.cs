@@ -137,9 +137,6 @@ namespace SourceExpander
                 .Select(d => d.Location.SourceSpan));
             var usings = root.Usings.Where(u => !unusedUsingsSpans.Contains(u.Span)).Select(u => u.ToString().Trim()).ToArray();
 
-            var remover = new MinifyRewriter();
-            var newRoot = (CompilationUnitSyntax)remover.Visit(root)!;
-
             var prefix = $"{compilation.AssemblyName}>";
             var fileName = string.IsNullOrEmpty(commonPrefix) ?
                 prefix + tree.FilePath :
@@ -152,10 +149,10 @@ namespace SourceExpander
                 .Distinct()
                 .ToArray();
 
-            var bodyTree = CSharpSyntaxTree.ParseText(newRoot.ToString(), cancellationToken: cancellationToken);
+            var newRoot = (CompilationUnitSyntax)new UsingRemover().Visit(root)!;
+            var minified = newRoot.NormalizeWhitespace("", "", true);
 
-            return new SourceFileInfoRaw(tree, fileName, typeNames, usings,
-                remover.Visit(bodyTree.GetRoot(cancellationToken).WithoutTrivia())!.ToString());
+            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
         }
 
         public bool HasType(string typeFullName)
