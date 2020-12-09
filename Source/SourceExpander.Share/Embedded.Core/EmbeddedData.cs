@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander
@@ -9,10 +9,10 @@ namespace SourceExpander
         public string AssemblyName { get; }
         public Version EmbedderVersion { get; }
         public LanguageVersion CSharpVersion { get; }
-        public IReadOnlyList<SourceFileInfo> Sources { get; }
+        public ImmutableArray<SourceFileInfo> Sources { get; }
         public bool AllowUnsafe { get; }
-        public bool IsEmpty => Sources.Count == 0;
-        internal EmbeddedData(string assemblyName, IReadOnlyList<SourceFileInfo> sources,
+        public bool IsEmpty => Sources.Length == 0;
+        internal EmbeddedData(string assemblyName, ImmutableArray<SourceFileInfo> sources,
             Version embedderVersion,
             LanguageVersion csharpVersion,
             bool allowUnsafe)
@@ -23,19 +23,20 @@ namespace SourceExpander
             CSharpVersion = csharpVersion;
             AllowUnsafe = allowUnsafe;
         }
-        public static EmbeddedData Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
+        public static EmbeddedData Create(string assemblyName, ImmutableDictionary<string, string> assemblyMetadatas)
         {
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
             Version? version = new Version(1, 0, 0);
             bool allowUnsafe = false;
-            var list = new List<SourceFileInfo>();
+
+            var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();
             foreach (var pair in assemblyMetadatas)
             {
                 var keyArray = pair.Key.Split('.');
                 if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
                     continue;
 
-                if (TryAddSourceFileInfos(keyArray, pair.Value, list)) { }
+                if (TryAddSourceFileInfos(keyArray, pair.Value, builder)) { }
                 else if (TryGetEmbedderVersion(keyArray, pair.Value, out var attrVersion))
                     version = attrVersion;
                 else if (TryGetEmbeddedLanguageVersion(keyArray, pair.Value, out var attrCSharpVersion))
@@ -43,19 +44,19 @@ namespace SourceExpander
                 else if (TryGetEmbeddedAllowUnsafe(keyArray, pair.Value, out var attrAllowUnsafe))
                     allowUnsafe = attrAllowUnsafe;
             }
-            return new EmbeddedData(assemblyName, list, version, csharpVersion, allowUnsafe);
+            return new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe);
         }
-        private static bool TryAddSourceFileInfos(string[] keyArray, string value, List<SourceFileInfo> list)
+        private static bool TryAddSourceFileInfos(string[] keyArray, string value, ImmutableArray<SourceFileInfo>.Builder builder)
         {
             if (keyArray.Length >= 2
                 && keyArray[1] == "EmbeddedSourceCode")
             {
-                List<SourceFileInfo> embedded;
+                ImmutableArray<SourceFileInfo> embedded;
                 if (Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0)
                     embedded = SourceFileInfoUtil.ParseEmbeddedJson(SourceFileInfoUtil.FromGZipBase32768ToStream(value));
                 else
                     embedded = SourceFileInfoUtil.ParseEmbeddedJson(value);
-                list.AddRange(embedded);
+                builder.AddRange(embedded);
                 return true;
             }
             return false;

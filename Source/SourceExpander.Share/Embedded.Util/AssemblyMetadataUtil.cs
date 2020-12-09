@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -14,11 +15,9 @@ namespace SourceExpander
                 if (symbol is null)
                     continue;
 
-                var embedded = EmbeddedData.Create(
-                    symbol.Name,
-                    symbol.GetAttributes()
-                    .Select(GetAttributeSourceCode)
-                    .OfType<KeyValuePair<string, string>>());
+                var embedded = EmbeddedData.Create(symbol.Name,
+                    ImmutableDictionary.CreateRange(symbol.GetAttributes().Select(GetAttributeSourceCode).OfType<KeyValuePair<string, string>>())
+                    );
 
                 if (!embedded.IsEmpty)
                     yield return embedded;
