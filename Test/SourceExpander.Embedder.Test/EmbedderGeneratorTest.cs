@@ -174,7 +174,7 @@ namespace SourceExpander.Embedder.Test
                     new string[] { "Test.I.IntRecord", "Test.I.D<T>" },
                     new string[] { "using System.Diagnostics;", "using System;", "using System.Collections.Generic;" },
                     new string[] { "TestAssembly>Put.cs" },
-                    "namespace Test.I { public record IntRecord(int n); class D<T> : IComparer<T> { public int Compare(T x, T y) => throw new NotImplementedException(); public static void WriteType() { Console.Write(typeof(T).FullName); Trace.Write(typeof(T).FullName); Put.Nested.Write(typeof(T).FullName); } } }"
+                    "namespace Test.I { using System.Collections; public record IntRecord(int n); class D<T> : IComparer<T> { public int Compare(T x, T y) => throw new NotImplementedException(); public static void WriteType() { Console.Write(typeof(T).FullName); Trace.Write(typeof(T).FullName); Put.Nested.Write(typeof(T).FullName); } } }"
                 ), new SourceFileInfo
                 (
                     "TestAssembly>Put.cs",
@@ -195,6 +195,7 @@ using System.Threading.Tasks; // unused
 using System.Collections.Generic;
 namespace Test.I
 {
+    using System.Collections;
     public record IntRecord(int n);
     class D<T> : IComparer<T>
     {
