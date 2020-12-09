@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace SourceExpander.Embedder.Test
+namespace SourceExpander.Share.Test
 {
     public class EmbeddedDataTest
     {

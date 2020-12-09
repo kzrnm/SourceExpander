@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -26,10 +26,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
-    <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj" />
+    <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj" />
   </ItemGroup>
 
 </Project>
