@@ -34,9 +34,7 @@ namespace SourceExpander
             var semanticModel = Compilation.GetSemanticModel(origTree);
             var origRoot = (CompilationUnitSyntax)origTree.GetRoot(cancellationToken);
             var requiedFiles = sourceFileContainer.ResolveDependency(
-                origRoot.DescendantNodes()
-                .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s, cancellationToken).Symbol))
-                .OfType<string>(),
+                RoslynUtil.AllTypeNames(semanticModel, origTree, cancellationToken),
                 false);
 
             var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(
@@ -77,17 +75,6 @@ namespace SourceExpander
         {
             Array.Sort(usings, (a, b) => StringComparer.Ordinal.Compare(a.TrimEnd(';'), b.TrimEnd(';')));
             return usings;
-        }
-
-
-        private static string? GetTypeNameFromSymbol(ISymbol? symbol)
-        {
-            if (symbol == null) return null;
-            if (symbol is INamedTypeSymbol named)
-            {
-                return named.ConstructedFrom.ToDisplayString();
-            }
-            return symbol.ContainingType?.ConstructedFrom?.ToDisplayString() ?? symbol.ToDisplayString();
         }
     }
 }

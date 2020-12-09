@@ -98,10 +98,8 @@ namespace SourceExpander
                 var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
 
                 var semanticModel = compilation.GetSemanticModel(tree, true);
-                var typeQueue = new Queue<string>(root.DescendantNodes()
-                    .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s, cancellationToken).Symbol?.OriginalDefinition))
-                    .OfType<string>()
-                    .Distinct());
+                var typeQueue = new Queue<string>(
+                    RoslynUtil.AllTypeNames(semanticModel, tree, cancellationToken));
 
                 var added = new HashSet<string>(raw.TypeNames);
                 var dependencies = new HashSet<string>();
@@ -154,23 +152,14 @@ namespace SourceExpander
                 .Distinct()
                 .ToArray();
 
+            var bodyTree = CSharpSyntaxTree.ParseText(newRoot.ToString(), cancellationToken: cancellationToken);
+
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings,
-                remover.Visit(CSharpSyntaxTree.ParseText(newRoot.ToString(), cancellationToken: cancellationToken)
-                .GetRoot(cancellationToken))!.ToString());
+                remover.Visit(bodyTree.GetRoot(cancellationToken).WithoutTrivia())!.ToString());
         }
 
         public bool HasType(string typeFullName)
             => compilation.GetTypeByMetadataName(typeFullName) != null;
-
-        private static string? GetTypeNameFromSymbol(ISymbol? symbol)
-        {
-            if (symbol == null) return null;
-            if (symbol is INamedTypeSymbol named)
-            {
-                return named.ConstructedFrom.ToDisplayString();
-            }
-            return symbol.ContainingType?.ConstructedFrom?.ToDisplayString() ?? symbol.ToDisplayString();
-        }
 
         public static string ResolveCommomFileNamePrefix(Compilation compilation)
             => ResolveCommomPrefix(compilation.SyntaxTrees.Select(tree => tree.FilePath));
