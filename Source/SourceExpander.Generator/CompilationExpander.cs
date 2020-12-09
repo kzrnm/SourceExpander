@@ -47,8 +47,7 @@ namespace SourceExpander
 
             var usings = new HashSet<string>(newRoot.Usings.Select(u => u.ToString().Trim()));
 
-            var remover = new UsingRemover();
-            var newBody = remover.Visit(newRoot).ToString();
+            var newBody = (new UsingRemover().Visit(newRoot) ?? throw new InvalidOperationException()).ToString();
 
             usings.UnionWith(requiedFiles.SelectMany(s => s.Usings));
 
