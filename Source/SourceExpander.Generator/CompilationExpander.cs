@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,20 +28,20 @@ namespace SourceExpander
 
         private CSharpCompilation Compilation { get; }
 
-        public string ExpandCode(SyntaxTree origTree)
+        public string ExpandCode(SyntaxTree origTree, CancellationToken cancellationToken)
         {
             var sb = new StringBuilder();
             var semanticModel = Compilation.GetSemanticModel(origTree);
-            var origRoot = (CompilationUnitSyntax)origTree.GetRoot();
+            var origRoot = (CompilationUnitSyntax)origTree.GetRoot(cancellationToken);
             var requiedFiles = sourceFileContainer.ResolveDependency(
                 origRoot.DescendantNodes()
-                .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s).Symbol))
+                .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s, cancellationToken).Symbol))
                 .OfType<string>(),
                 false);
 
             var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(
                 ImmutableHashSet.CreateRange<SyntaxNode?>(semanticModel
-                .GetDiagnostics(null)
+                .GetDiagnostics(null, cancellationToken: cancellationToken)
                 .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
                 .Select(d => origRoot.FindNode(d.Location.SourceSpan))
                 .OfType<UsingDirectiveSyntax>()))

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Roslyn;
@@ -12,22 +13,25 @@ namespace SourceExpander
         private readonly SourceFileContainer container;
         private readonly CompilationExpander expander;
         private readonly IDiagnosticReporter reporter;
+        private readonly CancellationToken cancellationToken;
 
         public EmbeddedLoader(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
-            IDiagnosticReporter reporter)
+            IDiagnosticReporter reporter,
+            CancellationToken cancellationToken)
         {
             var trees = compilation.SyntaxTrees;
             foreach (var tree in trees)
             {
                 var newOpts = tree.Options.WithDocumentationMode(DocumentationMode.Diagnose);
-                compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(), newOpts));
+                compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(cancellationToken), newOpts));
             }
 
             this.reporter = reporter;
             this.compilation = compilation;
             this.parseOptions = parseOptions;
+            this.cancellationToken = cancellationToken;
             var embeddedDatas = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
             container = new SourceFileContainer(WithCheck(embeddedDatas));
             expander = new CompilationExpander(compilation, container);
@@ -61,7 +65,7 @@ namespace SourceExpander
         public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
         {
             foreach (var tree in compilation.SyntaxTrees)
-                yield return (tree.FilePath, expander.ExpandCode(tree));
+                yield return (tree.FilePath, expander.ExpandCode(tree, cancellationToken));
         }
 
         public bool IsEmbeddedEmpty => container.Count == 0;
