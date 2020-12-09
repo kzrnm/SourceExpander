@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,13 +17,11 @@ namespace SourceExpander
         public CompilationExpander(CSharpCompilation compilation, SourceFileContainer sourceFileContainer)
         {
             this.sourceFileContainer = sourceFileContainer;
-            var specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>
-            {
-                { "CS8019", ReportDiagnostic.Error },
-                { "CS0105", ReportDiagnostic.Error },
-            };
+            var specificDiagnosticOptionsBuilder = ImmutableDictionary.CreateBuilder<string, ReportDiagnostic>();
+            specificDiagnosticOptionsBuilder.Add("CS8019", ReportDiagnostic.Error);
+            specificDiagnosticOptionsBuilder.Add("CS0105", ReportDiagnostic.Error);
             var opts = compilation.Options
-                .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
+                .WithSpecificDiagnosticOptions(specificDiagnosticOptionsBuilder.ToImmutable());
             Compilation = compilation.WithOptions(opts);
         }
 
@@ -32,7 +31,7 @@ namespace SourceExpander
         {
             var sb = new StringBuilder();
             var semanticModel = Compilation.GetSemanticModel(origTree);
-            var origRoot = origTree.GetRoot();
+            var origRoot = (CompilationUnitSyntax)origTree.GetRoot();
             var requiedFiles = sourceFileContainer.ResolveDependency(
                 origRoot.DescendantNodes()
                 .Select(s => GetTypeNameFromSymbol(semanticModel.GetSymbolInfo(s).Symbol))
@@ -40,11 +39,11 @@ namespace SourceExpander
                 false);
 
             var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(
-                semanticModel
+                ImmutableHashSet.CreateRange<SyntaxNode?>(semanticModel
                 .GetDiagnostics(null)
                 .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
                 .Select(d => origRoot.FindNode(d.Location.SourceSpan))
-                .OfType<UsingDirectiveSyntax>())
+                .OfType<UsingDirectiveSyntax>()))
                 .Visit(origRoot) ?? throw new InvalidOperationException());
 
             var usings = new HashSet<string>(newRoot.Usings.Select(u => u.ToString().Trim()));
@@ -55,8 +54,7 @@ namespace SourceExpander
             usings.UnionWith(requiedFiles.SelectMany(s => s.Usings));
 
 
-            var sortedUsings = SortedUsings(usings);
-            foreach (var u in sortedUsings)
+            foreach (var u in SortUsings(usings.ToArray()))
                 sb.AppendLine(u);
 
             using var sr = new StringReader(newBody);
@@ -74,12 +72,12 @@ namespace SourceExpander
             return sb.ToString();
         }
 
-        public static string[] SortedUsings(IEnumerable<string> usings)
+        private static string[] SortUsings(string[] usings)
         {
-            var arr = usings.ToArray();
-            Array.Sort(arr, (a, b) => StringComparer.Ordinal.Compare(a.TrimEnd(';'), b.TrimEnd(';')));
-            return arr;
+            Array.Sort(usings, (a, b) => StringComparer.Ordinal.Compare(a.TrimEnd(';'), b.TrimEnd(';')));
+            return usings;
         }
+
 
         private static string? GetTypeNameFromSymbol(ISymbol? symbol)
         {

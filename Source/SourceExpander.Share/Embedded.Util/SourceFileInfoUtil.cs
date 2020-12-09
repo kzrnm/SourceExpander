@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -30,23 +30,15 @@ namespace SourceExpander
             msOut.Position = 0;
             return msOut;
         }
-#if NETSTANDARD2_0
-        internal static List<SourceFileInfo> ParseEmbeddedJson(string json)
+        internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(string json)
         {
             using var ms = new MemoryStream(new UTF8Encoding(false).GetBytes(json));
             return ParseEmbeddedJson(ms);
         }
-        internal static List<SourceFileInfo> ParseEmbeddedJson(Stream stream)
+        internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(Stream stream)
         {
-            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<SourceFileInfo>));
-            return (List<SourceFileInfo>)serializer.ReadObject(stream);
+            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(SourceFileInfo[]));
+            return ImmutableArray.Create((SourceFileInfo[])serializer.ReadObject(stream));
         }
-#else
-        internal static List<SourceFileInfo> ParseEmbeddedJson(string json)
-            => System.Text.Json.JsonSerializer.Deserialize<List<SourceFileInfo>>(json);
-
-        internal static List<SourceFileInfo> ParseEmbeddedJson(Stream stream)
-            => System.Text.Json.JsonSerializer.DeserializeAsync<List<SourceFileInfo>>(stream).Result;
-#endif
     }
 }
