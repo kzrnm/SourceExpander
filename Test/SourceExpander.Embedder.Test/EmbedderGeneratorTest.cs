@@ -19,16 +19,19 @@ namespace SourceExpander.Embedder.Test
                 assemblyName: "TestAssembly",
                 syntaxTrees: GetTestSyntaxes(),
                 references: defaultMetadatas.Append(expanderCoreReference),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                    { "CS8019", ReportDiagnostic.Suppress },
+                }));
             compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
-            compilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
+            compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
 
             var reporter = new MockDiagnosticReporter();
@@ -188,7 +191,7 @@ namespace SourceExpander.Embedder.Test
             yield return CSharpSyntaxTree.ParseText(
                 @"using System.Diagnostics;
 using System;
-using System.Collections;
+using System.Threading.Tasks; // unused
 using System.Collections.Generic;
 namespace Test.I
 {

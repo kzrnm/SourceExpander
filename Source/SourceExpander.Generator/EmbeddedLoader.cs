@@ -19,7 +19,7 @@ namespace SourceExpander
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
             IDiagnosticReporter reporter,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var trees = compilation.SyntaxTrees;
             foreach (var tree in trees)
