@@ -4,13 +4,20 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SampleLibrary</RootNamespace>
     <LangVersion>6</LangVersion>
+    <UseLocalReference>false</UseLocalReference>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(UseLocalReference)' != 'true'">
     <PackageReference Include="SourceExpander.Embedder" Version="2.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseLocalReference)' == 'true'">
+    <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>

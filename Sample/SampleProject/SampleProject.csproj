@@ -3,14 +3,23 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseLocalReference>false</UseLocalReference>
   </PropertyGroup>
 
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(UseLocalReference)' != 'true'">
     <PackageReference Include="SourceExpander" Version="2.2.0" />
   </ItemGroup>
-  
-  
+  <ItemGroup Condition="'$(UseLocalReference)' == 'true'">
+    <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
+    <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+  </ItemGroup>
+
+
+
   <ItemGroup>
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
     <ProjectReference Include="..\_SampleLibrary2\_SampleLibrary2.csproj" />
