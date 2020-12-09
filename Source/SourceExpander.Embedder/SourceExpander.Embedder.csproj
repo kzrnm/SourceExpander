@@ -28,6 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="build\**" Pack="true" PackagePath="build" />
+    <Content Include="content\**" Pack="true" PackagePath="content" />
     <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
   </ItemGroup>
 
@@ -36,6 +38,11 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <None Remove="build\SourceExpander.Embedder.targets" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Base32768" Version="1.0.5" GeneratePathProperty="true" />
