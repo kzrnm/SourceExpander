@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Expanded;
 using Xunit;
 
-namespace SourceExpander.Generator.Test
+namespace SourceExpander.Generator.Generate.Test
 {
     public class NotFoundTest
     {

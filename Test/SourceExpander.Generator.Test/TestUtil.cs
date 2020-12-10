@@ -6,7 +6,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using SourceExpander.Expanded;
 
-namespace SourceExpander.Generator.Test
+namespace SourceExpander.Generator
 {
     internal static partial class TestUtil
     {

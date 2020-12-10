@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace SourceExpander.Embedder.Test
+namespace SourceExpander.Embedder.Generate.Test
 {
     public class OtherDependencyTest
     {

@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using static SourceExpander.Embedder.Test.TestUtil;
+using static SourceExpander.Embedder.TestUtil;
 
-namespace SourceExpander.Embedder.Test
+namespace SourceExpander.Embedder.Generate.Test
 {
     public class PreProcessTest
     {
