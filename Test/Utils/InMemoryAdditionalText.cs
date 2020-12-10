@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace SourceExpander
 {
-    internal class InMemoryAdditionalText : AdditionalText
+    public class InMemoryAdditionalText : AdditionalText
     {
         public InMemoryAdditionalText(string path, string source) : this(path, source, new UTF8Encoding(false)) { }
         public InMemoryAdditionalText(string path, string source, Encoding encoding)

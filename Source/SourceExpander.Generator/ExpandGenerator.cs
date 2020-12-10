@@ -45,7 +45,7 @@ namespace SourceExpander
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EXPAND0007_ParseConfigError, Location.None, e.Message));
-                throw;
+                return;
             }
 
             var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config);

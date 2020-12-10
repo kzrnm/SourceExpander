@@ -1,0 +1,13 @@
+{
+    "$schema": "https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json",
+    "exclude-attributes": [
+        "System.Diagnostics.DebuggerBrowsableAttribute",
+        "System.Diagnostics.DebuggerDisplayAttribute",
+        "System.Diagnostics.DebuggerHiddenAttribute",
+        "System.Diagnostics.DebuggerNonUserCodeAttribute",
+        "System.Diagnostics.DebuggerStepperBoundaryAttribute",
+        "System.Diagnostics.DebuggerStepThroughAttribute",
+        "System.Diagnostics.DebuggerTypeProxyAttribute",
+        "System.Diagnostics.DebuggerVisualizerAttribute"
+    ]
+}

@@ -28,7 +28,7 @@ namespace SourceExpander
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EMBED0003_ParseConfigError, Location.None, e.Message));
-                throw;
+                return;
             }
 
             var resolver = new EmbeddingResolver(

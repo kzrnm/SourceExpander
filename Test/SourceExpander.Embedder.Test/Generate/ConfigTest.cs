@@ -137,5 +137,56 @@ namespace SourceExpander.Embedder.Generate.Test
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();
         }
+
+
+        public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+        {
+            {
+                new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": 1
+}
+")
+            },
+            {
+                new InMemoryAdditionalText(
+                "/foo/bar/sourceExpander.embedder.config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": 1
+}
+")
+            },
+        };
+
+        [Theory]
+        [MemberData(nameof(ParseErrorJsons))]
+        public void ParseErrorTest(InMemoryAdditionalText additionalText)
+        {
+            var compilation = CSharpCompilation.Create(
+                assemblyName: "TestAssembly",
+                syntaxTrees: GetTestSyntaxes(),
+                references: defaultMetadatas.Append(expanderCoreReference),
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                   {"CS8019",ReportDiagnostic.Suppress },
+                }));
+            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var generator = new EmbedderGenerator();
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator },
+                additionalTexts: new[] { 
+                    additionalText,
+                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                },
+                parseOptions: opts);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+            diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
+        }
     }
 }
