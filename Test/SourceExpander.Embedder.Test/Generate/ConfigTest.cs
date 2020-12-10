@@ -9,9 +9,9 @@ using static SourceExpander.Embedder.TestUtil;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class EmbedderGeneratorTest
+    public class ConfigTest
     {
-        public EmbedderGeneratorTest()
+        public ConfigTest()
         {
             compilation = CSharpCompilation.Create(
                    assemblyName: "TestAssembly",
@@ -26,8 +26,7 @@ namespace SourceExpander.Embedder.Generate.Test
         }
         private readonly CSharpCompilation compilation;
         static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-        static ImmutableArray<SourceFileInfo> embeddedFiles
-            = ImmutableArray.Create(
+        static readonly ImmutableArray<SourceFileInfo> embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
                 (
                     "TestAssembly>F/N.cs",
@@ -48,7 +47,7 @@ namespace SourceExpander.Embedder.Generate.Test
                     new string[] { "Test.I.IntRecord", "Test.I.D<T>" },
                     new string[] { "using System.Diagnostics;", "using System;", "using System.Collections.Generic;" },
                     new string[] { "TestAssembly>Put.cs" },
-                    @"namespace Test.I{using System.Collections;public record IntRecord(int n);[System.Diagnostics.DebuggerDisplay(""TEST"")]class D<T> : IComparer<T>{public int Compare(T x, T y) => throw new NotImplementedException();[System.Diagnostics.Conditional(""TEST"")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}}}"
+                      @"namespace Test.I{using System.Collections;public record IntRecord(int n);class D<T> : IComparer<T>{public int Compare(T x, T y) => throw new NotImplementedException();[System.Diagnostics.Conditional(""TEST"")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}}}"
                 ), new SourceFileInfo
                 (
                     "TestAssembly>Put.cs",
@@ -57,12 +56,38 @@ namespace SourceExpander.Embedder.Generate.Test
                     ImmutableArray.Create<string>(),
                     "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
                 ));
+
+
         [Fact]
         public void GenerateTest()
         {
+            var compilation = CSharpCompilation.Create(
+                assemblyName: "TestAssembly",
+                syntaxTrees: GetTestSyntaxes(),
+                references: defaultMetadatas.Append(expanderCoreReference),
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                   {"CS8019",ReportDiagnostic.Suppress },
+                }));
+            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": [
+        ""System.Diagnostics.DebuggerDisplayAttribute""
+    ]
+}
+");
+
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator },
+                additionalTexts: new[] { additionalText },
+                parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
@@ -104,8 +129,10 @@ namespace SourceExpander.Embedder.Generate.Test
         [Fact]
         public void ResolverTest()
         {
+            var config = new EmbedderConfig(
+                new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, config).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();

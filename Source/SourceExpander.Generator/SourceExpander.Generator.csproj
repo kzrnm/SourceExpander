@@ -51,6 +51,17 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <None Remove="build\SourceExpander.Generator.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="build\SourceExpander.Generator.targets">
+      <PackagePath>build</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Base32768" Version="1.0.5" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

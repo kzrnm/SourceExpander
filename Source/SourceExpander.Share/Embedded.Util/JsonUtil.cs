@@ -18,8 +18,11 @@ namespace SourceExpander
 
         public static T ParseJson<T>(SourceText jsonText, CancellationToken cancellationToken)
         {
-            using var ms = new MemoryStream(jsonText.Length);
-            using var sw = new StreamWriter(ms, jsonText.Encoding ?? Encoding.UTF8);
+            using var ms = new MemoryStream();
+            using var sw = new StreamWriter(ms, jsonText.Encoding ?? new UTF8Encoding(false))
+            {
+                AutoFlush = true
+            };
             jsonText.Write(sw, cancellationToken);
             ms.Position = 0;
             return ParseJson<T>(ms);

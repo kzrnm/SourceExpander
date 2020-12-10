@@ -114,7 +114,7 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 
@@ -200,7 +200,7 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 

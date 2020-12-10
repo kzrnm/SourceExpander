@@ -26,9 +26,11 @@ namespace Test.I
 {
     using System.Collections;
     public record IntRecord(int n);
+    [System.Diagnostics.DebuggerDisplay(""TEST"")]
     class D<T> : IComparer<T>
     {
         public int Compare(T x,T y) => throw new NotImplementedException();
+        [System.Diagnostics.Conditional(""TEST"")]
         public static void WriteType()
         {
             Console.Write(typeof(T).FullName);

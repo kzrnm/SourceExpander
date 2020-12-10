@@ -17,11 +17,13 @@ namespace SourceExpander
         private readonly CSharpCompilation compilation;
         private readonly CSharpParseOptions parseOptions;
         private readonly IDiagnosticReporter reporter;
+        private readonly EmbedderConfig config;
         private readonly CancellationToken cancellationToken;
         public EmbeddingResolver(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
             IDiagnosticReporter reporter,
+            EmbedderConfig config,
             CancellationToken cancellationToken = default)
         {
             var specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>
@@ -34,6 +36,7 @@ namespace SourceExpander
             this.compilation = compilation.WithOptions(opts);
             this.parseOptions = parseOptions;
             this.reporter = reporter;
+            this.config = config;
             this.cancellationToken = cancellationToken;
         }
         public IEnumerable<(string name, SourceText sourceText)> EnumerateEmbeddingSources()
@@ -148,9 +151,12 @@ namespace SourceExpander
                 .Distinct()
                 .ToArray();
 
-            var newRoot = (CompilationUnitSyntax)new UsingRemover().Visit(root)!;
-            var minified = newRoot.NormalizeWhitespace("", "", true);
+            var newRoot = new EmbedderRewriter(semanticModel, config).Visit(root);
+            newRoot = new UsingRemover().Visit(newRoot);
+            if (newRoot is null)
+                throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
+            var minified = newRoot.NormalizeWhitespace("", "", true);
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
         }
 

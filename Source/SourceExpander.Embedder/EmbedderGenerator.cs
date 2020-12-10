@@ -14,13 +14,17 @@ namespace SourceExpander
         public void Initialize(GeneratorInitializationContext context) { }
         public void Execute(GeneratorExecutionContext context)
         {
-            var configFile = context.AdditionalFiles.FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
-            _ = configFile?.GetText(context.CancellationToken);
+            var configText = context.AdditionalFiles
+                .FirstOrDefault(a =>
+                    StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+                ?.GetText(context.CancellationToken);
+            var config = EmbedderConfig.Parse(configText, context.CancellationToken);
 
             var resolver = new EmbeddingResolver(
                 (CSharpCompilation)context.Compilation,
                 (CSharpParseOptions)context.ParseOptions,
                 new DiagnosticReporter(context),
+                config,
                 context.CancellationToken);
 
             foreach (var (path, source) in resolver.EnumerateEmbeddingSources())

@@ -9,6 +9,8 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class PreProcessTest
     {
+        static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+
         [Fact]
         public void GenerateTest()
         {
@@ -33,7 +35,7 @@ path: "Program.cs") },
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();

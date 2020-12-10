@@ -7,10 +7,11 @@ namespace SourceExpander
 {
     internal class InMemoryAdditionalText : AdditionalText
     {
-        public InMemoryAdditionalText(string path, string source)
+        public InMemoryAdditionalText(string path, string source) : this(path, source, new UTF8Encoding(false)) { }
+        public InMemoryAdditionalText(string path, string source, Encoding encoding)
         {
             Path = path;
-            sourceText = SourceText.From(source, Encoding.UTF8);
+            sourceText = SourceText.From(source, encoding);
         }
         public override string Path { get; }
         private readonly SourceText sourceText;
