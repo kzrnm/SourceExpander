@@ -3,7 +3,7 @@
     "required": [],
     "additionalProperties": true,
     "properties": {
-        "ignore-files": {
+        "ignore-file-pattern-regex": {
             "type": "array",
             "items": {
                 "type": "string"
