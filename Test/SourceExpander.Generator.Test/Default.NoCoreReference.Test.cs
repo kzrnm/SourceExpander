@@ -75,7 +75,7 @@ Put2.Write();",
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            dynamic files = TestUtil.GetExpandedFiles(outputCompilation);
+            dynamic files = GeneratorUtil.GetExpandedFiles(outputCompilation);
             ((System.Collections.IEnumerable)files).Should().HaveCount(2);
             ((object)files["/home/source/Program.cs"]).Should()
                 .BeEquivalentTo(
@@ -149,7 +149,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            dynamic files = TestUtil.GetExpandedFiles(outputCompilation);
+            dynamic files = GeneratorUtil.GetExpandedFiles(outputCompilation);
             ((System.Collections.IEnumerable)files).Should().HaveCount(1);
             ((object)files["/home/source/Program.cs"]).Should()
                 .BeEquivalentTo(

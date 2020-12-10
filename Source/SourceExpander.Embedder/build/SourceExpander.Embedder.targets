@@ -1,10 +1,10 @@
 <Project>
 
   <PropertyGroup>
-    <EmbeddingConfigFile>$(ProjectDir)embedding-config.json.xml</EmbeddingConfigFile>
+    <EmbedderConfigFile>$(ProjectDir)SourceExpander.Embedder.Config.json</EmbedderConfigFile>
   </PropertyGroup>
-  <ItemGroup Condition="Exists($(EmbeddingConfigFile))">
-    <AdditionalFiles Include="$(EmbeddingConfigFile)" />
+  <ItemGroup Condition="Exists($(EmbedderConfigFile))">
+    <AdditionalFiles Include="$(EmbedderConfigFile)" />
   </ItemGroup>
-  
+
 </Project>

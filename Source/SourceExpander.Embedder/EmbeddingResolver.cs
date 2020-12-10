@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -43,7 +42,7 @@ namespace SourceExpander
             if (infos.Length == 0)
                 yield break;
 
-            var json = ToJson(infos);
+            var json = JsonUtil.ToJson(infos);
             var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
             var embbeddingMetadata = new Dictionary<string, string>
             {
@@ -185,14 +184,6 @@ namespace SourceExpander
             return min;
         }
 
-
-        static string ToJson(IEnumerable<SourceFileInfo> infos)
-        {
-            var serializer = new DataContractJsonSerializer(typeof(IEnumerable<SourceFileInfo>));
-            using var ms = new MemoryStream();
-            serializer.WriteObject(ms, infos);
-            return Encoding.UTF8.GetString(ms.ToArray());
-        }
         static string MakeAssemblyMetadataAttributes(IEnumerable<KeyValuePair<string, string>> dic)
         {
             var sb = new StringBuilder("using System.Reflection;");

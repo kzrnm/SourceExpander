@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json",
     "exclude-attributes": [
         "System.Diagnostics.DebuggerBrowsableAttribute",
-        "System.Diagnostics.DebuggerDisplayAttribute  ",
+        "System.Diagnostics.DebuggerDisplayAttribute",
         "System.Diagnostics.DebuggerHiddenAttribute",
         "System.Diagnostics.DebuggerNonUserCodeAttribute",
         "System.Diagnostics.DebuggerStepperBoundaryAttribute",

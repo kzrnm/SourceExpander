@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace SourceExpander
 {
-    internal static class MetadataUtil
+    internal static class GeneratorUtil
     {
         public static object GetExpandedFiles(Compilation compilation)
         {

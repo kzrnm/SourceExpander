@@ -24,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Utils\MetadataUtil.cs" Link="Utils\MetadataUtil.cs" />
+    <Compile Include="..\Utils\InMemoryAdditionalText.cs" Link="Utils\InMemoryAdditionalText.cs" />
+    <Compile Include="..\Utils\GeneratorUtil.cs" Link="Utils\GeneratorUtil.cs" />
+    <Compile Include="..\Utils\MockDiagnosticReporter.cs" Link="Utils\MockDiagnosticReporter.cs" />
   </ItemGroup>
 
   <ItemGroup>

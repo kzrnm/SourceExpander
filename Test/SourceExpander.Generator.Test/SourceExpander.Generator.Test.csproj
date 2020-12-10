@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Utils\MetadataUtil.cs" Link="Utils\MetadataUtil.cs" />
+    <Compile Include="..\Utils\GeneratorUtil.cs" Link="Utils\GeneratorUtil.cs" />
   </ItemGroup>
 
   <ItemGroup>
