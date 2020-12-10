@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <SourceExpanderEmbedderConfigFile>$(ProjectDir)SourceExpander.Embedder.Config.json</SourceExpanderEmbedderConfigFile>
+    <SourceExpanderEmbedderConfigFile Condition=" '$(SourceExpanderEmbedderConfigFile)' == ''">$(ProjectDir)SourceExpander.Embedder.Config.json</SourceExpanderEmbedderConfigFile>
   </PropertyGroup>
   <ItemGroup Condition="Exists($(SourceExpanderEmbedderConfigFile))">
     <AdditionalFiles Include="$(SourceExpanderEmbedderConfigFile)" />
