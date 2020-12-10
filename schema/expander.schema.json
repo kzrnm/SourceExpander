@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "required": [],
+    "additionalProperties": true,
+    "properties": {
+        "ignore-files": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}
