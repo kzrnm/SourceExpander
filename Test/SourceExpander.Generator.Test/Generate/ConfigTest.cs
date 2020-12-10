@@ -49,7 +49,7 @@ Put2.Write();",
         }
 
         [Fact]
-        public void Success()
+        public void IgnoreFile()
         {
             var version = LanguageVersion.Latest;
             var syntaxTrees = CreateTrees(version);

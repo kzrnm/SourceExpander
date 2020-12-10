@@ -8,7 +8,7 @@
 
 
   <ItemGroup Condition="'$(UseLocalReference)' != 'true'">
-    <PackageReference Include="SourceExpander" Version="2.2.0" />
+    <PackageReference Include="SourceExpander" Version="2.3.0-alpha.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseLocalReference)' == 'true'">
     <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
@@ -17,8 +17,6 @@
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
   </ItemGroup>
-
-
 
   <ItemGroup>
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
