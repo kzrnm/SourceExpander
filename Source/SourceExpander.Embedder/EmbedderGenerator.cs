@@ -18,7 +18,18 @@ namespace SourceExpander
                 .FirstOrDefault(a =>
                     StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
                 ?.GetText(context.CancellationToken);
-            var config = EmbedderConfig.Parse(configText, context.CancellationToken);
+
+            EmbedderConfig config;
+            try
+            {
+                config = EmbedderConfig.Parse(configText, context.CancellationToken);
+            }
+            catch (ParseConfigException e)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0003_ParseConfigError, Location.None, e.Message));
+                throw;
+            }
 
             var resolver = new EmbeddingResolver(
                 (CSharpCompilation)context.Compilation,

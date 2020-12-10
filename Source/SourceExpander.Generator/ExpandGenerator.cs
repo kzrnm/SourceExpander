@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -12,6 +13,7 @@ namespace SourceExpander
     [Generator]
     public class ExpandGenerator : ISourceGenerator
     {
+        private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
         public void Execute(GeneratorExecutionContext context)
         {
             if (context.Compilation is not CSharpCompilation compilation
@@ -29,7 +31,24 @@ namespace SourceExpander
                 return;
             }
 
-            var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context));
+            var configText = context.AdditionalFiles
+                    .FirstOrDefault(a =>
+                        StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+                    ?.GetText(context.CancellationToken);
+
+            ExpandConfig config;
+            try
+            {
+                config = ExpandConfig.Parse(configText, context.CancellationToken);
+            }
+            catch (ParseConfigException e)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EXPAND0007_ParseConfigError, Location.None, e.Message));
+                throw;
+            }
+
+            var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config);
             if (loader.IsEmbeddedEmpty)
                 context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001_NotFoundEmbedded, Location.None));
 
@@ -40,10 +59,10 @@ namespace SourceExpander
                    SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
             }
 
+            var expandedCode = CreateExpanded(loader);
+
             context.AddSource("SourceExpander.Expanded.cs",
-                SourceText.From(
-                    CreateExpanded(loader),
-                    Encoding.UTF8));
+                SourceText.From(expandedCode, Encoding.UTF8));
         }
         static bool HasCoreReference(IEnumerable<AssemblyIdentity> referencedAssemblyNames)
             => referencedAssemblyNames.Any(a => a.Name.Equals("SourceExpander.Core", StringComparison.OrdinalIgnoreCase));

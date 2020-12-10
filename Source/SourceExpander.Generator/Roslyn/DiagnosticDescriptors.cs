@@ -46,5 +46,12 @@ namespace SourceExpander.Roslyn
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
             true);
+        public static readonly DiagnosticDescriptor EXPAND0007_ParseConfigError = new DiagnosticDescriptor(
+            "EXPAND0007",
+            "Error config file",
+            "Error config file: {0}",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Error,
+            true);
     }
 }

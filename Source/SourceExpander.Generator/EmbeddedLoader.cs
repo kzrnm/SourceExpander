@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Roslyn;
@@ -13,12 +14,14 @@ namespace SourceExpander
         private readonly SourceFileContainer container;
         private readonly CompilationExpander expander;
         private readonly IDiagnosticReporter reporter;
+        private readonly ExpandConfig config;
         private readonly CancellationToken cancellationToken;
 
         public EmbeddedLoader(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
             IDiagnosticReporter reporter,
+            ExpandConfig config,
             CancellationToken cancellationToken = default)
         {
             var trees = compilation.SyntaxTrees;
@@ -31,6 +34,7 @@ namespace SourceExpander
             this.reporter = reporter;
             this.compilation = compilation;
             this.parseOptions = parseOptions;
+            this.config = config;
             this.cancellationToken = cancellationToken;
             var embeddedDatas = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
             container = new SourceFileContainer(WithCheck(embeddedDatas));
@@ -65,7 +69,11 @@ namespace SourceExpander
         public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
         {
             foreach (var tree in compilation.SyntaxTrees)
-                yield return (tree.FilePath, expander.ExpandCode(tree, cancellationToken));
+            {
+                var filePath = tree.FilePath;
+                if (!config.IgnoreFilePatterns.Any(regex => regex.IsMatch(filePath)))
+                    yield return (filePath, expander.ExpandCode(tree, cancellationToken));
+            }
         }
 
         public bool IsEmbeddedEmpty => container.Count == 0;

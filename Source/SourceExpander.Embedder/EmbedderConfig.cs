@@ -18,10 +18,17 @@ namespace SourceExpander
 
         public static EmbedderConfig Parse(SourceText? sourceText, CancellationToken cancellationToken)
         {
-            if (sourceText is not null && JsonUtil.ParseJson<EmbedderConfigData>(sourceText, cancellationToken) is { } data)
-                return new EmbedderConfig(
-                    excludeAttributes: data.ExcludeAttributes ?? Array.Empty<string>());
-            return new EmbedderConfig();
+            try
+            {
+                if (sourceText is not null && JsonUtil.ParseJson<EmbedderConfigData>(sourceText, cancellationToken) is { } data)
+                    return new EmbedderConfig(
+                        excludeAttributes: data.ExcludeAttributes ?? Array.Empty<string>());
+                return new EmbedderConfig();
+            }
+            catch (Exception e)
+            {
+                throw new ParseConfigException(e);
+            }
         }
 
         [DataContract]
@@ -31,5 +38,12 @@ namespace SourceExpander
             [DataMember(Name = "exclude-attributes")]
             public string[]? ExcludeAttributes { set; get; }
         }
+    }
+
+#pragma warning disable CA1032
+    internal sealed class ParseConfigException : Exception
+    {
+        public ParseConfigException() { }
+        public ParseConfigException(Exception inner) : base(inner.Message, inner) { }
     }
 }
