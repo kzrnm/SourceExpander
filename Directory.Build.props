@@ -8,8 +8,8 @@
     <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>
     <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
 
-    <Version>2.3.0-alpha.1</Version>
-    <AssemblyVersion>2.3.0.1</AssemblyVersion>
+    <Version>2.3.0-alpha.2</Version>
+    <AssemblyVersion>2.3.0.2</AssemblyVersion>
     <RepositoryCommit Condition="'$(GIT_COMMIT)' != ''">$(GIT_COMMIT)</RepositoryCommit>
 
     <SignAssembly>True</SignAssembly>
