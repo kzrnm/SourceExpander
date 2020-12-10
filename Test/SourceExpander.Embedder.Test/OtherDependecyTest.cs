@@ -16,7 +16,7 @@ namespace SourceExpander.Embedder.Test
                 syntaxTrees: new[] {
                         syntax,
                 },
-                references: Util.defaultMetadatas,
+                references: TestUtil.defaultMetadatas,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
@@ -35,7 +35,7 @@ namespace SourceExpander.Embedder.Test
                         @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
                         path: @"/home/other/AssemblyInfo.cs")
                 },
-                references: Util.defaultMetadatas,
+                references: TestUtil.defaultMetadatas,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
         }
@@ -81,7 +81,7 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: Util.defaultMetadatas.Append(OtherDependency),
+                references: TestUtil.defaultMetadatas.Append(OtherDependency),
                 options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
 
@@ -167,7 +167,7 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: Util.defaultMetadatas.Append(OtherDependency),
+                references: TestUtil.defaultMetadatas.Append(OtherDependency),
                 options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
 
 

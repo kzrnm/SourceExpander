@@ -6,7 +6,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using static SourceExpander.Embedder.Test.Util;
+using static SourceExpander.Embedder.Test.TestUtil;
 
 namespace SourceExpander.Embedder.Test
 {
