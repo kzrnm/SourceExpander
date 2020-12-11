@@ -71,7 +71,7 @@ namespace SourceExpander
             foreach (var tree in compilation.SyntaxTrees)
             {
                 var filePath = tree.FilePath;
-                if (!config.IgnoreFilePatterns.Any(regex => regex.IsMatch(filePath)))
+                if (config.IsMatch(filePath))
                     yield return (filePath, expander.ExpandCode(tree, cancellationToken));
             }
         }
