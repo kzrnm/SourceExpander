@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SampleLibrary</RootNamespace>
     <LangVersion>6</LangVersion>
-    <UseLocalReference>false</UseLocalReference>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(UseLocalReference)' != 'true'">
