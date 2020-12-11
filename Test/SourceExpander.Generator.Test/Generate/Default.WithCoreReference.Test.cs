@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SourceExpander.Generator.Generate.Test
 {
-    public class DefaultWithCoreReferenceTest
+    public class DefaultWithCoreReferenceTest : ExpandGeneratorTestBase
     {
         private static SyntaxTree[] CreateTrees(LanguageVersion languageVersion)
         {
@@ -53,15 +53,14 @@ Put2.Write();",
         {
             var version = LanguageVersion.Latest;
             var syntaxTrees = CreateTrees(version);
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences),
-                options: new CSharpCompilationOptions(OutputKind.ConsoleApplication)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas:sampleLibReferences.Append(coreReference)
+                );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
@@ -74,7 +73,7 @@ Put2.Write();",
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(2);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
@@ -125,15 +124,14 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
         public void SuccessVersion(LanguageVersion version)
         {
             var syntaxTrees = CreateTrees(version).Take(1).ToArray();
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference)
+                );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
@@ -146,7 +144,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
@@ -182,21 +180,20 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
         {
 
             var syntaxTrees = CreateTrees(version).Take(1).ToArray();
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference)
+                );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator },
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
             diagnostics.Should()
                 .ContainSingle()
                 .Which

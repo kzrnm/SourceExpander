@@ -5,26 +5,83 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using static SourceExpander.Embedder.TestUtil;
+using static SourceExpander.Embedder.EmbeddingGeneratorTestBase;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class ConfigTest
+    public class ConfigTest : EmbeddingGeneratorTestBase
     {
         public ConfigTest()
         {
-            compilation = CSharpCompilation.Create(
-                   assemblyName: "TestAssembly",
-                   syntaxTrees: GetTestSyntaxes(),
-                   references: defaultMetadatas.Append(expanderCoreReference),
-                   options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                   .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                   {"CS8019",ReportDiagnostic.Suppress },
-                   }));
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
+            compilation = CreateCompilation(TestSyntaxes,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        {"CS8019",ReportDiagnostic.Suppress },
+                    }),
+                new[] { expanderCoreReference });
+            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
             compilation.GetDiagnostics().Should().BeEmpty();
         }
         private readonly CSharpCompilation compilation;
+        private static SyntaxTree[] TestSyntaxes => new[]
+        {
+                 CSharpSyntaxTree.ParseText(
+                    @"using System.Diagnostics;namespace Test{static class Put{public class Nested{ public static void Write(string v){Debug.WriteLine(v);}}}}",
+                    path: "/home/source/Put.cs"),
+                 CSharpSyntaxTree.ParseText(
+                    @"using System.Diagnostics;
+    using System;
+    using System.Threading.Tasks;// unused
+    using System.Collections.Generic;
+    namespace Test.I
+    {
+        using System.Collections;
+        public record IntRecord(int n);
+        [System.Diagnostics.DebuggerDisplay(""TEST"")]
+        class D<T> : IComparer<T>
+        {
+            public int Compare(T x,T y) => throw new NotImplementedException();
+            [System.Diagnostics.Conditional(""TEST"")]
+            public static void WriteType()
+            {
+                Console.Write(typeof(T).FullName);
+                Trace.Write(typeof(T).FullName);
+                Put.Nested.Write(typeof(T).FullName);
+            }
+        }
+    }",
+                    path: "/home/source/I/D.cs"),
+                 CSharpSyntaxTree.ParseText(
+                   @"using System;
+    using System.Diagnostics;
+    using static System.Console;
+
+    namespace Test.F
+    {
+        class N
+        {
+            public static void WriteN()
+            {
+                Console.Write(NumType.Zero);
+                Write(""N"");
+                Trace.Write(""N"");
+                Put.Nested.Write(""N"");
+            }
+        }
+    }",
+                    path: "/home/source/F/N.cs"),
+                 CSharpSyntaxTree.ParseText(
+       @"
+    namespace Test.F
+    {
+        public enum NumType
+        {
+            Zero,
+            Pos,
+            Neg,
+        }
+    }", path: "/home/source/F/NumType.cs"),
+        };
         static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         static readonly ImmutableArray<SourceFileInfo> embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
@@ -61,17 +118,6 @@ namespace SourceExpander.Embedder.Generate.Test
         [Fact]
         public void GenerateTest()
         {
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: GetTestSyntaxes(),
-                references: defaultMetadatas.Append(expanderCoreReference),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                   {"CS8019",ReportDiagnostic.Suppress },
-                }));
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
-            compilation.GetDiagnostics().Should().BeEmpty();
-
             var additionalText = new InMemoryAdditionalText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
@@ -91,7 +137,7 @@ namespace SourceExpander.Embedder.Generate.Test
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
 
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -109,7 +155,7 @@ namespace SourceExpander.Embedder.Generate.Test
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
             diagnostics.Should().BeEmpty();
 
             outputCompilation.SyntaxTrees
@@ -165,17 +211,6 @@ namespace SourceExpander.Embedder.Generate.Test
         [MemberData(nameof(ParseErrorJsons))]
         public void ParseErrorTest(InMemoryAdditionalText additionalText)
         {
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: GetTestSyntaxes(),
-                references: defaultMetadatas.Append(expanderCoreReference),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                   {"CS8019",ReportDiagnostic.Suppress },
-                }));
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxesCount);
-            compilation.GetDiagnostics().Should().BeEmpty();
-
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(

@@ -8,17 +8,14 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class OtherDependencyTest
+    public class OtherDependencyTest : EmbeddingGeneratorTestBase
     {
         private static CSharpCompilation MakeOtherCompilation(SyntaxTree syntax)
         {
-            var compilation = CSharpCompilation.Create("OtherDependency",
-                syntaxTrees: new[] {
-                        syntax,
-                },
-                references: TestUtil.defaultMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-            );
+            var compilation = CreateCompilation(
+                new[] { syntax, },
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                assemblyName: "OtherDependency");
 
             var generator = new EmbedderGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
@@ -28,16 +25,14 @@ namespace SourceExpander.Embedder.Generate.Test
 
         private static CSharpCompilation MakeOldStyleCompilation(SyntaxTree syntax)
         {
-            return CSharpCompilation.Create("OtherDependency",
-                syntaxTrees: new[] {
+            return CreateCompilation(new[] {
                         syntax,
                         CSharpSyntaxTree.ParseText(
                         @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
                         path: @"/home/other/AssemblyInfo.cs")
                 },
-                references: TestUtil.defaultMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-            );
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                assemblyName: "OtherDependency");
         }
 
         private readonly Dictionary<string, CompilationReference> otherDependencies = new Dictionary<string, CompilationReference>();
@@ -57,9 +52,8 @@ namespace SourceExpander.Embedder.Generate.Test
         [InlineData("current")]
         public void OtherTest(string name)
         {
-            var OtherDependency = otherDependencies[name];
-            var compilation = CSharpCompilation.Create("Mine",
-                syntaxTrees: new[] {
+            var compilation = CreateCompilation(
+                new[] {
                     CSharpSyntaxTree.ParseText(@"
 namespace Mine{
     public static class C
@@ -81,10 +75,9 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: TestUtil.defaultMetadatas.Append(OtherDependency),
-                options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-
-
+                new CSharpCompilationOptions(OutputKind.ConsoleApplication),
+                new[] { otherDependencies[name] }
+                );
             compilation.SyntaxTrees.Should().HaveCount(2);
             compilation.GetDiagnostics().Should().BeEmpty();
 
@@ -97,15 +90,15 @@ namespace Mine{
             var expected = new[] {
                 new SourceFileInfo
                 (
-                    "Mine>Program.cs",
+                    "TestAssembly>Program.cs",
                     new string[] { "Mine.Program" },
                     new string[] { "using OC = Other.C;" },
-                    new string[] { "OtherDependency>C.cs", "Mine>C.cs" },
+                    new string[] { "OtherDependency>C.cs", "TestAssembly>C.cs" },
                     "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
                 ),
                 new SourceFileInfo
                 (
-                    "Mine>C.cs",
+                    "TestAssembly>C.cs",
                     new string[] { "Mine.C" },
                     Array.Empty<string>(),
                     Array.Empty<string>(),
@@ -142,10 +135,10 @@ namespace Mine{
                 @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]",
                 path: @"/home/other/AssemblyInfo2.cs"));
 
-            var OtherDependency = otherCompilation.ToMetadataReference();
+            var otherDependency = otherCompilation.ToMetadataReference();
 
-            var compilation = CSharpCompilation.Create("Mine",
-                syntaxTrees: new[] {
+            var compilation = CreateCompilation(
+                new[] {
                     CSharpSyntaxTree.ParseText(@"
 namespace Mine{
     public static class C
@@ -167,9 +160,9 @@ namespace Mine{
     }
 }", path: @"/home/mine/Program.cs"),
         },
-                references: TestUtil.defaultMetadatas.Append(OtherDependency),
-                options: new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-
+                new CSharpCompilationOptions(OutputKind.ConsoleApplication),
+                additionalMetadatas: new[] { otherDependency }
+                );
 
             compilation.SyntaxTrees.Should().HaveCount(2);
             compilation.GetDiagnostics().Should().BeEmpty();
@@ -183,15 +176,15 @@ namespace Mine{
             var expected = new[] {
                 new SourceFileInfo
                 (
-                    "Mine>Program.cs",
+                    "TestAssembly>Program.cs",
                     new string[] { "Mine.Program" },
                     new string[] { "using OC = Other.C;" },
-                    new string[] { "OtherDependency>C.cs", "Mine>C.cs" },
+                    new string[] { "OtherDependency>C.cs", "TestAssembly>C.cs" },
                     "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
                 ),
                 new SourceFileInfo
                 (
-                    "Mine>C.cs",
+                    "TestAssembly>C.cs",
                     new string[] { "Mine.C" },
                     Array.Empty<string>(),
                     Array.Empty<string>(),

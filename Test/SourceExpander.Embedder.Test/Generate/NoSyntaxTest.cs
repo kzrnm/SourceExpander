@@ -3,19 +3,15 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using static SourceExpander.Embedder.TestUtil;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class NoSyntaxTest
+    public class NoSyntaxTest : EmbeddingGeneratorTestBase
     {
         public NoSyntaxTest()
         {
-            compilation = CSharpCompilation.Create(
-               assemblyName: "TestAssembly",
-               syntaxTrees: ImmutableArray.Create<SyntaxTree>(),
-               references: defaultMetadatas,
-               options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            compilation = CreateCompilation(ImmutableArray.Create<SyntaxTree>(),
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             compilation.SyntaxTrees.Should().BeEmpty();
             compilation.GetDiagnostics()
                 .Should().BeEmpty();

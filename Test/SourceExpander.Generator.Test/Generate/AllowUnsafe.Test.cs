@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SourceExpander.Generator.Generate.Test
 {
-    public class AllowUnsafeTest
+    public class AllowUnsafeTest : ExpandGeneratorTestBase
     {
         [Fact]
         public void NotAllowTest()
@@ -33,27 +33,27 @@ class Program
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
                     path: "/home/source/Program.cs"),
             };
-            var newerEmbedderCompilation = CSharpCompilation.Create("OtherDependency",
-                syntaxTrees: new[] {
+            var anotherCompilation = CreateCompilation(
+                new[] {
                     CSharpSyntaxTree.ParseText(
                         @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
                         + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
                         + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedAllowUnsafe"",""true"")]",
                         path: @"/home/other/AssemblyInfo.cs"),
                 },
-                references: TestUtil.withCoreReferenceMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-            );
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                additionalMetadatas: sampleLibReferences.Append(coreReference),
+                assemblyName: "OtherDependency"
+                );
 
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilation.ToMetadataReference()),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference).Append(anotherCompilation.ToMetadataReference())
+                );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
@@ -64,7 +64,7 @@ class Program
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
@@ -126,28 +126,28 @@ class Program
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
                     path: "/home/source/Program.cs"),
             };
-            var newerEmbedderCompilation = CSharpCompilation.Create("OtherDependency",
-                syntaxTrees: new[] {
+            var anotherCompilation = CreateCompilation(
+                new[] {
                     CSharpSyntaxTree.ParseText(
                         @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
                         + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
                         + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedAllowUnsafe"",""true"")]",
                         path: @"/home/other/AssemblyInfo.cs"),
                 },
-                references: TestUtil.withCoreReferenceMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-            );
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                additionalMetadatas: sampleLibReferences.Append(coreReference),
+                assemblyName: "OtherDependency"
+                );
 
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilation.ToMetadataReference()),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithAllowUnsafe(true)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithAllowUnsafe(true)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference).Append(anotherCompilation.ToMetadataReference())
+                );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
@@ -158,7 +158,7 @@ class Program
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(

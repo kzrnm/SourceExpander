@@ -8,18 +8,20 @@ using Xunit;
 
 namespace SourceExpander.Generator.Generate.Test
 {
-    public class LangVersion7_2Test
+    public class LangVersion7_2Test : ExpandGeneratorTestBase
     {
-        private static readonly CompilationReference newerEmbedderCompilationRef = CSharpCompilation.Create("OtherDependency",
-            syntaxTrees: new[] {
-                CSharpSyntaxTree.ParseText(
+        private static readonly CompilationReference newerEmbedderCompilationRef =
+            CreateCompilation(
+                new[] {
+                    CSharpSyntaxTree.ParseText(
                     @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
                     + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2.0.0.0"")]"
                     + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
                     , path: @"/home/other/AssemblyInfo.cs"),
-            },
-            references: TestUtil.withCoreReferenceMetadatas,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                },
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                additionalMetadatas: new[] { coreReference },
+                assemblyName: "OtherDependency"
         ).ToMetadataReference();
         private static IEnumerable<SyntaxTree> CreateSyntaxTrees(LanguageVersion languageVersion)
         {
@@ -48,15 +50,14 @@ class Program
         [InlineData(LanguageVersion.CSharp8)]
         public void Success(LanguageVersion languageVersion)
         {
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: CreateSyntaxTrees(languageVersion),
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilationRef),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                CreateSyntaxTrees(languageVersion),
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference).Append(newerEmbedderCompilationRef)
+                );
             compilation.SyntaxTrees.Should().HaveCount(1);
 
             var generator = new ExpandGenerator();
@@ -72,7 +73,7 @@ class Program
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
@@ -109,15 +110,14 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
         [InlineData(LanguageVersion.CSharp7_1)]
         public void Failure(LanguageVersion languageVersion)
         {
-            var sampleReferences = TestUtil.GetSampleDllPaths().Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: CreateSyntaxTrees(languageVersion),
-                references: TestUtil.withCoreReferenceMetadatas.Concat(sampleReferences).Append(newerEmbedderCompilationRef),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
+            var compilation = CreateCompilation(
+                CreateSyntaxTrees(languageVersion),
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference).Append(newerEmbedderCompilationRef)
+                );
             compilation.SyntaxTrees.Should().HaveCount(1);
 
             var generator = new ExpandGenerator();
@@ -133,7 +133,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(

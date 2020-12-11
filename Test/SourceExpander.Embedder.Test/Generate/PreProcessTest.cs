@@ -1,22 +1,20 @@
-﻿using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using static SourceExpander.Embedder.TestUtil;
+using static SourceExpander.Embedder.EmbeddingGeneratorTestBase;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class PreProcessTest
+    public class PreProcessTest : EmbeddingGeneratorTestBase
     {
         static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
 
         [Fact]
         public void GenerateTest()
         {
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: new[] { CSharpSyntaxTree.ParseText(@"using System;
+            var compilation = CreateCompilation(
+                new[] { CSharpSyntaxTree.ParseText(@"using System;
 class Program
 {
     static void Main() =>
@@ -27,10 +25,10 @@ class Program
 #endif
 }
 ",
-options: new CSharpParseOptions(preprocessorSymbols:new[]{ "Trace" }),
+new CSharpParseOptions(preprocessorSymbols:new[]{ "Trace" }),
 path: "Program.cs") },
-                references: defaultMetadatas.Append(expanderCoreReference),
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                additionalMetadatas: new[] { expanderCoreReference });
             compilation.SyntaxTrees.Should().HaveCount(1);
             compilation.GetDiagnostics().Should().BeEmpty();
 
