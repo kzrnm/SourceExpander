@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Utils\InMemoryAdditionalText.cs" Link="Utils\InMemoryAdditionalText.cs" />
+    <Compile Include="..\Utils\GeneratorTestBase.cs" Link="Utils\GeneratorTestBase.cs" />
+    <Compile Include="..\Utils\MockDiagnosticReporter.cs" Link="Utils\MockDiagnosticReporter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

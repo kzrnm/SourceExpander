@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using Microsoft.CodeAnalysis;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander.Embedder.Test
+namespace SourceExpander
 {
     public class MockDiagnosticReporter : IDiagnosticReporter
     {

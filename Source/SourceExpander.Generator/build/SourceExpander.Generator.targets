@@ -1,0 +1,10 @@
+<Project>
+
+  <PropertyGroup>
+    <SourceExpanderGeneratorConfigFile Condition=" '$(SourceExpanderGeneratorConfigFile)' == ''">$(ProjectDir)SourceExpander.Generator.Config.json</SourceExpanderGeneratorConfigFile>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists($(SourceExpanderGeneratorConfigFile))">
+    <AdditionalFiles Include="$(SourceExpanderGeneratorConfigFile)" />
+  </ItemGroup>
+
+</Project>

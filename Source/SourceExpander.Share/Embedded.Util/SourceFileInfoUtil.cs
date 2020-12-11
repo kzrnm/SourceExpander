@@ -31,14 +31,8 @@ namespace SourceExpander
             return msOut;
         }
         internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(string json)
-        {
-            using var ms = new MemoryStream(new UTF8Encoding(false).GetBytes(json));
-            return ParseEmbeddedJson(ms);
-        }
+            => ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(json));
         internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(Stream stream)
-        {
-            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(SourceFileInfo[]));
-            return ImmutableArray.Create((SourceFileInfo[])serializer.ReadObject(stream));
-        }
+            => ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(stream));
     }
 }

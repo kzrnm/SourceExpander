@@ -5,14 +5,18 @@ using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Expanded;
 using Xunit;
 
-namespace SourceExpander.Generator.Test
+namespace SourceExpander.Generator.Generate.Test
 {
-    public class NotFoundTest
+    public class NotFoundTest : ExpandGeneratorTestBase
     {
         [Fact]
         public void GenerateTest()
         {
-            const string code = @"using System;
+            var compilation = CreateCompilation(
+                new[]
+                {
+                    CSharpSyntaxTree.ParseText(
+                        @"using System;
 using System.Reflection;
 using static System.Math;
 
@@ -22,24 +26,16 @@ class Program
     {
         Console.WriteLine(42);
     }
-}";
-            var syntaxTrees = new[]
-            {
-                CSharpSyntaxTree.ParseText(
-                    code,
-                    options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
-                    path: "/home/source/Program.cs"),
-            };
-
-            var compilation = CSharpCompilation.Create(
-                assemblyName: "TestAssembly",
-                syntaxTrees: syntaxTrees,
-                references: TestUtil.withCoreReferenceMetadatas,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                    { "CS8019", ReportDiagnostic.Suppress },
-                }));
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+}",
+                        options: new CSharpParseOptions(documentationMode:DocumentationMode.None),
+                        path: "/home/source/Program.cs"),
+                },
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: new[] { coreReference });
+            compilation.SyntaxTrees.Should().HaveCount(1);
 
             var generator = new ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
@@ -49,12 +45,12 @@ class Program
                 .Which
                 .Id
                 .Should().Be("EXPAND0001");
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
 
             outputCompilation.SyntaxTrees
             .Should()
             .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(outputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
