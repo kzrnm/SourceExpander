@@ -3,9 +3,19 @@
     "type": "object",
     "additionalProperties": true,
     "properties": {
-        "ignore-file-pattern-regex": {
+        "match-file-pattern": {
+            "description": "file name whitelist",
             "type": "array",
             "items": {
+                "description": "file name whitelist",
+                "type": "string"
+            }
+        },
+        "ignore-file-pattern-regex": {
+            "description": "ignore file name regex pattern",
+            "type": "array",
+            "items": {
+                "description": "ignore file name regex pattern",
                 "type": "string"
             }
         }

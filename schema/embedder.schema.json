@@ -4,8 +4,10 @@
     "additionalProperties": true,
     "properties": {
         "exclude-attributes": {
+            "description": "attribute full name that remove on embedding",
             "type": "array",
             "items": {
+                "description": "attribute full name that remove on embedding",
                 "type": "string"
             }
         }
