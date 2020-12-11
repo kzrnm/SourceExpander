@@ -7,9 +7,19 @@
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander</PackageId>
     <Description>A library that expanding embedded source code.</Description>
-
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadata">
+      <_Parameter1>SourceExpander.EmbeddedSourceCode.GZipBase32768</_Parameter1>
+      <_Parameter2>㘅桠ҠҠҠ偕䟶鄣㹆斥嫔韄㠽Ꮦ⥝潾䯬珦ᘏ㵁䓈諓㨰塶柟薳礡茍歑垏璥䎪桩葞㹛癥罦賬跄殱徸⥅橈讈我秦笊冺㴎欯ꉝ劭䞍擂漝箰蒏䧹鷯⢦㔩噳疪瘯䐕興尓燘秒⡄㨼矉蒄晍答␛壁詁斦刓⥵㟛䑩ᖶ✎镖鑣緃蒛糭㸗猏痼旯旄㲽繲䃪⫢鲘䚣漲垽䲖眡臕勦⋙郻♆雙魝幼形敇濫瀼┠ꐭ珗߄ꜘ肪䥲棄笀㘏堿颅俿凷劾鍤䵴疋揸儰暠ҿ</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadata">
+      <_Parameter1>SourceExpander.EmbeddedLanguageVersion</_Parameter1>
+      <_Parameter2>4</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
     <ProjectReference Include="..\SourceExpander.Generator\SourceExpander.Generator.csproj" />
