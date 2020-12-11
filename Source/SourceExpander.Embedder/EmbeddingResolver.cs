@@ -14,7 +14,7 @@ namespace SourceExpander
 {
     public class EmbeddingResolver
     {
-        private readonly CSharpCompilation compilation;
+        private CSharpCompilation compilation;
         private readonly CSharpParseOptions parseOptions;
         private readonly IDiagnosticReporter reporter;
         private readonly EmbedderConfig config;
@@ -59,14 +59,43 @@ namespace SourceExpander
                 embbeddingMetadata["SourceExpander.EmbeddedAllowUnsafe"] = "true";
             }
 
+            var sb = new StringBuilder("using System.Reflection;");
+
+            foreach (var p in embbeddingMetadata)
+            {
+                sb.Append("[assembly: AssemblyMetadataAttribute(");
+                sb.Append(p.Key.ToLiteral());
+                sb.Append(",");
+                sb.Append(p.Value.ToLiteral());
+                sb.AppendLine(")]");
+            }
+
             yield return (
                 "EmbeddedSourceCode.Metadata.Generated.cs",
-                SourceText.From(MakeAssemblyMetadataAttributes(embbeddingMetadata), Encoding.UTF8)
-            );
+                SourceText.From(sb.ToString(), Encoding.UTF8));
         }
 
+        private bool updated = false;
+        private void UpdateCompilation()
+        {
+            if (updated)
+                return;
+            updated = true;
+            var newCompilation = compilation;
+            var trees = compilation.SyntaxTrees;
+            foreach (var tree in trees)
+            {
+                var semanticModel = compilation.GetSemanticModel(tree, false);
+                var newRoot = new EmbedderRewriter(semanticModel, config).Visit(tree.GetRoot(cancellationToken));
+                newCompilation = newCompilation.ReplaceSyntaxTree(tree,
+                    tree.WithRootAndOptions(newRoot, tree.Options));
+            }
+            compilation = newCompilation;
+            return;
+        }
         public SourceFileInfo[] ResolveFiles()
         {
+            UpdateCompilation();
             var sources = new List<SourceFileInfo>();
             foreach (var embedded in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
             {
@@ -89,6 +118,38 @@ namespace SourceExpander
             return infos;
         }
 
+        private SourceFileInfoRaw ParseSource(SyntaxTree tree, string commonPrefix)
+        {
+            var semanticModel = compilation.GetSemanticModel(tree, true);
+            var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
+            var unusedUsingsSpans = new HashSet<TextSpan>(semanticModel
+                .GetDiagnostics(null)
+                .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
+                .Select(d => d.Location.SourceSpan));
+            var usings = root.Usings
+                .Where(u => !unusedUsingsSpans.Contains(u.Span))
+                .Select(u => u.ToString().Trim())
+                .ToArray();
+
+            var prefix = $"{compilation.AssemblyName}>";
+            var fileName = string.IsNullOrEmpty(commonPrefix) ?
+                prefix + tree.FilePath :
+                tree.FilePath.Replace(commonPrefix, prefix);
+
+            var typeNames = root.DescendantNodes()
+                .Where(s => s is BaseTypeDeclarationSyntax || s is DelegateDeclarationSyntax)
+                .Select(syntax => semanticModel.GetDeclaredSymbol(syntax, cancellationToken)?.ToDisplayString())
+                .OfType<string>()
+                .Distinct()
+                .ToArray();
+
+            var newRoot = new UsingRemover().Visit(root);
+            if (newRoot is null)
+                throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
+
+            var minified = newRoot.NormalizeWhitespace("", "", true);
+            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
+        }
         private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
             var dependencyInfo = infos.Select(s => new SourceFileInfoSlim(s))
@@ -129,36 +190,6 @@ namespace SourceExpander
                     raw.CodeBody
                 );
         }
-        private SourceFileInfoRaw ParseSource(SyntaxTree tree, string commonPrefix)
-        {
-            var semanticModel = compilation.GetSemanticModel(tree, true);
-            var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
-            var unusedUsingsSpans = new HashSet<TextSpan>(semanticModel
-                .GetDiagnostics(null)
-                .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
-                .Select(d => d.Location.SourceSpan));
-            var usings = root.Usings.Where(u => !unusedUsingsSpans.Contains(u.Span)).Select(u => u.ToString().Trim()).ToArray();
-
-            var prefix = $"{compilation.AssemblyName}>";
-            var fileName = string.IsNullOrEmpty(commonPrefix) ?
-                prefix + tree.FilePath :
-                tree.FilePath.Replace(commonPrefix, prefix);
-
-            var typeNames = root.DescendantNodes()
-                .Where(s => s is BaseTypeDeclarationSyntax || s is DelegateDeclarationSyntax)
-                .Select(syntax => semanticModel.GetDeclaredSymbol(syntax, cancellationToken)?.ToDisplayString())
-                .OfType<string>()
-                .Distinct()
-                .ToArray();
-
-            var newRoot = new EmbedderRewriter(semanticModel, config).Visit(root);
-            newRoot = new UsingRemover().Visit(newRoot);
-            if (newRoot is null)
-                throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
-
-            var minified = newRoot.NormalizeWhitespace("", "", true);
-            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
-        }
 
         public bool HasType(string typeFullName)
             => compilation.GetTypeByMetadataName(typeFullName) != null;
@@ -188,20 +219,6 @@ namespace SourceExpander
                     return min.Substring(0, i);
             }
             return min;
-        }
-
-        static string MakeAssemblyMetadataAttributes(IEnumerable<KeyValuePair<string, string>> dic)
-        {
-            var sb = new StringBuilder("using System.Reflection;");
-            foreach (var p in dic)
-            {
-                sb.Append("[assembly: AssemblyMetadataAttribute(");
-                sb.Append(p.Key.ToLiteral());
-                sb.Append(",");
-                sb.Append(p.Value.ToLiteral());
-                sb.AppendLine(")]");
-            }
-            return sb.ToString();
         }
     }
 }

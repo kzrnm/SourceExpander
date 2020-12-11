@@ -29,57 +29,59 @@ namespace SourceExpander.Embedder.Generate.Test
                     path: "/home/source/Put.cs"),
                  CSharpSyntaxTree.ParseText(
                     @"using System.Diagnostics;
-    using System;
-    using System.Threading.Tasks;// unused
-    using System.Collections.Generic;
-    namespace Test.I
+using System;
+using System.Threading.Tasks;// unused
+using System.Collections.Generic;
+namespace Test.I
+{
+    using System.Collections;
+    public record IntRecord(int n);
+    [System.Diagnostics.DebuggerDisplay(""TEST"")]
+    class D<T> : IComparer<T>
     {
-        using System.Collections;
-        public record IntRecord(int n);
-        [System.Diagnostics.DebuggerDisplay(""TEST"")]
-        class D<T> : IComparer<T>
+        public int Compare(T x,T y) => throw new NotImplementedException();
+        [System.Diagnostics.Conditional(""TEST"")]
+        public static void WriteType()
         {
-            public int Compare(T x,T y) => throw new NotImplementedException();
-            [System.Diagnostics.Conditional(""TEST"")]
-            public static void WriteType()
-            {
-                Console.Write(typeof(T).FullName);
-                Trace.Write(typeof(T).FullName);
-                Put.Nested.Write(typeof(T).FullName);
-            }
+            Console.Write(typeof(T).FullName);
+            Trace.Write(typeof(T).FullName);
+            Put.Nested.Write(typeof(T).FullName);
         }
-    }",
+    }
+}",
                     path: "/home/source/I/D.cs"),
                  CSharpSyntaxTree.ParseText(
                    @"using System;
-    using System.Diagnostics;
-    using static System.Console;
+using System.Diagnostics;
+using static System.Console;
 
-    namespace Test.F
+namespace Test.F
+{
+    class N
     {
-        class N
+        public static void WriteN()
         {
-            public static void WriteN()
-            {
-                Console.Write(NumType.Zero);
-                Write(""N"");
-                Trace.Write(""N"");
-                Put.Nested.Write(""N"");
-            }
+            Console.Write(NumType.Zero);
+            Write(""N"");
+            Trace.Write(""N"");
+            Put.Nested.Write(""N"");
         }
-    }",
+    }
+}",
                     path: "/home/source/F/N.cs"),
                  CSharpSyntaxTree.ParseText(
        @"
-    namespace Test.F
+using System.Diagnostics;
+namespace Test.F
+{
+    [DebuggerDisplay(""TEST"")]
+    public enum NumType
     {
-        public enum NumType
-        {
-            Zero,
-            Pos,
-            Neg,
-        }
-    }", path: "/home/source/F/NumType.cs"),
+        Zero,
+        Pos,
+        Neg,
+    }
+}", path: "/home/source/F/NumType.cs"),
         };
         static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         static readonly ImmutableArray<SourceFileInfo> embeddedFiles = ImmutableArray.Create(
