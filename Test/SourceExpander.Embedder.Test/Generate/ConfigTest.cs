@@ -215,7 +215,7 @@ namespace SourceExpander.Embedder.Generate.Test
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(
                 new[] { generator },
-                additionalTexts: new[] { 
+                additionalTexts: new[] {
                     additionalText,
                     new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                 },

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Roslyn;

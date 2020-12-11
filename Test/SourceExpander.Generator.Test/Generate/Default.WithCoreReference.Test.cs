@@ -59,7 +59,7 @@ Put2.Write();",
                     .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                         { "CS8019", ReportDiagnostic.Suppress },
                     }),
-                additionalMetadatas:sampleLibReferences.Append(coreReference)
+                additionalMetadatas: sampleLibReferences.Append(coreReference)
                 );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 

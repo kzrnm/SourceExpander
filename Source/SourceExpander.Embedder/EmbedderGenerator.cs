@@ -1,9 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Roslyn;
-using System.Linq;
-using System.IO;
-using System;
 
 namespace SourceExpander
 {
