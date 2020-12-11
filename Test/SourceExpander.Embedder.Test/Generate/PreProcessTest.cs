@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using static SourceExpander.Embedder.EmbeddingGeneratorTestBase;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
