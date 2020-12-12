@@ -27,6 +27,10 @@ namespace SourceExpander
             if (context.Node is not UsingDirectiveSyntax node)
                 return;
 
+            // If node is in namespace, Using is safe.
+            if (!node.Parent.IsKind(SyntaxKind.CompilationUnit))
+                return;
+
             DiagnosticDescriptor diagnosticDescriptor;
             if (node.StaticKeyword.IsKind(SyntaxKind.StaticKeyword))
                 diagnosticDescriptor = DiagnosticDescriptors.EMBEDDER0001_UsingStatic;

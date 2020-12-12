@@ -13,9 +13,15 @@ namespace AtCoderAnalyzer.Test
 using System;
 using System.Collections.Generic;
 
-public interface IAny<T> {
-    T Prop1 { set; get; }
-    T Prop2 { get; set; }
+namespace Foo
+{
+    using static System.Console;
+    using MM = System.Math;
+
+    public interface IAny<T> {
+        T Prop1 { set; get; }
+        T Prop2 { get; set; }
+    }
 }
 ";
             await VerifyCS.VerifyAnalyzerAsync(source);
