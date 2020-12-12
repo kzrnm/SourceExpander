@@ -10,11 +10,12 @@ namespace SourceExpander
     {
         public static string ToGZipBase32768(string code)
         {
-            using var msIn = new MemoryStream(new UTF8Encoding(false).GetBytes(code));
+            var writeBytes = new UTF8Encoding(false).GetBytes(code);
             using var msOut = new MemoryStream();
-            using (var gz = new GZipStream(msOut, CompressionMode.Compress))
-                msIn.CopyTo(gz);
-            return Base32768.Encode(msOut.ToArray());
+            using (var gz = new GZipStream(msOut, CompressionMode.Compress, true))
+                gz.Write(writeBytes, 0, writeBytes.Length);
+            msOut.Position = 0;
+            return Base32768.Encode(msOut);
         }
         public static string FromGZipBase32768(string compressed)
         {
