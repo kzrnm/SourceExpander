@@ -3,6 +3,15 @@
     "type": "object",
     "additionalProperties": true,
     "properties": {
+        "embedding-type": {
+            "description": "embedding type",
+            "type": "string",
+            "default": "gzip-base32768",
+            "enum": [
+                "raw",
+                "gzip-base32768"
+            ]
+        },
         "exclude-attributes": {
             "description": "attribute full name that remove on embedding",
             "type": "array",
