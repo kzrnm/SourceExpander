@@ -53,6 +53,8 @@ namespace SourceExpander
         }
         public IEnumerable<(string name, SourceText sourceText)> EnumerateEmbeddingSources()
         {
+            if (!config.Enabled)
+                yield break;
             var infos = ResolveFiles();
             if (infos.Length == 0)
                 yield break;
@@ -115,6 +117,8 @@ namespace SourceExpander
         }
         public SourceFileInfo[] ResolveFiles()
         {
+            if (!config.Enabled)
+                return Array.Empty<SourceFileInfo>();
             UpdateCompilation();
             var sources = new List<SourceFileInfo>();
             foreach (var embedded in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))

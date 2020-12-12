@@ -13,16 +13,21 @@ namespace SourceExpander
     {
         public ExpandConfig()
             : this(
+                  true,
                   Array.Empty<string>(),
                   Array.Empty<Regex>())
         { }
         public ExpandConfig(
+            bool enabled,
             string[] matchFilePatterns,
             IEnumerable<Regex> ignoreFilePatterns)
         {
+            Enabled = enabled;
             MatchFilePatterns = ImmutableArray.Create(matchFilePatterns);
             IgnoreFilePatterns = ImmutableArray.CreateRange(ignoreFilePatterns);
         }
+
+        public bool Enabled { get; }
         public ImmutableArray<string> MatchFilePatterns { get; }
         public ImmutableArray<Regex> IgnoreFilePatterns { get; }
         public bool IsMatch(string filePath)
@@ -36,8 +41,9 @@ namespace SourceExpander
             {
                 if (sourceText is not null && JsonUtil.ParseJson<ExpandConfigData>(sourceText, cancellationToken) is { } data)
                     return new ExpandConfig(
-                        matchFilePatterns: data?.MatchFilePattern ?? Array.Empty<string>(),
-                        ignoreFilePatterns: data?.IgnoreFilePatternRegex?.Select(s => new Regex(s))
+                        enabled: data.Enabled ?? true,
+                        matchFilePatterns: data.MatchFilePattern ?? Array.Empty<string>(),
+                        ignoreFilePatterns: data.IgnoreFilePatternRegex?.Select(s => new Regex(s))
                         ?? Array.Empty<Regex>());
                 return new ExpandConfig();
             }
@@ -50,11 +56,14 @@ namespace SourceExpander
         [DataContract]
         private class ExpandConfigData
         {
-            public ExtensionDataObject? ExtensionData { get; set; }
+            [DataMember(Name = "enabled")]
+            public bool? Enabled { set; get; }
             [DataMember(Name = "match-file-pattern")]
             public string[]? MatchFilePattern { set; get; }
             [DataMember(Name = "ignore-file-pattern-regex")]
             public string[]? IgnoreFilePatternRegex { set; get; }
+
+            public ExtensionDataObject? ExtensionData { get; set; }
         }
     }
 

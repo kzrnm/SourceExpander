@@ -115,6 +115,44 @@ namespace Test.F
                     "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
                 ));
 
+        [Fact]
+        public void NotEnabled()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""enabled"": false,
+    ""exclude-attributes"": [
+        ""System.Diagnostics.DebuggerDisplayAttribute""
+    ]
+}
+");
+
+            var generator = new EmbedderGenerator();
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator },
+                additionalTexts: new[] { additionalText },
+                parseOptions: opts);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
+            diagnostics.Should().BeEmpty();
+
+            outputCompilation.SyntaxTrees
+                .Should()
+                .NotContain(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"));
+        }
 
         [Fact]
         public void ExcludeAttributes()
@@ -161,7 +199,7 @@ namespace Test.F
 
             outputCompilation.SyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","))
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
                 .Which
                 .ToString()
                 .Should()
@@ -177,6 +215,7 @@ namespace Test.F
         public void ExcludeAttributesResolver()
         {
             var config = new EmbedderConfig(
+                true,
                 EmbeddingType.GZipBase32768,
                 new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
             var reporter = new MockDiagnosticReporter();
@@ -231,7 +270,7 @@ namespace Test.F
 
             outputCompilation.SyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\","))
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
                 .Which
                 .ToString()
                 .Should()

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -40,6 +39,20 @@ namespace SourceExpander
             container = new SourceFileContainer(WithCheck(embeddedDatas));
             expander = new CompilationExpander(compilation, container);
         }
+        public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
+        {
+            if (!config.Enabled)
+                yield break;
+            foreach (var tree in compilation.SyntaxTrees)
+            {
+                var filePath = tree.FilePath;
+                if (config.IsMatch(filePath))
+                    yield return (filePath, expander.ExpandCode(tree, cancellationToken));
+            }
+        }
+
+        public bool IsEmbeddedEmpty => container.Count == 0;
+
         private IEnumerable<EmbeddedData> WithCheck(IEnumerable<EmbeddedData> embeddedDatas)
         {
             foreach (var embedded in embeddedDatas)
@@ -65,17 +78,5 @@ namespace SourceExpander
                 yield return embedded;
             }
         }
-
-        public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
-        {
-            foreach (var tree in compilation.SyntaxTrees)
-            {
-                var filePath = tree.FilePath;
-                if (config.IsMatch(filePath))
-                    yield return (filePath, expander.ExpandCode(tree, cancellationToken));
-            }
-        }
-
-        public bool IsEmbeddedEmpty => container.Count == 0;
     }
 }

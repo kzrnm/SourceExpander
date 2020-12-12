@@ -49,6 +49,43 @@ Put2.Write();",
         }
 
         [Fact]
+        public void NotEnabled()
+        {
+            var version = LanguageVersion.Latest;
+            var syntaxTrees = CreateTrees(version);
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference)
+                );
+            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""enabled"": false
+}
+");
+
+            var generator = new ExpandGenerator();
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                additionalTexts: new AdditionalText[] { additionalText },
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+            outputCompilation.SyntaxTrees
+                .Should()
+                .NotContain(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
+            outputCompilation.GetTypeByMetadataName("SourceExpander.Expanded.ExpandedContainer").Should().BeNull();
+        }
+
+        [Fact]
         public void Whitelist()
         {
             var version = LanguageVersion.Latest;
