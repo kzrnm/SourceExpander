@@ -45,14 +45,22 @@ namespace SourceExpander
             if (infos.Length == 0)
                 yield break;
 
-            var json = JsonUtil.ToJson(infos);
-            var gZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
             var embbeddingMetadata = new Dictionary<string, string>
             {
                 { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
-                { "SourceExpander.EmbeddedSourceCode.GZipBase32768", gZipBase32768 },
                 { "SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString()},
             };
+
+            var json = JsonUtil.ToJson(infos);
+            switch (config.EmbeddingType)
+            {
+                case EmbeddingType.Raw:
+                    embbeddingMetadata["SourceExpander.EmbeddedSourceCode"] = json;
+                    break;
+                default:
+                    embbeddingMetadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"] = SourceFileInfoUtil.ToGZipBase32768(json);
+                    break;
+            }
 
             if (compilation.Options.AllowUnsafe)
             {

@@ -117,7 +117,7 @@ namespace Test.F
 
 
         [Fact]
-        public void GenerateTest()
+        public void ExcludeAttributes()
         {
             var additionalText = new InMemoryAdditionalText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
@@ -174,9 +174,10 @@ namespace Test.F
         }
 
         [Fact]
-        public void ResolverTest()
+        public void ExcludeAttributesResolver()
         {
             var config = new EmbedderConfig(
+                EmbeddingType.GZipBase32768,
                 new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
             var reporter = new MockDiagnosticReporter();
             new EmbeddingResolver(compilation, opts, reporter, config).ResolveFiles()
@@ -185,6 +186,62 @@ namespace Test.F
             reporter.Diagnostics.Should().BeEmpty();
         }
 
+
+        [Fact]
+        public void EmbeddingRaw()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-type"": ""Raw"",
+    ""exclude-attributes"": [
+        ""System.Diagnostics.DebuggerDisplayAttribute""
+    ]
+}
+");
+
+            var generator = new EmbedderGenerator();
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator },
+                additionalTexts: new[] { additionalText },
+                parseOptions: opts);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embedded)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embedded)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            diagnostics.Should().BeEmpty();
+
+            outputCompilation.SyntaxTrees
+                .Should()
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\","))
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
+        }
 
         public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
         {
