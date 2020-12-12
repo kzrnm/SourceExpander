@@ -117,7 +117,7 @@ jobs:
           tag: ${{ steps.tag-version.outputs.new_tag }}
           name: Version ${{ needs.get-version.outputs.version }}
           body: https://github.com/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new_tag }}/CHANGELOG.md
-          artifacts: "./dist/*.nupkg"
+          artifacts: "./dist/*.nupkg,./dist/*.snupkg"
           prerelease: ${{ needs.get-version.outputs.is-prerelease }}
   publish:
     runs-on: ubuntu-latest
