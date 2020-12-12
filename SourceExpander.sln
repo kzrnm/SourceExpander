@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Ana
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Analyzer.Test", "Test\SourceExpander.Embedder.Analyzer.Test\SourceExpander.Embedder.Analyzer.Test.csproj", "{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummySourceExpanderGenerator", "Source\DummySourceExpanderGenerator\DummySourceExpanderGenerator.csproj", "{638DE41B-9F52-4265-AE3B-3E357C16FA8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
