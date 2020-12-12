@@ -29,6 +29,7 @@ namespace SourceExpander
                 parseOptions,
                 new DummyDiagnosticReporter(),
                 new EmbedderConfig(
+                    true,
                     EmbeddingType.GZipBase32768,
                     excludeAttributes: new[] {
                         "System.Runtime.CompilerServices.MethodImplAttribute",

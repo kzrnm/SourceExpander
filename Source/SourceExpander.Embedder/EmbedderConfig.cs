@@ -10,17 +10,21 @@ namespace SourceExpander
     {
         public EmbedderConfig()
             : this(
+                  true,
                   EmbeddingType.GZipBase32768,
                   Array.Empty<string>())
         { }
         public EmbedderConfig(
+            bool enabled,
             EmbeddingType embeddingType,
             string[] excludeAttributes)
         {
+            Enabled = enabled;
             EmbeddingType = embeddingType;
             ExcludeAttributes = ImmutableHashSet.Create(excludeAttributes);
         }
 
+        public bool Enabled { get; }
         public EmbeddingType EmbeddingType { get; }
         public ImmutableHashSet<string> ExcludeAttributes { get; }
 
@@ -37,6 +41,7 @@ namespace SourceExpander
             {
                 if (sourceText is not null && JsonUtil.ParseJson<EmbedderConfigData>(sourceText, cancellationToken) is { } data)
                     return new EmbedderConfig(
+                        enabled: data.Enabled ?? true,
                         embeddingType: ParseEmbeddingType(data.EmbeddingType),
                         excludeAttributes: data.ExcludeAttributes ?? Array.Empty<string>());
                 return new EmbedderConfig();
@@ -50,11 +55,14 @@ namespace SourceExpander
         [DataContract]
         private class EmbedderConfigData
         {
-            public ExtensionDataObject? ExtensionData { get; set; }
+            [DataMember(Name = "enabled")]
+            public bool? Enabled { set; get; }
             [DataMember(Name = "embedding-type")]
             public string? EmbeddingType { set; get; }
             [DataMember(Name = "exclude-attributes")]
             public string[]? ExcludeAttributes { set; get; }
+
+            public ExtensionDataObject? ExtensionData { get; set; }
         }
     }
 

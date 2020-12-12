@@ -48,6 +48,9 @@ namespace SourceExpander
                 return;
             }
 
+            if (!config.Enabled)
+                return;
+
             var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config);
             if (loader.IsEmbeddedEmpty)
                 context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0001_NotFoundEmbedded, Location.None));
