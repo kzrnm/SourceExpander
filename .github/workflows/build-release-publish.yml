@@ -116,7 +116,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.tag-version.outputs.new_tag }}
           name: Version ${{ needs.get-version.outputs.version }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          body: https://github.com/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new_tag }}/CHANGELOG.md
           artifacts: "./dist/*.nupkg"
           prerelease: ${{ needs.get-version.outputs.is-prerelease }}
   publish:
