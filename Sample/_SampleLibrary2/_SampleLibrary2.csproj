@@ -7,13 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(UseLocalReference)' != 'true'">
-    <PackageReference Include="SourceExpander.Embedder" Version="2.3.0-alpha.3">
+    <PackageReference Include="SourceExpander.Embedder" Version="2.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SourceExpander.Embedder.Analyzer" Version="2.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(UseLocalReference)' == 'true'">
     <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Source\SourceExpander.Embedder.Analyzer\SourceExpander.Embedder.Analyzer.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
