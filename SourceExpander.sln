@@ -12,7 +12,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AFAE54D6-A794-42BF-96B7-4BFEBF33B62F}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		CHANGELOG.md = CHANGELOG.md
 		Directory.Build.props = Directory.Build.props
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder", "Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj", "{D75E7B4A-0C65-4038-A365-A438260F9982}"
@@ -31,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Ana
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Analyzer.Test", "Test\SourceExpander.Embedder.Analyzer.Test\SourceExpander.Embedder.Analyzer.Test.csproj", "{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummySourceExpanderEmbedder", "Source\DummySourceExpanderEmbedder\DummySourceExpanderEmbedder.csproj", "{638DE41B-9F52-4265-AE3B-3E357C16FA8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummySourceExpanderEmbedder", "Source\DummySourceExpanderEmbedder\DummySourceExpanderEmbedder.csproj", "{638DE41B-9F52-4265-AE3B-3E357C16FA8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
