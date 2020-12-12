@@ -34,16 +34,7 @@ namespace SourceExpander
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
 
-            if (parseOptions.DocumentationMode != DocumentationMode.Diagnose)
-            {
-                parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
-                var list = new List<SyntaxTree>(compilation.SyntaxTrees.Length);
-                foreach (var tree in compilation.SyntaxTrees)
-                {
-                    list.Add(tree.WithRootAndOptions(tree.GetRoot(cancellationToken), parseOptions));
-                }
-                compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(list);
-            }
+            parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
 
             this.compilation = compilation.WithOptions(opts);
             this.parseOptions = parseOptions;
@@ -110,7 +101,7 @@ namespace SourceExpander
                 var semanticModel = compilation.GetSemanticModel(tree, false);
                 var newRoot = new EmbedderRewriter(semanticModel, config).Visit(tree.GetRoot(cancellationToken));
                 newCompilation = newCompilation.ReplaceSyntaxTree(tree,
-                    tree.WithRootAndOptions(newRoot, tree.Options));
+                    tree.WithRootAndOptions(newRoot, parseOptions));
             }
             compilation = newCompilation;
             return;
