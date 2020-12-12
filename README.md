@@ -12,13 +12,13 @@
 - [Getting started](#getting-started)
   - [For library user](#for-library-user)
   - [For library developer](#for-library-developer)
+    - [Analyzer(optional)](#analyzeroptional)
 - [Embedded data](#embedded-data)
   - [EmbedderVersion](#embedderversion)
   - [EmbeddedLanguageVersion](#embeddedlanguageversion)
   - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
   - [EmbeddedSourceCode](#embeddedsourcecode)
     - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
-- [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
