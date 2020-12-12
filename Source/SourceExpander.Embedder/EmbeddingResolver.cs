@@ -33,6 +33,18 @@ namespace SourceExpander
             };
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
+
+            if (parseOptions.DocumentationMode != DocumentationMode.Diagnose)
+            {
+                parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
+                var list = new List<SyntaxTree>(compilation.SyntaxTrees.Length);
+                foreach (var tree in compilation.SyntaxTrees)
+                {
+                    list.Add(tree.WithRootAndOptions(tree.GetRoot(cancellationToken), parseOptions));
+                }
+                compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(list);
+            }
+
             this.compilation = compilation.WithOptions(opts);
             this.parseOptions = parseOptions;
             this.reporter = reporter;
@@ -136,7 +148,7 @@ namespace SourceExpander
                 .Select(d => d.Location.SourceSpan));
             var usings = root.Usings
                 .Where(u => !unusedUsingsSpans.Contains(u.Span))
-                .Select(u => u.ToString().Trim())
+                .Select(u => u.NormalizeWhitespace("", "", true).ToString().Trim())
                 .ToArray();
 
             var prefix = $"{compilation.AssemblyName}>";
