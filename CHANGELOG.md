@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.3.2] - 2020-12-13
 ### Changed
+- Add GitHub link to Expand Code.
+
+## [2.3.2] - 2020-12-13
+### Changed
 - Update Base32768 from 1.0.7 to 1.0.8.
 
 ## [2.3.1] - 2020-12-13
