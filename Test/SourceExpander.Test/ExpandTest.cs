@@ -89,9 +89,9 @@ class Program
         Expander.Expand();
     }
 }
-#region Expanded
+#region Expanded by https://github.com/naminodarie/SourceExpander
 namespace SourceExpander{public class Expander{[Conditional(""EXP"")]public static void Expand(string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true){}public static string ExpandString(string inputFilePath = null, bool ignoreAnyError = true){return """";}}}
-#endregion Expanded
+#endregion Expanded by https://github.com/naminodarie/SourceExpander
 ")
                 );
         }
