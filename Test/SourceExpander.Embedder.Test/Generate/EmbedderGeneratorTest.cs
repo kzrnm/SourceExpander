@@ -55,19 +55,22 @@ namespace SourceExpander.Embedder.Generate.Test
     using System.Diagnostics;
     using static System.Console;
 
-    namespace Test.F
+namespace Test.F
+{
+    class N
     {
-        class N
+        /// <summary>
+        /// XML Document
+        /// </summary>
+        public static void WriteN()
         {
-            public static void WriteN()
-            {
-                Console.Write(NumType.Zero);
-                Write(""N"");
-                Trace.Write(""N"");
-                Put.Nested.Write(""N"");
-            }
+            Console.Write(NumType.Zero);
+            Write(""N"");
+            Trace.Write(""N"");
+            Put.Nested.Write(""N"");
         }
-    }",
+    }
+}",
                     path: "/home/source/F/N.cs"),
                  CSharpSyntaxTree.ParseText(
        @"

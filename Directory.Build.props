@@ -9,8 +9,8 @@
     <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/naminodarie/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
 
-    <Version>2.3.3</Version>
-    <AssemblyVersion>2.3.3.101</AssemblyVersion>
+    <Version>2.3.4</Version>
+    <AssemblyVersion>2.3.4.101</AssemblyVersion>
     <RepositoryCommit Condition="'$(GIT_COMMIT)' != ''">$(GIT_COMMIT)</RepositoryCommit>
 
     <SignAssembly>True</SignAssembly>

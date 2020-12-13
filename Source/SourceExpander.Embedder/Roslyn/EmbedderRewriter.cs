@@ -17,6 +17,8 @@ namespace SourceExpander.Roslyn
             this.model = model;
             this.config = config;
         }
+
+        public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia) => SyntaxFactory.ElasticMarker;
         public override SyntaxNode? VisitAttribute(AttributeSyntax node)
         {
             if (model.GetTypeInfo(node).Type is { } typeSymbol
