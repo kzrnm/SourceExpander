@@ -8,9 +8,9 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class EmbedderGeneratorTest : EmbeddingGeneratorTestBase
+    public class MultiSyntaxTest : EmbeddingGeneratorTestBase
     {
-        public EmbedderGeneratorTest()
+        public MultiSyntaxTest()
         {
             compilation = CreateCompilation(TestSyntaxes,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
