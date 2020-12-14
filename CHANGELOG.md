@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Validate embedded source code.
+- Minify embedded source code.
 
 ## [2.3.4] - 2020-12-14
 ### Changed

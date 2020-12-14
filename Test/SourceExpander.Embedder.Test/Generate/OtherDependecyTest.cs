@@ -102,7 +102,7 @@ namespace Mine{
                     new string[] { "Mine.C" },
                     Array.Empty<string>(),
                     Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P() => System.Console.WriteLine();}}"
+                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 )
             };
 
@@ -188,7 +188,7 @@ namespace Mine{
                     new string[] { "Mine.C" },
                     Array.Empty<string>(),
                     Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P() => System.Console.WriteLine();}}"
+                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 )
             };
 

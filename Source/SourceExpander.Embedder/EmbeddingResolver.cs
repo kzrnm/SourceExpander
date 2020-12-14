@@ -146,7 +146,7 @@ namespace SourceExpander
                 .Select(d => d.Location.SourceSpan));
             var usings = root.Usings
                 .Where(u => !unusedUsingsSpans.Contains(u.Span))
-                .Select(u => u.NormalizeWhitespace("", "", true).ToString().Trim())
+                .Select(u => u.NormalizeWhitespace("", " ").ToString().Trim())
                 .ToArray();
 
             var prefix = $"{compilation.AssemblyName}>";
@@ -165,17 +165,17 @@ namespace SourceExpander
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
-            var minified = newRoot.NormalizeWhitespace("", "", true);
+            var minified = new TriviaRemover().Visit(newRoot.NormalizeWhitespace("", " ")).ToString();
 
             if (ValidationHelpers.CompareSyntax(newRoot,
-                CSharpSyntaxTree.ParseText(minified.ToString(),
+                CSharpSyntaxTree.ParseText(minified,
                 parseOptions,
                 cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)
             {
                 reporter.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diff.ToString()));
             }
-            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
+            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified);
         }
         private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
