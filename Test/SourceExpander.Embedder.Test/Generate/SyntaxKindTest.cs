@@ -937,12 +937,13 @@ public class Def
         public static readonly IEnumerable<object[]> TestTableArgs = TestTable.Select(d => new object[] { d });
 
         public static readonly Dictionary<string, TestData> TestTableDic = TestTable.ToDictionary(d => d.Name);
-        public static readonly IEnumerable<string> TestTableNames = TestTableDic.Keys;
+        public static readonly IEnumerable<object[]> TestTableNameArgs = TestTableDic.Keys.Select(n => new object[] { n });
 
         [Theory]
-        [MemberData(nameof(TestTableArgs))]
-        public void Generate(TestData testData)
+        [MemberData(nameof(TestTableNameArgs))]
+        public void Generate(string testName)
         {
+            var testData = TestTableDic[testName];
             var compilation = CreateCompilation(new[] { testData.SyntaxTree }, compilationOptions, new[] { expanderCoreReference });
             compilation.GetDiagnostics().Should().BeEmpty();
 
@@ -957,13 +958,16 @@ public class Def
                 .Should()
                 .ContainSingle()
                 .Which;
+            CreateCompilation(
+                new[] { CSharpSyntaxTree.ParseText(resolved.Restore(), parseOptions, "/foo/path.cs", new UTF8Encoding(false)) },
+                compilationOptions,
+                new[] { expanderCoreReference })
+                .GetDiagnostics().Should().BeEmpty();
             resolved
                 .Should()
                 .BeEquivalentTo(testData.Expected);
             reporter.Diagnostics.Should().BeEmpty();
 
-            var newCompilation = CreateCompilation(new[] { CSharpSyntaxTree.ParseText(resolved.Restore(), parseOptions, "/foo/path.cs", new UTF8Encoding(false)) }, compilationOptions, new[] { expanderCoreReference });
-            newCompilation.GetDiagnostics().Should().BeEmpty();
 
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
