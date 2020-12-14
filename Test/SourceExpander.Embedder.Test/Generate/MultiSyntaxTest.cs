@@ -143,9 +143,6 @@ namespace Test.F
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
-            diagnostics.Should().BeEmpty();
-
             outputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","))
