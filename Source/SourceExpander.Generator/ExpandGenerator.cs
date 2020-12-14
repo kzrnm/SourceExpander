@@ -16,6 +16,13 @@ namespace SourceExpander
         private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
         public void Execute(GeneratorExecutionContext context)
         {
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                //System.Diagnostics.Debugger.Launch();
+            }
+#endif
+
             if (context.Compilation is not CSharpCompilation compilation
                 || context.ParseOptions is not CSharpParseOptions opts)
             {

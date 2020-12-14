@@ -14,6 +14,13 @@ namespace SourceExpander
         public void Initialize(GeneratorInitializationContext context) { }
         public void Execute(GeneratorExecutionContext context)
         {
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                //System.Diagnostics.Debugger.Launch();
+            }
+#endif
+
             var configText = context.AdditionalFiles
                 .FirstOrDefault(a =>
                     StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
