@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FluentAssertions;
@@ -868,7 +869,6 @@ public class Def
                     new string[0],
                     @"public class Def{byte[] Arr = new byte[]{1, 2, 3};public void M(){using var ms1 = new MemoryStream(Arr);using (var ms2 = new MemoryStream())ms2.CopyTo(ms1);using (var ms3 = new MemoryStream()){ms3.CopyTo(ms1);}}}"
             )),
-#if ERRORS
             new TestData("If", @"
 using System;
 public class Def
@@ -920,7 +920,6 @@ public class Def
                     new string[0],
                     @"public class Def{public object M(){var obj =from d in Enumerable.Repeat(System.DateTime.Now, 5)where d.DayOfYear < 200orderby d.Yearselect d.DayOfWeek;return obj.First();}}"
             )),
-#endif
         };
         private static readonly CSharpParseOptions parseOptions
             = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
