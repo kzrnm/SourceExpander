@@ -8,9 +8,9 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class EmbedderGeneratorTest : EmbeddingGeneratorTestBase
+    public class MultiSyntaxTest : EmbeddingGeneratorTestBase
     {
-        public EmbedderGeneratorTest()
+        public MultiSyntaxTest()
         {
             compilation = CreateCompilation(TestSyntaxes,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
@@ -142,9 +142,6 @@ namespace Test.F
                 SourceFileInfoUtil.FromGZipBase32768(embedded))
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
-            diagnostics.Should().BeEmpty();
 
             outputCompilation.SyntaxTrees
                 .Should()
