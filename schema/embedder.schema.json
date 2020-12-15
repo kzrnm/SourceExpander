@@ -23,6 +23,14 @@
                 "description": "attribute full name that remove on embedding",
                 "type": "string"
             }
+        },
+        "add-trivia-kind": {
+            "description": "A list of Microsoft.CodeAnalysis.CSharp.SyntaxKind with LeadingTrivia/Trailing trivia",
+            "type": "array",
+            "items": {
+                "description": "Microsoft.CodeAnalysis.CSharp.SyntaxKind with LeadingTrivia/Trailing trivia",
+                "type": "string"
+            }
         }
     }
 }
