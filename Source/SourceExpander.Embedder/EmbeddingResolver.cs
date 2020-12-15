@@ -165,7 +165,7 @@ namespace SourceExpander
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
-            var minified = new TriviaRemover().Visit(newRoot.NormalizeWhitespace("", " ")).ToString();
+            var minified = new TriviaRemover(config).Visit(newRoot.NormalizeWhitespace("", " "))!.ToString();
 
             if (ValidationHelpers.CompareSyntax(newRoot,
                 CSharpSyntaxTree.ParseText(minified,

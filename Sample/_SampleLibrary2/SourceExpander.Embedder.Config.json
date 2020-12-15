@@ -9,5 +9,8 @@
         "System.Diagnostics.DebuggerStepThroughAttribute",
         "System.Diagnostics.DebuggerTypeProxyAttribute",
         "System.Diagnostics.DebuggerVisualizerAttribute"
+    ],
+    "add-trivia-kinds": [
+        "EqualsGreaterThanToken"
     ]
 }

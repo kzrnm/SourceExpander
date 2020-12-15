@@ -37,7 +37,8 @@ namespace SourceExpander
                     excludeAttributes: new[] {
                         "System.Runtime.CompilerServices.MethodImplAttribute",
                         "System.Runtime.CompilerServices.CallerFilePathAttribute"
-                    }),
+                    },
+                    addTriviaKinds: ImmutableHashSet<SyntaxKind>.Empty),
                 context.CancellationToken);
 
             context.AddSource(

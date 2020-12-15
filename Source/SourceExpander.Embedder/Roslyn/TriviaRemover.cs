@@ -7,8 +7,11 @@ namespace SourceExpander.Roslyn
 {
     public class TriviaRemover : CSharpSyntaxRewriter
     {
-        public TriviaRemover()
+        private readonly EmbedderConfig config;
+        public TriviaRemover(EmbedderConfig config)
         {
+            this.config = config;
+
             var splitBuilder = ImmutableHashSet.CreateBuilder<SyntaxKind>();
             splitBuilder.Add(SyntaxKind.TildeToken);
             splitBuilder.Add(SyntaxKind.ExclamationToken);
@@ -67,9 +70,23 @@ namespace SourceExpander.Roslyn
             SplitToken = splitBuilder.ToImmutable();
         }
         public ImmutableHashSet<SyntaxKind> SplitToken { get; }
+        public override SyntaxNode? Visit(SyntaxNode? node)
+        {
+            var res = base.Visit(node);
+            if (res is null)
+                return null;
+            if (config.AddTriviaKinds.Contains(res.Kind()))
+                return res.WithLeadingTrivia(SyntaxFactory.Space).WithTrailingTrivia(SyntaxFactory.Space);
+            return res;
+        }
         public override SyntaxToken VisitToken(SyntaxToken token)
         {
             var res = base.VisitToken(token);
+
+            if (config.AddTriviaKinds.Contains(token.Kind()))
+                return res
+                    .WithLeadingTrivia(SyntaxFactory.Space)
+                    .WithTrailingTrivia(SyntaxFactory.Space);
 
             if (SplitToken.Contains(token.Kind()))
                 return res.WithoutTrivia();
