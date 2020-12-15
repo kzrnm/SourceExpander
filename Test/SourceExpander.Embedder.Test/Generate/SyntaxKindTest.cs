@@ -960,7 +960,21 @@ public class Def
                     new string[0],
                     "public class Def{public void M(int n){Int32 a=0;int b=2- --a-1;var c=a-- - --b-~1;c=a-- -b;c=a- --b;}}"
             )),
+            new TestData("Generic and Lambda", @"
+using System;
+public class Def
+{
+    public int M<T>(T n) where T : IComparable<T> => n.CompareTo(default);
+}
+",
+                new SourceFileInfo("TestAssembly>path.cs",
+                    new string[]{ "Def" },
+                    new string[]{ "using System;" },
+                    new string[0],
+                    "public class Def{public int M<T>(T n)where T:IComparable<T> =>n.CompareTo(default);}"
+            )),
         };
+
         private static readonly CSharpParseOptions parseOptions
             = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
             .WithLanguageVersion(LanguageVersion.CSharp9);
@@ -971,7 +985,6 @@ public class Def
                     .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                         {"CS8019",ReportDiagnostic.Suppress },
                     });
-
 
         public static readonly IEnumerable<object[]> TestTableArgs = TestTable.Select(d => new object[] { d });
 
