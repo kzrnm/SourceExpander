@@ -121,7 +121,9 @@ namespace Test.F
         {
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                additionalTexts: new[] { enableMinifyJson },
+                parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
@@ -161,7 +163,7 @@ namespace Test.F
         public void ResolverTest()
         {
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();

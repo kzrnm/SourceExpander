@@ -38,7 +38,7 @@ namespace SourceExpander
                         "System.Runtime.CompilerServices.MethodImplAttribute",
                         "System.Runtime.CompilerServices.CallerFilePathAttribute"
                     },
-                    addTriviaKinds: ImmutableHashSet<SyntaxKind>.Empty),
+                    enableMinify: true),
                 context.CancellationToken);
 
             context.AddSource(

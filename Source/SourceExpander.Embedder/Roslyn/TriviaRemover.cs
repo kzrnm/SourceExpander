@@ -5,13 +5,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SourceExpander.Roslyn
 {
-    public class TriviaRemover : CSharpSyntaxRewriter
+    internal class TriviaRemover : CSharpSyntaxRewriter
     {
-        private readonly EmbedderConfig config;
-        public TriviaRemover(EmbedderConfig config)
+        public TriviaRemover()
         {
-            this.config = config;
-
             var splitBuilder = ImmutableHashSet.CreateBuilder<SyntaxKind>();
             splitBuilder.Add(SyntaxKind.TildeToken);
             splitBuilder.Add(SyntaxKind.ExclamationToken);
@@ -88,26 +85,10 @@ namespace SourceExpander.Roslyn
         }
         public ImmutableHashSet<SyntaxKind> SplitToken { get; }
         public ImmutableHashSet<SyntaxKind> PreEqualsToken { get; }
-        public override SyntaxNode? Visit(SyntaxNode? node)
-        {
-            var res = base.Visit(node);
-            if (res is null)
-                return null;
-            if (config.AddTriviaKinds.Contains(res.Kind()))
-                return res.WithLeadingTrivia(SyntaxFactory.Space).WithTrailingTrivia(SyntaxFactory.Space);
-            return res;
-        }
         public override SyntaxToken VisitToken(SyntaxToken token)
         {
             var res = base.VisitToken(token);
-
-            if (config.AddTriviaKinds.Contains(token.Kind()))
-                return res
-                    .WithLeadingTrivia(SyntaxFactory.Space)
-                    .WithTrailingTrivia(SyntaxFactory.Space);
-
             var kind = token.Kind();
-
             var previous = token.GetPreviousToken().Kind();
             var next = token.GetNextToken().Kind();
 

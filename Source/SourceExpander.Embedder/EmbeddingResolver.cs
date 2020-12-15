@@ -165,10 +165,15 @@ namespace SourceExpander
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
-            var minified = new TriviaRemover(config).Visit(newRoot.NormalizeWhitespace("", " "))!.ToString();
+            var minified = newRoot.NormalizeWhitespace("", " ");
+            if (config.EnableMinify)
+            {
+                minified = new TriviaRemover().Visit(minified)!;
+            }
+            string minifiedCode = minified!.ToString();
 
             if (ValidationHelpers.CompareSyntax(newRoot,
-                CSharpSyntaxTree.ParseText(minified,
+                CSharpSyntaxTree.ParseText(minifiedCode,
                 parseOptions,
                 cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)
             {
@@ -185,7 +190,7 @@ namespace SourceExpander
                 reporter.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diffStr));
             }
-            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified);
+            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minifiedCode);
         }
         private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
