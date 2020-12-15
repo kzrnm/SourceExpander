@@ -24,7 +24,7 @@
                 "type": "string"
             }
         },
-        "add-trivia-kind": {
+        "add-trivia-kinds": {
             "description": "A list of Microsoft.CodeAnalysis.CSharp.SyntaxKind with LeadingTrivia/Trailing trivia",
             "type": "array",
             "items": {
