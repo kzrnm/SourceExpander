@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Text;
 
 namespace SourceExpander.Roslyn
 {
@@ -45,6 +46,24 @@ namespace SourceExpander.Roslyn
                 compilation.References,
                 compilation.Options);
             return GetCompilationDiagnostic(embeddedCompilation);
+        }
+
+        public static SyntaxNode? CompareSyntax(SyntaxNode orig, SyntaxNode target)
+        {
+            orig = orig.NormalizeWhitespace(" ", " ");
+            target = target.NormalizeWhitespace(" ", " ");
+            var origStr = orig.ToString();
+            var targetStr = target.ToString();
+            if (origStr == targetStr)
+                return null;
+
+            var length = Math.Min(origStr.Length, targetStr.Length);
+            int i;
+            for (i = 0; i < length; i++)
+                if (origStr[i] != targetStr[i])
+                    break;
+
+            return target.FindNode(new TextSpan(i, 1));
         }
     }
 }

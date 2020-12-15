@@ -166,6 +166,15 @@ namespace SourceExpander
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
             var minified = newRoot.NormalizeWhitespace("", "", true);
+
+            if (ValidationHelpers.CompareSyntax(newRoot,
+                CSharpSyntaxTree.ParseText(minified.ToString(),
+                parseOptions,
+                cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)
+            {
+                reporter.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diff.ToString()));
+            }
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
         }
         private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
