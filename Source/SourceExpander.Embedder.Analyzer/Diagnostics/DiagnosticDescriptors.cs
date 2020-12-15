@@ -32,5 +32,33 @@ namespace SourceExpander.Diagnostics
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true
             );
+        internal static readonly DiagnosticDescriptor EMBEDDER0003_NullableProject = new DiagnosticDescriptor(
+            "EMBEDDER0003",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBEDDER0003_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBEDDER0003_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Compilation",
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true
+            );
+        internal static readonly DiagnosticDescriptor EMBEDDER0004_NullableDirective = new DiagnosticDescriptor(
+            "EMBEDDER0004",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBEDDER0004_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBEDDER0004_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Compilation",
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true
+            );
     }
 }
