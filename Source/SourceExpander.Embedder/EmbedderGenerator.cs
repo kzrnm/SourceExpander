@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
@@ -37,7 +36,7 @@ namespace SourceExpander
             if (!config.Enabled)
                 return;
 
-            if (!ValidateCompilation(context.Compilation))
+            if (context.Compilation.GetDiagnostics(context.CancellationToken).HasCompilationError())
                 return;
 
             var embeddingContext = new EmbeddingContext(
@@ -69,30 +68,6 @@ namespace SourceExpander
                 sb.AppendLine(")]");
             }
             return SourceText.From(sb.ToString(), Encoding.UTF8);
-        }
-
-        private static bool ValidateCompilation(Compilation compilation)
-        {
-            using var ms = new MemoryStream();
-            return ValidateCompilation(compilation.Emit(ms));
-        }
-        private static bool ValidateCompilation(EmitResult result)
-            => result.Success
-            && !result.Diagnostics.Any(d => d.IsWarningAsError || d.Severity == DiagnosticSeverity.Error);
-
-        private bool ValidateEmbeddedSources(EmbeddingContext context, ImmutableArray<SourceFileInfo> sources)
-        {
-            SyntaxTree ToSyntaxTree(SourceFileInfo source)
-                => CSharpSyntaxTree.ParseText(
-                    source.Restore(),
-                    context.ParseOptions,
-                    cancellationToken: context.CancellationToken);
-
-            var embeddedCompilation = CSharpCompilation.Create("NewCompilation",
-                sources.Select(s => ToSyntaxTree(s)),
-                context.Compilation.References,
-                context.Compilation.Options);
-            return ValidateCompilation(embeddedCompilation);
         }
     }
 }

@@ -121,7 +121,19 @@ namespace SourceExpander
                 .Where(info => info.TypeNames.Any())
                 .ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
-            return _cacheResolvedFiles = ImmutableArray.Create(infos);
+
+            _cacheResolvedFiles = ImmutableArray.Create(infos);
+            if (ValidationHelpers.EnumerateEmbeddedSourcesErrorLocations(
+                compilation, parseOptions, _cacheResolvedFiles, cancellationToken).ToArray()
+                is { } diagnosticsLocations
+                && diagnosticsLocations.Length > 0)
+            {
+                reporter.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
+                    string.Join(", ", diagnosticsLocations.Select(d => d.Location?.SourceTree?.FilePath).OfType<string>().Distinct())));
+            }
+
+            return _cacheResolvedFiles;
         }
 
         private SourceFileInfoRaw ParseSource(SyntaxTree tree, string commonPrefix)

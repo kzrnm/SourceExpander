@@ -25,5 +25,12 @@ namespace SourceExpander.Roslyn
             "EmbedderGenerator",
             DiagnosticSeverity.Error,
             true);
+        public static readonly DiagnosticDescriptor EMBED0004_ErrorEmbeddedSource = new DiagnosticDescriptor(
+            "EMBED0004",
+            "Error embedded source",
+            "Error embedded source: {0}",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Error,
+            true);
     }
 }
