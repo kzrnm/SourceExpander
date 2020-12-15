@@ -77,5 +77,23 @@ namespace SourceExpander.Diagnostics {
                 return ResourceManager.GetString("EMBEDDER0002_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Nullable option is unsupported に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBEDDER0003_Title {
+            get {
+                return ResourceManager.GetString("EMBEDDER0003_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Nullable directive is unsupported に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBEDDER0004_Title {
+            get {
+                return ResourceManager.GetString("EMBEDDER0004_Title", resourceCulture);
+            }
+        }
     }
 }
