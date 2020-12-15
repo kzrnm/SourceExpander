@@ -17,15 +17,15 @@ namespace SourceExpander
         {
             Enabled = enabled;
             EmbeddingType = embeddingType;
+            EnableMinify = enableMinify;
             ExcludeAttributes = excludeAttributes switch
             {
                 null => ImmutableHashSet<string>.Empty,
                 _ => ImmutableHashSet.Create(excludeAttributes),
             };
-            EnableMinify = enableMinify;
             RemoveConditional = removeConditional switch
             {
-                null => ImmutableHashSet.Create("DEBUG"),
+                null => ImmutableHashSet<string>.Empty,
                 _ => ImmutableHashSet.Create(removeConditional),
             };
         }

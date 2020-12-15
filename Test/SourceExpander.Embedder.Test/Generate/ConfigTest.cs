@@ -249,7 +249,7 @@ class Program
         }
 
         [Fact]
-        public void Conditional()
+        public void NoConditional()
         {
             var additionalText = new InMemoryAdditionalText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
@@ -280,9 +280,9 @@ class Program
                  (
                      "TestAssembly>Program.cs",
                      new string[] { "Program" },
-                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray.Create<string>(),
-                     @"class Program{static void Main(){Console.WriteLine(1);}}"
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
 
             var generator = new EmbedderGenerator();
@@ -330,7 +330,7 @@ class Program
         }
 
         [Fact]
-        public void Conditional2()
+        public void Conditional()
         {
             var additionalText = new InMemoryAdditionalText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
