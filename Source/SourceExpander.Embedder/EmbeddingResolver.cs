@@ -87,7 +87,7 @@ namespace SourceExpander
             foreach (var tree in trees)
             {
                 var semanticModel = compilation.GetSemanticModel(tree, false);
-                var newRoot = new EmbedderRewriter(semanticModel, config).Visit(tree.GetRoot(cancellationToken));
+                var newRoot = new EmbedderRewriter(semanticModel, config, cancellationToken).Visit(tree.GetRoot(cancellationToken));
                 newCompilation = newCompilation.ReplaceSyntaxTree(tree,
                     tree.WithRootAndOptions(newRoot, parseOptions));
             }
