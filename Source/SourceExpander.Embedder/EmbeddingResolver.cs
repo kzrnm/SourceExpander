@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,6 +19,10 @@ namespace SourceExpander
         private readonly IDiagnosticReporter reporter;
         private readonly EmbedderConfig config;
         private readonly CancellationToken cancellationToken;
+        public EmbeddingResolver(EmbeddingContext context)
+            : this(context.Compilation, context.ParseOptions, context.Reporter, context.Config, context.CancellationToken)
+        { }
+
         public EmbeddingResolver(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
@@ -42,50 +46,34 @@ namespace SourceExpander
             this.config = config;
             this.cancellationToken = cancellationToken;
         }
-        public IEnumerable<(string name, SourceText sourceText)> EnumerateEmbeddingSources()
+        public ImmutableDictionary<string, string> EnumerateAssemblyMetadata()
         {
             if (!config.Enabled)
-                yield break;
+                return ImmutableDictionary<string, string>.Empty;
             var infos = ResolveFiles();
             if (infos.Length == 0)
-                yield break;
+                return ImmutableDictionary<string, string>.Empty;
 
-            var embbeddingMetadata = new Dictionary<string, string>
-            {
-                { "SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString() },
-                { "SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString()},
-            };
+            var embbeddingMetadataBuilder = ImmutableDictionary.CreateBuilder<string, string>();
+            embbeddingMetadataBuilder.Add("SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString());
+            embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString());
 
             var json = JsonUtil.ToJson(infos);
             switch (config.EmbeddingType)
             {
                 case EmbeddingType.Raw:
-                    embbeddingMetadata["SourceExpander.EmbeddedSourceCode"] = json;
+                    embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedSourceCode", json);
                     break;
                 default:
-                    embbeddingMetadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"] = SourceFileInfoUtil.ToGZipBase32768(json);
+                    embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedSourceCode.GZipBase32768", SourceFileInfoUtil.ToGZipBase32768(json));
                     break;
             }
 
             if (compilation.Options.AllowUnsafe)
             {
-                embbeddingMetadata["SourceExpander.EmbeddedAllowUnsafe"] = "true";
+                embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedAllowUnsafe", "true");
             }
-
-            var sb = new StringBuilder("using System.Reflection;");
-
-            foreach (var p in embbeddingMetadata)
-            {
-                sb.Append("[assembly: AssemblyMetadataAttribute(");
-                sb.Append(p.Key.ToLiteral());
-                sb.Append(",");
-                sb.Append(p.Value.ToLiteral());
-                sb.AppendLine(")]");
-            }
-
-            yield return (
-                "EmbeddedSourceCode.Metadata.Generated.cs",
-                SourceText.From(sb.ToString(), Encoding.UTF8));
+            return embbeddingMetadataBuilder.ToImmutable();
         }
 
         private bool updated = false;
@@ -106,10 +94,13 @@ namespace SourceExpander
             compilation = newCompilation;
             return;
         }
-        public SourceFileInfo[] ResolveFiles()
+        private ImmutableArray<SourceFileInfo> _cacheResolvedFiles;
+        public ImmutableArray<SourceFileInfo> ResolveFiles()
         {
+            if (!_cacheResolvedFiles.IsDefault)
+                return _cacheResolvedFiles;
             if (!config.Enabled)
-                return Array.Empty<SourceFileInfo>();
+                return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
             UpdateCompilation();
             var sources = new List<SourceFileInfo>();
             foreach (var embedded in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
@@ -130,7 +121,19 @@ namespace SourceExpander
                 .Where(info => info.TypeNames.Any())
                 .ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
-            return infos;
+
+            _cacheResolvedFiles = ImmutableArray.Create(infos);
+            if (ValidationHelpers.EnumerateEmbeddedSourcesErrorLocations(
+                compilation, parseOptions, _cacheResolvedFiles, cancellationToken).ToArray()
+                is { } diagnosticsLocations
+                && diagnosticsLocations.Length > 0)
+            {
+                reporter.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
+                    string.Join(", ", diagnosticsLocations.Select(d => d.Location?.SourceTree?.FilePath).OfType<string>().Distinct())));
+            }
+
+            return _cacheResolvedFiles;
         }
 
         private SourceFileInfoRaw ParseSource(SyntaxTree tree, string commonPrefix)
@@ -163,11 +166,20 @@ namespace SourceExpander
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
             var minified = newRoot.NormalizeWhitespace("", "", true);
+
+            if (ValidationHelpers.CompareSyntax(newRoot,
+                CSharpSyntaxTree.ParseText(minified.ToString(),
+                parseOptions,
+                cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)
+            {
+                reporter.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diff.ToString()));
+            }
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified.ToString());
         }
         private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
-            var dependencyInfo = infos.Select(s => new SourceFileInfoSlim(s))
+            var dependencyInfo = infos.Cast<ISourceFileInfoSlim>()
                 .Concat(otherInfos.Select(s => new SourceFileInfoSlim(s)))
                 .ToArray();
             IEnumerable<string> GetDependencies(SourceFileInfoRaw raw)
@@ -234,6 +246,47 @@ namespace SourceExpander
                     return min.Substring(0, i);
             }
             return min;
+        }
+
+
+        private interface ISourceFileInfoSlim
+        {
+            string FileName { get; }
+            ImmutableHashSet<string> TypeNames { get; }
+        }
+        private class SourceFileInfoRaw : ISourceFileInfoSlim
+        {
+            public SyntaxTree SyntaxTree { get; }
+            public string FileName { get; }
+            public ImmutableHashSet<string> TypeNames { get; }
+            public IEnumerable<string> Usings { get; }
+            public string CodeBody { get; }
+
+            public SourceFileInfoRaw(
+                SyntaxTree syntaxTree,
+                string fileName,
+                IEnumerable<string> typeNames,
+                IEnumerable<string> usings,
+                string codeBody)
+            {
+                SyntaxTree = syntaxTree;
+                FileName = fileName;
+                TypeNames = ImmutableHashSet.CreateRange(typeNames);
+                Usings = usings;
+                CodeBody = codeBody;
+            }
+        }
+        private class SourceFileInfoSlim : ISourceFileInfoSlim
+        {
+            public string FileName { get; }
+            public ImmutableHashSet<string> TypeNames { get; }
+
+            public SourceFileInfoSlim(SourceFileInfo file) : this(file.FileName, file.TypeNames) { }
+            public SourceFileInfoSlim(string filename, IEnumerable<string> typeNames)
+            {
+                FileName = filename;
+                TypeNames = ImmutableHashSet.CreateRange(typeNames);
+            }
         }
     }
 }
