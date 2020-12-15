@@ -83,7 +83,9 @@ namespace Mine{
 
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                additionalTexts: new[] { enableMinifyJson },
+                parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
             outputCompilation.GetDiagnostics().Should().BeEmpty();
 
@@ -107,7 +109,7 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 
@@ -169,7 +171,9 @@ namespace Mine{
 
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                additionalTexts: new[] { enableMinifyJson },
+                parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
             outputCompilation.GetDiagnostics().Should().BeEmpty();
 
@@ -193,7 +197,7 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 

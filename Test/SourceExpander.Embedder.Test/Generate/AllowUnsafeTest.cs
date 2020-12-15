@@ -115,14 +115,16 @@ namespace SourceExpander.Embedder.Generate.Test
         public void GenerateTest()
         {
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
+            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+                additionalTexts: new[] { enableMinifyJson },
+                parseOptions: opts);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
             outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();
@@ -162,7 +164,7 @@ namespace SourceExpander.Embedder.Generate.Test
         public void ResolverTest()
         {
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();

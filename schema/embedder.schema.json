@@ -7,6 +7,11 @@
             "type": "boolean",
             "default": true
         },
+        "enable-minify": {
+            "type": "boolean",
+            "description": "[experimental]minify embedded source code",
+            "default": false
+        },
         "embedding-type": {
             "description": "embedding type",
             "type": "string",
@@ -21,14 +26,6 @@
             "type": "array",
             "items": {
                 "description": "attribute full name that remove on embedding",
-                "type": "string"
-            }
-        },
-        "add-trivia-kinds": {
-            "description": "A list of Microsoft.CodeAnalysis.CSharp.SyntaxKind with LeadingTrivia/Trailing trivia",
-            "type": "array",
-            "items": {
-                "description": "Microsoft.CodeAnalysis.CSharp.SyntaxKind with LeadingTrivia/Trailing trivia",
                 "type": "string"
             }
         }

@@ -9,6 +9,13 @@ namespace SourceExpander.Embedder
     {
         public static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(SourceFileInfo).Assembly.Location);
 
+        public static InMemoryAdditionalText enableMinifyJson = new InMemoryAdditionalText(
+            "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""enable-minify"": true
+}
+");
         internal static object GetExpandedFiles(Compilation compilation)
         {
             using var ms = new MemoryStream();
