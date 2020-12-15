@@ -172,8 +172,18 @@ namespace SourceExpander
                 parseOptions,
                 cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)
             {
+                var diffStr = diff.ToString();
+
+                while (diffStr.Length < 10)
+                {
+                    diff = diff.Parent;
+                    if (diff is null)
+                        break;
+                    diffStr = diff.ToString();
+                }
+
                 reporter.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diff.ToString()));
+                    DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diffStr));
             }
             return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minified);
         }
