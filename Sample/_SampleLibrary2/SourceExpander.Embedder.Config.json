@@ -10,7 +10,8 @@
         "System.Diagnostics.DebuggerTypeProxyAttribute",
         "System.Diagnostics.DebuggerVisualizerAttribute"
     ],
-    "add-trivia-kinds": [
-        "EqualsGreaterThanToken"
+    "enable-minify": true,
+    "remove-conditional": [
+        "DEBUG"
     ]
 }

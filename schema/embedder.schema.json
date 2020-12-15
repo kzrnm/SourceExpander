@@ -12,6 +12,17 @@
             "description": "[experimental]minify embedded source code",
             "default": false
         },
+        "remove-conditional": {
+            "description": "Remove method Conditional(\"{Value}\")",
+            "type": "array",
+            "default": [
+                "DEBUG"
+            ],
+            "items": {
+                "description": "Remove method Conditional(\"{Value}\")",
+                "type": "string"
+            }
+        },
         "embedding-type": {
             "description": "embedding type",
             "type": "string",
