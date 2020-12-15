@@ -35,7 +35,7 @@ namespace SourceExpander.Roslyn
         public static readonly DiagnosticDescriptor EMBED0005_EmbeddedSourceDiff = new DiagnosticDescriptor(
             "EMBED0005",
             "Different syntax",
-            "Different syntax: near {0}",
+            "Different syntax: near {0}. This is Embedder error, please report this to GitHub repository.",
             "EmbedderGenerator",
             DiagnosticSeverity.Error,
             true);

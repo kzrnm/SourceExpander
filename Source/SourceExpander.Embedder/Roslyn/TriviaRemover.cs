@@ -66,10 +66,28 @@ namespace SourceExpander.Roslyn
             splitBuilder.Add(SyntaxKind.CaretEqualsToken);
             splitBuilder.Add(SyntaxKind.PercentEqualsToken);
             splitBuilder.Add(SyntaxKind.QuestionQuestionEqualsToken);
-
             SplitToken = splitBuilder.ToImmutable();
+
+            var preEqualsBuilder = ImmutableHashSet.CreateBuilder<SyntaxKind>();
+            preEqualsBuilder.Add(SyntaxKind.ExclamationToken);
+            preEqualsBuilder.Add(SyntaxKind.EqualsToken);
+            preEqualsBuilder.Add(SyntaxKind.LessThanToken);
+            preEqualsBuilder.Add(SyntaxKind.LessThanLessThanToken);
+            preEqualsBuilder.Add(SyntaxKind.GreaterThanToken);
+            preEqualsBuilder.Add(SyntaxKind.GreaterThanGreaterThanToken);
+            preEqualsBuilder.Add(SyntaxKind.SlashToken);
+            preEqualsBuilder.Add(SyntaxKind.AsteriskToken);
+            preEqualsBuilder.Add(SyntaxKind.BarToken);
+            preEqualsBuilder.Add(SyntaxKind.AmpersandToken);
+            preEqualsBuilder.Add(SyntaxKind.PlusToken);
+            preEqualsBuilder.Add(SyntaxKind.MinusToken);
+            preEqualsBuilder.Add(SyntaxKind.CaretToken);
+            preEqualsBuilder.Add(SyntaxKind.PercentToken);
+            preEqualsBuilder.Add(SyntaxKind.QuestionQuestionToken);
+            PreEqualsToken = preEqualsBuilder.ToImmutable();
         }
         public ImmutableHashSet<SyntaxKind> SplitToken { get; }
+        public ImmutableHashSet<SyntaxKind> PreEqualsToken { get; }
         public override SyntaxNode? Visit(SyntaxNode? node)
         {
             var res = base.Visit(node);
@@ -88,13 +106,27 @@ namespace SourceExpander.Roslyn
                     .WithLeadingTrivia(SyntaxFactory.Space)
                     .WithTrailingTrivia(SyntaxFactory.Space);
 
-            if (SplitToken.Contains(token.Kind()))
+            var kind = token.Kind();
+
+            var previous = token.GetPreviousToken().Kind();
+            var next = token.GetNextToken().Kind();
+
+            // LeadingTrivia
+            switch (kind)
+            {
+                case SyntaxKind.EqualsGreaterThanToken:
+                    if (PreEqualsToken.Contains(previous))
+                        return res.WithLeadingTrivia(SyntaxFactory.Space).WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                    return res.WithoutTrivia();
+            }
+
+            if (SplitToken.Contains(kind))
                 return res.WithoutTrivia();
-
-            if (SplitToken.Contains(token.GetPreviousToken().Kind()))
+            if (SplitToken.Contains(kind))
+                return res.WithoutTrivia();
+            if (SplitToken.Contains(previous))
                 res = res.WithLeadingTrivia(SyntaxFactory.ElasticMarker);
-
-            if (SplitToken.Contains(token.GetNextToken().Kind()))
+            if (SplitToken.Contains(next))
                 res = res.WithTrailingTrivia(SyntaxFactory.ElasticMarker);
 
             return res;
