@@ -22,6 +22,63 @@ namespace SourceExpander.Embedder.Generate.Test
         static SyntaxTree CreateSyntaxTree(string code, string path = null)
             => CSharpSyntaxTree.ParseText(code, path: path ?? "/home/source/Program.cs");
 
+
+        public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+        {
+            {
+                new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": 1
+}
+")
+            },
+            {
+                new InMemoryAdditionalText(
+                "/foo/bar/sourceExpander.embedder.config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": 1
+}
+")
+            },
+        };
+
+        [Theory]
+        [MemberData(nameof(ParseErrorJsons))]
+        public void ParseErrorTest(InMemoryAdditionalText additionalText)
+        {
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var generator = new EmbedderGenerator();
+            RunGenerator(compilation, generator,
+                    additionalTexts: new[] {
+                                    additionalText,
+                                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
+                    parseOptions: parseOptions)
+                .Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
+        }
+
         [Fact]
         public void NotEnabled()
         {
@@ -234,7 +291,7 @@ class Program
         }
 
         [Fact]
-        public void NoConditional()
+        public void ConditionalNone()
         {
             var additionalText = new InMemoryAdditionalText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
@@ -401,60 +458,339 @@ class Program
                 .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
         }
 
-        public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+
+        [Fact]
+        public void EmbeddingSourceClassNone()
         {
-            {
-                new InMemoryAdditionalText(
+            var additionalText = new InMemoryAdditionalText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
-    ""exclude-attributes"": 1
+    ""embedding-source-class"": {
+        ""enabled"": false,
+        ""if-directive"": ""SOURCEEXPANDER""
+    },
+    ""enable-minify"": true
 }
-")
-            },
-            {
-                new InMemoryAdditionalText(
-                "/foo/bar/sourceExpander.embedder.config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
-    ""exclude-attributes"": 1
-}
-")
-            },
-        };
+");
 
-        [Theory]
-        [MemberData(nameof(ParseErrorJsons))]
-        public void ParseErrorTest(InMemoryAdditionalText additionalText)
-        {
             var compilation = CreateCompilation(new[] {
                 CreateSyntaxTree(@"
 using System;
 using System.Diagnostics;
 
-[DebuggerDisplay(""Name"")]
 class Program
 {
     static void Main()
     {
+        Debug.Assert(true);
         Console.WriteLine(1);
     }
-
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
 }
 ")
             }, compilationOptions, new[] { expanderCoreReference });
             compilation.GetDiagnostics().Should().BeEmpty();
 
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                 ));
+
             var generator = new EmbedderGenerator();
-            RunGenerator(compilation, generator,
-                    additionalTexts: new[] {
-                                    additionalText,
-                                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
-                    },
-                    parseOptions: parseOptions)
-                .Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
+
+            gen.AddedSyntaxTrees
+                .Should()
+                .ContainSingle()
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
+                .And
+                .NotContain("SourceFileInfo");
+        }
+
+
+        [Fact]
+        public void EmbeddingSourceClass()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-source-class"": {
+        ""enabled"": true,
+        ""if-directive"": ""EXPDIRECTIVE""
+    },
+    ""enable-minify"": true
+}
+");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+class Program
+{
+    static void Main()
+    {
+        Debug.Assert(true);
+        Console.WriteLine(1);
+    }
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                 ));
+
+            var generator = new EmbedderGenerator();
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
+
+            gen.AddedSyntaxTrees
+                .Should()
+                .ContainSingle()
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
+                .And
+                .ContainAll("new SourceFileInfo[]", "#if EXPDIRECTIVE");
+        }
+
+        [Fact]
+        public void EmbeddingSourceClassDefault()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-source-class"": {
+        ""enabled"": true
+    },
+    ""enable-minify"": true
+}
+");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+class Program
+{
+    static void Main()
+    {
+        Debug.Assert(true);
+        Console.WriteLine(1);
+    }
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                 ));
+
+            var generator = new EmbedderGenerator();
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            var add = gen.AddedSyntaxTrees.First();
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
+
+            gen.AddedSyntaxTrees
+                .Should()
+                .ContainSingle()
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
+                .And
+                .ContainAll("new SourceFileInfo[]", "#if DEBUG");
+        }
+
+        [Fact]
+        public void EmbeddingSourceClassAlways()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-source-class"": {
+        ""enabled"": true,
+        ""if-directive"": """"
+    },
+    ""enable-minify"": true
+}
+");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+class Program
+{
+    static void Main()
+    {
+        Debug.Assert(true);
+        Console.WriteLine(1);
+    }
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                 ));
+
+            var generator = new EmbedderGenerator();
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            var add = gen.AddedSyntaxTrees.First();
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
+
+            gen.AddedSyntaxTrees
+                .Should()
+                .ContainSingle()
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
+                .And
+                .Contain("new SourceFileInfo[]")
+                .And
+                .NotContain("#if");
         }
     }
 }

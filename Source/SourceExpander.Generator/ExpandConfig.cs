@@ -62,8 +62,6 @@ namespace SourceExpander
             public string[]? MatchFilePattern { set; get; }
             [DataMember(Name = "ignore-file-pattern-regex")]
             public string[]? IgnoreFilePatternRegex { set; get; }
-
-            public ExtensionDataObject? ExtensionData { get; set; }
         }
     }
 

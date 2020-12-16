@@ -12,6 +12,21 @@
             "description": "[experimental]minify embedded source code",
             "default": false
         },
+        "embedding-source-class": {
+            "type": "object",
+            "description": "embedding source code as class",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "if-directive": {
+                    "description": "#if directive name",
+                    "type": "string",
+                    "default": "DEBUG"
+                }
+            }
+        },
         "remove-conditional": {
             "description": "Remove method Conditional(\"{Value}\")",
             "type": "array",
