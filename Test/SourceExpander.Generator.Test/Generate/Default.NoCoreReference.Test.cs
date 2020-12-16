@@ -137,7 +137,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator, 
+            var gen = RunGenerator(compilation, generator,
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();

@@ -1067,7 +1067,7 @@ public class Def
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var gen = RunGenerator(compilation, generator, 
+            var gen = RunGenerator(compilation, generator,
                 additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
