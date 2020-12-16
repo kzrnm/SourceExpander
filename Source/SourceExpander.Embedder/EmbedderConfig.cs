@@ -13,7 +13,8 @@ namespace SourceExpander
             EmbeddingType embeddingType = EmbeddingType.GZipBase32768,
             string[]? excludeAttributes = null,
             bool enableMinify = false,
-            string[]? removeConditional = null)
+            string[]? removeConditional = null,
+            EmbeddingSourceClass? embeddingSourceClass = null)
         {
             Enabled = enabled;
             EmbeddingType = embeddingType;
@@ -28,6 +29,7 @@ namespace SourceExpander
                 null => ImmutableHashSet<string>.Empty,
                 _ => ImmutableHashSet.Create(removeConditional),
             };
+            EmbeddingSourceClass = embeddingSourceClass ?? new EmbeddingSourceClass(false);
         }
 
         public bool Enabled { get; }
@@ -35,25 +37,14 @@ namespace SourceExpander
         public ImmutableHashSet<string> ExcludeAttributes { get; }
         public bool EnableMinify { get; }
         public ImmutableHashSet<string> RemoveConditional { get; }
-
+        public EmbeddingSourceClass EmbeddingSourceClass { get; }
         public static EmbedderConfig Parse(SourceText? sourceText, CancellationToken cancellationToken)
         {
-            static EmbeddingType ParseEmbeddingType(string? str)
-                => str?.ToLowerInvariant() switch
-                {
-                    "raw" => EmbeddingType.Raw,
-                    _ => EmbeddingType.GZipBase32768,
-                };
-
             try
             {
-                if (sourceText is not null && JsonUtil.ParseJson<EmbedderConfigData>(sourceText, cancellationToken) is { } data)
-                    return new EmbedderConfig(
-                        enabled: data.Enabled ?? true,
-                        embeddingType: ParseEmbeddingType(data.EmbeddingType),
-                        excludeAttributes: data.ExcludeAttributes,
-                        removeConditional: data.RemoveConditional,
-                        enableMinify: data.EnableMinify == true);
+                if (sourceText is not null
+                    && JsonUtil.ParseJson<EmbedderConfigData>(sourceText, cancellationToken) is { } data)
+                    return data.ToImmutable();
                 return new EmbedderConfig();
             }
             catch (Exception e)
@@ -75,7 +66,51 @@ namespace SourceExpander
             public bool? EnableMinify { set; get; }
             [DataMember(Name = "remove-conditional")]
             public string[]? RemoveConditional { set; get; }
+
+            [DataMember(Name = "embedding-source-class")]
+            public SourceClassData? EmbeddingSourceClass { set; get; }
+
+
+            static EmbeddingType ParseEmbeddingType(string? str)
+                => str?.ToLowerInvariant() switch
+                {
+                    "raw" => SourceExpander.EmbeddingType.Raw,
+                    _ => SourceExpander.EmbeddingType.GZipBase32768,
+                };
+
+            public EmbedderConfig ToImmutable() =>
+                new EmbedderConfig(
+                        Enabled ?? true,
+                        ParseEmbeddingType(EmbeddingType),
+                        ExcludeAttributes,
+                        EnableMinify == true,
+                        RemoveConditional,
+                        EmbeddingSourceClass?.ToImmutable());
         }
+
+        [DataContract]
+        private class SourceClassData
+        {
+            [DataMember(Name = "enabled")]
+            public bool? Enabled { set; get; }
+            [DataMember(Name = "if-directive")]
+            public string? IfDirective { set; get; }
+
+            public EmbeddingSourceClass ToImmutable() => new EmbeddingSourceClass(Enabled == true, IfDirective);
+        }
+    }
+
+    public class EmbeddingSourceClass
+    {
+        public EmbeddingSourceClass(bool enabled = false, string? ifDirective = null)
+        {
+            Enabled = enabled;
+            IfDirective = ifDirective ?? "DEBUG";
+        }
+        public bool Enabled { set; get; }
+        public string IfDirective { set; get; }
+
+        public override string ToString() => Enabled ? $"if: {IfDirective}" : "disable";
     }
 
     public enum EmbeddingType

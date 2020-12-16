@@ -59,13 +59,19 @@ namespace SourceExpander
             if (resolvedSources.Length == 0)
                 return;
 
+            var sb = CreateMetadataSource(new StringBuilder(), resolver.EnumerateAssemblyMetadata());
+
+            if (config.EmbeddingSourceClass.Enabled)
+                CreateEmbbedingSourceClass(sb, resolvedSources, config.EmbeddingSourceClass.IfDirective);
+
             context.AddSource(
-                "EmbeddedSourceCode.Metadata.Generated.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+                "EmbeddedSourceCode.Metadata.Generated.cs",
+                SourceText.From(sb.ToString(), Encoding.UTF8));
         }
 
-        private static SourceText CreateMetadataSource(ImmutableDictionary<string, string> metadatas)
+        private static StringBuilder CreateMetadataSource(StringBuilder sb, ImmutableDictionary<string, string> metadatas)
         {
-            var sb = new StringBuilder("using System.Reflection;");
+            sb.AppendLine("using System.Reflection;");
             foreach (var p in metadatas)
             {
                 sb.Append("[assembly: AssemblyMetadataAttribute(");
@@ -74,7 +80,48 @@ namespace SourceExpander
                 sb.Append(p.Value.ToLiteral());
                 sb.AppendLine(")]");
             }
-            return SourceText.From(sb.ToString(), Encoding.UTF8);
+            return sb;
+        }
+
+        private static StringBuilder CreateEmbbedingSourceClass(StringBuilder sb,
+            ImmutableArray<SourceFileInfo> sources,
+            string ifDirective)
+        {
+            if (!string.IsNullOrWhiteSpace(ifDirective))
+                sb.Append("#if ").AppendLine(ifDirective);
+            sb.AppendLine("namespace SourceExpander.Embedded{");
+            sb.AppendLine("using System;");
+            sb.AppendLine("using System.Collections.Generic;");
+            sb.AppendLine("public class SourceFileInfo{");
+            sb.AppendLine("  public string FileName{get;set;}");
+            sb.AppendLine("  public IEnumerable<string> TypeNames{get;set;}");
+            sb.AppendLine("  public IEnumerable<string> Usings{get;set;}");
+            sb.AppendLine("  public IEnumerable<string> Dependencies{get;set;}");
+            sb.AppendLine("  public string CodeBody{get;set;}");
+            sb.AppendLine("}");
+            sb.AppendLine("public class SourceFileInfoContainer{");
+            sb.AppendLine("  public static readonly IReadOnlyList<SourceFileInfo> Files = Array.AsReadOnly(new SourceFileInfo[]{");
+            foreach (var source in sources)
+            {
+                sb.AppendLine("    new SourceFileInfo{");
+                if (source.FileName is { } fileName)
+                    sb.Append("      FileName = ").Append(fileName.ToLiteral()).AppendLine(",");
+                if (source.CodeBody is { } body)
+                    sb.Append("      CodeBody = ").Append(body.ToLiteral()).AppendLine(",");
+                if (source.Usings is { } usings)
+                    sb.Append("      Usings = new string[]{").Append(string.Join(", ",
+                        usings.Select(s => s.ToLiteral()))).AppendLine("},");
+                if (source.Dependencies is { } deps)
+                    sb.Append("      Dependencies = new string[]{").Append(string.Join(", ",
+                        deps.Select(s => s.ToLiteral()))).AppendLine("},");
+                sb.AppendLine("    },");
+            }
+            sb.AppendLine("  });");
+            sb.AppendLine("}");
+            sb.AppendLine("}");
+            if (!string.IsNullOrWhiteSpace(ifDirective))
+                sb.AppendLine("#endif");
+            return sb;
         }
     }
 }

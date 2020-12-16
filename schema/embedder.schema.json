@@ -23,7 +23,7 @@
                 "if-directive": {
                     "description": "#if directive name",
                     "type": "string",
-                    "default": "SOURCEEXPANDER"
+                    "default": "DEBUG"
                 }
             }
         },
