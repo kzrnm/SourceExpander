@@ -7,7 +7,7 @@
 
 
   <ItemGroup Condition="'$(UseLocalReference)' != 'true'">
-    <PackageReference Include="SourceExpander" Version="2.3.1" />
+    <PackageReference Include="SourceExpander" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseLocalReference)' == 'true'">
     <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />
