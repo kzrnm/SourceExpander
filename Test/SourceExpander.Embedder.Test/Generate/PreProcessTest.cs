@@ -7,7 +7,7 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class PreProcessTest : EmbeddingGeneratorTestBase
     {
-        static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
 
         [Fact]
         public void GenerateTest()
@@ -32,15 +32,14 @@ path: "Program.cs") },
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
-            var newTree = outputCompilation.SyntaxTrees
+            var newTree = gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.FilePath.Contains("EmbeddedSourceCode.Metadata.Generated.cs"))
+                .ContainSingle()
                 .Which;
             newTree.ToString().Should().ContainAll(
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
