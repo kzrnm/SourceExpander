@@ -64,16 +64,15 @@ Put2.Write();",
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+            var gen = RunGenerator(compilation, generator,
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            outputCompilation.SyntaxTrees
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
             files.Should().HaveCount(2);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
@@ -135,16 +134,15 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+            var gen = RunGenerator(compilation, generator,
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            outputCompilation.SyntaxTrees
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(
@@ -191,10 +189,9 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+            var gen = RunGenerator(compilation, generator,
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
-            diagnostics.Should()
+            gen.Diagnostics.Should()
                 .ContainSingle()
                 .Which
                 .Id

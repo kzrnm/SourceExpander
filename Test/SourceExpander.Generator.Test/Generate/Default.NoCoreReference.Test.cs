@@ -63,18 +63,18 @@ Put2.Write();",
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
-            outputCompilation.SyntaxTrees
+            var gen = RunGenerator(compilation, generator,
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.SourceCode.cs"));
-            outputCompilation.SyntaxTrees
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            dynamic files = GetExpandedFiles(outputCompilation);
+            dynamic files = GetExpandedFiles(gen.OutputCompilation);
             ((System.Collections.IEnumerable)files).Should().HaveCount(2);
             ((System.Collections.IEnumerable)files.Values).Cast<object>().Should().NotContain(o => o.GetType() == typeof(SourceCode));
             ((object)files["/home/source/Program.cs"]).Should()
@@ -137,18 +137,18 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
-            outputCompilation.SyntaxTrees
+            var gen = RunGenerator(compilation, generator,
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.SourceCode.cs"));
-            outputCompilation.SyntaxTrees
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            dynamic files = GetExpandedFiles(outputCompilation);
+            dynamic files = GetExpandedFiles(gen.OutputCompilation);
             ((System.Collections.IEnumerable)files).Should().HaveCount(1);
             ((System.Collections.IEnumerable)files.Values).Cast<object>().Should().NotContain(o => o.GetType() == typeof(SourceCode));
             ((object)files["/home/source/Program.cs"]).Should()
@@ -195,10 +195,9 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+            var gen = RunGenerator(compilation, generator,
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
-            diagnostics.Should()
+            gen.Diagnostics.Should()
                 .ContainSingle()
                 .Which
                 .Id

@@ -52,26 +52,21 @@ class Program
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(
-                new[] { generator },
-                additionalTexts: new[] { additionalText },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(1);
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(1);
-            diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1);
+            gen.Diagnostics.Should().BeEmpty();
 
-            outputCompilation.SyntaxTrees
+            gen.OutputCompilation.SyntaxTrees
                 .Should()
                 .NotContain(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"));
         }
@@ -121,17 +116,12 @@ class Program
                  ));
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(
-                new[] { generator },
-                additionalTexts: new[] { additionalText },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
@@ -147,12 +137,13 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
-            diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
 
-            outputCompilation.SyntaxTrees
+
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
@@ -207,17 +198,12 @@ class Program
                  ));
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(
-                new[] { generator },
-                additionalTexts: new[] { additionalText },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
@@ -231,12 +217,11 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
-            diagnostics.Should().BeEmpty();
-
-            outputCompilation.SyntaxTrees
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
@@ -286,17 +271,12 @@ class Program
                  ));
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(
-                new[] { generator },
-                additionalTexts: new[] { additionalText },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
@@ -312,12 +292,13 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
-            diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
 
-            outputCompilation.SyntaxTrees
+
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
@@ -382,17 +363,12 @@ class Program
                  ));
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(
-                new[] { generator },
-                additionalTexts: new[] { additionalText },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
@@ -408,12 +384,12 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
-            diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
 
-            outputCompilation.SyntaxTrees
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
@@ -472,16 +448,13 @@ class Program
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(
-                new[] { generator },
-                additionalTexts: new[] {
-                    additionalText,
-                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
-                },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
-            diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
+            RunGenerator(compilation, generator,
+                    additionalTexts: new[] {
+                                    additionalText,
+                                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
+                    parseOptions: parseOptions)
+                .Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
         }
     }
 }

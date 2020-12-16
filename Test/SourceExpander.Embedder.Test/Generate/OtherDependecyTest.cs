@@ -18,9 +18,9 @@ namespace SourceExpander.Embedder.Generate.Test
                 assemblyName: "OtherDependency");
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
-            return (CSharpCompilation)outputCompilation;
+            return RunGenerator(compilation, generator,
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse))
+                .OutputCompilation;
         }
 
         private static CSharpCompilation MakeOldStyleCompilation(SyntaxTree syntax)
@@ -82,12 +82,9 @@ namespace Mine{
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
-                additionalTexts: new[] { enableMinifyJson },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var gen = RunGenerator(compilation, generator, additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
 
             var expected = new[] {
                 new SourceFileInfo
@@ -109,14 +106,13 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
+            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 
             reporter.Diagnostics.Should().BeEmpty();
 
-
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
@@ -170,12 +166,9 @@ namespace Mine{
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
-                additionalTexts: new[] { enableMinifyJson },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var gen = RunGenerator(compilation, generator, additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
 
             var expected = new[] {
                 new SourceFileInfo
@@ -197,11 +190,11 @@ namespace Mine{
             };
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
+            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(expected);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                         .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                         .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];

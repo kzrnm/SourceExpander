@@ -38,19 +38,19 @@ class Program
             compilation.SyntaxTrees.Should().HaveCount(1);
 
             var generator = new ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            diagnostics.Should().ContainSingle()
+            var gen = RunGenerator(compilation, generator,
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.Diagnostics.Should().ContainSingle()
                 .Which
                 .Id
                 .Should().Be("EXPAND0001");
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
-            outputCompilation.SyntaxTrees
+            gen.OutputCompilation.SyntaxTrees
             .Should()
             .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(outputCompilation);
+            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
             files.Should().HaveCount(1);
             files["/home/source/Program.cs"].Should()
                 .BeEquivalentTo(

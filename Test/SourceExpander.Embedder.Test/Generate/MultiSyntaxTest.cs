@@ -84,7 +84,7 @@ namespace Test.F
         }
     }", path: "/home/source/F/NumType.cs"),
         };
-        static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         static ImmutableArray<SourceFileInfo> embeddedFiles
             = ImmutableArray.Create(
                 new SourceFileInfo
@@ -120,16 +120,13 @@ namespace Test.F
         public void GenerateTest()
         {
             var generator = new EmbedderGenerator();
-            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
-                additionalTexts: new[] { enableMinifyJson },
-                parseOptions: opts);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var gen = RunGenerator(compilation, generator, additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
@@ -145,9 +142,9 @@ namespace Test.F
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
@@ -163,7 +160,7 @@ namespace Test.F
         public void ResolverTest()
         {
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
+            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
             reporter.Diagnostics.Should().BeEmpty();

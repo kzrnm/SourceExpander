@@ -17,23 +17,22 @@ namespace SourceExpander.Embedder.Generate.Test
                 .Should().BeEmpty();
         }
         private readonly CSharpCompilation compilation;
-        static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         [Fact]
         public void GenerateNoSyntaxesTest()
         {
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse));
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            outputCompilation.SyntaxTrees.Should().BeEmpty();
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
         }
 
         [Fact]
         public void ResolverTest()
         {
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, new EmbedderConfig()).ResolveFiles()
+            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig()).ResolveFiles()
                 .Should().BeEmpty();
             reporter.Diagnostics.Should().BeEmpty();
         }

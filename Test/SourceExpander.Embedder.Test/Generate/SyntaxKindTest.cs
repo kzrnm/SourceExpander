@@ -1000,10 +1000,10 @@ public class Def
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: parseOptions);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
+
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
 
             var reporter = new MockDiagnosticReporter();
             var resolved = new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig()).ResolveFiles()
@@ -1021,7 +1021,7 @@ public class Def
             reporter.Diagnostics.Should().BeEmpty();
 
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
@@ -1043,12 +1043,12 @@ public class Def
                 .Should()
                 .BeEquivalentTo(testData.Expected);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
-            diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
 
-            outputCompilation.SyntaxTrees
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
@@ -1067,15 +1067,14 @@ public class Def
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new EmbedderGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
-                additionalTexts: new[] { enableMinifyJson },
-                parseOptions: parseOptions);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            diagnostics.Should().BeEmpty();
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            var gen = RunGenerator(compilation, generator,
+                additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
 
             var reporter = new MockDiagnosticReporter();
-            var resolved = new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
+            var resolved = new EmbeddingResolver(compilation, parseOptions, reporter,
+                new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .ContainSingle()
                 .Which;
@@ -1090,7 +1089,7 @@ public class Def
             reporter.Diagnostics.Should().BeEmpty();
 
 
-            var metadata = outputCompilation.Assembly.GetAttributes()
+            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
@@ -1112,12 +1111,12 @@ public class Def
                 .Should()
                 .BeEquivalentTo(testData.ExpectedMinify);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(2);
-            diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.Diagnostics.Should().BeEmpty();
 
-            outputCompilation.SyntaxTrees
+            gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\","))
+                .ContainSingle()
                 .Which
                 .ToString()
                 .Should()
