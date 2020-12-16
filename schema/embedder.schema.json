@@ -15,9 +15,7 @@
         "remove-conditional": {
             "description": "Remove method Conditional(\"{Value}\")",
             "type": "array",
-            "default": [
-                "DEBUG"
-            ],
+            "default": [],
             "items": {
                 "description": "Remove method Conditional(\"{Value}\")",
                 "type": "string"

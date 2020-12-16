@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 using Xunit;
-#pragma warning disable CA1825
 
 namespace SourceExpander.Embedder.Generate.Test
 {

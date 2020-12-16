@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using System.Threading;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -12,10 +14,12 @@ namespace SourceExpander.Roslyn
     {
         private readonly SemanticModel model;
         private readonly EmbedderConfig config;
-        public EmbedderRewriter(SemanticModel model, EmbedderConfig config)
+        private readonly CancellationToken cancellationToken;
+        public EmbedderRewriter(SemanticModel model, EmbedderConfig config, CancellationToken cancellationToken)
         {
             this.model = model;
             this.config = config;
+            this.cancellationToken = cancellationToken;
         }
 
         public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia) => SyntaxFactory.ElasticMarker;
@@ -32,6 +36,30 @@ namespace SourceExpander.Roslyn
             if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Count > 0)
                 return attrs;
             return null;
+        }
+        public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)
+        {
+            bool IsRemovableInvocation(InvocationExpressionSyntax node)
+            {
+                const string System_Diagnostics_ConditionalAttribute = "System.Diagnostics.ConditionalAttribute";
+
+                if (model.GetSymbolInfo(node, cancellationToken).Symbol is not IMethodSymbol symbol)
+                    return false;
+                var conditions = symbol.GetAttributes()
+                    .Where(at => at.AttributeClass?.ToString() == System_Diagnostics_ConditionalAttribute)
+                    .Select(at => at.ConstructorArguments[0].Value)
+                    .OfType<string>();
+
+                return config.RemoveConditional.Overlaps(conditions);
+            }
+            var res = base.VisitExpressionStatement(node);
+            if (node.Parent.IsKind(SyntaxKind.Block)
+                && node.Expression is InvocationExpressionSyntax invocation
+                && IsRemovableInvocation(invocation))
+            {
+                return null;
+            }
+            return res;
         }
     }
 }

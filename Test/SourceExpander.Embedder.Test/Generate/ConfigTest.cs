@@ -10,80 +10,17 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class ConfigTest : EmbeddingGeneratorTestBase
     {
-        public ConfigTest()
-        {
-            compilation = CreateCompilation(TestSyntaxes,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpCompilationOptions compilationOptions
+            = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                     .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        {"CS8019",ReportDiagnostic.Suppress },
-                    }),
-                new[] { expanderCoreReference });
-            compilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
-            compilation.GetDiagnostics().Should().BeEmpty();
-        }
-        private readonly CSharpCompilation compilation;
-        private static SyntaxTree[] TestSyntaxes => new[]
-        {
-                 CSharpSyntaxTree.ParseText(
-                    @"using System.Diagnostics;namespace Test{static class Put{public class Nested{ public static void Write(string v){Debug.WriteLine(v);}}}}",
-                    path: "/home/source/Put.cs"),
-                 CSharpSyntaxTree.ParseText(
-                    @"using System.Diagnostics;
-using System;
-using System.Threading.Tasks;// unused
-using System.Collections.Generic;
-namespace Test.I
-{
-    using System.Collections;
-    public record IntRecord(int n);
-    [System.Diagnostics.DebuggerDisplay(""TEST"")]
-    class D<T> : IComparer<T>
-    {
-        public int Compare(T x,T y) => throw new NotImplementedException();
-        [System.Diagnostics.Conditional(""TEST"")]
-        public static void WriteType()
-        {
-            Console.Write(typeof(T).FullName);
-            Trace.Write(typeof(T).FullName);
-            Put.Nested.Write(typeof(T).FullName);
-        }
-    }
-}",
-                    path: "/home/source/I/D.cs"),
-                 CSharpSyntaxTree.ParseText(
-                   @"using System;
-using System.Diagnostics;
-using static System.Console;
+                        {
+                            "CS8019",ReportDiagnostic.Suppress
+                        },
+                    });
 
-namespace Test.F
-{
-    class N
-    {
-        public static void WriteN()
-        {
-            Console.Write(NumType.Zero);
-            Write(""N"");
-            Trace.Write(""N"");
-            Put.Nested.Write(""N"");
-        }
-    }
-}",
-                    path: "/home/source/F/N.cs"),
-                 CSharpSyntaxTree.ParseText(
-       @"
-using System.Diagnostics;
-namespace Test.F
-{
-    [DebuggerDisplay(""TEST"")]
-    public enum NumType
-    {
-        Zero,
-        Pos,
-        Neg,
-    }
-}", path: "/home/source/F/NumType.cs"),
-        };
-        static readonly CSharpParseOptions opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static SyntaxTree CreateSyntaxTree(string code, string path = null)
+            => CSharpSyntaxTree.ParseText(code, path: path ?? "/home/source/Program.cs");
 
         [Fact]
         public void NotEnabled()
@@ -99,6 +36,21 @@ namespace Test.F
 }
 ");
 
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(
@@ -108,7 +60,7 @@ namespace Test.F
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
+            outputCompilation.SyntaxTrees.Should().HaveCount(1);
 
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -116,7 +68,7 @@ namespace Test.F
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
+            outputCompilation.SyntaxTrees.Should().HaveCount(1);
             diagnostics.Should().BeEmpty();
 
             outputCompilation.SyntaxTrees
@@ -137,35 +89,35 @@ namespace Test.F
     ""enable-minify"": true
 }
 ");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
-                     "TestAssembly>F/N.cs",
-                     new string[] { "Test.F.N" },
-                     new string[] { "using System;", "using System.Diagnostics;", "using static System.Console;" },
-                     new string[] { "TestAssembly>F/NumType.cs", "TestAssembly>Put.cs" },
-                     "namespace Test.F{class N{public static void WriteN(){Console.Write(NumType.Zero);Write(\"N\");Trace.Write(\"N\");Put.Nested.Write(\"N\");}}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>F/NumType.cs",
-                     new string[] { "Test.F.NumType" },
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;"),
                      ImmutableArray.Create<string>(),
-                     ImmutableArray.Create<string>(),
-                     "namespace Test.F{public enum NumType{Zero,Pos,Neg,}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>I/D.cs",
-                     new string[] { "Test.I.IntRecord", "Test.I.D<T>" },
-                     new string[] { "using System.Diagnostics;", "using System;", "using System.Collections.Generic;" },
-                     new string[] { "TestAssembly>Put.cs" },
-                     @"namespace Test.I{using System.Collections;public record IntRecord(int n);class D<T>:IComparer<T>{public int Compare(T x,T y)=>throw new NotImplementedException();[System.Diagnostics.Conditional(""TEST"")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>Put.cs",
-                     new string[] { "Test.Put", "Test.Put.Nested" },
-                     new string[] { "using System.Diagnostics;" },
-                     ImmutableArray.Create<string>(),
-                     "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
+                     @"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
                  ));
 
             var generator = new EmbedderGenerator();
@@ -177,7 +129,7 @@ namespace Test.F
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
 
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -195,7 +147,7 @@ namespace Test.F
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
             diagnostics.Should().BeEmpty();
 
             outputCompilation.SyntaxTrees
@@ -213,52 +165,6 @@ namespace Test.F
         }
 
         [Fact]
-        public void ExcludeAttributesResolver()
-        {
-            var embeddedFiles = ImmutableArray.Create(
-                 new SourceFileInfo
-                 (
-                     "TestAssembly>F/N.cs",
-                     new string[] { "Test.F.N" },
-                     new string[] { "using System;", "using System.Diagnostics;", "using static System.Console;" },
-                     new string[] { "TestAssembly>F/NumType.cs", "TestAssembly>Put.cs" },
-                     "namespace Test.F{class N{public static void WriteN(){Console.Write(NumType.Zero);Write(\"N\");Trace.Write(\"N\");Put.Nested.Write(\"N\");}}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>F/NumType.cs",
-                     new string[] { "Test.F.NumType" },
-                     ImmutableArray.Create<string>(),
-                     ImmutableArray.Create<string>(),
-                     "namespace Test.F{public enum NumType{Zero,Pos,Neg,}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>I/D.cs",
-                     new string[] { "Test.I.IntRecord", "Test.I.D<T>" },
-                     new string[] { "using System.Diagnostics;", "using System;", "using System.Collections.Generic;" },
-                     new string[] { "TestAssembly>Put.cs" },
-                     @"namespace Test.I{using System.Collections;public record IntRecord(int n);class D<T>:IComparer<T>{public int Compare(T x,T y)=>throw new NotImplementedException();[System.Diagnostics.Conditional(""TEST"")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>Put.cs",
-                     new string[] { "Test.Put", "Test.Put.Nested" },
-                     new string[] { "using System.Diagnostics;" },
-                     ImmutableArray.Create<string>(),
-                     "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
-                 ));
-
-            var config = new EmbedderConfig(
-                true,
-                EmbeddingType.GZipBase32768,
-                new[] { "System.Diagnostics.DebuggerDisplayAttribute" },
-                enableMinify: true);
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, opts, reporter, config).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
-            reporter.Diagnostics.Should().BeEmpty();
-        }
-
-        [Fact]
         public void EmbeddingRaw()
         {
             var additionalText = new InMemoryAdditionalText(
@@ -266,41 +172,38 @@ namespace Test.F
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
-    ""exclude-attributes"": [
-        ""System.Diagnostics.DebuggerDisplayAttribute""
-    ],
     ""enable-minify"": true
 }
 ");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
-                     "TestAssembly>F/N.cs",
-                     new string[] { "Test.F.N" },
-                     new string[] { "using System;", "using System.Diagnostics;", "using static System.Console;" },
-                     new string[] { "TestAssembly>F/NumType.cs", "TestAssembly>Put.cs" },
-                     "namespace Test.F{class N{public static void WriteN(){Console.Write(NumType.Zero);Write(\"N\");Trace.Write(\"N\");Put.Nested.Write(\"N\");}}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>F/NumType.cs",
-                     new string[] { "Test.F.NumType" },
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray.Create<string>(),
-                     ImmutableArray.Create<string>(),
-                     "namespace Test.F{public enum NumType{Zero,Pos,Neg,}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>I/D.cs",
-                     new string[] { "Test.I.IntRecord", "Test.I.D<T>" },
-                     new string[] { "using System.Diagnostics;", "using System;", "using System.Collections.Generic;" },
-                     new string[] { "TestAssembly>Put.cs" },
-                     @"namespace Test.I{using System.Collections;public record IntRecord(int n);class D<T>:IComparer<T>{public int Compare(T x,T y)=>throw new NotImplementedException();[System.Diagnostics.Conditional(""TEST"")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}}}"
-                 ), new SourceFileInfo
-                 (
-                     "TestAssembly>Put.cs",
-                     new string[] { "Test.Put", "Test.Put.Nested" },
-                     new string[] { "using System.Diagnostics;" },
-                     ImmutableArray.Create<string>(),
-                     "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
+                     @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
                  ));
 
             var generator = new EmbedderGenerator();
@@ -312,7 +215,7 @@ namespace Test.F
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             diagnostics.Should().BeEmpty();
             outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
 
             var metadata = outputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -328,7 +231,7 @@ namespace Test.F
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            outputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
             diagnostics.Should().BeEmpty();
 
             outputCompilation.SyntaxTrees
@@ -339,6 +242,183 @@ namespace Test.F
                 .Should()
                 .ContainAll(
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
+        }
+
+        [Fact]
+        public void NoConditional()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""enable-minify"": true
+}
+");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+class Program
+{
+    static void Main()
+    {
+        Debug.Assert(true);
+        Console.WriteLine(1);
+    }
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                 ));
+
+            var generator = new EmbedderGenerator();
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator },
+                additionalTexts: new[] { additionalText },
+                parseOptions: opts);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            diagnostics.Should().BeEmpty();
+
+            outputCompilation.SyntaxTrees
+                .Should()
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
+        }
+
+        [Fact]
+        public void Conditional()
+        {
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""remove-conditional"": [
+        ""DEBUG"", ""DEBUG2""
+    ],
+    ""enable-minify"": true
+}
+");
+
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+class Program
+{
+    static void Main()
+    {
+        Debug.Assert(true);
+        T();
+        T4();
+        T8();
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+    [Conditional(""DEBUG2"")]
+    static void T4() => Console.WriteLine(4);
+    [System.Diagnostics.Conditional(""DEBUG2"")]
+    [Conditional(""Test"")]
+    static void T8() => Console.WriteLine(8);
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestAssembly>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);[Conditional(""DEBUG2"")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(""DEBUG2"")][Conditional(""Test"")]static void T8()=>Console.WriteLine(8);}"
+                 ));
+
+            var generator = new EmbedderGenerator();
+            var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+            var driver = CSharpGeneratorDriver.Create(
+                new[] { generator },
+                additionalTexts: new[] { additionalText },
+                parseOptions: opts);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            diagnostics.Should().BeEmpty();
+            outputCompilation.GetDiagnostics().Should().BeEmpty();
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+
+            var metadata = outputCompilation.Assembly.GetAttributes()
+                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
+                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
+            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
+            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
+
+            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embedded))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+
+            outputCompilation.SyntaxTrees.Should().HaveCount(2);
+            diagnostics.Should().BeEmpty();
+
+            outputCompilation.SyntaxTrees
+                .Should()
+                .ContainSingle(tree => tree.GetRoot(default).ToString().Contains("[assembly: AssemblyMetadataAttribute(\"SourceExpander"))
+                .Which
+                .ToString()
+                .Should()
+                .ContainAll(
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
                 )
                 .And
@@ -371,6 +451,26 @@ namespace Test.F
         [MemberData(nameof(ParseErrorJsons))]
         public void ParseErrorTest(InMemoryAdditionalText additionalText)
         {
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
             var generator = new EmbedderGenerator();
             var opts = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var driver = CSharpGeneratorDriver.Create(
