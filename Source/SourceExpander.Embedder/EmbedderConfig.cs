@@ -75,8 +75,6 @@ namespace SourceExpander
             public bool? EnableMinify { set; get; }
             [DataMember(Name = "remove-conditional")]
             public string[]? RemoveConditional { set; get; }
-
-            public ExtensionDataObject? ExtensionData { get; set; }
         }
     }
 
