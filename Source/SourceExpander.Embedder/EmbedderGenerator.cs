@@ -94,9 +94,9 @@ namespace SourceExpander
             sb.AppendLine("using System.Collections.Generic;");
             sb.AppendLine("public class SourceFileInfo{");
             sb.AppendLine("  public string FileName{get;set;}");
-            sb.AppendLine("  public IEnumerable<string> TypeNames{get;set;}");
-            sb.AppendLine("  public IEnumerable<string> Usings{get;set;}");
-            sb.AppendLine("  public IEnumerable<string> Dependencies{get;set;}");
+            sb.AppendLine("  public string[] TypeNames{get;set;}");
+            sb.AppendLine("  public string[] Usings{get;set;}");
+            sb.AppendLine("  public string[] Dependencies{get;set;}");
             sb.AppendLine("  public string CodeBody{get;set;}");
             sb.AppendLine("}");
             sb.AppendLine("public class SourceFileInfoContainer{");
@@ -108,6 +108,9 @@ namespace SourceExpander
                     sb.Append("      FileName = ").Append(fileName.ToLiteral()).AppendLine(",");
                 if (source.CodeBody is { } body)
                     sb.Append("      CodeBody = ").Append(body.ToLiteral()).AppendLine(",");
+                if (source.TypeNames is { } typeNames)
+                    sb.Append("      TypeNames = new string[]{").Append(string.Join(", ",
+                        typeNames.Select(s => s.ToLiteral()))).AppendLine("},");
                 if (source.Usings is { } usings)
                     sb.Append("      Usings = new string[]{").Append(string.Join(", ",
                         usings.Select(s => s.ToLiteral()))).AppendLine("},");
