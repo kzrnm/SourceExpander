@@ -22,6 +22,63 @@ namespace SourceExpander.Embedder.Generate.Test
         static SyntaxTree CreateSyntaxTree(string code, string path = null)
             => CSharpSyntaxTree.ParseText(code, path: path ?? "/home/source/Program.cs");
 
+
+        public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+        {
+            {
+                new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": 1
+}
+")
+            },
+            {
+                new InMemoryAdditionalText(
+                "/foo/bar/sourceExpander.embedder.config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""exclude-attributes"": 1
+}
+")
+            },
+        };
+
+        [Theory]
+        [MemberData(nameof(ParseErrorJsons))]
+        public void ParseErrorTest(InMemoryAdditionalText additionalText)
+        {
+            var compilation = CreateCompilation(new[] {
+                CreateSyntaxTree(@"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+")
+            }, compilationOptions, new[] { expanderCoreReference });
+            compilation.GetDiagnostics().Should().BeEmpty();
+
+            var generator = new EmbedderGenerator();
+            RunGenerator(compilation, generator,
+                    additionalTexts: new[] {
+                                    additionalText,
+                                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
+                    parseOptions: parseOptions)
+                .Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
+        }
+
         [Fact]
         public void NotEnabled()
         {
@@ -399,62 +456,6 @@ class Program
                 )
                 .And
                 .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
-        }
-
-        public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
-        {
-            {
-                new InMemoryAdditionalText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
-    ""exclude-attributes"": 1
-}
-")
-            },
-            {
-                new InMemoryAdditionalText(
-                "/foo/bar/sourceExpander.embedder.config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
-    ""exclude-attributes"": 1
-}
-")
-            },
-        };
-
-        [Theory]
-        [MemberData(nameof(ParseErrorJsons))]
-        public void ParseErrorTest(InMemoryAdditionalText additionalText)
-        {
-            var compilation = CreateCompilation(new[] {
-                CreateSyntaxTree(@"
-using System;
-using System.Diagnostics;
-
-[DebuggerDisplay(""Name"")]
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
-
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-}
-")
-            }, compilationOptions, new[] { expanderCoreReference });
-            compilation.GetDiagnostics().Should().BeEmpty();
-
-            var generator = new EmbedderGenerator();
-            RunGenerator(compilation, generator,
-                    additionalTexts: new[] {
-                                    additionalText,
-                                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
-                    },
-                    parseOptions: parseOptions)
-                .Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EMBED0003");
         }
     }
 }

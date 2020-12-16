@@ -48,6 +48,62 @@ Put2.Write();",
             };
         }
 
+        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+        {
+            {
+                new InMemoryAdditionalText("/foo/bar/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""ignore-file-pattern-regex"": 1
+}
+")
+            },
+            {
+                new InMemoryAdditionalText("/foo/bar/sourceExpander.generator.config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""ignore-file-pattern-regex"": 1
+}
+")
+            },
+            {
+                new InMemoryAdditionalText("/regexerror/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""ignore-file-pattern-regex"": [
+        ""(""
+    ]
+}
+")
+            },
+        };
+
+        [Theory]
+        [MemberData(nameof(ParseErrorJsons))]
+        public void ParseErrorTest(InMemoryAdditionalText additionalText)
+        {
+            var version = LanguageVersion.Latest;
+            var syntaxTrees = CreateTrees(version);
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference)
+                );
+            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+
+            var generator = new ExpandGenerator();
+            var gen = RunGenerator(compilation, generator,
+                additionalTexts: new AdditionalText[] {
+                    additionalText,
+                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                },
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            gen.Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EXPAND0007");
+        }
+
         [Fact]
         public void NotEnabled()
         {
@@ -212,63 +268,6 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
 #endregion Expanded by https://github.com/naminodarie/SourceExpander
 ")
                 );
-        }
-
-
-        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
-        {
-            {
-                new InMemoryAdditionalText("/foo/bar/SourceExpander.Generator.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
-    ""ignore-file-pattern-regex"": 1
-}
-")
-            },
-            {
-                new InMemoryAdditionalText("/foo/bar/sourceExpander.generator.config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
-    ""ignore-file-pattern-regex"": 1
-}
-")
-            },
-            {
-                new InMemoryAdditionalText("/regexerror/SourceExpander.Generator.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
-    ""ignore-file-pattern-regex"": [
-        ""(""
-    ]
-}
-")
-            },
-        };
-
-        [Theory]
-        [MemberData(nameof(ParseErrorJsons))]
-        public void ParseErrorTest(InMemoryAdditionalText additionalText)
-        {
-            var version = LanguageVersion.Latest;
-            var syntaxTrees = CreateTrees(version);
-            var compilation = CreateCompilation(
-                syntaxTrees,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
-
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new AdditionalText[] {
-                    additionalText,
-                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
-                },
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            gen.Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EXPAND0007");
         }
     }
 }
