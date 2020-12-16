@@ -14,7 +14,7 @@
         },
         "embedding-source-class": {
             "type": "object",
-            "description": "embedding source code as class",
+            "description": "(For debug)Embedding source code as class",
             "properties": {
                 "enabled": {
                     "type": "boolean",
