@@ -1,5 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json",
+    "enable-minify": true,
     "exclude-attributes": [
         "System.Diagnostics.DebuggerBrowsableAttribute",
         "System.Diagnostics.DebuggerDisplayAttribute",
