@@ -1,18 +1,8 @@
 name: test
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - ".github/workflows/**"
-      - "**"
-      - "!**.md"
   pull_request:
-    paths:
-      - ".github/workflows/**"
-      - "**"
-      - "!**.md"
+    types: [opened, synchronize]
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -30,7 +20,7 @@ jobs:
       - name: Install dotnet-format
         run: dotnet tool install --global dotnet-format
       - name: Format
-        run: dotnet format ${{ env.WORKFLOW_BUILD_SLN }} --check --dry-run
+        run: dotnet format ${{ env.WORKFLOW_BUILD_SLN }} --check
   test:
     runs-on: ubuntu-latest
     steps:

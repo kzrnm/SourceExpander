@@ -40,8 +40,7 @@ Source generator that embed source codes.
 
 ## Status
 
-![test](https://github.com/naminodarie/SourceExpander/workflows/test/badge.svg?branch=master)
-![test](https://github.com/naminodarie/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
+![build](https://github.com/naminodarie/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
 
 |Library|NuGet|
 |:---|:---|
