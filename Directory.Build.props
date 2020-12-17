@@ -9,8 +9,8 @@
     <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/naminodarie/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
 
-    <Version>2.4.1</Version>
-    <AssemblyVersion>2.4.1.100</AssemblyVersion>
+    <Version>2.4.2</Version>
+    <AssemblyVersion>2.4.2.100</AssemblyVersion>
 
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
@@ -24,7 +24,7 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="" Visible="false" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>gi
+      <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
