@@ -100,7 +100,7 @@ namespace SourceExpander
             sb.AppendLine("  public string CodeBody{get;set;}");
             sb.AppendLine("}");
             sb.AppendLine("public class SourceFileInfoContainer{");
-            sb.AppendLine("  public static readonly IReadOnlyList<SourceFileInfo> Files = Array.AsReadOnly(new SourceFileInfo[]{");
+            sb.AppendLine("  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{");
             foreach (var source in sources)
             {
                 sb.AppendLine("    new SourceFileInfo{");
@@ -119,7 +119,7 @@ namespace SourceExpander
                         deps.Select(s => s.ToLiteral()))).AppendLine("},");
                 sb.AppendLine("    },");
             }
-            sb.AppendLine("  });");
+            sb.AppendLine("  };");
             sb.AppendLine("}");
             sb.AppendLine("}");
             if (!string.IsNullOrWhiteSpace(ifDirective))
