@@ -21,7 +21,9 @@ namespace SourceExpander.Embedder.Testing.Test
                 "SourceExpander.EmbedderVersion",
                 "SourceExpander.EmbeddedSourceCode.GZipBase32768")
                 .And.HaveCount(3);
+            embedded.EmbeddedLanguageVersion.Should().Be("6");
             embedded.AssemblyMetadatas["SourceExpander.EmbeddedLanguageVersion"].Should().Be("6");
+            embedded.EmbedderVersion.Should().Be("2.4.1.100");
             embedded.AssemblyMetadatas["SourceExpander.EmbedderVersion"].Should().Be("2.4.1.100");
 
             embedded.SourceFiles.Should().BeEquivalentTo(new SourceFileInfo[]
