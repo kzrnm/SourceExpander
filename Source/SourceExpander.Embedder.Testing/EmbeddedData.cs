@@ -17,9 +17,25 @@ namespace SourceExpander
         public string AssemblyName { get; }
 
         /// <summary>
+        /// Version of SourceExpander.Embedder
+        /// </summary>
+        public string? EmbedderVersion
+            => AssemblyMetadatas.GetValueOrDefault("SourceExpander.EmbedderVersion");
+
+
+        /// <summary>
+        /// C# version of embedded source code
+        /// </summary>
+        public string? EmbeddedLanguageVersion
+            => AssemblyMetadatas.GetValueOrDefault("SourceExpander.EmbeddedLanguageVersion");
+
+
+        /// <summary>
         /// <see cref="AssemblyMetadataAttribute"/> of assembly
         /// </summary>
         public ImmutableDictionary<string, string> AssemblyMetadatas { get; }
+
+
 
         /// <summary>
         /// embedded source code
