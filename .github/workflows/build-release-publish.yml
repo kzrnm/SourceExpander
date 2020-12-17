@@ -14,7 +14,6 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   WORKFLOW_VERSION_PROJ: Directory.Build.props
   WORKFLOW_BUILD_SLN: SourceExpander.sln
-  GIT_COMMIT: ${{ github.sha }}
 
 jobs:
   get-version:
