@@ -50,7 +50,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Base32768" Version="1.0.8" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" Version="1.0.9" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
