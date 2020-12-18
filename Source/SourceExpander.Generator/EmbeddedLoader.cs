@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -47,7 +48,19 @@ namespace SourceExpander
             {
                 var filePath = tree.FilePath;
                 if (config.IsMatch(filePath))
-                    yield return (filePath, expander.ExpandCode(tree, cancellationToken));
+                {
+                    string expanded;
+                    try
+                    {
+                        expanded = expander.ExpandCode(tree, cancellationToken);
+                    }
+                    catch
+                    {
+                        Trace.WriteLine($"failed: {filePath}");
+                        continue;
+                    }
+                    yield return (filePath, expanded);
+                }
             }
         }
 

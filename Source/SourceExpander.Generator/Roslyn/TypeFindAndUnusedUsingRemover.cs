@@ -25,7 +25,7 @@ namespace SourceExpander.Roslyn
             if (node is null)
                 return null;
             var namedTypeSymbol = RoslynUtil.GetTypeNameFromSymbol(model.GetSymbolInfo(node, cancellationToken).Symbol);
-            if(namedTypeSymbol?.ToDisplayString() is string typeName)
+            if (namedTypeSymbol?.ToDisplayString() is string typeName)
             {
                 typeNamesBuilder?.Add(typeName);
             }
