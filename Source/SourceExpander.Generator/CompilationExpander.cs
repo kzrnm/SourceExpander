@@ -33,17 +33,13 @@ namespace SourceExpander
             var sb = new StringBuilder();
             var semanticModel = Compilation.GetSemanticModel(origTree, true);
             var origRoot = (CompilationUnitSyntax)origTree.GetRoot(cancellationToken);
-            var requiedFiles = sourceFileContainer.ResolveDependency(
-                RoslynUtil.AllTypeNames(semanticModel, origTree, cancellationToken),
-                false);
 
-            var newRoot = (CompilationUnitSyntax)(new MatchSyntaxRemover(
-                ImmutableHashSet.CreateRange<SyntaxNode?>(semanticModel
-                .GetDiagnostics(null, cancellationToken: cancellationToken)
-                .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
-                .Select(d => origRoot.FindNode(d.Location.SourceSpan))
-                .OfType<UsingDirectiveSyntax>()))
-                .Visit(origRoot) ?? throw new InvalidOperationException());
+            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
+            if (typeFindAndUnusedUsingRemover.Visit(origRoot) is not CompilationUnitSyntax newRoot)
+                throw new InvalidOperationException($"{nameof(newRoot)} is null");
+            if (typeFindAndUnusedUsingRemover.TypeNames is not { } typeNames)
+                throw new InvalidOperationException($"{nameof(typeNames)} is null");
+            var requiedFiles = sourceFileContainer.ResolveDependency(typeNames, false);
 
             var usings = new HashSet<string>(newRoot.Usings.Select(u => u.ToString().Trim()));
 

@@ -30,7 +30,7 @@ namespace SourceExpander
             }
         }
 
-        private static INamedTypeSymbol? GetTypeNameFromSymbol(ISymbol? symbol)
+        public static INamedTypeSymbol? GetTypeNameFromSymbol(ISymbol? symbol)
         {
             if (symbol == null) return null;
             if (symbol is INamedTypeSymbol named)
