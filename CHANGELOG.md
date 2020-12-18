@@ -5,38 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.6] - 2020-12-18
+## [2.5.0] - 2020-12-18
 ### Added
 
 - Remove unused types in using static
-
-## [2.4.5] - 2020-12-18
-### Added
-
 - GenerateDocumentationFile
-
-## [2.4.4] - 2020-12-18
-### Changed
-
-- Change Diagnostics level.
-
-## [2.4.3] - 2020-12-18
-### Changed
-
-- SemanticModel ignore accessibility.
-
-## [2.4.2] - 2020-12-17
-### Added
-
 - SourceExpander.Embedder.Testing: Add Properties
-
-## [2.4.1] - 2020-12-17
-### Added
-
 - SourceExpander.Embedder: Embedding source as class
 - SourceExpander.Embedder.Testing: Utility for Testing
 
-## [2.4.0] - 2020-12-16
+### Changed
+
+- Change Diagnostics level.
+- SemanticModel ignore accessibility.
+
+## [2.5.0] - 2020-12-16
 ### Added
 
 - Validate embedded source code.
