@@ -7,7 +7,6 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
 namespace SourceExpander
@@ -153,30 +152,20 @@ namespace SourceExpander
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
-            var unusedUsingsSpans = new HashSet<TextSpan>(semanticModel
-                .GetDiagnostics(null)
-                .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
-                .Select(d => d.Location.SourceSpan));
-            var usings = root.Usings
-                .Where(u => !unusedUsingsSpans.Contains(u.Span))
-                .Select(u => u.NormalizeWhitespace("", " ").ToString().Trim())
-                .ToArray();
+            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
+
+            var newRoot = typeFindAndUnusedUsingRemover.Visit(root);
+            if (newRoot is null)
+                throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
+
+            var usings = typeFindAndUnusedUsingRemover.RootUsings();
 
             var prefix = $"{compilation.AssemblyName}>";
             var fileName = string.IsNullOrEmpty(commonPrefix) ?
                 prefix + tree.FilePath :
                 tree.FilePath.Replace(commonPrefix, prefix);
 
-            var typeNames = root.DescendantNodes()
-                .Where(s => s is BaseTypeDeclarationSyntax || s is DelegateDeclarationSyntax)
-                .Select(syntax => semanticModel.GetDeclaredSymbol(syntax, cancellationToken)?.ToDisplayString())
-                .OfType<string>()
-                .Distinct()
-                .ToArray();
-
-            var newRoot = new UsingRemover().Visit(root);
-            if (newRoot is null)
-                throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
+            var typeNames = typeFindAndUnusedUsingRemover.DefinedTypeNames();
 
             var minified = newRoot.NormalizeWhitespace("", " ");
             if (config.EnableMinify)

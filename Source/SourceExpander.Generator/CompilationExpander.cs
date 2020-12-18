@@ -37,21 +37,18 @@ namespace SourceExpander
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
             if (typeFindAndUnusedUsingRemover.Visit(origRoot) is not CompilationUnitSyntax newRoot)
                 throw new InvalidOperationException($"{nameof(newRoot)} is null");
-            if (typeFindAndUnusedUsingRemover.TypeNames is not { } typeNames)
+            if (typeFindAndUnusedUsingRemover.UsedTypeNames() is not { } typeNames)
                 throw new InvalidOperationException($"{nameof(typeNames)} is null");
             var requiedFiles = sourceFileContainer.ResolveDependency(typeNames, false);
 
-            var usings = new HashSet<string>(newRoot.Usings.Select(u => u.ToString().Trim()));
+            var usings = typeFindAndUnusedUsingRemover.RootUsings()
+                .Union(requiedFiles.SelectMany(s => s.Usings))
+                .ToArray();
 
-            var newBody = (new UsingRemover().Visit(newRoot) ?? throw new InvalidOperationException()).ToString();
-
-            usings.UnionWith(requiedFiles.SelectMany(s => s.Usings));
-
-
-            foreach (var u in SortUsings(usings.ToArray()))
+            foreach (var u in SortUsings(usings))
                 sb.AppendLine(u);
 
-            using var sr = new StringReader(newBody);
+            using var sr = new StringReader(newRoot.ToString());
             var line = sr.ReadLine();
             while (line != null)
             {

@@ -14,7 +14,7 @@ namespace SourceExpander.Roslyn
         private readonly CancellationToken cancellationToken;
 
         private readonly ImmutableHashSet<string>.Builder typeNamesBuilder = ImmutableHashSet.CreateBuilder<string>();
-        public ImmutableHashSet<string> UsedTypeNames() => typeNamesBuilder.ToImmutable();
+        public ImmutableHashSet<string> DefinedTypeNames() => typeNamesBuilder.ToImmutable();
 
         private readonly ImmutableHashSet<string>.Builder rootUsingsBuilder = ImmutableHashSet.CreateBuilder<string>();
         public ImmutableHashSet<string> RootUsings() => rootUsingsBuilder.ToImmutable();
@@ -24,15 +24,21 @@ namespace SourceExpander.Roslyn
             this.cancellationToken = cancellationToken;
             diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken);
         }
+
+        private void FindDeclaredType(MemberDeclarationSyntax node)
+        {
+            var typeName = model.GetDeclaredSymbol(node, cancellationToken)?.ToDisplayString();
+            if (typeName is not null)
+                typeNamesBuilder.Add(typeName);
+        }
+
         public override SyntaxNode? Visit(SyntaxNode? node)
         {
-            if (node is null)
-                return null;
-            var namedTypeSymbol = RoslynUtil.GetTypeNameFromSymbol(model.GetSymbolInfo(node, cancellationToken).Symbol);
-            if (namedTypeSymbol?.ToDisplayString() is string typeName)
-            {
-                typeNamesBuilder.Add(typeName);
-            }
+            if (node is BaseTypeDeclarationSyntax typeDeclaration)
+                FindDeclaredType(typeDeclaration);
+            else if (node is DelegateDeclarationSyntax delegateDeclaration)
+                FindDeclaredType(delegateDeclaration);
+
             return base.Visit(node);
         }
 
