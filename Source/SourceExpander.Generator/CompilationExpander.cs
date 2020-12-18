@@ -31,7 +31,7 @@ namespace SourceExpander
         public string ExpandCode(SyntaxTree origTree, CancellationToken cancellationToken)
         {
             var sb = new StringBuilder();
-            var semanticModel = Compilation.GetSemanticModel(origTree);
+            var semanticModel = Compilation.GetSemanticModel(origTree, true);
             var origRoot = (CompilationUnitSyntax)origTree.GetRoot(cancellationToken);
             var requiedFiles = sourceFileContainer.ResolveDependency(
                 RoslynUtil.AllTypeNames(semanticModel, origTree, cancellationToken),
