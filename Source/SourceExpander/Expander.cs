@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 
 namespace SourceExpander
 {
+    /// <summary>
+    /// Expands embedded source codes.
+    /// </summary>
     public static class Expander
     {
         /// <summary>
