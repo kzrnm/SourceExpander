@@ -28,7 +28,7 @@ namespace SourceExpander.Roslyn
             => diagnostics.Where(d => d.IsWarningAsError || d.Severity == DiagnosticSeverity.Error);
         public static bool HasCompilationError(this IEnumerable<Diagnostic> diagnostics)
             => diagnostics.EnumerateCompilationError().Any();
-        public static IEnumerable<Diagnostic> EnumerateEmbeddedSourcesErrorLocations(
+        public static IEnumerable<Diagnostic> EnumerateEmbeddedSourcesErrors(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
             ImmutableArray<SourceFileInfo> sources,

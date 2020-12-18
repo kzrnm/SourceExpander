@@ -123,14 +123,27 @@ namespace SourceExpander
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
             _cacheResolvedFiles = ImmutableArray.Create(infos);
-            if (ValidationHelpers.EnumerateEmbeddedSourcesErrorLocations(
+            if (ValidationHelpers.EnumerateEmbeddedSourcesErrors(
                 compilation, parseOptions, _cacheResolvedFiles, cancellationToken).ToArray()
-                is { } diagnosticsLocations
-                && diagnosticsLocations.Length > 0)
+                is { } diagnostics
+                && diagnostics.Length > 0)
             {
+                var messageDic = new Dictionary<string, List<string>>();
+                foreach (var d in diagnostics)
+                {
+                    var file = d.Location?.SourceTree?.FilePath;
+                    if (file is null)
+                        continue;
+                    var message = d.GetMessage();
+                    if (!messageDic.TryGetValue(file, out var messages))
+                    {
+                        messages = messageDic[file] = new List<string>();
+                    }
+                    messages.Add(message);
+                }
                 reporter.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
-                    string.Join(", ", diagnosticsLocations.Select(d => d.Location?.SourceTree?.FilePath).OfType<string>().Distinct())));
+                    string.Join(", ", messageDic.Select(p => $"{p.Key}: {{{string.Join(", ", p.Value)}}}"))));
             }
 
             return _cacheResolvedFiles;

@@ -23,14 +23,14 @@ namespace SourceExpander.Roslyn
             "Compilation must be C#",
             "Compilation must be C#. Compilation is {0}.",
             "EmbedderGenerator",
-            DiagnosticSeverity.Error,
+            DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EXPAND0004_MustBeNewerThanCSharp3 = new DiagnosticDescriptor(
             "EXPAND0004",
             "C# version must be newer than C# 3",
             "C# version must be newer than C# 3. Compilation's C# version is {0}.",
             "EmbedderGenerator",
-            DiagnosticSeverity.Error,
+            DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EXPAND0005_NewerCSharpVersion = new DiagnosticDescriptor(
             "EXPAND0005",

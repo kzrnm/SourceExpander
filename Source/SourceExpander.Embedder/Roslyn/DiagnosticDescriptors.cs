@@ -16,7 +16,7 @@ namespace SourceExpander.Roslyn
             "Compilation must be C#",
             "Compilation must be C#",
             "EmbedderGenerator",
-            DiagnosticSeverity.Error,
+            DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EMBED0003_ParseConfigError = new DiagnosticDescriptor(
             "EMBED0003",
@@ -30,7 +30,7 @@ namespace SourceExpander.Roslyn
             "Error embedded source",
             "Error embedded source: {0}",
             "EmbedderGenerator",
-            DiagnosticSeverity.Error,
+            DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EMBED0005_EmbeddedSourceDiff = new DiagnosticDescriptor(
             "EMBED0005",

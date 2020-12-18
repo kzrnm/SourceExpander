@@ -43,8 +43,8 @@ class Program
 
             var diagnostic = reporter.Diagnostics.Should().ContainSingle().Which;
             diagnostic.Id.Should().Be("EMBED0004");
-            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Error);
-            diagnostic.GetMessage().Should().Be("Error embedded source: TestAssembly>Program.cs");
+            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Warning);
+            diagnostic.GetMessage().Should().StartWith("Error embedded source: TestAssembly>Program.cs:");
         }
     }
 }
