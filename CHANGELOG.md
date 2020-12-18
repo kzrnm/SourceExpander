@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change Diagnostics level.
 - SemanticModel ignore accessibility.
 
-## [2.5.0] - 2020-12-16
+## [2.4.0] - 2020-12-16
 ### Added
 
 - Validate embedded source code.
