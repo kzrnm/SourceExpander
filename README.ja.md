@@ -14,10 +14,10 @@ README languages:
   - [SourceExpander.Embedder](#sourceexpanderembedder)
 - [Status](#status)
 - [Getting started](#getting-started)
-  - [For library user](#for-library-user)
-  - [For library developer](#for-library-developer)
-    - [Analyzer(optional)](#analyzeroptional)
-- [Embedded data](#embedded-data)
+  - [ライブラリ利用者向け](#%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E5%88%A9%E7%94%A8%E8%80%85%E5%90%91%E3%81%91)
+  - [ライブラリ開発者向け](#%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E9%96%8B%E7%99%BA%E8%80%85%E5%90%91%E3%81%91)
+    - [アナライザー(optional)](#%E3%82%A2%E3%83%8A%E3%83%A9%E3%82%A4%E3%82%B6%E3%83%BCoptional)
+- [埋め込まれるデータ](#%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BE%E3%82%8C%E3%82%8B%E3%83%87%E3%83%BC%E3%82%BF)
   - [EmbedderVersion](#embedderversion)
   - [EmbeddedLanguageVersion](#embeddedlanguageversion)
   - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
@@ -30,17 +30,17 @@ README languages:
 
 ### SourceExpander(library)
 
-Library that expand embedded source codes.
+ソースコードをファイルに展開するライブラリです。
 
 
 ### SourceExpander.Generator
 
-Source generator that expand embedded source codes.
+ソースジェネレーターで埋め込まれたソースコードを展開するライブラリです。
 
 
 ### SourceExpander.Embedder
 
-Source generator that embed source codes.
+ソースコードを埋め込むライブラリです。
 
 ## Status
 
@@ -56,15 +56,15 @@ Source generator that embed source codes.
 
 ## Getting started
 
-This library require **.NET 5 SDK** or **Visual Studio 16.8** or later because this library use Source Generators.
+このライブラリはソースジェネレーターを使用するため、 **.NET 5 SDK** または **Visual Studio 16.8** 以降が必須です。
 
-### For library user
+### ライブラリ利用者向け
 
-see [Sample](/Sample) or https://github.com/naminodarie/ac-library-csharp
+[Sample](/Sample) や https://github.com/naminodarie/ac-library-csharp を参考としてください。
 
 ```
 Install-Package SourceExpander
-Install-Package <A library with embedded source>
+Install-Package <ソースコードが埋め込まれたライブラリ>
 ```
 
 ```C#
@@ -79,7 +79,7 @@ class Program
 }
 ```
 
-When you run the code, `SourceExpander.Expander.Expand()` create new file that combined library code.
+このコードを実行すると, `SourceExpander.Expander.Expand()`でソースコードが結合された下記のようなファイルが出力されます。
 
 ```C#
 using System;
@@ -98,23 +98,23 @@ namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] pub
 #endregion Expanded by https://github.com/naminodarie/SourceExpander
 ```
 
-### For library developer
+### ライブラリ開発者向け
 
-It's easy, just install `SourceExpander.Embedder`.
+`SourceExpander.Embedder` をインストールするだけでOKです。
 
 ```
 Install-Package SourceExpander.Embedder
 ```
 
-#### Analyzer(optional)
+#### アナライザー(optional)
 
 ```
 Install-Package SourceExpander.Embedder.Analyzer
 ```
 
-## Embedded data
+## 埋め込まれるデータ
 
-`SourceExpander.Embedder` embed some data like below.
+`SourceExpander.Embedder` は下記のようなコードを埋め込みます。
 
 ```C#
 using System.Reflection;
@@ -128,21 +128,21 @@ using System.Reflection;
 
 ### EmbedderVersion
 
-AssemblyVersion of `SourceExpander.Embedder`.
+`SourceExpander.Embedder` の AssemblyVersion です。
 
 ### EmbeddedLanguageVersion
 
-C# version of embbeded source code.
+埋め込まれたソースコードの C# のバージョンです。
 
 ### EmbeddedAllowUnsafe
 
-if `true`, embbeded source code allow unsafe code.
+`true` ならば埋め込まれたソースコードは `unsafe` が許可されています。
 
 ### EmbeddedSourceCode
 
-Actually, this metadata does not embedded. for explanation.
+実際には埋め込まれませんが、説明用に記述します。
 
-json seriarized array of `SourceFileInfo`.
+`SourceFileInfo` を JSON シリアライズしたものです。
 
 ```C#
 public class SourceFileInfo
@@ -172,5 +172,4 @@ public class SourceFileInfo
 
 #### EmbeddedSourceCode.GZipBase32768
 
-gzip and [base32768](https://github.com/naminodarie/Base32768/) encoded json.
-
+EmbeddedSourceCode の JSON を gzip 圧縮し、[base32768](https://github.com/naminodarie/Base32768/) でエンコードしたものです。
