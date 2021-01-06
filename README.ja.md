@@ -30,17 +30,17 @@ README languages:
 
 ### SourceExpander(library)
 
-Library that expand embedded source codes.
+ソースコードをファイルに展開するライブラリです。
 
 
 ### SourceExpander.Generator
 
-Source generator that expand embedded source codes.
+ソースジェネレーターで埋め込まれたソースコードを展開するライブラリです。
 
 
 ### SourceExpander.Embedder
 
-Source generator that embed source codes.
+ソースコードを埋め込むライブラリです。
 
 ## Status
 
@@ -56,15 +56,15 @@ Source generator that embed source codes.
 
 ## Getting started
 
-This library require **.NET 5 SDK** or **Visual Studio 16.8** or later because this library use Source Generators.
+このライブラリはソースジェネレーターを使用するため、 **.NET 5 SDK** または **Visual Studio 16.8** 以降が必須です。
 
-### For library user
+### ライブラリ利用者向け
 
-see [Sample](/Sample) or https://github.com/naminodarie/ac-library-csharp
+[Sample](/Sample) や https://github.com/naminodarie/ac-library-csharp を参考としてください。
 
 ```
 Install-Package SourceExpander
-Install-Package <A library with embedded source>
+Install-Package <ソースコードが埋め込まれたライブラリ>
 ```
 
 ```C#
@@ -79,7 +79,7 @@ class Program
 }
 ```
 
-When you run the code, `SourceExpander.Expander.Expand()` create new file that combined library code.
+このコードを実行すると, `SourceExpander.Expander.Expand()`でソースコードが結合された下記のようなファイルが出力されます。
 
 ```C#
 using System;
@@ -98,23 +98,23 @@ namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] pub
 #endregion Expanded by https://github.com/naminodarie/SourceExpander
 ```
 
-### For library developer
+### ライブラリ開発者向け
 
-Just install `SourceExpander.Embedder`.
+`SourceExpander.Embedder` をインストールしてください。それだけで埋め込まれます。
 
 ```
 Install-Package SourceExpander.Embedder
 ```
 
-#### Analyzer(optional)
+#### アナライザー(optional)
 
 ```
 Install-Package SourceExpander.Embedder.Analyzer
 ```
 
-## Embedded data
+## 埋め込まれるデータ
 
-`SourceExpander.Embedder` embed some data like below.
+`SourceExpander.Embedder` は下記のようなコードを埋め込みます。
 
 ```C#
 using System.Reflection;
@@ -128,21 +128,21 @@ using System.Reflection;
 
 ### EmbedderVersion
 
-AssemblyVersion of `SourceExpander.Embedder`.
+`SourceExpander.Embedder` の AssemblyVersion です。
 
 ### EmbeddedLanguageVersion
 
-C# version of embbeded source code.
+埋め込まれたソースコードの C# のバージョンです。
 
 ### EmbeddedAllowUnsafe
 
-if `true`, embbeded source code allow unsafe code.
+`true` ならば埋め込まれたソースコードは `unsafe` が許可されています。
 
 ### EmbeddedSourceCode
 
-Actually, this metadata does not embedded. for explanation.
+実際には埋め込まれませんが、説明用に記述します。
 
-json seriarized array of `SourceFileInfo`.
+`SourceFileInfo` を JSON シリアライズしたものです。
 
 ```C#
 public class SourceFileInfo
@@ -172,5 +172,4 @@ public class SourceFileInfo
 
 #### EmbeddedSourceCode.GZipBase32768
 
-gzip and [base32768](https://github.com/naminodarie/Base32768/) encoded json.
-
+EmbeddedSourceCode の JSON を gzip 圧縮し、[base32768](https://github.com/naminodarie/Base32768/) でエンコードしたものです。
