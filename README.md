@@ -100,7 +100,7 @@ namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] pub
 
 ### For library developer
 
-Just install `SourceExpander.Embedder`.
+It's easy, just install `SourceExpander.Embedder`.
 
 ```
 Install-Package SourceExpander.Embedder

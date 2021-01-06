@@ -100,7 +100,7 @@ namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] pub
 
 ### ライブラリ開発者向け
 
-`SourceExpander.Embedder` をインストールしてください。それだけで埋め込まれます。
+`SourceExpander.Embedder` をインストールするだけでOKです。
 
 ```
 Install-Package SourceExpander.Embedder
