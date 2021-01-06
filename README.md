@@ -118,7 +118,7 @@ Install-Package SourceExpander.Embedder.Analyzer
 
 ```C#
 using System.Reflection;
-[assembly: AssemblyMetadata("SourceExpander.EmbedderVersion", "2.2.0.101")]
+[assembly: AssemblyMetadata("SourceExpander.EmbedderVersion", "2.5.0.101")]
 [assembly: AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion", "2")]
 [assembly: AssemblyMetadata("SourceExpander.EmbeddedAllowUnsafe", "true")]
 [assembly: AssemblyMetadata("SourceExpander.EmbeddedSourceCode.GZipBase32768", "㘅桠ҠҠԀᏕ䴾阺㹈斪筟楸厮嫉盆炚磈臤梽胍㦬竂帙詪煩㔬樄ᗗ踜鲯诇ᠩ珱䪜䐽闾鱏珣茙灸䏙⨧㤄寨砳⬅ស䮙松Ꝉ㥅䱀餯ꃣ虱嫁榏㪰糰蝃技夛䥘谼礞䐿斄禕蚷屔彺㪪賳鱥䝢鰨覶⬴誼⬼獬鞨胒宝䭴摺眚䅗䃝䚏隻嫻痛簴Ꜿ変⇣㇋聼欈Ꭽ墷霶勎嶐窢銖㤁┠䁺⠛缧䋹凬☂䁸栣僼邐䑹瘜蛭諠賿㨚咈鍂ꄱ禱唨毊崨叼緭䥜榄闺䦖麷䘘㨵ᖶ琜鎎ᰇ髎飭㪬採ꅈ㥞盧䢽䃘煃⬘喔渻莖案ᯋ硟ꋛ叝谴缄ꍢ⋗溁ᣒ颂浢ꍈꉭ㑆焤鹠杳煄㾳䴡䂱㙽楯裦鷬梙掫取颤⩑㰑㕋ꂤ碎麓㾕昖啘繅餬簚盎鍣䨽籭詽绑襌硲❞擧ꌥ膩辪聫㭒珥㴟囓䓖焜铽痢ꊆꍼᓥ囦纇維Ⲡ㤬垇螇感縋㼎砾褳強襓瀕樥阵瀭蜺兔峃絻藈萢饑㶬櫊綖嶅鏕㻶坶禵䓓Ⴐ咇詤煑⬐毱㱒獅鐥椳䖑ᙋ冄㴼㗭隯顑命貽职葅苫⢸栚䀹䢳噂槝䲰䰮⇷ᔈ⎙䕪絑㝖垿䞉場珟䉛㰭䵶日憭蕼馣㸩涴䓋䃇懚鹯琥镌ⴊ電萞猛流癊⏔恚Ԉң")]
