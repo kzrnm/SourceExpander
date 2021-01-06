@@ -112,6 +112,9 @@ Install-Package SourceExpander.Embedder
 Install-Package SourceExpander.Embedder.Analyzer
 ```
 
+### Notes
+Because `SourceExpander.Embedder` run at compile time, the embedded source code cannot be used in the same project.
+
 ## Embedded data
 
 `SourceExpander.Embedder` embed some data like below.

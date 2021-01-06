@@ -112,6 +112,10 @@ Install-Package SourceExpander.Embedder
 Install-Package SourceExpander.Embedder.Analyzer
 ```
 
+### 注釈
+
+`SourceExpander.Embedder`はコンパイル時に実行されるので、埋め込んだソースコードを同一のプロジェクトで利用することはできません。
+
 ## 埋め込まれるデータ
 
 `SourceExpander.Embedder` は下記のようなコードを埋め込みます。
