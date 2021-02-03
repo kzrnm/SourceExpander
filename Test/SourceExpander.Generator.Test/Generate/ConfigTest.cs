@@ -269,5 +269,85 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
 ")
                 );
         }
+
+
+        [Fact]
+        public void StaticEmbeddingText()
+        {
+            var version = LanguageVersion.Latest;
+            var syntaxTrees = CreateTrees(version);
+            var compilation = CreateCompilation(
+                syntaxTrees,
+                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        { "CS8019", ReportDiagnostic.Suppress },
+                    }),
+                additionalMetadatas: sampleLibReferences.Append(coreReference)
+                );
+            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+
+            var additionalText = new InMemoryAdditionalText(
+                "/foo/bar/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""static-embedding-text"": ""/* Static Embedding Text */""
+}
+");
+
+            var generator = new ExpandGenerator();
+            var gen = RunGenerator(compilation, generator,
+                additionalTexts: new AdditionalText[] { additionalText },
+                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
+            gen.Diagnostics.Should().BeEmpty();
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
+            gen.OutputCompilation.SyntaxTrees
+                .Should()
+                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
+            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
+            files["/home/source/Program.cs"].Should()
+                .BeEquivalentTo(
+                new SourceCode(
+                    path: "/home/source/Program.cs",
+                    code: @"using SampleLibrary;
+using System;
+using System.Diagnostics;
+class Program
+{
+    static void P()
+    {
+        Console.WriteLine(42);
+        Put.WriteRandom();
+#if !EXPAND_GENERATOR
+        Console.WriteLine(24);
+#endif
+    }
+}
+#region Expanded by https://github.com/naminodarie/SourceExpander
+/* Static Embedding Text */
+namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
+namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
+#endregion Expanded by https://github.com/naminodarie/SourceExpander
+")
+                );
+
+            files["/home/source/Program2.cs"].Should()
+                .BeEquivalentTo(
+                new SourceCode(
+                    path: "/home/source/Program2.cs",
+                    code: @"using SampleLibrary;
+using System;
+using System.Diagnostics;
+Console.WriteLine(42);
+Put2.Write();
+#region Expanded by https://github.com/naminodarie/SourceExpander
+/* Static Embedding Text */
+namespace SampleLibrary { public static class Put2 { public static void Write() => Put.WriteRandom(); } } 
+namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
+namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
+#endregion Expanded by https://github.com/naminodarie/SourceExpander
+")
+                );
+        }
     }
 }

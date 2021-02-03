@@ -15,6 +15,10 @@
                 "type": "string"
             }
         },
+        "static-embedding-text": {
+            "description": "static embedding text",
+            "type": "string"
+        },
         "ignore-file-pattern-regex": {
             "description": "ignore file name regex pattern",
             "type": "array",

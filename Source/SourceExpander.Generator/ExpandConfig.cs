@@ -15,21 +15,25 @@ namespace SourceExpander
             : this(
                   true,
                   Array.Empty<string>(),
-                  Array.Empty<Regex>())
+                  Array.Empty<Regex>(),
+                  null)
         { }
         public ExpandConfig(
             bool enabled,
             string[] matchFilePatterns,
-            IEnumerable<Regex> ignoreFilePatterns)
+            IEnumerable<Regex> ignoreFilePatterns,
+            string? staticEmbeddingText)
         {
             Enabled = enabled;
             MatchFilePatterns = ImmutableArray.Create(matchFilePatterns);
             IgnoreFilePatterns = ImmutableArray.CreateRange(ignoreFilePatterns);
+            StaticEmbeddingText = staticEmbeddingText;
         }
 
         public bool Enabled { get; }
         public ImmutableArray<string> MatchFilePatterns { get; }
         public ImmutableArray<Regex> IgnoreFilePatterns { get; }
+        public string? StaticEmbeddingText { get; }
         public bool IsMatch(string filePath)
             => (MatchFilePatterns.Length == 0
                 || MatchFilePatterns.Any(p => filePath.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0))
@@ -44,7 +48,8 @@ namespace SourceExpander
                         enabled: data.Enabled ?? true,
                         matchFilePatterns: data.MatchFilePattern ?? Array.Empty<string>(),
                         ignoreFilePatterns: data.IgnoreFilePatternRegex?.Select(s => new Regex(s))
-                        ?? Array.Empty<Regex>());
+                        ?? Array.Empty<Regex>(),
+                        staticEmbeddingText: data.StaticEmbeddingText);
                 return new ExpandConfig();
             }
             catch (Exception e)
@@ -62,6 +67,8 @@ namespace SourceExpander
             public string[]? MatchFilePattern { set; get; }
             [DataMember(Name = "ignore-file-pattern-regex")]
             public string[]? IgnoreFilePatternRegex { set; get; }
+            [DataMember(Name = "static-embedding-text")]
+            public string? StaticEmbeddingText { set; get; }
         }
     }
 

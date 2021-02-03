@@ -38,7 +38,7 @@ namespace SourceExpander
             this.cancellationToken = cancellationToken;
             var embeddedDatas = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
             container = new SourceFileContainer(WithCheck(embeddedDatas));
-            expander = new CompilationExpander(compilation, container);
+            expander = new CompilationExpander(compilation, container, config);
         }
         public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
         {

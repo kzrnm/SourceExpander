@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -15,7 +14,8 @@ namespace SourceExpander
     internal class CompilationExpander
     {
         private readonly SourceFileContainer sourceFileContainer;
-        public CompilationExpander(CSharpCompilation compilation, SourceFileContainer sourceFileContainer)
+        private ExpandConfig Config { get; }
+        public CompilationExpander(CSharpCompilation compilation, SourceFileContainer sourceFileContainer, ExpandConfig config)
         {
             this.sourceFileContainer = sourceFileContainer;
             var specificDiagnosticOptionsBuilder = ImmutableDictionary.CreateBuilder<string, ReportDiagnostic>();
@@ -24,6 +24,7 @@ namespace SourceExpander
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptionsBuilder.ToImmutable());
             Compilation = compilation.WithOptions(opts);
+            Config = config;
         }
 
         private CSharpCompilation Compilation { get; }
@@ -57,6 +58,8 @@ namespace SourceExpander
             }
 
             sb.AppendLine("#region Expanded by https://github.com/naminodarie/SourceExpander");
+            if (!string.IsNullOrEmpty(Config.StaticEmbeddingText))
+                sb.AppendLine(Config.StaticEmbeddingText);
             foreach (var s in requiedFiles)
                 sb.AppendLine(s.CodeBody);
             sb.AppendLine("#endregion Expanded by https://github.com/naminodarie/SourceExpander");
