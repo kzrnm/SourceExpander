@@ -129,4 +129,7 @@
   <data name="EMBEDDER0004_Title" xml:space="preserve">
     <value>nullableディレクティブは未対応です</value>
   </data>
+  <data name="EMBEDDER0005_Title" xml:space="preserve">
+    <value>埋め込んだコードは同一のアセンブリでは使用できません</value>
+  </data>
 </root>

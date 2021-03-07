@@ -95,5 +95,14 @@ namespace SourceExpander.Diagnostics {
                 return ResourceManager.GetString("EMBEDDER0004_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Embedded code cannot be used in the same assembly に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBEDDER0005_Title {
+            get {
+                return ResourceManager.GetString("EMBEDDER0005_Title", resourceCulture);
+            }
+        }
     }
 }
