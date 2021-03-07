@@ -17,6 +17,7 @@ README languages:
   - [For library user](#for-library-user)
   - [For library developer](#for-library-developer)
     - [Analyzer(optional)](#analyzeroptional)
+  - [Notes](#notes)
 - [Embedded data](#embedded-data)
   - [EmbedderVersion](#embedderversion)
   - [EmbeddedLanguageVersion](#embeddedlanguageversion)

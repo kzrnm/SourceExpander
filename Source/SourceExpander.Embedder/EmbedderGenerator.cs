@@ -62,7 +62,9 @@ namespace SourceExpander
             var sb = CreateMetadataSource(new StringBuilder(), resolver.EnumerateAssemblyMetadata());
 
             if (config.EmbeddingSourceClass.Enabled)
-                CreateEmbbedingSourceClass(sb, resolvedSources, config.EmbeddingSourceClass.IfDirective);
+                context.AddSource(
+                    "EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs",
+                    SourceText.From(CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName), Encoding.UTF8));
 
             context.AddSource(
                 "EmbeddedSourceCode.Metadata.Generated.cs",
@@ -83,15 +85,15 @@ namespace SourceExpander
             return sb;
         }
 
-        private static StringBuilder CreateEmbbedingSourceClass(StringBuilder sb,
+        private static string CreateEmbbedingSourceClass(
             ImmutableArray<SourceFileInfo> sources,
-            string ifDirective)
+            string className)
         {
-            if (!string.IsNullOrWhiteSpace(ifDirective))
-                sb.Append("#if ").AppendLine(ifDirective);
+            StringBuilder sb = new();
             sb.AppendLine("namespace SourceExpander.Embedded{");
             sb.AppendLine("using System;");
             sb.AppendLine("using System.Collections.Generic;");
+            sb.AppendLine("public class " + className + "{");
             sb.AppendLine("public class SourceFileInfo{");
             sb.AppendLine("  public string FileName{get;set;}");
             sb.AppendLine("  public string[] TypeNames{get;set;}");
@@ -99,7 +101,6 @@ namespace SourceExpander
             sb.AppendLine("  public string[] Dependencies{get;set;}");
             sb.AppendLine("  public string CodeBody{get;set;}");
             sb.AppendLine("}");
-            sb.AppendLine("public class SourceFileInfoContainer{");
             sb.AppendLine("  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{");
             foreach (var source in sources)
             {
@@ -109,22 +110,32 @@ namespace SourceExpander
                 if (source.CodeBody is { } body)
                     sb.Append("      CodeBody = ").Append(body.ToLiteral()).AppendLine(",");
                 if (source.TypeNames is { } typeNames)
-                    sb.Append("      TypeNames = new string[]{").Append(string.Join(", ",
-                        typeNames.Select(s => s.ToLiteral()))).AppendLine("},");
+                {
+                    sb.AppendLine("      TypeNames = new string[]{");
+                    foreach (var ty in typeNames.Select(s => s.ToLiteral()))
+                        sb.Append("        ").Append(ty).AppendLine(",");
+                    sb.AppendLine("      },");
+                }
                 if (source.Usings is { } usings)
-                    sb.Append("      Usings = new string[]{").Append(string.Join(", ",
-                        usings.Select(s => s.ToLiteral()))).AppendLine("},");
+                {
+                    sb.AppendLine("      Usings = new string[]{");
+                    foreach (var u in usings.OrderBy(s => s).Select(s => s.ToLiteral()))
+                        sb.Append("        ").Append(u).AppendLine(",");
+                    sb.AppendLine("      },");
+                }
                 if (source.Dependencies is { } deps)
-                    sb.Append("      Dependencies = new string[]{").Append(string.Join(", ",
-                        deps.Select(s => s.ToLiteral()))).AppendLine("},");
+                {
+                    sb.AppendLine("      Dependencies = new string[]{");
+                    foreach (var d in deps.Select(s => s.ToLiteral()))
+                        sb.Append("        ").Append(d).AppendLine(",");
+                    sb.AppendLine("      },");
+                }
                 sb.AppendLine("    },");
             }
             sb.AppendLine("  };");
             sb.AppendLine("}");
             sb.AppendLine("}");
-            if (!string.IsNullOrWhiteSpace(ifDirective))
-                sb.AppendLine("#endif");
-            return sb;
+            return sb.ToString();
         }
     }
 }

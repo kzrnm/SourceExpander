@@ -552,7 +552,7 @@ class Program
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-source-class"": {
         ""enabled"": true,
-        ""if-directive"": ""EXPDIRECTIVE""
+        ""class-name"": ""Container""
     },
     ""enable-minify"": true
 }
@@ -589,7 +589,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -607,23 +607,44 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(s => s.FilePath.EndsWith("EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs"))
                 .Which
                 .ToString()
                 .Should()
-                .ContainAll(
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
-                )
-                .And
-                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
-                .And
-                .ContainAll("new SourceFileInfo[]", "#if EXPDIRECTIVE");
+                .Be(@"namespace SourceExpander.Embedded{
+using System;
+using System.Collections.Generic;
+public class Container{
+public class SourceFileInfo{
+  public string FileName{get;set;}
+  public string[] TypeNames{get;set;}
+  public string[] Usings{get;set;}
+  public string[] Dependencies{get;set;}
+  public string CodeBody{get;set;}
+}
+  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{
+    new SourceFileInfo{
+      FileName = ""TestAssembly>Program.cs"",
+      CodeBody = ""class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"",
+      TypeNames = new string[]{
+        ""Program"",
+      },
+      Usings = new string[]{
+        ""using System;"",
+        ""using System.Diagnostics;"",
+      },
+      Dependencies = new string[]{
+      },
+    },
+  };
+}
+}
+");
         }
 
         [Fact]
@@ -672,7 +693,7 @@ class Program
             var add = gen.AddedSyntaxTrees.First();
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -689,23 +710,44 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(s => s.FilePath.EndsWith("EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs"))
                 .Which
                 .ToString()
                 .Should()
-                .ContainAll(
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
-                )
-                .And
-                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
-                .And
-                .ContainAll("new SourceFileInfo[]", "#if DEBUG");
+                .Be(@"namespace SourceExpander.Embedded{
+using System;
+using System.Collections.Generic;
+public class SourceFileInfoContainer{
+public class SourceFileInfo{
+  public string FileName{get;set;}
+  public string[] TypeNames{get;set;}
+  public string[] Usings{get;set;}
+  public string[] Dependencies{get;set;}
+  public string CodeBody{get;set;}
+}
+  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{
+    new SourceFileInfo{
+      FileName = ""TestAssembly>Program.cs"",
+      CodeBody = ""class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"",
+      TypeNames = new string[]{
+        ""Program"",
+      },
+      Usings = new string[]{
+        ""using System;"",
+        ""using System.Diagnostics;"",
+      },
+      Dependencies = new string[]{
+      },
+    },
+  };
+}
+}
+");
         }
 
         [Fact]
@@ -717,7 +759,7 @@ class Program
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-source-class"": {
         ""enabled"": true,
-        ""if-directive"": """"
+        ""class-name"": """"
     },
     ""enable-minify"": true
 }
@@ -755,7 +797,7 @@ class Program
             var add = gen.AddedSyntaxTrees.First();
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -772,25 +814,44 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(s => s.FilePath.EndsWith("EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs"))
                 .Which
                 .ToString()
                 .Should()
-                .ContainAll(
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
-                )
-                .And
-                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",")
-                .And
-                .Contain("new SourceFileInfo[]")
-                .And
-                .NotContain("#if");
+                .Be(@"namespace SourceExpander.Embedded{
+using System;
+using System.Collections.Generic;
+public class SourceFileInfoContainer{
+public class SourceFileInfo{
+  public string FileName{get;set;}
+  public string[] TypeNames{get;set;}
+  public string[] Usings{get;set;}
+  public string[] Dependencies{get;set;}
+  public string CodeBody{get;set;}
+}
+  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{
+    new SourceFileInfo{
+      FileName = ""TestAssembly>Program.cs"",
+      CodeBody = ""class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"",
+      TypeNames = new string[]{
+        ""Program"",
+      },
+      Usings = new string[]{
+        ""using System;"",
+        ""using System.Diagnostics;"",
+      },
+      Dependencies = new string[]{
+      },
+    },
+  };
+}
+}
+");
         }
     }
 }

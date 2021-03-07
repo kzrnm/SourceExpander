@@ -93,24 +93,24 @@ namespace SourceExpander
         {
             [DataMember(Name = "enabled")]
             public bool? Enabled { set; get; }
-            [DataMember(Name = "if-directive")]
-            public string? IfDirective { set; get; }
+            [DataMember(Name = "class-name")]
+            public string? ClassName { set; get; }
 
-            public EmbeddingSourceClass ToImmutable() => new EmbeddingSourceClass(Enabled == true, IfDirective);
+            public EmbeddingSourceClass ToImmutable() => new EmbeddingSourceClass(Enabled == true, ClassName);
         }
     }
 
     public class EmbeddingSourceClass
     {
-        public EmbeddingSourceClass(bool enabled = false, string? ifDirective = null)
+        public EmbeddingSourceClass(bool enabled = false, string? className = null)
         {
             Enabled = enabled;
-            IfDirective = ifDirective ?? "DEBUG";
+            ClassName = string.IsNullOrWhiteSpace(className) ? "SourceFileInfoContainer" : className!;
         }
         public bool Enabled { set; get; }
-        public string IfDirective { set; get; }
+        public string ClassName { set; get; }
 
-        public override string ToString() => Enabled ? $"if: {IfDirective}" : "disable";
+        public override string ToString() => Enabled ? $"class: {ClassName}" : "disable";
     }
 
     public enum EmbeddingType
