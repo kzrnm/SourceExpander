@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Base32768" Version="1.0.9" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
-    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.1" />
   </ItemGroup>
 
 </Project>
