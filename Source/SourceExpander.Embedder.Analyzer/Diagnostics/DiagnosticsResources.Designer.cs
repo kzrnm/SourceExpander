@@ -61,6 +61,15 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
+        ///   Avoid using static directive because there is a risk of name collision に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBEDDER0001_Body {
+            get {
+                return ResourceManager.GetString("EMBEDDER0001_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Avoid using static directive に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EMBEDDER0001_Title {

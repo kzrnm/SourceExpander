@@ -11,11 +11,11 @@ namespace SourceExpander.Diagnostics
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
             new LocalizableResourceString(
-                nameof(DiagnosticsResources.EMBEDDER0001_Title),
+                nameof(DiagnosticsResources.EMBEDDER0001_Body),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
             "Using Directive",
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Info,
             isEnabledByDefault: true
             );
         internal static readonly DiagnosticDescriptor EMBEDDER0002_UsingAlias = new(
