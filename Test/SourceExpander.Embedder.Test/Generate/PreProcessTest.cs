@@ -7,7 +7,7 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class PreProcessTest : EmbeddingGeneratorTestBase
     {
-        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
 
         [Fact]
         public void GenerateTest()
@@ -35,11 +35,11 @@ path: "Program.cs") },
             var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var newTree = gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which;
             newTree.ToString().Should().ContainAll(
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",

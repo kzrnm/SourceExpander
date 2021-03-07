@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
@@ -7,16 +8,24 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class AllowUnsafeTest : EmbeddingGeneratorTestBase
+    public class SkipFileTest : EmbeddingGeneratorTestBase
     {
-        public AllowUnsafeTest()
+        public SkipFileTest()
         {
             compilation = CreateCompilation(TestSyntaxes,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                       .WithAllowUnsafe(true),
+                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
+                        {"CS8019",ReportDiagnostic.Suppress },
+                    }),
                 new[] { expanderCoreReference });
             compilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length);
-            compilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
+            compilation.GetDiagnostics()
+                .Where(d => d.Id switch
+                {
+                    "CS0234" or "CS0246" => false,
+                    _ => true
+                })
+                .Should().BeEmpty();
         }
         private readonly CSharpCompilation compilation;
         private static SyntaxTree[] TestSyntaxes => new[]
@@ -51,20 +60,40 @@ namespace SourceExpander.Embedder.Generate.Test
                    @"using System;
     using System.Diagnostics;
     using static System.Console;
+using SourceExpander;
 
-    namespace Test.F
+namespace Test.F
+{
+    [SourceExpander.NotEmbeddingSource]
+    class N
     {
-        class N
+        /// <summary>
+        /// XML Document
+        /// </summary>
+        public static void WriteN()
         {
-            public static void WriteN()
-            {
-                Console.Write(NumType.Zero);
-                Write(""N"");
-                Trace.Write(""N"");
-                Put.Nested.Write(""N"");
-            }
+            Console.Write(NumType.Zero);
+            Write(""N"");
+            Trace.Write(""N"");
+            Put.Nested.Write(""N"");
         }
-    }",
+    }
+
+    [NotEmbeddingSource]
+    struct R
+    {
+        /// <summary>
+        /// XML Document
+        /// </summary>
+        public static void WriteN()
+        {
+            Console.Write(NumType.Zero);
+            Write(""N"");
+            Trace.Write(""N"");
+            Put.Nested.Write(""N"");
+        }
+    }
+}",
                     path: "/home/source/F/N.cs"),
                  CSharpSyntaxTree.ParseText(
        @"
@@ -79,16 +108,9 @@ namespace SourceExpander.Embedder.Generate.Test
     }", path: "/home/source/F/NumType.cs"),
         };
         static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-        static readonly ImmutableArray<SourceFileInfo> embeddedFiles
+        static ImmutableArray<SourceFileInfo> embeddedFiles
             = ImmutableArray.Create(
                 new SourceFileInfo
-                (
-                    "TestAssembly>F/N.cs",
-                    new string[] { "Test.F.N" },
-                    new string[] { "using System;", "using System.Diagnostics;", "using static System.Console;" },
-                    new string[] { "TestAssembly>F/NumType.cs", "TestAssembly>Put.cs" },
-                    "namespace Test.F{class N{public static void WriteN(){Console.Write(NumType.Zero);Write(\"N\");Trace.Write(\"N\");Put.Nested.Write(\"N\");}}}"
-                ), new SourceFileInfo
                 (
                     "TestAssembly>F/NumType.cs",
                     new string[] { "Test.F.NumType" },
@@ -110,21 +132,19 @@ namespace SourceExpander.Embedder.Generate.Test
                     ImmutableArray.Create<string>(),
                     "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
                 ));
-
         [Fact]
         public void GenerateTest()
         {
             var generator = new EmbedderGenerator();
+            var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
             var gen = RunGenerator(compilation, generator, additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
+            var debugTrees = gen.OutputCompilation.SyntaxTrees;
+            var debugRoots = debugTrees.Select(t => t.GetRoot()).ToArray();
             gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 2);
+            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length - 1
+                + CompileTimeTypeMaker.SourceCount + 2);
 
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
-            reporter.Diagnostics.Should().BeEmpty();
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -142,8 +162,6 @@ namespace SourceExpander.Embedder.Generate.Test
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.Diagnostics.Should().BeEmpty();
-
             gen.AddedSyntaxTrees
                 .Should()
                 .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
@@ -152,8 +170,10 @@ namespace SourceExpander.Embedder.Generate.Test
                 .Should()
                 .ContainAll(
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")");
+                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
+                )
+                .And
+                .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
         }
 
         [Fact]
@@ -163,8 +183,7 @@ namespace SourceExpander.Embedder.Generate.Test
             new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            reporter.Diagnostics.Should().BeEmpty();
+            reporter.Diagnostics.Should().NotContain(d => d.Id != "CS0246");
         }
-
     }
 }

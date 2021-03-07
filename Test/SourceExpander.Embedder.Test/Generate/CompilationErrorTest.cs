@@ -8,7 +8,7 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class CompilationErrorTest : EmbeddingGeneratorTestBase
     {
-        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         [Fact]
         public void GenerateInputError()
         {
@@ -22,7 +22,7 @@ class Program
                      new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             var generator = new EmbedderGenerator();
             var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
-            gen.OutputCompilation.SyntaxTrees.Should().ContainSingle();
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1 + CompileTimeTypeMaker.SourceCount);
             gen.Diagnostics.Should().BeEmpty();
         }
 
@@ -39,12 +39,10 @@ class Program
                      new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig()).ResolveFiles().Should().ContainSingle();
-
-            var diagnostic = reporter.Diagnostics.Should().ContainSingle().Which;
-            diagnostic.Id.Should().Be("EMBED0004");
-            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Warning);
-            diagnostic.GetMessage().Should().StartWith("Error embedded source: TestAssembly>Program.cs:");
+            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig())
+                .ResolveFiles()
+                .Should()
+                .BeEmpty();
         }
     }
 }

@@ -1043,12 +1043,12 @@ public class Def
                 .Should()
                 .BeEquivalentTo(testData.Expected);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -1111,12 +1111,12 @@ public class Def
                 .Should()
                 .BeEquivalentTo(testData.ExpectedMinify);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()

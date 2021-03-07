@@ -25,20 +25,40 @@ namespace SourceExpander.Roslyn
             diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken);
         }
 
-        private void FindDeclaredType(MemberDeclarationSyntax node)
+        /// <summary>
+        /// Find Type or skip
+        /// </summary>
+        /// <returns>if <see langword="false"/>, ignore <paramref name="node"/></returns>
+        private bool FindDeclaredType(MemberDeclarationSyntax node)
         {
-            var typeName = model.GetDeclaredSymbol(node, cancellationToken)?.ToDisplayString();
+            if (model.GetDeclaredSymbol(node, cancellationToken) is not ITypeSymbol symbol)
+                return false;
+
+            if (symbol.GetAttributes()
+                .Any(at => at.AttributeClass?.ToString() == "SourceExpander.NotEmbeddingSourceAttribute"))
+                return false;
+
+            var typeName = symbol?.ToDisplayString();
             if (typeName is not null)
+            {
                 typeNamesBuilder.Add(typeName);
+                return true;
+            }
+            return false;
         }
 
         public override SyntaxNode? Visit(SyntaxNode? node)
         {
             if (node is BaseTypeDeclarationSyntax typeDeclaration)
-                FindDeclaredType(typeDeclaration);
+            {
+                if (!FindDeclaredType(typeDeclaration))
+                    return null;
+            }
             else if (node is DelegateDeclarationSyntax delegateDeclaration)
-                FindDeclaredType(delegateDeclaration);
-
+            {
+                if (!FindDeclaredType(delegateDeclaration))
+                    return null;
+            }
             return base.Visit(node);
         }
 

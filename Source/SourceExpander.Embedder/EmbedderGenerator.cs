@@ -24,6 +24,13 @@ namespace SourceExpander
             }
 #endif
 
+            if (context.Compilation is not CSharpCompilation compilation) return;
+            if (!compilation.SyntaxTrees.Any()) return;
+
+            foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
+                context.AddSource(hintName, sourceText);
+
+
             var configText = context.AdditionalFiles
                 .FirstOrDefault(a =>
                     StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
@@ -43,11 +50,8 @@ namespace SourceExpander
             if (!config.Enabled)
                 return;
 
-            if (context.Compilation.GetDiagnostics(context.CancellationToken).HasCompilationError())
-                return;
-
             var embeddingContext = new EmbeddingContext(
-                (CSharpCompilation)context.Compilation,
+                compilation,
                 (CSharpParseOptions)context.ParseOptions,
                 new DiagnosticReporter(context),
                 config,
@@ -63,11 +67,11 @@ namespace SourceExpander
 
             if (config.EmbeddingSourceClass.Enabled)
                 context.AddSource(
-                    "EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs",
-                    SourceText.From(CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName), Encoding.UTF8));
+                    "EmbeddingSourceClass.cs",
+                    CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
 
             context.AddSource(
-                "EmbeddedSourceCode.Metadata.Generated.cs",
+                "EmbeddedSourceCode.Metadata.cs",
                 SourceText.From(sb.ToString(), Encoding.UTF8));
         }
 
@@ -85,7 +89,7 @@ namespace SourceExpander
             return sb;
         }
 
-        private static string CreateEmbbedingSourceClass(
+        private static SourceText CreateEmbbedingSourceClass(
             ImmutableArray<SourceFileInfo> sources,
             string className)
         {
@@ -135,7 +139,7 @@ namespace SourceExpander
             sb.AppendLine("  };");
             sb.AppendLine("}");
             sb.AppendLine("}");
-            return sb.ToString();
+            return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
     }
 }

@@ -16,6 +16,7 @@ README languages:
 - [Getting started](#getting-started)
   - [ライブラリ利用者向け](#%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E5%88%A9%E7%94%A8%E8%80%85%E5%90%91%E3%81%91)
   - [ライブラリ開発者向け](#%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E9%96%8B%E7%99%BA%E8%80%85%E5%90%91%E3%81%91)
+    - [埋め込みたくない型への対処](#%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BF%E3%81%9F%E3%81%8F%E3%81%AA%E3%81%84%E5%9E%8B%E3%81%B8%E3%81%AE%E5%AF%BE%E5%87%A6)
     - [アナライザー(optional)](#%E3%82%A2%E3%83%8A%E3%83%A9%E3%82%A4%E3%82%B6%E3%83%BCoptional)
   - [注釈](#%E6%B3%A8%E9%87%88)
 - [埋め込まれるデータ](#%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BE%E3%82%8C%E3%82%8B%E3%83%87%E3%83%BC%E3%82%BF)
@@ -106,6 +107,10 @@ namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] pub
 ```
 Install-Package SourceExpander.Embedder
 ```
+
+#### 埋め込みたくない型への対処
+
+`SourceExpander.NotEmbeddingSourceAttribute` を適用した型については埋め込みをスキップします。
 
 #### アナライザー(optional)
 

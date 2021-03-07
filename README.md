@@ -16,6 +16,7 @@ README languages:
 - [Getting started](#getting-started)
   - [For library user](#for-library-user)
   - [For library developer](#for-library-developer)
+    - [Avoid embedding some type](#avoid-embedding-some-type)
     - [Analyzer(optional)](#analyzeroptional)
   - [Notes](#notes)
 - [Embedded data](#embedded-data)
@@ -106,6 +107,10 @@ It's easy, just install `SourceExpander.Embedder`.
 ```
 Install-Package SourceExpander.Embedder
 ```
+
+#### Avoid embedding some type
+
+Embedding is skipped for type that have `SourceExpander.NotEmbeddingSourceAttribute`.
 
 #### Analyzer(optional)
 
