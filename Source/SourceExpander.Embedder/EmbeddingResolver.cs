@@ -99,7 +99,7 @@ namespace SourceExpander
         {
             if (!_cacheResolvedFiles.IsDefault)
                 return _cacheResolvedFiles;
-            if (!config.Enabled || compilation.GetDiagnostics(cancellationToken).HasCompilationError())
+            if (!config.Enabled)
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
             UpdateCompilation();
             var sources = new List<SourceFileInfo>();
