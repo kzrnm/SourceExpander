@@ -9,7 +9,6 @@ namespace SourceExpander
     {
         public static string ToLiteral(this string str)
             => SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(str)).ToFullString();
-
         public static IEnumerable<string> AllTypeNames(SemanticModel model, SyntaxTree tree, CancellationToken cancellationToken)
         {
             var distinctHashSet = new HashSet<string>();
