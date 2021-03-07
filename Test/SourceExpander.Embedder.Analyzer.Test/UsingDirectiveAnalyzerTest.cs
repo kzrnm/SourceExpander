@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Xunit;
-using VerifyCS = AtCoderAnalyzer.Test.CSharpAnalyzerVerifier<SourceExpander.UsingDirectiveAnalyzer>;
+using VerifyCS = SourceExpander.Embedder.Analyzer.Test.CSharpAnalyzerVerifier<SourceExpander.UsingDirectiveAnalyzer>;
 
-namespace AtCoderAnalyzer.Test
+namespace SourceExpander.Embedder.Analyzer.Test
 {
     public class UsingDirectiveAnalyzerTest
     {

@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Xunit;
-using VerifyCS = AtCoderAnalyzer.Test.CSharpAnalyzerVerifier<SourceExpander.NullableAnalyzer>;
+using VerifyCS = SourceExpander.Embedder.Analyzer.Test.CSharpAnalyzerVerifier<SourceExpander.NullableAnalyzer>;
 
-namespace AtCoderAnalyzer.Test
+namespace SourceExpander.Embedder.Analyzer.Test
 {
     public class NullableAnalyzerTest
     {

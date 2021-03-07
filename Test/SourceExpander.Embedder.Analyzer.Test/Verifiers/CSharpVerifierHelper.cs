@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace AtCoderAnalyzer.Test
+namespace SourceExpander.Embedder.Analyzer.Test
 {
     internal static class CSharpVerifierHelper
     {
