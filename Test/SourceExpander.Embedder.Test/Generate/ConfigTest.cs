@@ -176,7 +176,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -194,13 +194,13 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -258,7 +258,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -274,11 +274,11 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -331,7 +331,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -349,13 +349,13 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -423,7 +423,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -441,12 +441,12 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -505,7 +505,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -523,12 +523,12 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -589,7 +589,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(4);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -607,7 +607,6 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
@@ -693,7 +692,7 @@ class Program
             var add = gen.AddedSyntaxTrees.First();
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(4);
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -710,7 +709,6 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
@@ -797,7 +795,7 @@ class Program
             var add = gen.AddedSyntaxTrees.First();
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(4);
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -814,7 +812,6 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees

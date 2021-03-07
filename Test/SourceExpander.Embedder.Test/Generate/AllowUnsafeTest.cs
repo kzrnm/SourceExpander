@@ -26,7 +26,7 @@ namespace SourceExpander.Embedder.Generate.Test
                     path: "/home/source/Put.cs"),
                  CSharpSyntaxTree.ParseText(
                     @"using System.Diagnostics;
-    using System;
+    using System; // used 
     using System.Threading.Tasks;// unused
     using System.Collections.Generic;
     namespace Test.I
@@ -118,7 +118,7 @@ namespace SourceExpander.Embedder.Generate.Test
             var gen = RunGenerator(compilation, generator, additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 2);
 
             var reporter = new MockDiagnosticReporter();
             new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
@@ -142,12 +142,11 @@ namespace SourceExpander.Embedder.Generate.Test
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()

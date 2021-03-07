@@ -29,7 +29,7 @@ namespace SourceExpander.Embedder.Generate.Test
                     path: "/home/source/Put.cs"),
                  CSharpSyntaxTree.ParseText(
                     @"using System.Diagnostics;
-    using System;
+    using System; // used 
     using System.Threading.Tasks;// unused
     using System.Collections.Generic;
     namespace Test.I
@@ -124,7 +124,7 @@ namespace Test.F
             var gen = RunGenerator(compilation, generator, additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 1);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 2);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -144,7 +144,7 @@ namespace Test.F
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle()
+                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
                 .Which
                 .ToString()
                 .Should()
