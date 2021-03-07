@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - SourceExpander.Embedder: Add NotEmbeddingSourceAttribute
+- SourceExpander.Embedder.Analyzer: Warning on expanding embedded source
 ### Changed
 - SourceExpander.Embedder: Format EmbbedingSourceClass
 
