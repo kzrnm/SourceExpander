@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SourceExpander.Embedder.Analyzer: Warning on expanding embedded source
 ### Changed
 - SourceExpander.Embedder: Format EmbbedingSourceClass
+- SourceExpander.Embedder: Ignore compilation error
 
 ## [2.6.0] - 2021-02-04
 ### Added
