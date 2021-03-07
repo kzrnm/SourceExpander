@@ -7,7 +7,7 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class PreProcessTest : EmbeddingGeneratorTestBase
     {
-        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
 
         [Fact]
         public void GenerateTest()

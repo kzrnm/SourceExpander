@@ -31,16 +31,17 @@ namespace SourceExpander
         {
             var specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>
             {
-                { "CS8019", ReportDiagnostic.Error },
-                { "CS0105", ReportDiagnostic.Error },
+                { "CS8019", ReportDiagnostic.Warn },
+                { "CS0105", ReportDiagnostic.Warn },
             };
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
 
-            parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
-
-            this.compilation = compilation.WithOptions(opts);
-            this.parseOptions = parseOptions;
+            this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
+            this.compilation = compilation
+                .AddSyntaxTrees(
+                    CompileTimeTypeMaker.CreateSyntaxes(this.parseOptions))
+                .WithOptions(opts);
             this.reporter = reporter;
             this.config = config;
             this.cancellationToken = cancellationToken;
@@ -98,7 +99,7 @@ namespace SourceExpander
         {
             if (!_cacheResolvedFiles.IsDefault)
                 return _cacheResolvedFiles;
-            if (!config.Enabled)
+            if (!config.Enabled || compilation.GetDiagnostics(cancellationToken).HasCompilationError())
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
             UpdateCompilation();
             var sources = new List<SourceFileInfo>();
@@ -115,7 +116,9 @@ namespace SourceExpander
 
             var commonPrefix = ResolveCommomFileNamePrefix(compilation);
             var infos = ResolveRaw(
-                compilation.SyntaxTrees.Select(tree => ParseSource(tree, commonPrefix)),
+                compilation.SyntaxTrees
+                .Where(tree => !tree.IsCompileTimeType())
+                .Select(tree => ParseSource(tree, commonPrefix)),
                 sources)
                 .Where(info => info.TypeNames.Any())
                 .ToArray();
@@ -241,7 +244,9 @@ namespace SourceExpander
             => compilation.GetTypeByMetadataName(typeFullName) != null;
 
         public static string ResolveCommomFileNamePrefix(Compilation compilation)
-            => ResolveCommomPrefix(compilation.SyntaxTrees.Select(tree => tree.FilePath));
+            => ResolveCommomPrefix(compilation.SyntaxTrees
+                .Where(tree => !tree.IsCompileTimeType())
+                .Select(tree => tree.FilePath));
         public static string ResolveCommomPrefix(IEnumerable<string> strs)
         {
             var sorted = new SortedSet<string>(strs, StringComparer.Ordinal);

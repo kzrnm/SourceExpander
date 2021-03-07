@@ -24,6 +24,13 @@ namespace SourceExpander
             }
 #endif
 
+            if (context.Compilation is not CSharpCompilation compilation) return;
+            if (!compilation.SyntaxTrees.Any()) return;
+
+            foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
+                context.AddSource(hintName, sourceText);
+
+
             var configText = context.AdditionalFiles
                 .FirstOrDefault(a =>
                     StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
@@ -43,11 +50,8 @@ namespace SourceExpander
             if (!config.Enabled)
                 return;
 
-            if (context.Compilation.GetDiagnostics(context.CancellationToken).HasCompilationError())
-                return;
-
             var embeddingContext = new EmbeddingContext(
-                (CSharpCompilation)context.Compilation,
+                compilation,
                 (CSharpParseOptions)context.ParseOptions,
                 new DiagnosticReporter(context),
                 config,
@@ -66,7 +70,6 @@ namespace SourceExpander
                     "EmbeddingSourceClass.cs",
                     CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
 
-            context.AddSource("NotEmbeddingSourceAttribute", CreateNotEmbedding());
             context.AddSource(
                 "EmbeddedSourceCode.Metadata.cs",
                 SourceText.From(sb.ToString(), Encoding.UTF8));
@@ -138,20 +141,5 @@ namespace SourceExpander
             sb.AppendLine("}");
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
-
-        private SourceText CreateNotEmbedding()
-            => SourceText.From(@"using System;
-
-[AttributeUsage(
-    AttributeTargets.Class |
-    AttributeTargets.Struct |
-    AttributeTargets.Enum |
-    AttributeTargets.Interface |
-    AttributeTargets.Delegate,
-    Inherited = false, AllowMultiple = false)]
-internal sealed class NotEmbeddingSourceAttribute : Attribute
-{
-    public NotEmbeddingSourceAttribute() { }
-}", Encoding.UTF8);
     }
 }

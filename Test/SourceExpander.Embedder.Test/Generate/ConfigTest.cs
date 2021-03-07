@@ -112,7 +112,7 @@ class Program
             var gen = RunGenerator(compilation, generator, new[] { additionalText }, parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1 + CompileTimeTypeMaker.SourceCount);
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -120,7 +120,7 @@ class Program
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
             metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
 
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1);
+            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1 + CompileTimeTypeMaker.SourceCount);
             gen.Diagnostics.Should().BeEmpty();
 
             gen.OutputCompilation.SyntaxTrees

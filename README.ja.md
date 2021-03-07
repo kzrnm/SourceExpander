@@ -107,6 +107,10 @@ namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] pub
 Install-Package SourceExpander.Embedder
 ```
 
+#### 埋め込みたくない型への対処
+
+`SourceExpander.NotEmbeddingSourceAttribute` を適用した型については埋め込みをスキップします。
+
 #### アナライザー(optional)
 
 ```

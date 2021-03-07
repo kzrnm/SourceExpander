@@ -107,6 +107,10 @@ It's easy, just install `SourceExpander.Embedder`.
 Install-Package SourceExpander.Embedder
 ```
 
+#### Avoid embedding some type
+
+Embedding is skipped for type that have `SourceExpander.NotEmbeddingSourceAttribute`.
+
 #### Analyzer(optional)
 
 ```
