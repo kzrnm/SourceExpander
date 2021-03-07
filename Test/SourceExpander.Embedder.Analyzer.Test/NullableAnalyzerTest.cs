@@ -103,7 +103,7 @@ namespace Foo
             await test.RunAsync(CancellationToken.None);
         }
 
-        public class NullableCompilationTest : CSharpAnalyzerTest<SourceExpander.NullableAnalyzer, XUnitVerifier>
+        public class NullableCompilationTest : CSharpAnalyzerTest<NullableAnalyzer, XUnitVerifier>
         {
             public NullableCompilationTest(NullableContextOptions nullable)
             {
