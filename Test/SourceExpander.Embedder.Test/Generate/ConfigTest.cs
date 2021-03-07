@@ -10,7 +10,7 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class ConfigTest : EmbeddingGeneratorTestBase
     {
-        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         static readonly CSharpCompilationOptions compilationOptions
             = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                     .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {

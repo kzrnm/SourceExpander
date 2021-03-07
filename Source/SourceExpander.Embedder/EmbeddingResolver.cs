@@ -152,9 +152,11 @@ namespace SourceExpander
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
+
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
 
             var newRoot = typeFindAndUnusedUsingRemover.Visit(root);
+            newRoot = new TriviaRemover().Visit(newRoot);
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
@@ -170,7 +172,7 @@ namespace SourceExpander
             var minified = newRoot.NormalizeWhitespace("", " ");
             if (config.EnableMinify)
             {
-                minified = new TriviaRemover().Visit(minified)!;
+                minified = new TriviaFormatter().Visit(minified)!;
             }
             string minifiedCode = minified!.ToString();
 
@@ -273,6 +275,8 @@ namespace SourceExpander
         }
         private class SourceFileInfoRaw : ISourceFileInfoSlim
         {
+            public static readonly SourceFileInfoRaw Dummy
+                = new(CSharpSyntaxTree.ParseText(""), "Dummy", Array.Empty<string>(), Array.Empty<string>(), "");
             public SyntaxTree SyntaxTree { get; }
             public string FileName { get; }
             public ImmutableHashSet<string> TypeNames { get; }

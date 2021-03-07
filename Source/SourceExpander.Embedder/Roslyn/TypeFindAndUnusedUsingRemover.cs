@@ -25,6 +25,7 @@ namespace SourceExpander.Roslyn
             diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken);
         }
 
+
         private void FindDeclaredType(MemberDeclarationSyntax node)
         {
             var typeName = model.GetDeclaredSymbol(node, cancellationToken)?.ToDisplayString();

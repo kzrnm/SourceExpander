@@ -84,7 +84,7 @@ namespace Test.F
         }
     }", path: "/home/source/F/NumType.cs"),
         };
-        static readonly CSharpParseOptions parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         static ImmutableArray<SourceFileInfo> embeddedFiles
             = ImmutableArray.Create(
                 new SourceFileInfo
