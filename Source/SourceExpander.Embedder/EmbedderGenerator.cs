@@ -63,11 +63,11 @@ namespace SourceExpander
 
             if (config.EmbeddingSourceClass.Enabled)
                 context.AddSource(
-                    "EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs",
+                    "EmbeddingSourceClass.cs",
                     SourceText.From(CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName), Encoding.UTF8));
 
             context.AddSource(
-                "EmbeddedSourceCode.Metadata.Generated.cs",
+                "EmbeddedSourceCode.Metadata.cs",
                 SourceText.From(sb.ToString(), Encoding.UTF8));
         }
 

@@ -612,7 +612,7 @@ class Program
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(s => s.FilePath.EndsWith("EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs"))
+                .ContainSingle(s => s.FilePath.EndsWith("EmbeddingSourceClass.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -715,7 +715,7 @@ class Program
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(s => s.FilePath.EndsWith("EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs"))
+                .ContainSingle(s => s.FilePath.EndsWith("EmbeddingSourceClass.cs"))
                 .Which
                 .ToString()
                 .Should()
@@ -819,7 +819,7 @@ class Program
 
             gen.AddedSyntaxTrees
                 .Should()
-                .ContainSingle(s => s.FilePath.EndsWith("EmbeddedSourceCode.EmbeddingSourceClass.Generated.cs"))
+                .ContainSingle(s => s.FilePath.EndsWith("EmbeddingSourceClass.cs"))
                 .Which
                 .ToString()
                 .Should()
