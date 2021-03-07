@@ -26,7 +26,7 @@ namespace SourceExpander
         {
             if (context.Compilation.GetTypeByMetadataName("SourceExpander.Expander") is { } expanderType)
             {
-                var expandMethods = ImmutableHashSet.CreateRange(SymbolEqualityComparer.Default, 
+                var expandMethods = ImmutableHashSet.CreateRange(SymbolEqualityComparer.Default,
                     expanderType.GetMembers("Expand").OfType<IMethodSymbol>());
                 context.RegisterSyntaxNodeAction(
                     ctx => AnalyzeInvocation(ctx, expandMethods),
