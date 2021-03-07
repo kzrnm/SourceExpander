@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - SourceExpander.Embedder: Format EmbbedingSourceClass
 
-## [2.5.1] - 2021-02-04
+## [2.6.0] - 2021-02-04
 ### Added
 
 - SourceExpander.Generator: static emmbeding text
