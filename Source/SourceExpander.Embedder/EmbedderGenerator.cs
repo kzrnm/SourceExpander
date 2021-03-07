@@ -64,8 +64,9 @@ namespace SourceExpander
             if (config.EmbeddingSourceClass.Enabled)
                 context.AddSource(
                     "EmbeddingSourceClass.cs",
-                    SourceText.From(CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName), Encoding.UTF8));
+                    CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
 
+            context.AddSource("NotEmbeddingSourceAttribute", CreateNotEmbedding());
             context.AddSource(
                 "EmbeddedSourceCode.Metadata.cs",
                 SourceText.From(sb.ToString(), Encoding.UTF8));
@@ -85,7 +86,7 @@ namespace SourceExpander
             return sb;
         }
 
-        private static string CreateEmbbedingSourceClass(
+        private static SourceText CreateEmbbedingSourceClass(
             ImmutableArray<SourceFileInfo> sources,
             string className)
         {
@@ -135,7 +136,22 @@ namespace SourceExpander
             sb.AppendLine("  };");
             sb.AppendLine("}");
             sb.AppendLine("}");
-            return sb.ToString();
+            return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
+
+        private SourceText CreateNotEmbedding()
+            => SourceText.From(@"using System;
+
+[AttributeUsage(
+    AttributeTargets.Class |
+    AttributeTargets.Struct |
+    AttributeTargets.Enum |
+    AttributeTargets.Interface |
+    AttributeTargets.Delegate,
+    Inherited = false, AllowMultiple = false)]
+internal sealed class NotEmbeddingSourceAttribute : Attribute
+{
+    public NotEmbeddingSourceAttribute() { }
+}", Encoding.UTF8);
     }
 }
