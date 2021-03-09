@@ -123,7 +123,7 @@ class Def
                 ImmutableArray.Create("Def"),
                 ImmutableArray.Create("using System;"),
                 ImmutableArray<string>.Empty,
-                "class Def { public int Prop1 { get; init; }  public System.Random Prop2 { set; get; }  private IntPtr _Prop3; protected IntPtr Prop3 { set { _Prop3 = value; }  get => _Prop3; }  public ulong Prop4 { get; }  = 0; }",
+                "class Def { public int Prop1 { get; init; }  public System.Random Prop2 { set; get; }  private IntPtr _Prop3; protected IntPtr Prop3 { set { _Prop3 = value; }  get => _Prop3; }  public ulong Prop4 { get; } = 0; }",
                 "class Def{public int Prop1{get;init;}public System.Random Prop2{set;get;}private IntPtr _Prop3;protected IntPtr Prop3{set{_Prop3=value;}get=>_Prop3;}public ulong Prop4{get;}=0;}"
             ),
             new TestData("Event", @"
