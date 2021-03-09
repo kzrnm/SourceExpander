@@ -7,7 +7,7 @@ namespace SourceExpander
 {
     public class MockDiagnosticReporter : IDiagnosticReporter
     {
-        private readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
+        private readonly List<Diagnostic> diagnostics = new();
         public IReadOnlyCollection<Diagnostic> Diagnostics { get; }
         public MockDiagnosticReporter()
         {
