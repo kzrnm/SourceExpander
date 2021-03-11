@@ -120,12 +120,6 @@ namespace SourceExpander.Embedder.Generate.Test
             gen.OutputCompilation.GetDiagnostics().Should().OnlyContain(d => d.Id == "CS8019");
             gen.OutputCompilation.SyntaxTrees.Should().HaveCount(TestSyntaxes.Length + 2);
 
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
-            reporter.Diagnostics.Should().BeEmpty();
-
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -143,7 +137,6 @@ namespace SourceExpander.Embedder.Generate.Test
                 .BeEquivalentTo(embeddedFiles);
 
             gen.Diagnostics.Should().BeEmpty();
-
             gen.AddedSyntaxTrees
                 .Should()
                 .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
@@ -155,16 +148,5 @@ namespace SourceExpander.Embedder.Generate.Test
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",",
                 "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")");
         }
-
-        [Fact]
-        public void ResolverTest()
-        {
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
-            reporter.Diagnostics.Should().BeEmpty();
-        }
-
     }
 }

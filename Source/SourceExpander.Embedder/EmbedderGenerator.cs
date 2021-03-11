@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,12 @@ namespace SourceExpander
     public class EmbedderGenerator : ISourceGenerator
     {
         private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
-        public void Initialize(GeneratorInitializationContext context) { }
+        public void Initialize(GeneratorInitializationContext context)
+            => context.RegisterForPostInitialization(ctx =>
+            {
+                foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
+                    ctx.AddSource(hintName, sourceText);
+            });
         public void Execute(GeneratorExecutionContext context)
         {
 #if DEBUG
@@ -26,10 +32,7 @@ namespace SourceExpander
 
             if (context.Compilation is not CSharpCompilation compilation) return;
             if (!compilation.SyntaxTrees.Any()) return;
-
-            foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
-                context.AddSource(hintName, sourceText);
-
+            if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;
 
             var configText = context.AdditionalFiles
                 .FirstOrDefault(a =>
@@ -75,15 +78,15 @@ namespace SourceExpander
                 SourceText.From(sb.ToString(), Encoding.UTF8));
         }
 
-        private static StringBuilder CreateMetadataSource(StringBuilder sb, ImmutableDictionary<string, string> metadatas)
+        private static StringBuilder CreateMetadataSource(StringBuilder sb, IEnumerable<(string Key, string Value)> metadatas)
         {
             sb.AppendLine("using System.Reflection;");
-            foreach (var p in metadatas)
+            foreach (var (key, value) in metadatas)
             {
                 sb.Append("[assembly: AssemblyMetadataAttribute(");
-                sb.Append(p.Key.ToLiteral());
+                sb.Append(key.ToLiteral());
                 sb.Append(",");
-                sb.Append(p.Value.ToLiteral());
+                sb.Append(value.ToLiteral());
                 sb.AppendLine(")]");
             }
             return sb;

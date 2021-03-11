@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -45,15 +44,15 @@ namespace SourceExpander
                 "EmbeddedSourceCode.Metadata.Generated.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
         }
 
-        private static SourceText CreateMetadataSource(ImmutableDictionary<string, string> metadatas)
+        private static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
         {
             var sb = new StringBuilder("using System.Reflection;");
-            foreach (var p in metadatas)
+            foreach (var (Key, Value) in metadatas)
             {
                 sb.Append("[assembly: AssemblyMetadataAttribute(");
-                sb.Append(p.Key.ToLiteral());
+                sb.Append(Key.ToLiteral());
                 sb.Append(",");
-                sb.Append(p.Value.ToLiteral());
+                sb.Append(Value.ToLiteral());
                 sb.AppendLine(")]");
             }
             return SourceText.From(sb.ToString(), Encoding.UTF8);

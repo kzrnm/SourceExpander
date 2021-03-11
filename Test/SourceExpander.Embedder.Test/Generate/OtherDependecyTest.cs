@@ -35,7 +35,7 @@ namespace SourceExpander.Embedder.Generate.Test
                 assemblyName: "OtherDependency");
         }
 
-        private readonly Dictionary<string, CompilationReference> otherDependencies = new Dictionary<string, CompilationReference>();
+        private readonly Dictionary<string, CompilationReference> otherDependencies = new();
         public OtherDependencyTest()
         {
             var syntax = CSharpSyntaxTree.ParseText(
@@ -104,13 +104,6 @@ namespace Mine{
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 )
             };
-
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(expected);
-
-            reporter.Diagnostics.Should().BeEmpty();
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
@@ -189,11 +182,6 @@ namespace Mine{
                 )
             };
 
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(expected);
-
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                         .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                         .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -203,7 +191,7 @@ namespace Mine{
                 .Should()
                 .BeEquivalentTo(expected);
 
-            var diagnostic = reporter.Diagnostics
+            var diagnostic = gen.Diagnostics
                 .Should()
                 .ContainSingle()
                 .Which;

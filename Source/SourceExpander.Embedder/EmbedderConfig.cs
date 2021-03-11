@@ -79,7 +79,7 @@ namespace SourceExpander
                 };
 
             public EmbedderConfig ToImmutable() =>
-                new EmbedderConfig(
+                new(
                         Enabled ?? true,
                         ParseEmbeddingType(EmbeddingType),
                         ExcludeAttributes,
@@ -96,7 +96,7 @@ namespace SourceExpander
             [DataMember(Name = "class-name")]
             public string? ClassName { set; get; }
 
-            public EmbeddingSourceClass ToImmutable() => new EmbeddingSourceClass(Enabled == true, ClassName);
+            public EmbeddingSourceClass ToImmutable() => new(Enabled == true, ClassName);
         }
     }
 
