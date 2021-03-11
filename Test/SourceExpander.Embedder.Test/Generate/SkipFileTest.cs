@@ -175,15 +175,5 @@ namespace Test.F
                 .And
                 .NotContain("[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
         }
-
-        [Fact]
-        public void ResolverTest()
-        {
-            var reporter = new MockDiagnosticReporter();
-            new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
-            reporter.Diagnostics.Should().NotContain(d => d.Id != "CS0246");
-        }
     }
 }

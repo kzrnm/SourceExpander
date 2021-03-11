@@ -38,42 +38,66 @@ namespace SourceExpander
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
 
             this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
-            this.compilation = compilation
-                .AddSyntaxTrees(
-                    CompileTimeTypeMaker.CreateSyntaxes(this.parseOptions))
-                .WithOptions(opts);
+            this.compilation = compilation.WithOptions(opts);
             this.reporter = reporter;
             this.config = config;
             this.cancellationToken = cancellationToken;
         }
-        public ImmutableDictionary<string, string> EnumerateAssemblyMetadata()
+        private struct EmbeddingAssemblyMetadata
         {
+            public bool IsEnabled;
+            public bool EmbeddedAllowUnsafe;
+            public Version EmbedderVersion;
+            public LanguageVersion EmbeddedLanguageVersion;
+            public (string Raw, string GZipBase32768) EmbeddedSourceCode;
+
+            public IEnumerable<(string Key, string Value)> EnumerateMetadatas()
+            {
+                if (!IsEnabled) yield break;
+
+                if (EmbeddedAllowUnsafe)
+                    yield return ("SourceExpander.EmbeddedAllowUnsafe", "true");
+
+                yield return ("SourceExpander.EmbedderVersion", EmbedderVersion.ToString());
+                yield return ("SourceExpander.EmbeddedLanguageVersion", EmbeddedLanguageVersion.ToDisplayString());
+
+                yield return EmbeddedSourceCode switch
+                {
+                    (_, string gz) => ("SourceExpander.EmbeddedSourceCode.GZipBase32768", gz),
+                    (string raw, _) => ("SourceExpander.EmbeddedSourceCode", raw),
+                    _ => throw new InvalidDataException(),
+                };
+            }
+        }
+        public IEnumerable<(string Key, string Value)> EnumerateAssemblyMetadata() => ParseEmbeddingAssemblyMetadata().EnumerateMetadatas();
+
+        private EmbeddingAssemblyMetadata ParseEmbeddingAssemblyMetadata()
+        {
+            var result = new EmbeddingAssemblyMetadata();
+
             if (!config.Enabled)
-                return ImmutableDictionary<string, string>.Empty;
+                return result;
             var infos = ResolveFiles();
             if (infos.Length == 0)
-                return ImmutableDictionary<string, string>.Empty;
-
-            var embbeddingMetadataBuilder = ImmutableDictionary.CreateBuilder<string, string>();
-            embbeddingMetadataBuilder.Add("SourceExpander.EmbedderVersion", AssemblyUtil.AssemblyVersion.ToString());
-            embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedLanguageVersion", parseOptions.LanguageVersion.ToDisplayString());
-
+                return result;
             var json = JsonUtil.ToJson(infos);
+
+            result.IsEnabled = true;
+            result.EmbeddedAllowUnsafe = compilation.Options.AllowUnsafe;
+            result.EmbedderVersion = AssemblyUtil.AssemblyVersion;
+            result.EmbeddedLanguageVersion = parseOptions.LanguageVersion;
+
             switch (config.EmbeddingType)
             {
                 case EmbeddingType.Raw:
-                    embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedSourceCode", json);
+                    result.EmbeddedSourceCode.Raw = json;
                     break;
                 default:
-                    embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedSourceCode.GZipBase32768", SourceFileInfoUtil.ToGZipBase32768(json));
+                    result.EmbeddedSourceCode.GZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
                     break;
             }
 
-            if (compilation.Options.AllowUnsafe)
-            {
-                embbeddingMetadataBuilder.Add("SourceExpander.EmbeddedAllowUnsafe", "true");
-            }
-            return embbeddingMetadataBuilder.ToImmutable();
+            return result;
         }
 
         private bool updated = false;
@@ -102,7 +126,7 @@ namespace SourceExpander
             if (!config.Enabled)
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
             UpdateCompilation();
-            var sources = new List<SourceFileInfo>();
+            var depSources = new List<SourceFileInfo>();
             foreach (var embedded in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
             {
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
@@ -111,17 +135,15 @@ namespace SourceExpander
                         Diagnostic.Create(DiagnosticDescriptors.EMBED0001_OlderVersion, Location.None,
                         AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
                 }
-                sources.AddRange(embedded.Sources);
+                depSources.AddRange(embedded.Sources);
             }
 
-            var commonPrefix = ResolveCommomFileNamePrefix(compilation);
-            var infos = ResolveRaw(
-                compilation.SyntaxTrees
-                .Where(tree => !tree.IsCompileTimeType())
-                .Select(tree => ParseSource(tree, commonPrefix)),
-                sources)
+            var rawInfos = compilation.SyntaxTrees
+                .Select(tree => ParseSource(tree))
                 .Where(info => info.TypeNames.Any())
                 .ToArray();
+            var commonPrefix = ResolveCommomPrefix(rawInfos.Select(r => r.FileName));
+            var infos = ResolveRaw(rawInfos, commonPrefix, depSources).ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
             _cacheResolvedFiles = ImmutableArray.Create(infos);
@@ -151,7 +173,7 @@ namespace SourceExpander
             return _cacheResolvedFiles;
         }
 
-        private SourceFileInfoRaw ParseSource(SyntaxTree tree, string commonPrefix)
+        private SourceFileInfoRaw ParseSource(SyntaxTree tree)
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
@@ -164,11 +186,6 @@ namespace SourceExpander
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
             var usings = typeFindAndUnusedUsingRemover.RootUsings();
-
-            var prefix = $"{compilation.AssemblyName}>";
-            var fileName = string.IsNullOrEmpty(commonPrefix) ?
-                prefix + tree.FilePath :
-                tree.FilePath.Replace(commonPrefix, prefix);
 
             var typeNames = typeFindAndUnusedUsingRemover.DefinedTypeNames();
 
@@ -197,10 +214,17 @@ namespace SourceExpander
                 reporter.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diffStr));
             }
-            return new SourceFileInfoRaw(tree, fileName, typeNames, usings, minifiedCode);
+            return new SourceFileInfoRaw(tree, tree.FilePath, typeNames, usings, minifiedCode);
         }
-        private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
+        private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, string commonPrefix, IEnumerable<SourceFileInfo> otherInfos)
         {
+            var prefix = $"{compilation.AssemblyName}>";
+            string NewName(SourceFileInfoRaw raw)
+                => string.IsNullOrEmpty(commonPrefix) ?
+                prefix + raw.FileName :
+                raw.FileName.Replace(commonPrefix, prefix);
+            infos = infos.Select(raw => raw.WithFileName(NewName(raw)));
+
             var dependencyInfo = infos.Cast<ISourceFileInfoSlim>()
                 .Concat(otherInfos.Select(s => new SourceFileInfoSlim(s)))
                 .ToArray();
@@ -229,7 +253,9 @@ namespace SourceExpander
                 return dependencies;
             }
 
+
             foreach (var raw in infos)
+            {
                 yield return new SourceFileInfo
                 (
                     raw.FileName,
@@ -238,15 +264,12 @@ namespace SourceExpander
                     GetDependencies(raw),
                     raw.CodeBody
                 );
+            }
         }
 
         public bool HasType(string typeFullName)
             => compilation.GetTypeByMetadataName(typeFullName) != null;
 
-        public static string ResolveCommomFileNamePrefix(Compilation compilation)
-            => ResolveCommomPrefix(compilation.SyntaxTrees
-                .Where(tree => !tree.IsCompileTimeType())
-                .Select(tree => tree.FilePath));
         public static string ResolveCommomPrefix(IEnumerable<string> strs)
         {
             var sorted = new SortedSet<string>(strs, StringComparer.Ordinal);
@@ -287,6 +310,13 @@ namespace SourceExpander
             public ImmutableHashSet<string> TypeNames { get; }
             public IEnumerable<string> Usings { get; }
             public string CodeBody { get; }
+            public SourceFileInfoRaw WithFileName(string newName)
+                => new(
+                    SyntaxTree,
+                    newName,
+                    TypeNames,
+                    Usings,
+                    CodeBody);
 
             public SourceFileInfoRaw(
                 SyntaxTree syntaxTree,

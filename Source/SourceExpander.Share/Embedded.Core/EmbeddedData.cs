@@ -26,7 +26,7 @@ namespace SourceExpander
         public static EmbeddedData Create(string assemblyName, ImmutableDictionary<string, string> assemblyMetadatas)
         {
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
-            Version? version = new Version(1, 0, 0);
+            Version? version = new(1, 0, 0);
             bool allowUnsafe = false;
 
             var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();

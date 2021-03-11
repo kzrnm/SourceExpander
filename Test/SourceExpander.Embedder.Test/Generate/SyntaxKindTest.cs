@@ -1005,22 +1005,6 @@ public class Def
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
 
-            var reporter = new MockDiagnosticReporter();
-            var resolved = new EmbeddingResolver(compilation, parseOptions, reporter, new EmbedderConfig()).ResolveFiles()
-                .Should()
-                .ContainSingle()
-                .Which;
-            CreateCompilation(
-                new[] { CSharpSyntaxTree.ParseText(resolved.Restore(), parseOptions, "/foo/path.cs", new UTF8Encoding(false)) },
-                compilationOptions,
-                new[] { expanderCoreReference })
-                .GetDiagnostics().Should().BeEmpty();
-            resolved
-                .Should()
-                .BeEquivalentTo(testData.Expected);
-            reporter.Diagnostics.Should().BeEmpty();
-
-
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
                 .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
                 .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
@@ -1071,22 +1055,6 @@ public class Def
                 additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
             gen.Diagnostics.Should().BeEmpty();
             gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-
-            var reporter = new MockDiagnosticReporter();
-            var resolved = new EmbeddingResolver(compilation, parseOptions, reporter,
-                new EmbedderConfig(enableMinify: true)).ResolveFiles()
-                .Should()
-                .ContainSingle()
-                .Which;
-            CreateCompilation(
-                new[] { CSharpSyntaxTree.ParseText(resolved.Restore(), parseOptions, "/foo/path.cs", new UTF8Encoding(false)) },
-                compilationOptions,
-                new[] { expanderCoreReference })
-                .GetDiagnostics().Should().BeEmpty();
-            resolved
-                .Should()
-                .BeEquivalentTo(testData.ExpectedMinify);
-            reporter.Diagnostics.Should().BeEmpty();
 
 
             var metadata = gen.OutputCompilation.Assembly.GetAttributes()
