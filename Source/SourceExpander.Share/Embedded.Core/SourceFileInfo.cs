@@ -18,10 +18,19 @@ namespace SourceExpander
         string? codeBody)
         {
             FileName = fileName ?? "";
-            TypeNames = typeNames ?? Array.Empty<string>();
-            Usings = usings ?? Array.Empty<string>();
-            Dependencies = dependencies ?? Array.Empty<string>();
+            TypeNames = Sorted(typeNames, UsingComparer.Default);
+            Usings = Sorted(usings, UsingComparer.Default);
+            Dependencies = Sorted(dependencies, UsingComparer.Default);
             CodeBody = codeBody ?? "";
+        }
+
+        private static string[] Sorted(IEnumerable<string>? collection, IComparer<string> comparer)
+        {
+            if (collection is null)
+                return Array.Empty<string>();
+            var array = collection.ToArray();
+            Array.Sort(array, comparer);
+            return array;
         }
 
         [DataMember]

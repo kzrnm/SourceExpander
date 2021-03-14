@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -35,5 +37,17 @@ namespace SourceExpander
             => ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(json));
         internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(Stream stream)
             => ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(stream));
+
+        public static string[] SortUsings(string[] usings)
+        {
+            Array.Sort(usings, UsingComparer.Default);
+            return usings;
+        }
+    }
+
+    public class UsingComparer : IComparer<string>
+    {
+        public static readonly UsingComparer Default = new();
+        public int Compare(string x, string y) => StringComparer.Ordinal.Compare(x.TrimEnd(';'), y.TrimEnd(';'));
     }
 }
