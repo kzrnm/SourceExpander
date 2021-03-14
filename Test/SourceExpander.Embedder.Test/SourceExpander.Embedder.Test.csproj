@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Verifiers\CSharpSourceGeneratorTest.cs" Link="Verifiers\CSharpSourceGeneratorTest.cs"  />
     <Compile Include="..\Utils\InMemoryAdditionalText.cs" Link="Utils\InMemoryAdditionalText.cs" />
     <Compile Include="..\Utils\GeneratorTestBase.cs" Link="Utils\GeneratorTestBase.cs" />
     <Compile Include="..\Utils\MockDiagnosticReporter.cs" Link="Utils\MockDiagnosticReporter.cs" />
