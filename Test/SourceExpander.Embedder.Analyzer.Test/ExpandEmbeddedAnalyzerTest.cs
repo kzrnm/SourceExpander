@@ -11,7 +11,7 @@ namespace SourceExpander.Embedder.Analyzer.Test
 {
     public class ExpandEmbeddedAnalyzerTest
     {
-        public static TheoryData Expand_Data = new TheoryData<string, DiagnosticResult[]>
+        public static readonly TheoryData Expand_Data = new TheoryData<string, DiagnosticResult[]>
         {
             {
                 @"
