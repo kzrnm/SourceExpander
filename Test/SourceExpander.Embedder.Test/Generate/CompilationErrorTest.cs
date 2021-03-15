@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class CompilationErrorTest : EmbeddingGeneratorTestBase
+    public class CompilationErrorTest : EmbedderGeneratorTestBase
     {
         [Fact]
         public async Task Generate()

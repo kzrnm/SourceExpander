@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class AllowUnsafeTest : EmbeddingGeneratorTestBase
+    public class AllowUnsafeTest : EmbedderGeneratorTestBase
     {
         [Fact]
         public async Task Generate()

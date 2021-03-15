@@ -10,7 +10,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class SyntaxKindTest : EmbeddingGeneratorTestBase
+    public class SyntaxKindTest : EmbedderGeneratorTestBase
     {
         public static readonly TestData[] TestTable = new TestData[]
         {

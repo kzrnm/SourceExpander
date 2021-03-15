@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class SkipTypeTest : EmbeddingGeneratorTestBase
+    public class SkipTypeTest : EmbedderGeneratorTestBase
     {
         [Fact]
         public async Task Generate()

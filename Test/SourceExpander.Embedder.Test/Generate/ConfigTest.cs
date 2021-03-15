@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class ConfigTest : EmbeddingGeneratorTestBase
+    public class ConfigTest : EmbedderGeneratorTestBase
     {
         public static TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText>
         {

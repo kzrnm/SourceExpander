@@ -3,7 +3,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class NoSyntaxTest : EmbeddingGeneratorTestBase
+    public class NoSyntaxTest : EmbedderGeneratorTestBase
     {
         [Fact]
         public async Task Generate()

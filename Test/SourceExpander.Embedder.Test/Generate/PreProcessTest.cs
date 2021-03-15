@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class PreProcessTest : EmbeddingGeneratorTestBase
+    public class PreProcessTest : EmbedderGeneratorTestBase
     {
         [Fact]
         public async Task Generate()

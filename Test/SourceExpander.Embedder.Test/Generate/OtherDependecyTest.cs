@@ -10,7 +10,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class OtherDependencyTest : EmbeddingGeneratorTestBase
+    public class OtherDependencyTest : EmbedderGeneratorTestBase
     {
         static Solution CreateOtherReference(Solution solution,
             ProjectId projectId,

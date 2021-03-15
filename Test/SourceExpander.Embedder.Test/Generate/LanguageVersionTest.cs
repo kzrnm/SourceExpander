@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class LanguageVersionTest : EmbeddingGeneratorTestBase
+    public class LanguageVersionTest : EmbedderGeneratorTestBase
     {
         [Theory]
         [InlineData(LanguageVersion.Latest)]
