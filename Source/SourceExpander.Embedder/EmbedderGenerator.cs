@@ -29,7 +29,7 @@ namespace SourceExpander
             try
             {
 #if DEBUG
-                if (!System.Diagnostics.Debugger.IsAttached)
+                if (!Debugger.IsAttached)
                 {
                     //System.Diagnostics.Debugger.Launch();
                 }
@@ -83,11 +83,11 @@ namespace SourceExpander
                     SourceText.From(sb.ToString(), Encoding.UTF8));
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0001_UnknownError, Location.None));
+                    DiagnosticDescriptors.EMBED0001_UnknownError, Location.None, e.Message));
             }
         }
 

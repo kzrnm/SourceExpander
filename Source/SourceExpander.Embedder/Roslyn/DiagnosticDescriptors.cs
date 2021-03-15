@@ -7,7 +7,7 @@ namespace SourceExpander.Roslyn
         public static readonly DiagnosticDescriptor EMBED0001_UnknownError = new(
             "EMBED0001",
             "Unknown error",
-            "Unknown error",
+            "Unknown error: {0}",
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
             true);
