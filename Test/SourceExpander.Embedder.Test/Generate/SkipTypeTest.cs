@@ -151,6 +151,250 @@ namespace Test.F
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
+
+        [Fact]
+        public async Task Partial()
+        {
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create<string>(),
+                     @"partial class Program{static void Main()=>Console.WriteLine(1);}"
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"partial class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"using System;
+partial class Program
+{
+    static void Main() => Console.WriteLine(1);
+}
+[SourceExpander.NotEmbeddingSource]
+partial class Program
+{
+    static void M() => Console.WriteLine(2);
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 6, 17, 6, 35).WithArguments("NotEmbeddingSource", "SourceExpander"),
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 6, 17, 6, 35).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
+
+        [Fact]
+        public async Task Field()
+        {
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main()=>Console.WriteLine(1);}"
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"using System;
+class Program
+{
+    static void Main() => Console.WriteLine(1);
+    [SourceExpander.NotEmbeddingSource]
+    static int num = 2;
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
+
+
+        [Fact]
+        public async Task Property()
+        {
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main()=>Console.WriteLine(1);}"
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"using System;
+class Program
+{
+    static void Main() => Console.WriteLine(1);
+    [SourceExpander.NotEmbeddingSource]
+    static int num => 2;
+    [SourceExpander.NotEmbeddingSource]
+    static string text { get; set; }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 7, 21, 7, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 7, 21, 7, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
+
+        [Fact]
+        public async Task Method()
+        {
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main()=>Console.WriteLine(1);}"
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"using System;
+class Program
+{
+    static void Main() => Console.WriteLine(1);
+    [SourceExpander.NotEmbeddingSource]
+    static void M() => Console.WriteLine(2);
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
+                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
     }
 }
 

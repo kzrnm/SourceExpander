@@ -16,13 +16,7 @@ namespace SourceExpander
 
 namespace SourceExpander
 {
-    [AttributeUsage(
-        AttributeTargets.Class |
-        AttributeTargets.Struct |
-        AttributeTargets.Enum |
-        AttributeTargets.Interface |
-        AttributeTargets.Delegate,
-        Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
     [System.Diagnostics.Conditional(""COMPILE_TIME_ONLY"")]
     [NotEmbeddingSource]
     internal sealed class NotEmbeddingSourceAttribute : Attribute
