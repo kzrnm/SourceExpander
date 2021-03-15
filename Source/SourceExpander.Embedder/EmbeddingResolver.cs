@@ -158,22 +158,17 @@ namespace SourceExpander
                 is { } diagnostics
                 && diagnostics.Length > 0)
             {
-                var messageDic = new Dictionary<string, List<string>>();
                 foreach (var d in diagnostics)
                 {
                     var file = d.Location?.SourceTree?.FilePath;
-                    if (file is null)
+                    if (file is null || d.WarningLevel > 0)
                         continue;
-                    var message = d.GetMessage();
-                    if (!messageDic.TryGetValue(file, out var messages))
-                    {
-                        messages = messageDic[file] = new List<string>();
-                    }
-                    messages.Add(message);
+
+                    if (d.GetMessage() is string message)
+                        reporter.ReportDiagnostic(Diagnostic.Create(
+                            DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
+                            file, message));
                 }
-                reporter.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
-                    string.Join(", ", messageDic.Select(p => $"{p.Key}: {{{string.Join(", ", p.Value)}}}"))));
             }
 
             return _cacheResolvedFiles;

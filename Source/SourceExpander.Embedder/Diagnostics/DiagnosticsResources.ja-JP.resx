@@ -124,16 +124,10 @@
     <value>不明なエラー</value>
   </data>
   <data name="EMBED0002_Body" xml:space="preserve">
-    <value>Embeder version({0}) が {1}({2}) より古いです</value>
+    <value>Embeder version({0}) が {1}({2}) の Embedder より古いです</value>
   </data>
   <data name="EMBED0002_Title" xml:space="preserve">
     <value>Embeder version が古いです</value>
-  </data>
-  <data name="EMBED0005_Body" xml:space="preserve">
-    <value>Different syntax: near {0}. This is Embedder error, please report this to GitHub repository.</value>
-  </data>
-  <data name="EMBED0005_Title" xml:space="preserve">
-    <value>Different syntax</value>
   </data>
   <data name="EMBED0006_Body" xml:space="preserve">
     <value>他のアセンブリの埋め込みデータが不正です: {0}, Key: {1}, Message: {2}</value>

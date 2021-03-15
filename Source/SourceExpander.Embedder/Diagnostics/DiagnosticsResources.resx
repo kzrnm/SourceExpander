@@ -124,7 +124,7 @@
     <value>Unknown error</value>
   </data>
   <data name="EMBED0002_Body" xml:space="preserve">
-    <value>Embeder version({0}) is older than {1}({2})</value>
+    <value>Embeder version({0}) is older than embedder of {1}({2})</value>
   </data>
   <data name="EMBED0002_Title" xml:space="preserve">
     <value>Embeder version is older</value>
@@ -136,7 +136,7 @@
     <value>Error config file</value>
   </data>
   <data name="EMBED0004_Body" xml:space="preserve">
-    <value>Error embedded source: {0}</value>
+    <value>Error embedded source: File: {0}, Message: {1}</value>
   </data>
   <data name="EMBED0004_Title" xml:space="preserve">
     <value>Error embedded source</value>

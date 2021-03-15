@@ -79,7 +79,7 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
-        ///   Embeder version({0}) is older than {1}({2}) に類似しているローカライズされた文字列を検索します。
+        ///   Embeder version({0}) is older than embedder of {1}({2}) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EMBED0002_Body {
             get {
@@ -115,7 +115,7 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
-        ///   Error embedded source: {0} に類似しているローカライズされた文字列を検索します。
+        ///   Error embedded source: File: {0}, Message: {1} に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EMBED0004_Body {
             get {
