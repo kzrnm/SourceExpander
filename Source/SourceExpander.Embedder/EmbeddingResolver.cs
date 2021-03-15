@@ -127,13 +127,13 @@ namespace SourceExpander
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
             UpdateCompilation();
             var depSources = new List<SourceFileInfo>();
-            foreach (var (embedded, errors) in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
+            foreach (var (embedded, display, errors) in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
             {
                 foreach (var (key, message) in errors)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EMBED0006_EmbeddedDataError, Location.None,
-                        key, message));
+                        Diagnostic.Create(DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError, Location.None,
+                        display, key, message));
                 }
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {

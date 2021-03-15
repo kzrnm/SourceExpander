@@ -1,49 +1,86 @@
 ﻿using Microsoft.CodeAnalysis;
-#pragma warning disable RS2008
+using SourceExpander.Diagnostics;
+
 namespace SourceExpander
 {
     public static class DiagnosticDescriptors
     {
         public static readonly DiagnosticDescriptor EMBED0001_UnknownError = new(
             "EMBED0001",
-            "Unknown error",
-            "Unknown error: {0}",
-            "EmbedderGenerator",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0001_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0001_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Error",
             DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EMBED0002_OlderVersion = new(
             "EMBED0002",
-            "embeder version is older",
-            "embeder version({0}) is older than {1}({2})",
-            "EmbedderGenerator",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0002_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0002_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Usage",
             DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EMBED0003_ParseConfigError = new(
             "EMBED0003",
-            "Error config file",
-            "Error config file: {0}",
-            "EmbedderGenerator",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0003_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0003_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Error",
             DiagnosticSeverity.Error,
             true);
         public static readonly DiagnosticDescriptor EMBED0004_ErrorEmbeddedSource = new(
             "EMBED0004",
-            "Error embedded source",
-            "Error embedded source: {0}",
-            "EmbedderGenerator",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0004_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0004_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Error",
             DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EMBED0005_EmbeddedSourceDiff = new(
             "EMBED0005",
-            "Different syntax",
-            "Different syntax: near {0}. This is Embedder error, please report this to GitHub repository.",
-            "EmbedderGenerator",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0005_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0005_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "EmbedderError",
             DiagnosticSeverity.Error,
             true);
-        public static readonly DiagnosticDescriptor EMBED0006_EmbeddedDataError = new(
+        public static readonly DiagnosticDescriptor EMBED0006_AnotherAssemblyEmbeddedDataError = new(
             "EMBED0006",
-            "Invalid embedded data",
-            "Invalid embedded data: Key: {0}, Message: {1}",
-            "EmbedderGenerator",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0006_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0006_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Error",
             DiagnosticSeverity.Warning,
             true);
     }
