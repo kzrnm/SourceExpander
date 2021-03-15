@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Embedder
 {
-    public class EmbeddingGeneratorTestBase : GeneratorTestBase
+    public class EmbeddingGeneratorTestBase
     {
         public class Test : CSharpSourceGeneratorTest<EmbedderGenerator>
         {
@@ -32,7 +32,7 @@ namespace SourceExpander.Embedder
 
         public static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(SourceFileInfo).Assembly.Location);
 
-        public static InMemoryAdditionalText enableMinifyJson = new(
+        public static InMemorySourceText enableMinifyJson = new(
             "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
