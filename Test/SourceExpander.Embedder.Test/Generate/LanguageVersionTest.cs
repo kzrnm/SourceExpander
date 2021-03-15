@@ -7,10 +7,16 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class PreProcessTest : EmbeddingGeneratorTestBase
+    public class LanguageVersionTest : EmbeddingGeneratorTestBase
     {
-        [Fact]
-        public async Task Generate()
+        [Theory]
+        [InlineData(LanguageVersion.Latest)]
+        [InlineData(LanguageVersion.LatestMajor)]
+        [InlineData(LanguageVersion.Preview)]
+        [InlineData(LanguageVersion.CSharp7_3)]
+        [InlineData(LanguageVersion.CSharp8)]
+        [InlineData(LanguageVersion.CSharp9)]
+        public async Task Generate(LanguageVersion languageVersion)
         {
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -25,10 +31,7 @@ namespace SourceExpander.Embedder.Generate.Test
 
             var test = new Test
             {
-                ParseOptions = new CSharpParseOptions(LanguageVersion.CSharp9,
-                kind: SourceCodeKind.Regular,
-                documentationMode: DocumentationMode.Parse,
-                preprocessorSymbols: new[] { "Trace", "TEST" }),
+                ParseOptions = new CSharpParseOptions(languageVersion),
                 TestState =
                 {
                     AdditionalFiles =
@@ -41,18 +44,7 @@ namespace SourceExpander.Embedder.Generate.Test
                             @"using System;
 class Program
 {
-    static void Main() =>
-#if TRACE
-    Console.WriteLine(0);
-#else
-    Console.WriteLine(
-#if TEST
-1
-#else
-2
-#endif
-);
-#endif
+    static void Main() => Console.WriteLine(1);
 }
 "
                         ),
@@ -61,7 +53,7 @@ class Program
                     {
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{LanguageVersion.CSharp9.ToDisplayString()}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{languageVersion.MapSpecifiedToEffectiveVersion().ToDisplayString()}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
