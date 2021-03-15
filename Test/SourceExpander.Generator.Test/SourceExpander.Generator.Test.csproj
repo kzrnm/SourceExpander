@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Compile Include="..\Verifiers\CSharpSourceGeneratorTest.cs" Link="Verifiers\CSharpSourceGeneratorTest.cs" />
+    <Compile Include="..\Utils\EnvironmentExtension.cs" Link="Utils\EnvironmentExtension.cs" />
     <Compile Include="..\Utils\InMemorySourceText.cs" Link="Utils\InMemorySourceText.cs" />
   </ItemGroup>
 
@@ -38,12 +39,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SourceExpander.Core\SourceExpander.Core.csproj" />
     <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="testdata\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
