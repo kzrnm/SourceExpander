@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Utils\InMemoryAdditionalText.cs" Link="Utils\InMemoryAdditionalText.cs" />
+    <Compile Include="..\Utils\InMemorySourceText.cs" Link="Utils\InMemorySourceText.cs" />
     <Compile Include="..\Utils\GeneratorTestBase.cs" Link="Utils\GeneratorTestBase.cs" />
   </ItemGroup>
 

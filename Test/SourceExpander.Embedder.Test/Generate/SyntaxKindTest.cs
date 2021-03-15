@@ -1096,7 +1096,7 @@ public class Def
         {
             public override string ToString() => Name;
             public string Name { get; }
-            public InMemoryAdditionalText Source { get; }
+            public InMemorySourceText Source { get; }
             public SourceFileInfo Expected { get; }
             public SourceFileInfo ExpectedMinify { get; }
             public string ExpectedJson { get; }

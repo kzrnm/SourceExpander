@@ -48,10 +48,10 @@ Put2.Write();",
             };
         }
 
-        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText>
         {
             {
-                new InMemoryAdditionalText("/foo/bar/SourceExpander.Generator.Config.json", @"
+                new InMemorySourceText("/foo/bar/SourceExpander.Generator.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": 1
@@ -59,7 +59,7 @@ Put2.Write();",
 ")
             },
             {
-                new InMemoryAdditionalText("/foo/bar/sourceExpander.generator.config.json", @"
+                new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": 1
@@ -67,7 +67,7 @@ Put2.Write();",
 ")
             },
             {
-                new InMemoryAdditionalText("/regexerror/SourceExpander.Generator.Config.json", @"
+                new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": [
@@ -80,7 +80,7 @@ Put2.Write();",
 
         [Theory]
         [MemberData(nameof(ParseErrorJsons))]
-        public void ParseErrorTest(InMemoryAdditionalText additionalText)
+        public void ParseErrorTest(InMemorySourceText additionalText)
         {
             var version = LanguageVersion.Latest;
             var syntaxTrees = CreateTrees(version);
@@ -98,7 +98,7 @@ Put2.Write();",
             var gen = RunGenerator(compilation, generator,
                 additionalTexts: new AdditionalText[] {
                     additionalText,
-                    new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                 },
                 parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
             gen.Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EXPAND0007");
@@ -119,7 +119,7 @@ Put2.Write();",
                 );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
@@ -156,7 +156,7 @@ Put2.Write();",
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
             var pattern = @"source/Program.cs";
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
@@ -222,7 +222,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
 
             // language=regex
             var pattern = @"source/Program\d+\.cs$";
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
@@ -286,7 +286,7 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
                 );
             compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
 
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",

@@ -44,7 +44,7 @@ class Program
             gen.Diagnostics.Should().ContainSingle()
                 .Which
                 .Id
-                .Should().Be("EXPAND0001");
+                .Should().Be("EXPAND0003");
             gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
 
             gen.OutputCompilation.SyntaxTrees
