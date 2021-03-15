@@ -19,11 +19,26 @@ namespace SourceExpander.Roslyn
         private readonly ImmutableHashSet<string>.Builder rootUsingsBuilder = ImmutableHashSet.CreateBuilder<string>();
         public ImmutableHashSet<string> RootUsings() => rootUsingsBuilder.ToImmutable();
 
+        private readonly INamedTypeSymbol? NotEmbeddingSourceAttributeSymbol;
+
         public TypeFindAndUnusedUsingRemover(SemanticModel model, CancellationToken cancellationToken)
         {
             this.model = model;
+            NotEmbeddingSourceAttributeSymbol = model.Compilation.GetTypeByMetadataName("SourceExpander.NotEmbeddingSourceAttribute");
             this.cancellationToken = cancellationToken;
             diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken);
+        }
+
+        private bool HasNotEmbeddingSourceAttribute(SyntaxNode? node)
+        {
+            if (node is MemberDeclarationSyntax declarationSyntax)
+
+                foreach (var attributeListSyntax in declarationSyntax.AttributeLists)
+                    foreach (var attribute in attributeListSyntax.Attributes)
+                        if (model.GetTypeInfo(attribute).Type is ITypeSymbol atSymbol
+                            && SymbolEqualityComparer.Default.Equals(NotEmbeddingSourceAttributeSymbol, atSymbol))
+                            return true;
+            return false;
         }
 
         /// <summary>
@@ -33,10 +48,6 @@ namespace SourceExpander.Roslyn
         private bool FindDeclaredType(MemberDeclarationSyntax node)
         {
             if (model.GetDeclaredSymbol(node, cancellationToken) is not ITypeSymbol symbol)
-                return false;
-
-            if (symbol.GetAttributes()
-                .Any(at => at.AttributeClass?.ToString() == "SourceExpander.NotEmbeddingSourceAttribute"))
                 return false;
 
             var typeName = symbol?.ToDisplayString();
@@ -50,6 +61,8 @@ namespace SourceExpander.Roslyn
 
         public override SyntaxNode? Visit(SyntaxNode? node)
         {
+            if (HasNotEmbeddingSourceAttribute(node))
+                return null;
             if (node is BaseTypeDeclarationSyntax typeDeclaration)
             {
                 if (!FindDeclaredType(typeDeclaration))
