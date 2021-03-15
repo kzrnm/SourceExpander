@@ -975,17 +975,6 @@ public class Def
             ),
         };
 
-        private static readonly CSharpParseOptions parseOptions
-            = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
-            .WithLanguageVersion(LanguageVersion.CSharp9);
-
-        private static readonly CSharpCompilationOptions compilationOptions
-            = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithAllowUnsafe(true)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        {"CS8019",ReportDiagnostic.Suppress },
-                    });
-
         public static readonly IEnumerable<object[]> TestTableArgs = TestTable.Select(d => new object[] { d });
 
         public static readonly Dictionary<string, TestData> TestTableDic = TestTable.ToDictionary(d => d.Name);

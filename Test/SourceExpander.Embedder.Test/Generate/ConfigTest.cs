@@ -8,10 +8,10 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class ConfigTest : EmbeddingGeneratorTestBase
     {
-        public static TheoryData ParseErrorJsons = new TheoryData<InMemoryAdditionalText>
+        public static TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText>
         {
             {
-                new InMemoryAdditionalText(
+                new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -21,7 +21,7 @@ namespace SourceExpander.Embedder.Generate.Test
 ")
             },
             {
-                new InMemoryAdditionalText(
+                new InMemorySourceText(
                 "/foo/bar/sourceExpander.embedder.config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -34,7 +34,7 @@ namespace SourceExpander.Embedder.Generate.Test
 
         [Theory]
         [MemberData(nameof(ParseErrorJsons))]
-        public async Task ParseErrorTest(InMemoryAdditionalText additionalText)
+        public async Task ParseErrorTest(InMemorySourceText additionalText)
         {
             var test = new Test
             {
@@ -43,7 +43,7 @@ namespace SourceExpander.Embedder.Generate.Test
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -78,7 +78,7 @@ class Program
         [Fact]
         public async Task NotEnabled()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -97,7 +97,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -123,7 +123,7 @@ class Program
         [Fact]
         public async Task ExcludeAttributes()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -153,7 +153,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -198,7 +198,7 @@ class Program
         [Fact]
         public async Task EmbeddingRaw()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -225,7 +225,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -270,7 +270,7 @@ class Program
         [Fact]
         public async Task EmbeddingGzipBase32768()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -297,7 +297,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -345,7 +345,7 @@ class Program
         [Fact]
         public async Task ConditionalNone()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -372,7 +372,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -414,7 +414,7 @@ class Program
         [Fact]
         public async Task Conditional()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -444,7 +444,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -497,7 +497,7 @@ class Program
         [Fact]
         public async Task EmbeddingSourceClassNone()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -528,7 +528,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -570,7 +570,7 @@ class Program
         [Fact]
         public async Task EmbeddingSourceClass()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -601,7 +601,7 @@ class Program
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -673,7 +673,7 @@ public class SourceFileInfo{
         [Fact]
         public async Task EmbeddingSourceClassDefault()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -703,7 +703,7 @@ public class SourceFileInfo{
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -775,7 +775,7 @@ public class SourceFileInfo{
         [Fact]
         public async Task EmbeddingSourceClassAlways()
         {
-            var additionalText = new InMemoryAdditionalText(
+            var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
@@ -806,7 +806,7 @@ public class SourceFileInfo{
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemoryAdditionalText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (

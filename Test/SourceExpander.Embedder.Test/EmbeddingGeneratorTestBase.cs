@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Runtime.Loader;
+﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
@@ -29,9 +26,6 @@ namespace SourceExpander.Embedder
         private static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.CSharp9;
         public static string EmbeddedLanguageVersion => EmbeddedLanguageVersionEnum.ToDisplayString();
 
-
-        public static readonly MetadataReference expanderCoreReference = MetadataReference.CreateFromFile(typeof(SourceFileInfo).Assembly.Location);
-
         public static InMemorySourceText enableMinifyJson = new(
             "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
@@ -40,23 +34,5 @@ namespace SourceExpander.Embedder
     ""enable-minify"": true
 }
 ");
-        internal static object GetExpandedFiles(Compilation compilation)
-        {
-            using var ms = new MemoryStream();
-            if (!compilation.Emit(ms).Success)
-                throw new ArgumentException("compilation is failed", nameof(compilation));
-            ms.Position = 0;
-            var alc = new AssemblyLoadContext("GetExpandedFiles", true);
-            try
-            {
-                return alc.LoadFromStream(ms)
-                    .GetType("SourceExpander.Expanded.ExpandedContainer")
-                    .GetProperty("Files").GetValue(null);
-            }
-            finally
-            {
-                alc.Unload();
-            }
-        }
     }
 }
