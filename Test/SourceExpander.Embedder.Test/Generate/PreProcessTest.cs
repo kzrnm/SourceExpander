@@ -21,7 +21,7 @@ namespace SourceExpander.Embedder.Generate.Test
                      ImmutableArray.Create<string>(),
                      @"class Program{static void Main()=>Console.WriteLine(1);}"
                  ));
-            const string embeddedSourceCode = "㘅桠ҠҠҠ伖㿂⢃㹈㝟謝櫴⫢ꃵ鮱䯧腪䃺亇溦䫉峉㚬卤齏浑懆ᒾꑉ疱吧灊Ң遰䲑廛䐬痯㻼ꃲ鞓磂駄澚䱽儺㐛မ鐨頪覉杆琪ҹ疙盈䂅䩨卷圢頇ᅖ䉱捭羧鯣讫ꗟ奃泲嫀鏿⣀藀彷迤豜緜酲跀渑棗悿癲䣇ᕊ詠Ҡ";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
             var test = new Test
             {
@@ -62,18 +62,16 @@ class Program
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
                 }
             };
             await test.RunAsync();
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }

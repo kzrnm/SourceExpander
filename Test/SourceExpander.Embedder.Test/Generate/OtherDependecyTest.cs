@@ -53,7 +53,7 @@ namespace SourceExpander.Embedder.Generate.Test
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 ));
-            const string embeddedSourceCode = "㘅桠ҠҠҠ傶䗂⣂㹆䟗鬜熬㖀ⲣ輡毳䍠韀ꐪ⨺ᘭ嫕㱫浈葍禤䣇緦炼燻ꜜ楧蝫㑭企墓ᣒ⢪烥崴ᓝꖞ毶粎䭠咼窪㝓㘪赕䛫嫟⩅瀇㤃毥䃲㤹䖨訕誁箦彔㕉貸㟔驪㟠炔䌲ᓲ哑⢑㜼椹䄑舺┴獤兪ꂍ鏧綿祯䠢靣韈䦭䷁朇꜡塑㢴崒ꋲ包䅨鵹嚠ꀿ䧏速征従䆗缞麿禯柏襳鞫ꀌ虄霍噖㬋ᆈ鉢雰䠷ꌮ甈䤿扠■ƃ";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
 
             var others = new SourceFileCollection{
                 (
@@ -113,18 +113,16 @@ namespace Mine{
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
                 }
             };
             await test.RunAsync();
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
@@ -149,7 +147,7 @@ namespace Mine{
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 ));
-            const string embeddedSourceCode = "㘅桠ҠҠҠ傶䗂⣂㹆䟗鬜熬㖀ⲣ輡毳䍠韀ꐪ⨺ᘭ嫕㱫浈葍禤䣇緦炼燻ꜜ楧蝫㑭企墓ᣒ⢪烥崴ᓝꖞ毶粎䭠咼窪㝓㘪赕䛫嫟⩅瀇㤃毥䃲㤹䖨訕誁箦彔㕉貸㟔驪㟠炔䌲ᓲ哑⢑㜼椹䄑舺┴獤兪ꂍ鏧綿祯䠢靣韈䦭䷁朇꜡塑㢴崒ꋲ包䅨鵹嚠ꀿ䧏速征従䆗缞麿禯柏襳鞫ꀌ虄霍噖㬋ᆈ鉢雰䠷ꌮ甈䤿扠■ƃ";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
 
             var others = new SourceFileCollection{
                 (
@@ -210,18 +208,16 @@ namespace Mine{
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
                 }
             };
             await test.RunAsync();
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
@@ -238,7 +234,7 @@ namespace Mine{
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 ));
-            const string embeddedSourceCode = "㘅桠ҠҠҠ俕䎶⣂㹊旅呴韄硕ᆈ㒆璊Ꮥ樉仉楁㢌疠嵪睚鸳┇䠓淓ꊿ曈䓼丈蝄檪佰蔦㜦懧跈沑歹㿔⣂䥟㑻ꆗ䦘吪攙礥㑼犃藰艅泄㠏茳⠝ꀀ䞑蟭ᓏ瞈柢药烮ᒱ揓謬荎瀐畞泵㇀毙噂骊寗䆡ꗡᄙ恳缷臈㥯虤㼈们蕠ҠƟ";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
 
             var others = new SourceFileCollection{
                 (
@@ -286,18 +282,16 @@ namespace Mine{
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
                 }
             };
             await test.RunAsync();
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
@@ -314,7 +308,7 @@ namespace Mine{
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 ));
-            const string embeddedSourceCode = "㘅桠ҠҠҠ俕䎶⣂㹊旅呴韄硕ᆈ㒆璊Ꮥ樉仉楁㢌疠嵪睚鸳┇䠓淓ꊿ曈䓼丈蝄檪佰蔦㜦懧跈沑歹㿔⣂䥟㑻ꆗ䦘吪攙礥㑼犃藰艅泄㠏茳⠝ꀀ䞑蟭ᓏ瞈柢药烮ᒱ揓謬荎瀐畞泵㇀毙噂骊寗䆡ꗡᄙ恳缷臈㥯虤㼈们蕠ҠƟ";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
 
             var others = new SourceFileCollection{
                 (
@@ -361,18 +355,16 @@ namespace Mine{
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
                 }
             };
             await test.RunAsync();
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
@@ -389,7 +381,7 @@ namespace Mine{
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 ));
-            const string embeddedSourceCode = "㘅桠ҠҠҠ俕䎶⣂㹊旅呴韄硕ᆈ㒆璊Ꮥ樉仉楁㢌疠嵪睚鸳┇䠓淓ꊿ曈䓼丈蝄檪佰蔦㜦懧跈沑歹㿔⣂䥟㑻ꆗ䦘吪攙礥㑼犃藰艅泄㠏茳⠝ꀀ䞑蟭ᓏ瞈柢药烮ᒱ揓謬荎瀐畞泵㇀毙噂骊寗䆡ꗡᄙ恳缷臈㥯虤㼈们蕠ҠƟ";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
 
             var others = new SourceFileCollection{
                 (
@@ -398,7 +390,7 @@ namespace Mine{
                 ),
                 (
                 @"/home/other/AssemblyInfo.cs",
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode.GZipBase32768"", ""㘅桠ҠҠҠ俕䎶⣂㹊"")]"
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""㘅桠ҠҠҠ俕䎶⣂㹊"")]"
                 ),
             };
 
@@ -429,25 +421,23 @@ namespace Mine{
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("SourceExpander.EmbeddedSourceCode.GZipBase32768", "Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''."),
+                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character 'ã'."),
                     },
                     GeneratedSources =
                     {
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
 [assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
 "),
                     }
                 }
             };
             await test.RunAsync();
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }

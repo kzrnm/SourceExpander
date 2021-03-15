@@ -36,6 +36,7 @@ namespace SourceExpander.Embedder
             "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-type"": ""Raw"",
     ""enable-minify"": true
 }
 ");
