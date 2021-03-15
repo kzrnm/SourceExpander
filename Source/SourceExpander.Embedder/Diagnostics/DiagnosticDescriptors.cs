@@ -67,7 +67,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EMBED0005_Body),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "EmbedderError",
+            "Error",
             DiagnosticSeverity.Error,
             true);
         public static readonly DiagnosticDescriptor EMBED0006_AnotherAssemblyEmbeddedDataError = new(

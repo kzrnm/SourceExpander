@@ -28,7 +28,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EXPAND0002_Body),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "Error",
+            "Usage",
             DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EXPAND0003_NotFoundEmbedded = new(
@@ -41,7 +41,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EXPAND0003_Title),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "Error",
+            "Usage",
             DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EXPAND0004_MustBeNewerThanCSharp3 = new(
@@ -54,7 +54,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EXPAND0004_Title),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "Error",
+            "Usage",
             DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EXPAND0005_NewerCSharpVersion = new(
@@ -67,7 +67,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EXPAND0005_Body),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "Error",
+            "Usage",
             DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EXPAND0006_AllowUnsafe = new(
@@ -80,7 +80,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EXPAND0006_Body),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "Error",
+            "Usage",
             DiagnosticSeverity.Warning,
             true);
         public static readonly DiagnosticDescriptor EXPAND0007_ParseConfigError = new(
