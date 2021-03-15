@@ -39,5 +39,12 @@ namespace SourceExpander.Roslyn
             "EmbedderGenerator",
             DiagnosticSeverity.Error,
             true);
+        public static readonly DiagnosticDescriptor EMBED0006_EmbeddedDataError = new(
+            "EMBED0006",
+            "Invalid embedded data",
+            "Invalid embedded data: Key: {0}, Message: {1}",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

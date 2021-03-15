@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -40,6 +42,8 @@ namespace SourceExpander
             container = new SourceFileContainer(WithCheck(embeddedDatas));
             expander = new CompilationExpander(compilation, container, config);
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
         {
             if (!config.Enabled)
@@ -66,10 +70,16 @@ namespace SourceExpander
 
         public bool IsEmbeddedEmpty => container.Count == 0;
 
-        private IEnumerable<EmbeddedData> WithCheck(IEnumerable<EmbeddedData> embeddedDatas)
+        private IEnumerable<EmbeddedData> WithCheck(IEnumerable<(EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)> embeddedDatas)
         {
-            foreach (var embedded in embeddedDatas)
+            foreach (var (embedded, errors) in embeddedDatas)
             {
+                foreach (var (key, message) in errors)
+                {
+                    reporter.ReportDiagnostic(
+                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0008_EmbeddedDataError, Location.None,
+                        key, message));
+                }
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
                     reporter.ReportDiagnostic(

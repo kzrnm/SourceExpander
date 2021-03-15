@@ -302,9 +302,7 @@ namespace Mine{
                 .BeEquivalentTo(embeddedFiles);
         }
 
-
-
-        [Fact(Skip = "Unimplemented")]
+        [Fact]
         public async Task InvalidRaw()
         {
             var embeddedFiles = ImmutableArray.Create(
@@ -356,7 +354,82 @@ namespace Mine{
                     },
                     ExpectedDiagnostics =
                     {
-                        //DiagnosticResult.CompilerWarning("EMBED0001").WithArguments(EmbedderVersion, "Other", "2147483647.2147483647.2147483647.2147483647")
+                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. The token '\"' was expected but found '-'.")
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
+
+        [Fact]
+        public async Task InvalidGZipBase32768()
+        {
+            var embeddedFiles = ImmutableArray.Create(
+                new SourceFileInfo
+                (
+                    "TestProject>C.cs",
+                    new string[] { "Mine.C" },
+                    Array.Empty<string>(),
+                    Array.Empty<string>(),
+                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ));
+            const string embeddedSourceCode = "㘅桠ҠҠҠ俕䎶⣂㹊旅呴韄硕ᆈ㒆璊Ꮥ樉仉楁㢌疠嵪睚鸳┇䠓淓ꊿ曈䓼丈蝄檪佰蔦㜦懧跈沑歹㿔⣂䥟㑻ꆗ䦘吪攙礥㑼犃藰艅泄㠏茳⠝ꀀ䞑蟭ᓏ瞈柢药烮ᒱ揓謬荎瀐畞泵㇀毙噂骊寗䆡ꗡᄙ恳缷臈㥯虤㼈们蕠ҠƟ";
+
+            var others = new SourceFileCollection{
+                (
+                "home/other/C.cs",
+                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode.GZipBase32768"", ""㘅桠ҠҠҠ俕䎶⣂㹊"")]"
+                ),
+            };
+
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            @"/home/mine/C.cs",
+                            @"
+namespace Mine{
+    public static class C
+    {
+        public static void P() => System.Console.WriteLine();
+    }
+}"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("SourceExpander.EmbeddedSourceCode.GZipBase32768", "Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''."),
                     },
                     GeneratedSources =
                     {

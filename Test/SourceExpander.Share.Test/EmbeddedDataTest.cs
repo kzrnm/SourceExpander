@@ -13,13 +13,13 @@ namespace SourceExpander.Share.Test
         {
             EmbeddedData.Create("Empty", ImmutableDictionary.Create<string, string>())
                 .Should()
-                .BeEquivalentTo(new EmbeddedData(
+                .BeEquivalentTo((new EmbeddedData(
                     "Empty",
                     ImmutableArray.Create<SourceFileInfo>(),
                     new Version(1, 0, 0),
                     LanguageVersion.CSharp1
                     , false
-                    ));
+                    ), ImmutableArray<(string Key, string Message)>.Empty));
         }
 
         [Fact]
@@ -28,13 +28,13 @@ namespace SourceExpander.Share.Test
             EmbeddedData.Create("Version",
                 ImmutableDictionary.Create<string, string>().Add("SourceExpander.EmbedderVersion", "3.4.0.0"))
                 .Should()
-                .BeEquivalentTo(new EmbeddedData(
+                .BeEquivalentTo((new EmbeddedData(
                     "Version",
                     ImmutableArray.Create<SourceFileInfo>(),
                     new Version(3, 4, 0, 0),
                     LanguageVersion.CSharp1,
                     false
-                    ));
+                    ), ImmutableArray<(string Key, string Message)>.Empty));
         }
 
 
@@ -48,13 +48,13 @@ namespace SourceExpander.Share.Test
             EmbeddedData.Create("CSharpLanguageVersion",
                 ImmutableDictionary.Create<string, string>().Add("SourceExpander.EmbeddedLanguageVersion", embbeddedVersion))
                 .Should()
-                .BeEquivalentTo(new EmbeddedData(
+                .BeEquivalentTo((new EmbeddedData(
                     "CSharpLanguageVersion",
                     ImmutableArray.Create<SourceFileInfo>(),
                     new Version(1, 0, 0),
                     expectedVersion,
                     false
-                    ));
+                    ), ImmutableArray<(string Key, string Message)>.Empty));
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace SourceExpander.Share.Test
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                 .Add("SourceExpander.EmbeddedLanguageVersion", "7.3"))
                 .Should()
-                .BeEquivalentTo(expected);
+                .BeEquivalentTo((expected, ImmutableArray<(string Key, string Message)>.Empty));
 
             EmbeddedData.Create("RawJson",
                 ImmutableDictionary.Create<string, string>()
@@ -105,9 +105,39 @@ namespace SourceExpander.Share.Test
                .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                .Add("SourceExpander.EmbeddedSourceCode", json))
                 .Should()
-                .BeEquivalentTo(expected);
+                .BeEquivalentTo((expected, ImmutableArray<(string Key, string Message)>.Empty));
         }
 
+        [Fact]
+        public void RawJsonError()
+        {
+            string json = "[{]}]";
+            EmbeddedData.Create("RawJson",
+                ImmutableDictionary.Create<string, string>()
+                .Add("SourceExpander.EmbeddedSourceCode", json)
+                .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
+                .Add("SourceExpander.EmbeddedLanguageVersion", "7.3"))
+                .Should()
+                .BeEquivalentTo((
+                new EmbeddedData("RawJson",
+                ImmutableArray<SourceFileInfo>.Empty,
+                new(3, 4, 0, 0),
+                LanguageVersion.CSharp7_3, false),
+                ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. The token '\"' was expected but found ']'."))));
+
+            EmbeddedData.Create("RawJson",
+                ImmutableDictionary.Create<string, string>()
+               .Add("SourceExpander.EmbeddedLanguageVersion", "7.3")
+               .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
+               .Add("SourceExpander.EmbeddedSourceCode", json))
+                .Should()
+                .BeEquivalentTo((
+                new EmbeddedData("RawJson",
+                ImmutableArray<SourceFileInfo>.Empty,
+                new(3, 4, 0, 0),
+                LanguageVersion.CSharp7_3, false),
+                ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. The token '\"' was expected but found ']'."))));
+        }
         [Fact]
         public void GZipBase32768()
         {
@@ -133,14 +163,14 @@ namespace SourceExpander.Share.Test
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
             )
                 .Should()
-                .BeEquivalentTo(expected);
+                .BeEquivalentTo((expected, ImmutableArray<(string Key, string Message)>.Empty));
             EmbeddedData.Create("GZipBase32768", ImmutableDictionary.Create<string, string>()
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                 .Add("SourceExpander.EmbeddedLanguageVersion", "1")
                 .Add("SourceExpander.EmbeddedSourceCode.GZipBase32768", gzipBase32768)
             )
                 .Should()
-                .BeEquivalentTo(expected);
+                .BeEquivalentTo((expected, ImmutableArray<(string Key, string Message)>.Empty));
         }
     }
 }
