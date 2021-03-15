@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -12,27 +9,6 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class OtherDependencyTest : EmbedderGeneratorTestBase
     {
-        static Solution CreateOtherReference(Solution solution,
-            ProjectId projectId,
-            SourceFileCollection documents,
-            CSharpCompilationOptions compilationOptions = null)
-        {
-            if (compilationOptions is null)
-                compilationOptions = new(OutputKind.DynamicallyLinkedLibrary);
-
-            var targetProject = solution.GetProject(projectId);
-
-            var project = solution.AddProject("Other", "Other", "C#")
-                .WithMetadataReferences(targetProject.MetadataReferences)
-                .WithCompilationOptions(compilationOptions);
-            foreach (var (filename, content) in documents)
-            {
-                project = project.AddDocument(Path.GetFileNameWithoutExtension(filename), content, filePath: filename).Project;
-            }
-
-            return project.Solution.AddProjectReference(projectId, new(project.Id));
-        }
-
         [Fact]
         public async Task OtherRaw()
         {
