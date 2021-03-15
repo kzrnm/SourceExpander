@@ -16,5 +16,7 @@ namespace SourceExpander
         public override string Path { get; }
         private readonly SourceText sourceText;
         public override SourceText GetText(CancellationToken cancellationToken = default) => sourceText;
+        public static implicit operator (string filename, SourceText content)(InMemoryAdditionalText at)
+            => (at.Path, at.sourceText);
     }
 }

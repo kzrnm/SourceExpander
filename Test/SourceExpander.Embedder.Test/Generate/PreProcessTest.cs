@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Immutable;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
@@ -7,45 +9,73 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class PreProcessTest : EmbeddingGeneratorTestBase
     {
-        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
-
         [Fact]
-        public void GenerateTest()
+        public async Task Generate()
         {
-            var compilation = CreateCompilation(
-                new[] { CSharpSyntaxTree.ParseText(@"using System;
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create<string>(),
+                     @"class Program{static void Main()=>Console.WriteLine(1);}"
+                 ));
+            const string embeddedSourceCode = "㘅桠ҠҠҠ伖㿂⢃㹈㝟謝櫴⫢ꃵ鮱䯧腪䃺亇溦䫉峉㚬卤齏浑懆ᒾꑉ疱吧灊Ң遰䲑廛䐬痯㻼ꃲ鞓磂駄澚䱽儺㐛မ鐨頪覉杆琪ҹ疙盈䂅䩨卷圢頇ᅖ䉱捭羧鯣讫ꗟ奃泲嫀鏿⣀藀彷迤豜緜酲跀渑棗悿癲䣇ᕊ詠Ҡ";
+
+            var test = new Test
+            {
+                ParseOptions = new CSharpParseOptions(LanguageVersion.CSharp9,
+                kind: SourceCodeKind.Regular,
+                documentationMode: DocumentationMode.Parse,
+                preprocessorSymbols: new[] { "Trace", "TEST" }),
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"using System;
 class Program
 {
     static void Main() =>
 #if TRACE
     Console.WriteLine(0);
 #else
-    Console.WriteLine(1);
+    Console.WriteLine(
+#if TEST
+1
+#else
+2
+#endif
+);
 #endif
 }
-",
-new CSharpParseOptions(preprocessorSymbols:new[]{ "Trace" }),
-path: "Program.cs") },
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
-                additionalMetadatas: new[] { expanderCoreReference });
-            compilation.SyntaxTrees.Should().HaveCount(1);
-            compilation.GetDiagnostics().Should().BeEmpty();
-
-            var generator = new EmbedderGenerator();
-            var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
-
-            var newTree = gen.AddedSyntaxTrees
+"
+                        ),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",""{embeddedSourceCode}"")]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
                 .Should()
-                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
-                .Which;
-            newTree.ToString().Should().ContainAll(
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\","
-                );
-            newTree.GetDiagnostics().Should().BeEmpty();
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,61 +22,73 @@ namespace SourceExpander
                 foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
                     ctx.AddSource(hintName, sourceText);
             });
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         public void Execute(GeneratorExecutionContext context)
         {
-#if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                //System.Diagnostics.Debugger.Launch();
-            }
-#endif
-
-            if (context.Compilation is not CSharpCompilation compilation) return;
-            if (!compilation.SyntaxTrees.Any()) return;
-            if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;
-
-            var configText = context.AdditionalFiles
-                .FirstOrDefault(a =>
-                    StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
-                ?.GetText(context.CancellationToken);
-
-            EmbedderConfig config;
             try
             {
-                config = EmbedderConfig.Parse(configText, context.CancellationToken);
-            }
-            catch (ParseConfigException e)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0003_ParseConfigError, Location.None, e.Message));
-                return;
-            }
-            if (!config.Enabled)
-                return;
+#if DEBUG
+                if (!System.Diagnostics.Debugger.IsAttached)
+                {
+                    //System.Diagnostics.Debugger.Launch();
+                }
+#endif
 
-            var embeddingContext = new EmbeddingContext(
-                compilation,
-                (CSharpParseOptions)context.ParseOptions,
-                new DiagnosticReporter(context),
-                config,
-                context.CancellationToken);
+                if (context.Compilation is not CSharpCompilation compilation) return;
+                if (!compilation.SyntaxTrees.Any()) return;
+                if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;
 
-            var resolver = new EmbeddingResolver(embeddingContext);
-            var resolvedSources = resolver.ResolveFiles();
+                var configText = context.AdditionalFiles
+                    .FirstOrDefault(a =>
+                        StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+                    ?.GetText(context.CancellationToken);
 
-            if (resolvedSources.Length == 0)
-                return;
+                EmbedderConfig config;
+                try
+                {
+                    config = EmbedderConfig.Parse(configText, context.CancellationToken);
+                }
+                catch (ParseConfigException e)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.EMBED0003_ParseConfigError, Location.None, e.Message));
+                    return;
+                }
+                if (!config.Enabled)
+                    return;
 
-            var sb = CreateMetadataSource(new StringBuilder(), resolver.EnumerateAssemblyMetadata());
+                var embeddingContext = new EmbeddingContext(
+                    compilation,
+                    (CSharpParseOptions)context.ParseOptions,
+                    new DiagnosticReporter(context),
+                    config,
+                    context.CancellationToken);
 
-            if (config.EmbeddingSourceClass.Enabled)
+                var resolver = new EmbeddingResolver(embeddingContext);
+                var resolvedSources = resolver.ResolveFiles();
+
+                if (resolvedSources.Length == 0)
+                    return;
+
+                var sb = CreateMetadataSource(new StringBuilder(), resolver.EnumerateAssemblyMetadata());
+
+                if (config.EmbeddingSourceClass.Enabled)
+                    context.AddSource(
+                        "EmbeddingSourceClass.cs",
+                        CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
+
                 context.AddSource(
-                    "EmbeddingSourceClass.cs",
-                    CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
+                    "EmbeddedSourceCode.Metadata.cs",
+                    SourceText.From(sb.ToString(), Encoding.UTF8));
 
-            context.AddSource(
-                "EmbeddedSourceCode.Metadata.cs",
-                SourceText.From(sb.ToString(), Encoding.UTF8));
+            }
+            catch(Exception e)
+            {
+                Trace.WriteLine(e.ToString());
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0001_UnknownError, Location.None));
+            }
         }
 
         private static StringBuilder CreateMetadataSource(StringBuilder sb, IEnumerable<(string Key, string Value)> metadatas)

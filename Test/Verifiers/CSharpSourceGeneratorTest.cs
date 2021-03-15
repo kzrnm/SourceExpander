@@ -10,9 +10,9 @@ namespace SourceExpander
     public class CSharpSourceGeneratorTest<TSourceGenerator> : CSharpSourceGeneratorTest<TSourceGenerator, XUnitVerifier>
         where TSourceGenerator : ISourceGenerator, new()
     {
-        public CSharpCompilationOptions CompilationOptions { get; set; }
-        protected override CompilationOptions CreateCompilationOptions() => CompilationOptions ?? base.CreateCompilationOptions();
-        public CSharpParseOptions ParseOptions { get; set; }
-        protected override ParseOptions CreateParseOptions() => ParseOptions ?? base.CreateParseOptions();
+        public CSharpCompilationOptions CompilationOptions { get; set; } = new(OutputKind.DynamicallyLinkedLibrary);
+        protected override CompilationOptions CreateCompilationOptions() => CompilationOptions;
+        public CSharpParseOptions ParseOptions { get; set; } = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        protected override ParseOptions CreateParseOptions() => ParseOptions;
     }
 }

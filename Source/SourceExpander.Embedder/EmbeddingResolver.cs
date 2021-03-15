@@ -132,7 +132,7 @@ namespace SourceExpander
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EMBED0001_OlderVersion, Location.None,
+                        Diagnostic.Create(DiagnosticDescriptors.EMBED0002_OlderVersion, Location.None,
                         AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
                 }
                 depSources.AddRange(embedded.Sources);

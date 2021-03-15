@@ -4,19 +4,19 @@ namespace SourceExpander.Roslyn
 {
     public static class DiagnosticDescriptors
     {
-        public static readonly DiagnosticDescriptor EMBED0001_OlderVersion = new(
+        public static readonly DiagnosticDescriptor EMBED0001_UnknownError = new(
             "EMBED0001",
+            "Unknown error",
+            "Unknown error",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Warning,
+            true);
+        public static readonly DiagnosticDescriptor EMBED0002_OlderVersion = new(
+            "EMBED0002",
             "embeder version is older",
             "embeder version({0}) is older than {1}({2})",
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
-            true);
-        public static readonly DiagnosticDescriptor EMBED0002_NotCSharp = new(
-            "EMBED0002",
-            "Compilation must be C#",
-            "Compilation must be C#",
-            "EmbedderGenerator",
-            DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EMBED0003_ParseConfigError = new(
             "EMBED0003",
