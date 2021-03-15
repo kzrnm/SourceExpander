@@ -1,165 +1,177 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SourceExpander.Expanded;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace SourceExpander.Generator.Generate.Test
 {
-    public class LangVersion7_2Test : ExpandGeneratorTestBase
+    public class LangVersionTest : ExpandGeneratorTestBase
     {
-        private static readonly CompilationReference newerEmbedderCompilationRef =
-            CreateCompilation(
-                new[] {
-                    CSharpSyntaxTree.ParseText(
-                    @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
-                    + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2.0.0.0"")]"
-                    + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
-                    , path: @"/home/other/AssemblyInfo.cs"),
-                },
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
-                additionalMetadatas: new[] { coreReference },
-                assemblyName: "OtherDependency"
-        ).ToMetadataReference();
-        private static IEnumerable<SyntaxTree> CreateSyntaxTrees(LanguageVersion languageVersion)
+        readonly SourceFileCollection others = new()
         {
-            yield return CSharpSyntaxTree.ParseText(
-                @"using System;
-using SampleLibrary;
-
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
-    }
-}",
-                options: new CSharpParseOptions(documentationMode: DocumentationMode.None)
-                .WithLanguageVersion(languageVersion),
-                path: "/home/source/Program.cs");
-        }
+            (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+            (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+        };
 
         [Theory]
         [InlineData(LanguageVersion.CSharp7_2)]
         [InlineData(LanguageVersion.CSharp8)]
-        public void Success(LanguageVersion languageVersion)
+        [InlineData(LanguageVersion.CSharp9)]
+        public async Task Success(LanguageVersion version)
         {
-            var compilation = CreateCompilation(
-                CreateSyntaxTrees(languageVersion),
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference).Append(newerEmbedderCompilationRef)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(1);
+            var test = new Test
+            {
+                ParseOptions = new(version),
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
 
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse).WithLanguageVersion(languageVersion));
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
-
-            gen.OutputCompilation.SyntaxTrees
-                .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
-            files.Should().HaveCount(1);
-            files["/home/source/Program.cs"].Should()
-                .BeEquivalentTo(
-                new SourceCode(
-                    path: "/home/source/Program.cs",
-                    code: @"using SampleLibrary;
-using System;
-using System.Diagnostics;
 class Program
 {
     static void Main()
     {
         Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
+        C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
-namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
-")
-                );
-
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.Diagnostics.Should().BeEmpty();
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
         }
 
+
         [Theory]
+        [InlineData(LanguageVersion.CSharp4)]
+        [InlineData(LanguageVersion.CSharp5)]
         [InlineData(LanguageVersion.CSharp6)]
         [InlineData(LanguageVersion.CSharp7)]
         [InlineData(LanguageVersion.CSharp7_1)]
-        public void Failure(LanguageVersion languageVersion)
+        public async Task Failure(LanguageVersion version)
         {
-            var compilation = CreateCompilation(
-                CreateSyntaxTrees(languageVersion),
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference).Append(newerEmbedderCompilationRef)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(1);
+            var test = new Test
+            {
+                ParseOptions = new(version),
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
 
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse).WithLanguageVersion(languageVersion));
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(2);
-
-            gen.OutputCompilation.SyntaxTrees
-                .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
-            files.Should().HaveCount(1);
-            files["/home/source/Program.cs"].Should()
-                .BeEquivalentTo(
-                new SourceCode(
-                    path: "/home/source/Program.cs",
-                    code: @"using SampleLibrary;
-using System;
-using System.Diagnostics;
 class Program
 {
     static void Main()
     {
         Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
+        C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
-namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
-")
-                );
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                           DiagnosticResult.CompilerWarning("EXPAND0005").WithArguments(version.ToDisplayString(), "Other", "7.2"),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
+        }
 
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            var diagnostic = gen.Diagnostics
-                .Should()
-                .ContainSingle()
-                .Which;
-            diagnostic.Id.Should().Be("EXPAND0005");
-            diagnostic.DefaultSeverity.Should().Be(DiagnosticSeverity.Warning);
-            diagnostic.GetMessage()
-                .Should()
-                .Be($"C# version({languageVersion.ToDisplayString()}) is older than embedded OtherDependency(7.2)");
+        [Theory]
+        [InlineData(LanguageVersion.CSharp1)]
+        [InlineData(LanguageVersion.CSharp2)]
+        [InlineData(LanguageVersion.CSharp3)]
+        public async Task FailureWithCSharp3OrOlder(LanguageVersion version)
+        {
+            var test = new Test
+            {
+                ParseOptions = new(version),
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        new DiagnosticResult("EXPAND0004", DiagnosticSeverity.Info).WithArguments(version.ToDisplayString()),
+                    }
+                }
+            };
+            await test.RunAsync();
         }
     }
 }

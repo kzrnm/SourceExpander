@@ -1,54 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using SourceExpander.Expanded;
+﻿using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace SourceExpander.Generator.Generate.Test
 {
     public class ConfigTest : ExpandGeneratorTestBase
     {
-        private static SyntaxTree[] CreateTrees(LanguageVersion languageVersion)
-        {
-            var opts = new CSharpParseOptions(documentationMode: DocumentationMode.None)
-                .WithLanguageVersion(languageVersion);
-            return new[]
-            {
-                CSharpSyntaxTree.ParseText(
-                    @"using System;
-using SampleLibrary;
-
-class Program
-{
-    static void P()
-    {
-        Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
-    }
-}",
-                    options: opts,
-                    path: "/home/source/Program.cs"),
-                CSharpSyntaxTree.ParseText(
-                    @"using System;
-using System.Reflection;
-using SampleLibrary;
-using static System.MathF;
-using M = System.Math;
-
-
-Console.WriteLine(42);
-Put2.Write();",
-                    options: opts,
-                    path: "/home/source/Program2.cs"),
-            };
-        }
-
-        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText>
+        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText, string>
         {
             {
                 new InMemorySourceText("/foo/bar/SourceExpander.Generator.Config.json", @"
@@ -56,7 +14,8 @@ Put2.Write();",
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": 1
 }
-")
+"),
+                "Expecting state 'Element'.. Encountered 'Text'  with name '', namespace ''."
             },
             {
                 new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", @"
@@ -64,7 +23,8 @@ Put2.Write();",
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": 1
 }
-")
+"),
+                "Expecting state 'Element'.. Encountered 'Text'  with name '', namespace ''."
             },
             {
                 new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", @"
@@ -74,51 +34,93 @@ Put2.Write();",
         ""(""
     ]
 }
-")
+"),
+                "Invalid pattern '(' at offset 1. Not enough )'s."
             },
         };
 
         [Theory]
         [MemberData(nameof(ParseErrorJsons))]
-        public void ParseErrorTest(InMemorySourceText additionalText)
+        public async Task ParseErrorTest(InMemorySourceText additionalText, string diagnosticsArg)
         {
-            var version = LanguageVersion.Latest;
-            var syntaxTrees = CreateTrees(version);
-            var compilation = CreateCompilation(
-                syntaxTrees,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
 
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new AdditionalText[] {
-                    additionalText,
-                    new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
                 },
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            gen.Diagnostics.Should().ContainSingle().Which.Id.Should().Be("EXPAND0007");
+                TestState =
+                {
+                    AdditionalFiles = { additionalText, },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"
+                        ),
+                        (
+                            @"/home/mine/Program2.cs",
+                            @"using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerError("EXPAND0007").WithArguments(diagnosticsArg),
+                    },
+                }
+            };
+            await test.RunAsync();
         }
 
         [Fact]
-        public void NotEnabled()
+        public async Task NotEnabled()
         {
-            var version = LanguageVersion.Latest;
-            var syntaxTrees = CreateTrees(version);
-            var compilation = CreateCompilation(
-                syntaxTrees,
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
-
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
@@ -126,102 +128,74 @@ Put2.Write();",
     ""enabled"": false
 }
 ");
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles = { additionalText, },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
 
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new AdditionalText[] { additionalText },
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
-            gen.OutputCompilation.SyntaxTrees
-                .Should()
-                .NotContain(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            gen.OutputCompilation.GetTypeByMetadataName("SourceExpander.Expanded.ExpandedContainer").Should().BeNull();
-        }
-
-        [Fact]
-        public void Whitelist()
-        {
-            var version = LanguageVersion.Latest;
-            var syntaxTrees = CreateTrees(version);
-            var compilation = CreateCompilation(
-                syntaxTrees,
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
-
-            var pattern = @"source/Program.cs";
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Generator.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
-    ""match-file-pattern"": [
-" + pattern.ToLiteral() + @"
-    ]
-}
-");
-
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new AdditionalText[] { additionalText },
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            gen.OutputCompilation.SyntaxTrees
-                .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
-            files.Should().HaveCount(1);
-            files["/home/source/Program.cs"].Should()
-                .BeEquivalentTo(
-                new SourceCode(
-                    path: "/home/source/Program.cs",
-                    code: @"using SampleLibrary;
-using System;
-using System.Diagnostics;
 class Program
 {
-    static void P()
+    static void Main()
     {
         Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
+        C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
-namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
-")
-                );
+"
+                        ),
+                        (
+                            @"/home/mine/Program2.cs",
+                            @"using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                    },
+                }
+            };
+            await test.RunAsync();
         }
 
-
         [Fact]
-        public void IgnoreFile()
+        public async Task IgnoreFile()
         {
-            var version = LanguageVersion.Latest;
-            var syntaxTrees = CreateTrees(version);
-            var compilation = CreateCompilation(
-                syntaxTrees,
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
+
 
             // language=regex
-            var pattern = @"source/Program\d+\.cs$";
+            var pattern = @"mine/Program\d+\.cs$";
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
@@ -232,59 +206,197 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
 }
 ");
 
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new AdditionalText[] { additionalText },
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            gen.OutputCompilation.SyntaxTrees
-                .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
-            files.Should().HaveCount(1);
-            files["/home/source/Program.cs"].Should()
-                .BeEquivalentTo(
-                new SourceCode(
-                    path: "/home/source/Program.cs",
-                    code: @"using SampleLibrary;
-using System;
-using System.Diagnostics;
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles = { additionalText, },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
+
 class Program
 {
-    static void P()
+    static void Main()
     {
         Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
+        C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
-namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
-")
-                );
+"
+                        ),
+                        (
+                            @"/home/mine/X/Program2.cs",
+                            @"using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                        (
+                            @"/home/mine/Program1.cs",
+                            @"using System;
+using Other;
+
+class Program1
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                        (
+                            @"/home/mine/Program3.cs",
+                            @"using System;
+using Other;
+
+class Program3
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+{""/home/mine/X/Program2.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/X/Program2.cs""},{""code"",""using Other;\r\nclass Program2\r\n{\r\n    static void M()\r\n    {\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
         }
 
+        [Fact]
+        public async Task Whitelist()
+        {
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
+            var pattern = @"mine/Program.cs";
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""match-file-pattern"": [
+" + pattern.ToLiteral() + @"
+    ]
+}
+");
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles = { additionalText, },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"
+                        ),
+                        (
+                            @"/home/mine/Program2.cs",
+                            @"using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
+        }
 
         [Fact]
-        public void StaticEmbeddingText()
+        public async Task StaticEmbeddingText()
         {
-            var version = LanguageVersion.Latest;
-            var syntaxTrees = CreateTrees(version);
-            var compilation = CreateCompilation(
-                syntaxTrees,
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        { "CS8019", ReportDiagnostic.Suppress },
-                    }),
-                additionalMetadatas: sampleLibReferences.Append(coreReference)
-                );
-            compilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length);
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
 
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
@@ -293,61 +405,66 @@ namespace SampleLibrary { public class Xorshift : Random { private uint x = 1234
     ""static-embedding-text"": ""/* Static Embedding Text */""
 }
 ");
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles = { additionalText },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
 
-            var generator = new ExpandGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new AdditionalText[] { additionalText },
-                parseOptions: new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse, languageVersion: version));
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
-            gen.OutputCompilation.SyntaxTrees
-                .Should()
-                .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
-            var files = GetExpandedFilesWithCore(gen.OutputCompilation);
-            files["/home/source/Program.cs"].Should()
-                .BeEquivalentTo(
-                new SourceCode(
-                    path: "/home/source/Program.cs",
-                    code: @"using SampleLibrary;
-using System;
-using System.Diagnostics;
 class Program
 {
-    static void P()
+    static void Main()
     {
         Console.WriteLine(42);
-        Put.WriteRandom();
-#if !EXPAND_GENERATOR
-        Console.WriteLine(24);
-#endif
+        C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-/* Static Embedding Text */
-namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
-namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
-")
-                );
+"
+                        ),
+                        (
+                            @"/home/mine/Program2.cs",
+                            @"using System;
+using Other;
 
-            files["/home/source/Program2.cs"].Should()
-                .BeEquivalentTo(
-                new SourceCode(
-                    path: "/home/source/Program2.cs",
-                    code: @"using SampleLibrary;
-using System;
-using System.Diagnostics;
-Console.WriteLine(42);
-Put2.Write();
-#region Expanded by https://github.com/naminodarie/SourceExpander
-/* Static Embedding Text */
-namespace SampleLibrary { public static class Put2 { public static void Write() => Put.WriteRandom(); } } 
-namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } 
-namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } 
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
-")
-                );
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+{""/home/mine/Program2.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program2.cs""},{""code"",""using Other;\r\nclass Program2\r\n{\r\n    static void M()\r\n    {\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
         }
     }
 }
