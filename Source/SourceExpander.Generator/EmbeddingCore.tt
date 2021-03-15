@@ -16,7 +16,7 @@ return code.Replace("\"", "\\\"").Replace("    ", "\\t").Replace("\r", "").Repla
 
 namespace SourceExpander
 {
-internal static class EmbeddingCore{
+public static class EmbeddingCore{
     public const string SourceCodeClassCode = "<#= ReadFile() #>";
 }
 }

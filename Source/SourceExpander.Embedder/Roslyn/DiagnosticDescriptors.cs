@@ -4,19 +4,19 @@ namespace SourceExpander.Roslyn
 {
     public static class DiagnosticDescriptors
     {
-        public static readonly DiagnosticDescriptor EMBED0001_OlderVersion = new(
+        public static readonly DiagnosticDescriptor EMBED0001_UnknownError = new(
             "EMBED0001",
+            "Unknown error",
+            "Unknown error: {0}",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Warning,
+            true);
+        public static readonly DiagnosticDescriptor EMBED0002_OlderVersion = new(
+            "EMBED0002",
             "embeder version is older",
             "embeder version({0}) is older than {1}({2})",
             "EmbedderGenerator",
             DiagnosticSeverity.Warning,
-            true);
-        public static readonly DiagnosticDescriptor EMBED0002_NotCSharp = new(
-            "EMBED0002",
-            "Compilation must be C#",
-            "Compilation must be C#",
-            "EmbedderGenerator",
-            DiagnosticSeverity.Info,
             true);
         public static readonly DiagnosticDescriptor EMBED0003_ParseConfigError = new(
             "EMBED0003",
@@ -38,6 +38,13 @@ namespace SourceExpander.Roslyn
             "Different syntax: near {0}. This is Embedder error, please report this to GitHub repository.",
             "EmbedderGenerator",
             DiagnosticSeverity.Error,
+            true);
+        public static readonly DiagnosticDescriptor EMBED0006_EmbeddedDataError = new(
+            "EMBED0006",
+            "Invalid embedded data",
+            "Invalid embedded data: Key: {0}, Message: {1}",
+            "EmbedderGenerator",
+            DiagnosticSeverity.Warning,
             true);
     }
 }

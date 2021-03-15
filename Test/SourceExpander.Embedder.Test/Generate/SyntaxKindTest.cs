@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,7 +10,7 @@ using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class SyntaxKindTest : EmbeddingGeneratorTestBase
+    public class SyntaxKindTest : EmbedderGeneratorTestBase
     {
         public static readonly TestData[] TestTable = new TestData[]
         {
@@ -361,7 +361,7 @@ public class Def
         {
             1 => 1,
             int i => i,
-            IComparable c and long l => l,
+            IComparable c and long l when c.CompareTo(l) > 1 => l,
             DateTime d and { Ticks: 131 } => d.Ticks,
             _ => 1,
         };
@@ -371,8 +371,8 @@ public class Def
                 ImmutableArray.Create("Def"),
                 ImmutableArray.Create("using System;"),
                 ImmutableArray<string>.Empty,
-                "public class Def { Int32[] Arr = new[]{1, 2, 3}; public void M() { _ = ((object)DateTime.Now)switch { 1 => 1, int i => i, IComparable c and long l => l, DateTime d and { Ticks: 131 }  => d.Ticks, _ => 1, }  ; } }",
-                "public class Def{Int32[]Arr=new[]{1,2,3};public void M(){_=((object)DateTime.Now)switch{1=>1,int i=>i,IComparable c and long l=>l,DateTime d and{Ticks:131}=>d.Ticks,_=>1,};}}"
+                "public class Def { Int32[] Arr = new[]{1, 2, 3}; public void M() { _ = ((object)DateTime.Now)switch { 1 => 1, int i => i, IComparable c and long l when c.CompareTo(l) > 1 => l, DateTime d and { Ticks: 131 }  => d.Ticks, _ => 1, }  ; } }",
+                "public class Def{Int32[]Arr=new[]{1,2,3};public void M(){_=((object)DateTime.Now)switch{1=>1,int i=>i,IComparable c and long l when c.CompareTo(l)>1=>l,DateTime d and{Ticks:131}=>d.Ticks,_=>1,};}}"
             ),
             new TestData("UnaryExpression", @"
 using System;
@@ -975,17 +975,6 @@ public class Def
             ),
         };
 
-        private static readonly CSharpParseOptions parseOptions
-            = new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
-            .WithLanguageVersion(LanguageVersion.CSharp9);
-
-        private static readonly CSharpCompilationOptions compilationOptions
-            = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithAllowUnsafe(true)
-                    .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
-                        {"CS8019",ReportDiagnostic.Suppress },
-                    });
-
         public static readonly IEnumerable<object[]> TestTableArgs = TestTable.Select(d => new object[] { d });
 
         public static readonly Dictionary<string, TestData> TestTableDic = TestTable.ToDictionary(d => d.Name);
@@ -993,114 +982,114 @@ public class Def
 
         [Theory]
         [MemberData(nameof(TestTableNameArgs))]
-        public void Generate(string testName)
+        public async Task Generate(string testName)
         {
             var testData = TestTableDic[testName];
-            var compilation = CreateCompilation(new[] { testData.SyntaxTree }, compilationOptions, new[] { expanderCoreReference });
-            compilation.GetDiagnostics().Should().BeEmpty();
-
-            var generator = new EmbedderGenerator();
-            var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
-
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-
-            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
-                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
-                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
-            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
-            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
-
-            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embedded))
+            var test = new Test
+            {
+                CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true),
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        (
+            "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-type"": ""Raw""
+}
+"),
+                    },
+                    Sources =
+                    {
+                        testData.Source,
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedAllowUnsafe"",""true"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{testData.ExpectedJson.ToLiteral()})]
+"),
+                    },
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(testData.ExpectedJson)
                 .Should()
                 .ContainSingle()
                 .Which
                 .Should()
                 .BeEquivalentTo(testData.Expected);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embedded))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(testData.ExpectedJson)
                 .Should()
                 .ContainSingle()
                 .Which
                 .Should()
                 .BeEquivalentTo(testData.Expected);
-
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
-            gen.Diagnostics.Should().BeEmpty();
-
-            gen.AddedSyntaxTrees
-                .Should()
-                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
-                .Which
-                .ToString()
-                .Should()
-                .ContainAll(
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
         }
 
         [Theory]
         [MemberData(nameof(TestTableNameArgs))]
-        public void Minify(string testName)
+        public async Task Minify(string testName)
         {
             var testData = TestTableDic[testName];
-            var compilation = CreateCompilation(new[] { testData.SyntaxTree }, compilationOptions, new[] { expanderCoreReference });
-            compilation.GetDiagnostics().Should().BeEmpty();
-
-            var generator = new EmbedderGenerator();
-            var gen = RunGenerator(compilation, generator,
-                additionalTexts: new[] { enableMinifyJson }, parseOptions: parseOptions);
-            gen.Diagnostics.Should().BeEmpty();
-            gen.OutputCompilation.GetDiagnostics().Should().BeEmpty();
-
-
-            var metadata = gen.OutputCompilation.Assembly.GetAttributes()
-                .Where(x => x.AttributeClass?.Name == nameof(System.Reflection.AssemblyMetadataAttribute))
-                .ToDictionary(x => (string)x.ConstructorArguments[0].Value, x => (string)x.ConstructorArguments[1].Value);
-            metadata.Should().NotContainKey("SourceExpander.EmbeddedSourceCode");
-            metadata.Should().ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
-
-            var embedded = metadata["SourceExpander.EmbeddedSourceCode.GZipBase32768"];
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embedded))
+            var test = new Test
+            {
+                CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true),
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        (
+            "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-type"": ""Raw"",
+    ""enable-minify"": true
+}
+"),
+                    },
+                    Sources =
+                    {
+                        testData.Source,
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedAllowUnsafe"",""true"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{testData.ExpectedMinifyJson.ToLiteral()})]
+"),
+                    },
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(testData.ExpectedMinifyJson)
                 .Should()
                 .ContainSingle()
                 .Which
                 .Should()
                 .BeEquivalentTo(testData.ExpectedMinify);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-                SourceFileInfoUtil.FromGZipBase32768(embedded))
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(testData.ExpectedMinifyJson)
                 .Should()
                 .ContainSingle()
                 .Which
                 .Should()
                 .BeEquivalentTo(testData.ExpectedMinify);
-
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(3);
-            gen.Diagnostics.Should().BeEmpty();
-
-            gen.AddedSyntaxTrees
-                .Should()
-                .ContainSingle(t => t.FilePath.EndsWith("EmbeddedSourceCode.Metadata.cs"))
-                .Which
-                .ToString()
-                .Should()
-                .ContainAll(
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",",
-                "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",");
         }
 
         public class TestData
         {
             public override string ToString() => Name;
             public string Name { get; }
-            public CSharpSyntaxTree SyntaxTree { get; }
+            public InMemorySourceText Source { get; }
             public SourceFileInfo Expected { get; }
             public SourceFileInfo ExpectedMinify { get; }
+            public string ExpectedJson { get; }
+            public string ExpectedMinifyJson { get; }
             public TestData(
                 string name,
                 string syntax,
@@ -1111,19 +1100,21 @@ public class Def
                 string expectedMinifyCodeBody)
             {
                 Name = name;
-                SyntaxTree = (CSharpSyntaxTree)CSharpSyntaxTree.ParseText(syntax, parseOptions, "/foo/path.cs", new UTF8Encoding(false));
+                Source = new("/foo/path.cs", syntax);
                 Expected = new SourceFileInfo(
-                    "TestAssembly>path.cs",
+                    "TestProject>path.cs",
                     expectedTypeNames,
                     expectedUsings,
                     expectedDependencies,
                     expectedCodeBody);
                 ExpectedMinify = new SourceFileInfo(
-                    "TestAssembly>path.cs",
+                    "TestProject>path.cs",
                     expectedTypeNames,
                     expectedUsings,
                     expectedDependencies,
                     expectedMinifyCodeBody);
+                ExpectedJson = JsonUtil.ToJson(ImmutableArray.Create(Expected));
+                ExpectedMinifyJson = JsonUtil.ToJson(ImmutableArray.Create(ExpectedMinify));
             }
         }
     }

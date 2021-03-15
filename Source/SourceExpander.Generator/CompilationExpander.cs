@@ -46,7 +46,7 @@ namespace SourceExpander
                 .Union(requiedFiles.SelectMany(s => s.Usings))
                 .ToArray();
 
-            foreach (var u in SortUsings(usings))
+            foreach (var u in SourceFileInfoUtil.SortUsings(usings))
                 sb.AppendLine(u);
 
             using var sr = new StringReader(newRoot.ToString());
@@ -64,12 +64,6 @@ namespace SourceExpander
                 sb.AppendLine(s.CodeBody);
             sb.AppendLine("#endregion Expanded by https://github.com/naminodarie/SourceExpander");
             return sb.ToString();
-        }
-
-        private static string[] SortUsings(string[] usings)
-        {
-            Array.Sort(usings, (a, b) => StringComparer.Ordinal.Compare(a.TrimEnd(';'), b.TrimEnd(';')));
-            return usings;
         }
     }
 }

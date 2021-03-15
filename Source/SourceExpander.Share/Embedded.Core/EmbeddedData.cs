@@ -23,8 +23,10 @@ namespace SourceExpander
             CSharpVersion = csharpVersion;
             AllowUnsafe = allowUnsafe;
         }
-        public static EmbeddedData Create(string assemblyName, ImmutableDictionary<string, string> assemblyMetadatas)
+        public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
+            Create(string assemblyName, ImmutableDictionary<string, string> assemblyMetadatas)
         {
+            var errors = ImmutableArray.CreateBuilder<(string Key, string ErrorMessage)>();
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
             Version? version = new(1, 0, 0);
             bool allowUnsafe = false;
@@ -36,66 +38,153 @@ namespace SourceExpander
                 if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
                     continue;
 
-                if (TryAddSourceFileInfos(keyArray, pair.Value, builder)) { }
-                else if (TryGetEmbedderVersion(keyArray, pair.Value, out var attrVersion))
-                    version = attrVersion;
-                else if (TryGetEmbeddedLanguageVersion(keyArray, pair.Value, out var attrCSharpVersion))
-                    csharpVersion = attrCSharpVersion;
-                else if (TryGetEmbeddedAllowUnsafe(keyArray, pair.Value, out var attrAllowUnsafe))
-                    allowUnsafe = attrAllowUnsafe;
+                ParseResult r;
+                switch ((r = TryAddSourceFileInfos(keyArray, pair.Value, builder)).Result)
+                {
+                    case ParseResult.Status.NotMatch:
+                        break;
+                    case ParseResult.Status.Success:
+                        continue;
+                    case ParseResult.Status.Error:
+                        errors.Add((pair.Key, r.Message));
+                        continue;
+                }
+                switch ((r = TryGetEmbedderVersion(keyArray, pair.Value, out var attrVersion)).Result)
+                {
+                    case ParseResult.Status.NotMatch:
+                        break;
+                    case ParseResult.Status.Success:
+                        version = attrVersion;
+                        continue;
+                    case ParseResult.Status.Error:
+                        errors.Add((pair.Key, r.Message));
+                        continue;
+                }
+                switch ((r = TryGetEmbeddedLanguageVersion(keyArray, pair.Value, out var attrCSharpVersion)).Result)
+                {
+                    case ParseResult.Status.NotMatch:
+                        break;
+                    case ParseResult.Status.Success:
+                        csharpVersion = attrCSharpVersion;
+                        continue;
+                    case ParseResult.Status.Error:
+                        errors.Add((pair.Key, r.Message));
+                        continue;
+                }
+                switch ((r = TryGetEmbeddedAllowUnsafe(keyArray, pair.Value, out var attrAllowUnsafe)).Result)
+                {
+                    case ParseResult.Status.NotMatch:
+                        break;
+                    case ParseResult.Status.Success:
+                        allowUnsafe = attrAllowUnsafe;
+                        continue;
+                    case ParseResult.Status.Error:
+                        errors.Add((pair.Key, r.Message));
+                        continue;
+                }
             }
-            return new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe);
+            return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe), errors.ToImmutable());
         }
-        private static bool TryAddSourceFileInfos(string[] keyArray, string value, ImmutableArray<SourceFileInfo>.Builder builder)
+        private struct ParseResult
         {
-            if (keyArray.Length >= 2
-                && keyArray[1] == "EmbeddedSourceCode")
+            private ParseResult(Status result, string message)
             {
-                ImmutableArray<SourceFileInfo> embedded;
-                if (Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0)
-                    embedded = SourceFileInfoUtil.ParseEmbeddedJson(SourceFileInfoUtil.FromGZipBase32768ToStream(value));
-                else
-                    embedded = SourceFileInfoUtil.ParseEmbeddedJson(value);
-                builder.AddRange(embedded);
-                return true;
+                Result = result;
+                Message = message;
             }
-            return false;
+
+            public static readonly ParseResult Success = new(Status.Success, string.Empty);
+            public static readonly ParseResult NotMatch = new(Status.NotMatch, string.Empty);
+            public static ParseResult Error(string message) => new(Status.Error, message);
+            public enum Status
+            {
+                Success,
+                NotMatch,
+                Error,
+            }
+            public Status Result { get; }
+            public string Message { get; }
         }
-        private static bool TryGetEmbedderVersion(string[] keyArray, string value, out Version? version)
+#pragma warning disable CA1031
+        private static ParseResult TryAddSourceFileInfos(string[] keyArray, string value, ImmutableArray<SourceFileInfo>.Builder builder)
         {
-            if (keyArray.Length == 2
-                && keyArray[1] == "EmbedderVersion"
-                && Version.TryParse(value, out var embedderVersion))
+            try
             {
-                version = embedderVersion;
-                return true;
+                if (keyArray.Length >= 2
+                    && keyArray[1] == "EmbeddedSourceCode")
+                {
+                    ImmutableArray<SourceFileInfo> embedded;
+                    if (Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0)
+                        embedded = SourceFileInfoUtil.ParseEmbeddedJson(SourceFileInfoUtil.FromGZipBase32768ToStream(value));
+                    else
+                        embedded = SourceFileInfoUtil.ParseEmbeddedJson(value);
+                    builder.AddRange(embedded);
+                    return ParseResult.Success;
+                }
+                return ParseResult.NotMatch;
             }
+            catch (Exception e)
+            {
+                return ParseResult.Error(e.Message);
+            }
+        }
+        private static ParseResult TryGetEmbedderVersion(string[] keyArray, string value, out Version? version)
+        {
             version = null;
-            return false;
-        }
-        private static bool TryGetEmbeddedLanguageVersion(string[] keyArray, string value, out LanguageVersion version)
-        {
-            if (keyArray.Length == 2
-                && keyArray[1] == "EmbeddedLanguageVersion"
-                && LanguageVersionFacts.TryParse(value, out var embeddedVersion))
+            try
             {
-                version = embeddedVersion;
-                return true;
+                if (keyArray.Length == 2
+                    && keyArray[1] == "EmbedderVersion"
+                    && Version.TryParse(value, out var embedderVersion))
+                {
+                    version = embedderVersion;
+                    return ParseResult.Success;
+                }
+                return ParseResult.NotMatch;
             }
+            catch (Exception e)
+            {
+                return ParseResult.Error(e.Message);
+            }
+        }
+        private static ParseResult TryGetEmbeddedLanguageVersion(string[] keyArray, string value, out LanguageVersion version)
+        {
             version = LanguageVersion.Default;
-            return false;
-        }
-        private static bool TryGetEmbeddedAllowUnsafe(string[] keyArray, string value, out bool allowUnsafe)
-        {
-            if (keyArray.Length == 2
-                && keyArray[1] == "EmbeddedAllowUnsafe"
-                && bool.TryParse(value, out var embeddedAllowUnsafe))
+            try
             {
-                allowUnsafe = embeddedAllowUnsafe;
-                return true;
+                if (keyArray.Length == 2
+                    && keyArray[1] == "EmbeddedLanguageVersion"
+                    && LanguageVersionFacts.TryParse(value, out var embeddedVersion))
+                {
+                    version = embeddedVersion;
+                    return ParseResult.Success;
+                }
+                return ParseResult.NotMatch;
             }
-            allowUnsafe = false;
-            return false;
+            catch (Exception e)
+            {
+                return ParseResult.Error(e.Message);
+            }
         }
+        private static ParseResult TryGetEmbeddedAllowUnsafe(string[] keyArray, string value, out bool allowUnsafe)
+        {
+            allowUnsafe = false;
+            try
+            {
+                if (keyArray.Length == 2
+                    && keyArray[1] == "EmbeddedAllowUnsafe"
+                    && bool.TryParse(value, out var embeddedAllowUnsafe))
+                {
+                    allowUnsafe = embeddedAllowUnsafe;
+                    return ParseResult.Success;
+                }
+                return ParseResult.NotMatch;
+            }
+            catch (Exception e)
+            {
+                return ParseResult.Error(e.Message);
+            }
+        }
+#pragma warning restore CA1031
     }
 }

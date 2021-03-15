@@ -18,6 +18,7 @@ namespace SourceExpander.Roslyn
 
         private readonly ImmutableHashSet<string>.Builder rootUsingsBuilder = ImmutableHashSet.CreateBuilder<string>();
         public ImmutableHashSet<string> RootUsings() => rootUsingsBuilder.ToImmutable();
+
         public TypeFindAndUnusedUsingRemover(SemanticModel model, CancellationToken cancellationToken)
         {
             this.model = model;

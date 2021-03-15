@@ -1,28 +1,40 @@
-﻿using System.Collections.Immutable;
-using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
 {
-    public class CompilationErrorTest : EmbeddingGeneratorTestBase
+    public class CompilationErrorTest : EmbedderGeneratorTestBase
     {
-        static readonly CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         [Fact]
-        public void GenerateInputError()
+        public async Task Generate()
         {
-            var compilation = CreateCompilation(ImmutableArray.Create(
-                CSharpSyntaxTree.ParseText(@"
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        enableMinifyJson,
+                    },
+                    Sources = {
+                        (
+                            "home/test/Program.cs",
+                            @"
 class Program
 {
     public static int Method() => 1 + 2 ** 3;
 }
-", path: "/home/test/Program.cs")),
-                     new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            var generator = new EmbedderGenerator();
-            var gen = RunGenerator(compilation, generator, parseOptions: parseOptions);
-            gen.OutputCompilation.SyntaxTrees.Should().HaveCount(1 + CompileTimeTypeMaker.SourceCount);
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerError("CS0193").WithSpan("home/test/Program.cs", 4, 42, 4, 45),
+                    },
+                }
+            };
+            await test.RunAsync();
         }
     }
 }

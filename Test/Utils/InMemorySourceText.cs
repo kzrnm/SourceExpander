@@ -5,10 +5,10 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace SourceExpander
 {
-    public class InMemoryAdditionalText : AdditionalText
+    public class InMemorySourceText : AdditionalText
     {
-        public InMemoryAdditionalText(string path, string source) : this(path, source, new UTF8Encoding(false)) { }
-        public InMemoryAdditionalText(string path, string source, Encoding encoding)
+        public InMemorySourceText(string path, string source) : this(path, source, new UTF8Encoding(false)) { }
+        public InMemorySourceText(string path, string source, Encoding encoding)
         {
             Path = path;
             sourceText = SourceText.From(source, encoding);
@@ -16,5 +16,7 @@ namespace SourceExpander
         public override string Path { get; }
         private readonly SourceText sourceText;
         public override SourceText GetText(CancellationToken cancellationToken = default) => sourceText;
+        public static implicit operator (string filename, SourceText content)(InMemorySourceText at)
+            => (at.Path, at.sourceText);
     }
 }
