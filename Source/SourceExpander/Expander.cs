@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -33,8 +34,13 @@ namespace SourceExpander
 
                 File.WriteAllText(outputFilePath, combinedCode);
             }
-            catch
+            catch (ExpanderException)
             {
+                throw;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
                 if (!ignoreAnyError)
                     throw;
             }
@@ -51,19 +57,35 @@ namespace SourceExpander
             {
                 return ExpandString(inputFilePath, Assembly.GetCallingAssembly());
             }
-            catch
+            catch (ExpanderException)
             {
+                throw;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
                 if (!ignoreAnyError)
                     throw;
                 return "";
             }
         }
 
-
+        private class ExpanderException : Exception
+        {
+            public ExpanderException() { }
+            public ExpanderException(string message) : base(message) { }
+            public ExpanderException(string message, Exception inner) : base(message, inner) { }
+        }
         private static string ExpandString(string inputFilePath, Assembly callingAssembly)
         {
             if (inputFilePath is null)
                 throw new ArgumentNullException(nameof(inputFilePath));
+
+            var metadatas = callingAssembly.GetCustomAttributes<AssemblyMetadataAttribute>();
+            if (metadatas.Any(m => m.Key == "SourceExpander.EmbedderVersion"))
+            {
+                throw new ExpanderException(Resources.HasEmbeddedSource);
+            }
 
             var expandedContainerType = callingAssembly.GetType("SourceExpander.Expanded.ExpandedContainer");
             if (expandedContainerType is null)

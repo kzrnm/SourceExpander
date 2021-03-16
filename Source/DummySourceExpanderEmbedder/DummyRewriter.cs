@@ -31,6 +31,9 @@ namespace SourceExpander
 
         public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
         {
+            if (node.Parent.IsKind(SyntaxKind.ClassDeclaration) && node.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                return null;
+
             hasExtensionMethod = false;
             if (base.VisitClassDeclaration(node) is not ClassDeclarationSyntax dec)
                 return null;

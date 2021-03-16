@@ -59,5 +59,14 @@ namespace SourceExpander {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Embedded code cannot be used in the same assembly. For embedding source code, make new DLL project. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string HasEmbeddedSource {
+            get {
+                return ResourceManager.GetString("HasEmbeddedSource", resourceCulture);
+            }
+        }
     }
 }

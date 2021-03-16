@@ -11,6 +11,7 @@ namespace SourceExpander
     public class DummyGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context) { }
+
         public void Execute(GeneratorExecutionContext context)
         {
 #if DEBUG
