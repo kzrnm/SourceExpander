@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -136,6 +137,7 @@ namespace Test.F
 "),
                     },
                     ExpectedDiagnostics = {
+                        new DiagnosticResult("EMBED0009", DiagnosticSeverity.Info).WithSpan("/home/source/F/N.cs", 3, 5, 3, 33),
                         DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/F/N.cs", 8, 21, 8, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
                         DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/F/N.cs", 8, 21, 8, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
                         DiagnosticResult.CompilerError("CS0246").WithSpan("/home/source/F/N.cs", 23, 6, 23, 24).WithArguments("NotEmbeddingSource"),

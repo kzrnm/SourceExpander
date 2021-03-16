@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -83,6 +84,10 @@ namespace Mine{
 }
 "
                         ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 2, 1, 2, 20),
                     },
                     GeneratedSources =
                     {
@@ -178,6 +183,10 @@ namespace Mine{
 }
 "
                         ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 2, 1, 2, 20),
                     },
                     GeneratedSources =
                     {
