@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿extern alias Generator;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
@@ -59,7 +60,7 @@ class Program
                 Should().HaveCount(syntaxTrees.Length);
             compilation.GetDiagnostics().Should().BeEmpty();
 
-            var generator = new ExpandGenerator();
+            var generator = new Generator::SourceExpander.ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator },
                 parseOptions:
                 new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
