@@ -11,8 +11,15 @@ namespace SourceExpander
     public class DummyGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context) { }
+
         public void Execute(GeneratorExecutionContext context)
         {
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                //System.Diagnostics.Debugger.Launch();
+            }
+#endif
             var parseOptions = (CSharpParseOptions)context.ParseOptions;
             parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp4);
             var compilation = (CSharpCompilation)context.Compilation;
@@ -20,11 +27,12 @@ namespace SourceExpander
             var list = new List<SyntaxTree>(compilation.SyntaxTrees.Length);
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (tree.FilePath.EndsWith("Resources.Designer.cs"))
+                    continue;
                 var newRoot = rewriter.Visit(tree.GetRoot(context.CancellationToken));
                 list.Add(tree.WithRootAndOptions(newRoot, parseOptions));
             }
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(list);
-
 
             var resolver = new EmbeddingResolver(
                 compilation,

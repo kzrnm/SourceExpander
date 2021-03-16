@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SourceExpander.Diagnostics {
+namespace SourceExpander {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace SourceExpander.Diagnostics {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class DiagnosticsResources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal DiagnosticsResources() {
+        internal Resources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SourceExpander.Diagnostics {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SourceExpander.Diagnostics.DiagnosticsResources", typeof(DiagnosticsResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SourceExpander.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,56 +61,11 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
-        ///   Avoid using static directive because there is a risk of name collision に類似しているローカライズされた文字列を検索します。
+        ///   Embedded code cannot be used in the same assembly. For embedding source code, make new DLL project. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string EMBEDDER0001_Body {
+        internal static string HasEmbeddedSource {
             get {
-                return ResourceManager.GetString("EMBEDDER0001_Body", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Avoid using static directive に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EMBEDDER0001_Title {
-            get {
-                return ResourceManager.GetString("EMBEDDER0001_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Avoid using alias directive に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EMBEDDER0002_Title {
-            get {
-                return ResourceManager.GetString("EMBEDDER0002_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Nullable option is unsupported に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EMBEDDER0003_Title {
-            get {
-                return ResourceManager.GetString("EMBEDDER0003_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Nullable directive is unsupported に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EMBEDDER0004_Title {
-            get {
-                return ResourceManager.GetString("EMBEDDER0004_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Embedded code cannot be used in the same assembly に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EMBEDDER0005_Title {
-            get {
-                return ResourceManager.GetString("EMBEDDER0005_Title", resourceCulture);
+                return ResourceManager.GetString("HasEmbeddedSource", resourceCulture);
             }
         }
     }
