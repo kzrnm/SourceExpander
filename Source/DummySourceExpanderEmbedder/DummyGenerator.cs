@@ -16,7 +16,7 @@ namespace SourceExpander
 #if DEBUG
             if (!System.Diagnostics.Debugger.IsAttached)
             {
-                System.Diagnostics.Debugger.Launch();
+                //System.Diagnostics.Debugger.Launch();
             }
 #endif
             var parseOptions = (CSharpParseOptions)context.ParseOptions;
@@ -26,6 +26,8 @@ namespace SourceExpander
             var list = new List<SyntaxTree>(compilation.SyntaxTrees.Length);
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (tree.FilePath.EndsWith("Resources.Designer.cs"))
+                    continue;
                 var newRoot = rewriter.Visit(tree.GetRoot(context.CancellationToken));
                 list.Add(tree.WithRootAndOptions(newRoot, parseOptions));
             }
