@@ -64,7 +64,7 @@ namespace SourceExpander
                     context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded, Location.None));
 
 
-                if (!HasCoreReference(context.Compilation.ReferencedAssemblyNames))
+                if (!HasSourceCodeClass(compilation))
                 {
                     context.AddSource("SourceExpander.SourceCode.cs",
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
@@ -82,8 +82,11 @@ namespace SourceExpander
                     DiagnosticDescriptors.EXPAND0001_UnknownError, Location.None, e.Message));
             }
         }
-        static bool HasCoreReference(IEnumerable<AssemblyIdentity> referencedAssemblyNames)
-            => referencedAssemblyNames.Any(a => a.Name.Equals("SourceExpander.Core", StringComparison.OrdinalIgnoreCase));
+        static bool HasSourceCodeClass(Compilation compilation)
+        {
+            const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
+            return compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is not null;
+        }
 
 
         static string CreateExpanded(EmbeddedLoader loader)
