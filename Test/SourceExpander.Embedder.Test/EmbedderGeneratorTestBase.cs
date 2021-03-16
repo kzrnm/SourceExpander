@@ -47,7 +47,7 @@ namespace SourceExpander.Embedder
 
         public static string EmbedderVersion => typeof(EmbedderGenerator).Assembly.GetName().Version.ToString();
         private static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.CSharp9;
-        public static string EmbeddedLanguageVersion => EmbeddedLanguageVersionEnum.ToDisplayString();
+        public static string EmbeddedLanguageVersion => "9.0";
 
         public static InMemorySourceText enableMinifyJson = new(
             "/foo/bar/SourceExpander.Embedder.Config.json", @"

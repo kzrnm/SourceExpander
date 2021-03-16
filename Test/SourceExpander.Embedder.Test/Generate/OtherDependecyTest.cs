@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -83,6 +84,10 @@ namespace Mine{
 }
 "
                         ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 2, 1, 2, 20),
                     },
                     GeneratedSources =
                     {
@@ -178,6 +183,10 @@ namespace Mine{
 }
 "
                         ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 2, 1, 2, 20),
                     },
                     GeneratedSources =
                     {
@@ -293,7 +302,7 @@ namespace Mine{
                 ),
                 (
                 @"/home/other/AssemblyInfo.cs",
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""{-}"")]"
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[}"")]"
                 ),
             };
 
@@ -324,7 +333,7 @@ namespace Mine{
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. The token '\"' was expected but found '-'.")
+                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("Other", "SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.")
                     },
                     GeneratedSources =
                     {
@@ -397,7 +406,7 @@ namespace Mine{
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character 'ã'."),
+                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("Other", "SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character 'ã'."),
                     },
                     GeneratedSources =
                     {

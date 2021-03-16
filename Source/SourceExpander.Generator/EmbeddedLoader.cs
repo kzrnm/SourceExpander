@@ -70,15 +70,15 @@ namespace SourceExpander
 
         public bool IsEmbeddedEmpty => container.Count == 0;
 
-        private IEnumerable<EmbeddedData> WithCheck(IEnumerable<(EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)> embeddedDatas)
+        private IEnumerable<EmbeddedData> WithCheck(IEnumerable<(EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)> Errors)> embeddedDatas)
         {
-            foreach (var (embedded, errors) in embeddedDatas)
+            foreach (var (embedded, display, errors) in embeddedDatas)
             {
                 foreach (var (key, message) in errors)
                 {
                     reporter.ReportDiagnostic(
                         Diagnostic.Create(DiagnosticDescriptors.EXPAND0008_EmbeddedDataError, Location.None,
-                        key, message));
+                        display, key, message));
                 }
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {

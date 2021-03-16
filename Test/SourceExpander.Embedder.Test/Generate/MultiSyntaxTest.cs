@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace SourceExpander.Embedder.Generate.Test
@@ -111,6 +113,10 @@ namespace SourceExpander.Embedder.Generate.Test
             }
         }"
                         ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        new DiagnosticResult("EMBED0009", DiagnosticSeverity.Info).WithSpan("/home/source/F/N.cs", 3, 9, 3, 37),
                     },
                     GeneratedSources =
                     {

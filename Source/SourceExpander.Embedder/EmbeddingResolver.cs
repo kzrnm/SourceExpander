@@ -101,6 +101,12 @@ namespace SourceExpander
         }
 
         private bool updated = false;
+        private void VerifyCompilation()
+        {
+            if (compilation.Options.NullableContextOptions.AnnotationsEnabled())
+                reporter.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.EMBED0007_NullableProject, Location.None));
+        }
         private void UpdateCompilation()
         {
             if (updated)
@@ -111,7 +117,7 @@ namespace SourceExpander
             foreach (var tree in trees)
             {
                 var semanticModel = compilation.GetSemanticModel(tree, true);
-                var newRoot = new EmbedderRewriter(semanticModel, config, cancellationToken).Visit(tree.GetRoot(cancellationToken));
+                var newRoot = new EmbedderRewriter(semanticModel, config, reporter, cancellationToken).Visit(tree.GetRoot(cancellationToken));
                 newCompilation = newCompilation.ReplaceSyntaxTree(tree,
                     tree.WithRootAndOptions(newRoot, parseOptions));
             }
@@ -125,15 +131,17 @@ namespace SourceExpander
                 return _cacheResolvedFiles;
             if (!config.Enabled)
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
+
+            VerifyCompilation();
             UpdateCompilation();
             var depSources = new List<SourceFileInfo>();
-            foreach (var (embedded, errors) in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
+            foreach (var (embedded, display, errors) in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
             {
                 foreach (var (key, message) in errors)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EMBED0006_EmbeddedDataError, Location.None,
-                        key, message));
+                        Diagnostic.Create(DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError, Location.None,
+                        display, key, message));
                 }
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
@@ -158,22 +166,17 @@ namespace SourceExpander
                 is { } diagnostics
                 && diagnostics.Length > 0)
             {
-                var messageDic = new Dictionary<string, List<string>>();
                 foreach (var d in diagnostics)
                 {
                     var file = d.Location?.SourceTree?.FilePath;
-                    if (file is null)
+                    if (file is null || d.WarningLevel > 0)
                         continue;
-                    var message = d.GetMessage();
-                    if (!messageDic.TryGetValue(file, out var messages))
-                    {
-                        messages = messageDic[file] = new List<string>();
-                    }
-                    messages.Add(message);
+
+                    if (d.GetMessage() is string message)
+                        reporter.ReportDiagnostic(Diagnostic.Create(
+                            DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
+                            file, message));
                 }
-                reporter.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
-                    string.Join(", ", messageDic.Select(p => $"{p.Key}: {{{string.Join(", ", p.Value)}}}"))));
             }
 
             return _cacheResolvedFiles;

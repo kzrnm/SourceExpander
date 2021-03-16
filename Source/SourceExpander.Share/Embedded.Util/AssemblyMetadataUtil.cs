@@ -7,7 +7,7 @@ namespace SourceExpander
 {
     public static class AssemblyMetadataUtil
     {
-        public static IEnumerable<(EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)> GetEmbeddedSourceFiles(Compilation compilation)
+        public static IEnumerable<(EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)> Errors)> GetEmbeddedSourceFiles(Compilation compilation)
         {
             foreach (var reference in compilation.References)
             {
@@ -15,12 +15,13 @@ namespace SourceExpander
                 if (symbol is null)
                     continue;
 
+
                 var (embedded, errors) = EmbeddedData.Create(symbol.Name,
                     ImmutableDictionary.CreateRange(symbol.GetAttributes().Select(GetAttributeSourceCode).OfType<KeyValuePair<string, string>>())
                     );
 
                 if (!embedded.IsEmpty || errors.Any())
-                    yield return (embedded, errors);
+                    yield return (embedded, reference.Display, errors);
             }
         }
 
