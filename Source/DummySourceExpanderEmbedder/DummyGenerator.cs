@@ -24,8 +24,7 @@ namespace SourceExpander
                 list.Add(tree.WithRootAndOptions(newRoot, parseOptions));
             }
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(list);
-
-
+            
             var resolver = new EmbeddingResolver(
                 compilation,
                 parseOptions,
