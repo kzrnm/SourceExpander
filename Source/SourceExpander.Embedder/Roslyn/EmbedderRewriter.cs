@@ -14,14 +14,23 @@ namespace SourceExpander.Roslyn
     {
         private readonly SemanticModel model;
         private readonly EmbedderConfig config;
+        private readonly IDiagnosticReporter reporter;
         private readonly CancellationToken cancellationToken;
-        public EmbedderRewriter(SemanticModel model, EmbedderConfig config, CancellationToken cancellationToken)
+        public EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken)
+            : base(true)
         {
             this.model = model;
             this.config = config;
+            this.reporter = reporter;
             this.cancellationToken = cancellationToken;
         }
 
+        public override SyntaxNode? VisitNullableDirectiveTrivia(NullableDirectiveTriviaSyntax node)
+        {
+            reporter.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.EMBED0008_NullableDirective, node.GetLocation()));
+            return base.VisitNullableDirectiveTrivia(node);
+        }
         public override SyntaxNode? VisitAttribute(AttributeSyntax node)
         {
             if (model.GetTypeInfo(node).Type is { } typeSymbol

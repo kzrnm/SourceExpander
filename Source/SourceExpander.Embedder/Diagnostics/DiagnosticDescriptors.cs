@@ -83,5 +83,31 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Warning,
             true);
+        public static readonly DiagnosticDescriptor EMBED0007_NullableProject = new(
+            "EMBED0007",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0007_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0007_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Usage",
+            DiagnosticSeverity.Warning,
+            true);
+        public static readonly DiagnosticDescriptor EMBED0008_NullableDirective = new(
+            "EMBED0008",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0008_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0008_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Usage",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

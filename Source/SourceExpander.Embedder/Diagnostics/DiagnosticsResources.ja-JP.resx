@@ -135,4 +135,10 @@
   <data name="EMBED0006_Title" xml:space="preserve">
     <value>他のアセンブリの埋め込みデータが不正です</value>
   </data>
+  <data name="EMBED0007_Title" xml:space="preserve">
+    <value>nullableなプロジェクトは未対応です</value>
+  </data>
+  <data name="EMBED0008_Title" xml:space="preserve">
+    <value>nullableディレクティブは未対応です</value>
+  </data>
 </root>

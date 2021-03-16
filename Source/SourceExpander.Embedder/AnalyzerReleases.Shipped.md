@@ -12,3 +12,5 @@ EMBED0003 | Error | Error | Error config file
 EMBED0004 | Error | Warning | Error embedded source
 EMBED0005 | Error | Error | Different syntax
 EMBED0006 | Error | Warning | Another assembly has invalid embedded data
+EMBED0007 | Usage | Warning | Nullable option is unsupported
+EMBED0008 | Usage | Warning | Nullable directive is unsupported

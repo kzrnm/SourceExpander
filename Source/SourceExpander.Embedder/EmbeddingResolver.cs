@@ -101,6 +101,12 @@ namespace SourceExpander
         }
 
         private bool updated = false;
+        private void VerifyCompilation()
+        {
+            if (compilation.Options.NullableContextOptions.AnnotationsEnabled())
+                reporter.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.EMBED0007_NullableProject, Location.None));
+        }
         private void UpdateCompilation()
         {
             if (updated)
@@ -111,7 +117,7 @@ namespace SourceExpander
             foreach (var tree in trees)
             {
                 var semanticModel = compilation.GetSemanticModel(tree, true);
-                var newRoot = new EmbedderRewriter(semanticModel, config, cancellationToken).Visit(tree.GetRoot(cancellationToken));
+                var newRoot = new EmbedderRewriter(semanticModel, config, reporter, cancellationToken).Visit(tree.GetRoot(cancellationToken));
                 newCompilation = newCompilation.ReplaceSyntaxTree(tree,
                     tree.WithRootAndOptions(newRoot, parseOptions));
             }
@@ -125,6 +131,8 @@ namespace SourceExpander
                 return _cacheResolvedFiles;
             if (!config.Enabled)
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
+
+            VerifyCompilation();
             UpdateCompilation();
             var depSources = new List<SourceFileInfo>();
             foreach (var (embedded, display, errors) in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))

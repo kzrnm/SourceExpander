@@ -57,5 +57,21 @@ namespace SourceExpander.Embedder.Diagnostics.Test
                 .Should()
                 .Be("Another assembly has invalid embedded data: Other, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.");
         }
+        [Fact]
+        public void EMBED0007()
+        {
+            Diagnostic.Create(DiagnosticDescriptors.EMBED0007_NullableProject, Location.None)
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("Nullable option is unsupported");
+        }
+        [Fact]
+        public void EMBED0008()
+        {
+            Diagnostic.Create(DiagnosticDescriptors.EMBED0008_NullableDirective, Location.None)
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("Nullable directive is unsupported");
+        }
     }
 }
