@@ -24,7 +24,22 @@ namespace SourceExpander.Roslyn
             this.reporter = reporter;
             this.cancellationToken = cancellationToken;
         }
+        public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)
+        {
+            if (node.Parent.IsKind(SyntaxKind.CompilationUnit))
+            {
+                DiagnosticDescriptor diagnosticDescriptor;
+                if (node.StaticKeyword.IsKind(SyntaxKind.StaticKeyword))
+                    diagnosticDescriptor = DiagnosticDescriptors.EMBED0009_UsingStaticDirective;
+                else if (node.Alias != null)
+                    diagnosticDescriptor = DiagnosticDescriptors.EMBED0010_UsingAliasDirective;
+                else
+                    goto Fin;
 
+                reporter.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, node.GetLocation()));
+            }
+        Fin: return base.VisitUsingDirective(node);
+        }
         public override SyntaxNode? VisitNullableDirectiveTrivia(NullableDirectiveTriviaSyntax node)
         {
             reporter.ReportDiagnostic(Diagnostic.Create(

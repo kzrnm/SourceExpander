@@ -159,4 +159,16 @@
   <data name="EMBED0008_Title" xml:space="preserve">
     <value>Nullable directive is unsupported</value>
   </data>
+  <data name="EMBED0009_Body" xml:space="preserve">
+    <value>Avoid using static directive because there is a risk of name collision</value>
+  </data>
+  <data name="EMBED0009_Title" xml:space="preserve">
+    <value>Avoid using static directive</value>
+  </data>
+  <data name="EMBED0010_Body" xml:space="preserve">
+    <value>Avoid using alias directive because there is a risk of name collision</value>
+  </data>
+  <data name="EMBED0010_Title" xml:space="preserve">
+    <value>Avoid using alias directive</value>
+  </data>
 </root>

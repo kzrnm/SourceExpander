@@ -109,5 +109,31 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
+        public static readonly DiagnosticDescriptor EMBED0009_UsingStaticDirective = new(
+            "EMBED0009",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0009_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0009_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Usage",
+            DiagnosticSeverity.Info,
+            true);
+        public static readonly DiagnosticDescriptor EMBED0010_UsingAliasDirective = new(
+            "EMBED0010",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0010_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0010_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Usage",
+            DiagnosticSeverity.Info,
+            true);
     }
 }

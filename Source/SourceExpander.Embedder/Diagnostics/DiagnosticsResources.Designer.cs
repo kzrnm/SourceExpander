@@ -185,5 +185,41 @@ namespace SourceExpander.Diagnostics {
                 return ResourceManager.GetString("EMBED0008_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Avoid using static directive because there is a risk of name collision に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0009_Body {
+            get {
+                return ResourceManager.GetString("EMBED0009_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Avoid using static directive に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0009_Title {
+            get {
+                return ResourceManager.GetString("EMBED0009_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Avoid using alias directive because there is a risk of name collision に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0010_Body {
+            get {
+                return ResourceManager.GetString("EMBED0010_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Avoid using alias directive に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0010_Title {
+            get {
+                return ResourceManager.GetString("EMBED0010_Title", resourceCulture);
+            }
+        }
     }
 }

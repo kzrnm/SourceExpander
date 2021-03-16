@@ -73,5 +73,21 @@ namespace SourceExpander.Embedder.Diagnostics.Test
                 .Should()
                 .Be("Nullable directive is unsupported");
         }
+        [Fact]
+        public void EMBED0009()
+        {
+            Diagnostic.Create(DiagnosticDescriptors.EMBED0009_UsingStaticDirective, Location.None)
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("Avoid using static directive because there is a risk of name collision");
+        }
+        [Fact]
+        public void EMBED0010()
+        {
+            Diagnostic.Create(DiagnosticDescriptors.EMBED0010_UsingAliasDirective, Location.None)
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("Avoid using alias directive because there is a risk of name collision");
+        }
     }
 }

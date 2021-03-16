@@ -73,5 +73,21 @@ namespace SourceExpander.Embedder.Diagnostics.Test
                 .Should()
                 .Be("nullableディレクティブは未対応です");
         }
+        [Fact]
+        public void EMBED0009()
+        {
+            Diagnostic.Create(DiagnosticDescriptors.EMBED0009_UsingStaticDirective, Location.None)
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("名前衝突の危険があるため using static ディレクティブは非推奨です");
+        }
+        [Fact]
+        public void EMBED0010()
+        {
+            Diagnostic.Create(DiagnosticDescriptors.EMBED0010_UsingAliasDirective, Location.None)
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("名前衝突の危険があるため using alias ディレクティブは非推奨です");
+        }
     }
 }

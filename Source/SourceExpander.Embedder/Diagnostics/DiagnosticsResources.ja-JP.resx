@@ -141,4 +141,16 @@
   <data name="EMBED0008_Title" xml:space="preserve">
     <value>nullableディレクティブは未対応です</value>
   </data>
+  <data name="EMBED0009_Body" xml:space="preserve">
+    <value>名前衝突の危険があるため using static ディレクティブは非推奨です</value>
+  </data>
+  <data name="EMBED0009_Title" xml:space="preserve">
+    <value>using static ディレクティブは非推奨です</value>
+  </data>
+  <data name="EMBED0010_Body" xml:space="preserve">
+    <value>名前衝突の危険があるため using alias ディレクティブは非推奨です</value>
+  </data>
+  <data name="EMBED0010_Title" xml:space="preserve">
+    <value>using alias ディレクティブは非推奨です</value>
+  </data>
 </root>
