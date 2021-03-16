@@ -13,6 +13,12 @@ namespace SourceExpander
         public void Initialize(GeneratorInitializationContext context) { }
         public void Execute(GeneratorExecutionContext context)
         {
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+#endif
             var parseOptions = (CSharpParseOptions)context.ParseOptions;
             parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp4);
             var compilation = (CSharpCompilation)context.Compilation;
@@ -24,7 +30,7 @@ namespace SourceExpander
                 list.Add(tree.WithRootAndOptions(newRoot, parseOptions));
             }
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(list);
-            
+
             var resolver = new EmbeddingResolver(
                 compilation,
                 parseOptions,
