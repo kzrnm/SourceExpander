@@ -1,7 +1,5 @@
 ﻿extern alias Generator;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,19 +10,6 @@ namespace SourceExpander.Test
 {
     public class ExpandTest
     {
-        [Fact]
-        public void AssemblyMetadata()
-        {
-            var embedded = typeof(Expander).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-                .Where(attr => attr.Key.StartsWith("SourceExpander"))
-                .ToDictionary(attr => attr.Key, attr => attr.Value);
-            embedded.Should()
-                .ContainKey("SourceExpander.EmbeddedLanguageVersion")
-                .WhichValue.Should().Be("4");
-            embedded.Should()
-                .ContainKey("SourceExpander.EmbeddedSourceCode.GZipBase32768");
-        }
-
         [Fact]
         public void Expand()
         {
