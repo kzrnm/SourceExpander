@@ -31,8 +31,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Share.Test",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Analyzer", "Source\SourceExpander.Embedder.Analyzer\SourceExpander.Embedder.Analyzer.csproj", "{57A46B4F-C575-4180-BB61-084D6F10EFC2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Analyzer.Test", "Test\SourceExpander.Embedder.Analyzer.Test\SourceExpander.Embedder.Analyzer.Test.csproj", "{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummySourceExpanderEmbedder", "Source\DummySourceExpanderEmbedder\DummySourceExpanderEmbedder.csproj", "{638DE41B-9F52-4265-AE3B-3E357C16FA8C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Embedder.Testing", "Source\SourceExpander.Embedder.Testing\SourceExpander.Embedder.Testing.csproj", "{855C17DB-C877-4C85-AF22-C50AF449323D}"
@@ -81,10 +79,6 @@ Global
 		{57A46B4F-C575-4180-BB61-084D6F10EFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57A46B4F-C575-4180-BB61-084D6F10EFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57A46B4F-C575-4180-BB61-084D6F10EFC2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95}.Release|Any CPU.Build.0 = Release|Any CPU
 		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{638DE41B-9F52-4265-AE3B-3E357C16FA8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -106,7 +100,6 @@ Global
 		{524F5B6A-7ECB-4822-9761-0F79638B936D} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
 		{4BDD1D33-DB4B-4B06-A42D-58212D5F9A81} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
 		{3635087E-E105-4779-95A7-783EF4296F7C} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
-		{0DA0721A-5BC0-4B3B-B470-91A4AE2D8C95} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
 		{F14F4098-2ABC-408F-A6BC-309F3AF91DFB} = {4D491FE6-63FF-4D17-A6ED-F6ACB0B23214}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
