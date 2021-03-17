@@ -66,7 +66,7 @@ class Program2
                     ExpectedDiagnostics =
                     {
                         new DiagnosticResult("EXPAND0003", DiagnosticSeverity.Info),
-                        DiagnosticResult.CompilerWarning("EXPAND0008").WithArguments("Other", "SourceExpander.EmbeddedSourceCode", "Expecting state 'Element'.. Encountered 'Text'  with name '', namespace ''."),
+                        DiagnosticResult.CompilerWarning("EXPAND0008").WithArguments("Other", "SourceExpander.EmbeddedSourceCode", "Input string '-' is not a valid number. Path '[0]', line 1, position 2."),
                     },
                     GeneratedSources =
                     {

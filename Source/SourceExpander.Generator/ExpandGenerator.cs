@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -47,7 +46,7 @@ namespace SourceExpander
                 ExpandConfig config;
                 try
                 {
-                    config = ExpandConfig.Parse(configText, context.CancellationToken);
+                    config = ExpandConfig.Parse(configText);
                 }
                 catch (ParseConfigException e)
                 {

@@ -15,7 +15,7 @@ namespace SourceExpander.Generator.Generate.Test
     ""ignore-file-pattern-regex"": 1
 }
 "),
-                "Expecting state 'Element'.. Encountered 'Text'  with name '', namespace ''."
+                "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 4, position 34."
             },
             {
                 new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", @"
@@ -24,7 +24,7 @@ namespace SourceExpander.Generator.Generate.Test
     ""ignore-file-pattern-regex"": 1
 }
 "),
-                "Expecting state 'Element'.. Encountered 'Text'  with name '', namespace ''."
+                "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 4, position 34."
             },
             {
                 new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", @"

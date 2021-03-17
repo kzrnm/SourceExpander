@@ -34,15 +34,15 @@ namespace SourceExpander
         }
 
         [DataMember]
+        public string CodeBody { get; set; }
+        [DataMember]
+        public IEnumerable<string> Dependencies { get; set; }
+        [DataMember]
         public string FileName { get; set; }
         [DataMember]
         public IEnumerable<string> TypeNames { get; set; }
         [DataMember]
         public IEnumerable<string> Usings { get; set; }
-        [DataMember]
-        public IEnumerable<string> Dependencies { get; set; }
-        [DataMember]
-        public string CodeBody { get; set; }
 
         public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
     }

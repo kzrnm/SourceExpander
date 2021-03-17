@@ -64,6 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" GeneratePathProperty="true" />
     <PackageReference Include="Base32768" Version="1.0.9" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -82,6 +83,7 @@
 
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
+      <TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
@@ -89,6 +91,7 @@
   <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(TargetDir)\*.dll" PackagePath="analyzers\dotnet\cs" />
+      <TfmSpecificPackageFile Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
       <TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
       <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
     </ItemGroup>

@@ -17,10 +17,6 @@
     <Compile Remove="../SourceExpander.Embedder/EmbedderGenerator.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Base32768" Version="1.0.9" GeneratePathProperty="true" />
-  </ItemGroup>
-
   <ItemDefinitionGroup>
     <PackageReference>
       <PrivateAssets>all</PrivateAssets>
@@ -28,6 +24,8 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" Version="1.0.9" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -38,6 +36,7 @@
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
 

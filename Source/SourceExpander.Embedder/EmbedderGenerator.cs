@@ -47,7 +47,7 @@ namespace SourceExpander
                 EmbedderConfig config;
                 try
                 {
-                    config = EmbedderConfig.Parse(configText, context.CancellationToken);
+                    config = EmbedderConfig.Parse(configText);
                 }
                 catch (ParseConfigException e)
                 {
