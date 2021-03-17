@@ -17,7 +17,6 @@ namespace SourceExpander.Roslyn
         private readonly IDiagnosticReporter reporter;
         private readonly CancellationToken cancellationToken;
         public EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken)
-            : base(true)
         {
             this.model = model;
             this.config = config;
@@ -40,15 +39,18 @@ namespace SourceExpander.Roslyn
             }
         Fin: return base.VisitUsingDirective(node);
         }
-        public override SyntaxNode? VisitNullableDirectiveTrivia(NullableDirectiveTriviaSyntax node)
+        public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
         {
-            reporter.ReportDiagnostic(Diagnostic.Create(
-                DiagnosticDescriptors.EMBED0008_NullableDirective, node.GetLocation()));
-            return base.VisitNullableDirectiveTrivia(node);
+            if (trivia.IsKind(SyntaxKind.NullableDirectiveTrivia))
+            {
+                reporter.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0008_NullableDirective, trivia.GetLocation()));
+            }
+            return SyntaxFactory.ElasticMarker;
         }
         public override SyntaxNode? VisitAttribute(AttributeSyntax node)
         {
-            if (model.GetTypeInfo(node).Type is { } typeSymbol
+            if (model.GetTypeInfo(node, cancellationToken).Type is { } typeSymbol
                 && config.ExcludeAttributes.Contains(typeSymbol.ToString()))
                 return null;
             return base.VisitAttribute(node);
@@ -56,7 +58,8 @@ namespace SourceExpander.Roslyn
 
         public override SyntaxNode? VisitAttributeList(AttributeListSyntax node)
         {
-            if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Count > 0)
+            cancellationToken.ThrowIfCancellationRequested();
+            if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Any())
                 return attrs;
             return null;
         }
@@ -75,6 +78,7 @@ namespace SourceExpander.Roslyn
 
                 return config.RemoveConditional.Overlaps(conditions);
             }
+            cancellationToken.ThrowIfCancellationRequested();
             var res = base.VisitExpressionStatement(node);
             if (node.Parent.IsKind(SyntaxKind.Block)
                 && node.Expression is InvocationExpressionSyntax invocation

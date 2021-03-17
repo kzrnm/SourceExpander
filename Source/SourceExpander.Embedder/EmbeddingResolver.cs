@@ -194,7 +194,6 @@ namespace SourceExpander
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
 
             var newRoot = typeFindAndUnusedUsingRemover.Visit(root);
-            newRoot = new TriviaRemover().Visit(newRoot);
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
