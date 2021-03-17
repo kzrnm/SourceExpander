@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 
 namespace SourceExpander
@@ -19,21 +20,28 @@ namespace SourceExpander
             this.compilation = compilation;
         }
 
-        public IEnumerable<(EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)> Errors)>
-            GetEmbeddedSourceFiles()
+        public (EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)> Errors)[] GetEmbeddedSourceFiles(CancellationToken cancellationToken)
         {
-            foreach (var reference in compilation.References)
+            if (compilation.Options.ConcurrentBuild)
+                return compilation.References.AsParallel(cancellationToken)
+                    .Select(Load).ToArray();
+            else
+                return compilation.References.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                    .Select(Load).ToArray();
+
+            (EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)>)
+                Load(MetadataReference reference)
             {
                 var symbol = compilation.GetAssemblyOrModuleSymbol(reference);
                 if (symbol is null)
-                    continue;
+                    return (EmbeddedData.Empty, reference.Display, ImmutableArray<(string, string)>.Empty);
 
-                var (embedded, errors) = EmbeddedData.Create(symbol.Name,
+                var (embedded, errors) = EmbeddedData.Create(
+                    symbol.Name,
                     symbol.GetAttributes()
-                        .Select(GetAttributeSourceCode)
-                        .OfType<KeyValuePair<string, string>>());
-
-                yield return (embedded, reference.Display, errors);
+                    .Select(GetAttributeSourceCode)
+                    .OfType<KeyValuePair<string, string>>());
+                return (embedded, reference.Display, errors);
             }
         }
         KeyValuePair<string, string>? GetAttributeSourceCode(AttributeData attr)

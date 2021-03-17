@@ -37,7 +37,7 @@ namespace SourceExpander
             this.parseOptions = parseOptions;
             this.config = config;
             this.cancellationToken = cancellationToken;
-            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles();
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
             container = new SourceFileContainer(WithCheck(embeddedDatas));
             expander = new CompilationExpander(compilation, container, config);
         }

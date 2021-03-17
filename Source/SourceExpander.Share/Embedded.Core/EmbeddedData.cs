@@ -24,6 +24,11 @@ namespace SourceExpander
             CSharpVersion = csharpVersion;
             AllowUnsafe = allowUnsafe;
         }
+        public static EmbeddedData Empty => new("Empty", 
+            ImmutableArray<SourceFileInfo>.Empty, 
+            new(1, 0, 0), 
+            LanguageVersion.Default, 
+            false);
         public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
             Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
         {
@@ -36,7 +41,7 @@ namespace SourceExpander
             foreach (var pair in assemblyMetadatas)
             {
                 var key = pair.Key;
-                var value= pair.Value;
+                var value = pair.Value;
                 var keyArray = key.Split('.');
                 if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
                     continue;

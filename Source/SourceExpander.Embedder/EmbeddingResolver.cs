@@ -115,9 +115,11 @@ namespace SourceExpander
             updated = true;
             SyntaxTree[] newTrees;
             if (ConcurrentBuild)
-                newTrees = compilation.SyntaxTrees.AsParallel().Select(Rewrited).ToArray();
+                newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
+                    .Select(Rewrited).ToArray();
             else
-                newTrees = compilation.SyntaxTrees.Select(Rewrited).ToArray();
+                newTrees = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                    .Select(Rewrited).ToArray();
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
 
             SyntaxTree Rewrited(SyntaxTree tree)
@@ -138,8 +140,9 @@ namespace SourceExpander
 
             VerifyCompilation();
             UpdateCompilation();
+            cancellationToken.ThrowIfCancellationRequested();
             var depSources = new List<SourceFileInfo>();
-            foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles())
+            foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken))
             {
                 foreach (var (key, message) in errors)
                 {
@@ -158,10 +161,19 @@ namespace SourceExpander
                 depSources.AddRange(embedded.Sources);
             }
 
-            var rawInfos = compilation.SyntaxTrees
-                .Select(tree => ParseSource(tree))
-                .Where(info => info.TypeNames.Any())
-                .ToArray();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            SourceFileInfoRaw[] rawInfos;
+            if (ConcurrentBuild)
+                rawInfos = compilation.SyntaxTrees.AsParallel(cancellationToken)
+                    .Select(ParseSource)
+                    .Where(info => info.TypeNames.Any())
+                    .ToArray();
+            else
+                rawInfos = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                    .Select(ParseSource)
+                    .Where(info => info.TypeNames.Any())
+                    .ToArray();
             var commonPrefix = ResolveCommomPrefix(rawInfos.Select(r => r.FileName));
             var infos = ResolveRaw(rawInfos, commonPrefix, depSources).ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
