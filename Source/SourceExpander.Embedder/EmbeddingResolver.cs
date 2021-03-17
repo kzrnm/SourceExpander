@@ -17,6 +17,7 @@ namespace SourceExpander
         private readonly CSharpParseOptions parseOptions;
         private readonly IDiagnosticReporter reporter;
         private readonly EmbedderConfig config;
+        private readonly bool ConcurrentBuild;
         private readonly CancellationToken cancellationToken;
         public EmbeddingResolver(EmbeddingContext context)
             : this(context.Compilation, context.ParseOptions, context.Reporter, context.Config, context.CancellationToken)
@@ -36,7 +37,7 @@ namespace SourceExpander
             };
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
-
+            ConcurrentBuild = opts.ConcurrentBuild;
             this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
             this.compilation = compilation.WithOptions(opts);
             this.reporter = reporter;
@@ -109,20 +110,23 @@ namespace SourceExpander
         }
         private void UpdateCompilation()
         {
-            if (updated)
-                return;
+            cancellationToken.ThrowIfCancellationRequested();
+            if (updated) return;
             updated = true;
-            var newCompilation = compilation;
-            var trees = compilation.SyntaxTrees;
-            foreach (var tree in trees)
+            SyntaxTree[] newTrees;
+            if (ConcurrentBuild)
+                newTrees = compilation.SyntaxTrees.AsParallel().Select(Rewrited).ToArray();
+            else
+                newTrees = compilation.SyntaxTrees.Select(Rewrited).ToArray();
+            compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
+
+            SyntaxTree Rewrited(SyntaxTree tree)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var semanticModel = compilation.GetSemanticModel(tree, true);
-                var newRoot = new EmbedderRewriter(semanticModel, config, reporter, cancellationToken).Visit(tree.GetRoot(cancellationToken));
-                newCompilation = newCompilation.ReplaceSyntaxTree(tree,
-                    tree.WithRootAndOptions(newRoot, parseOptions));
+                var newRoot = new EmbedderRewriter(semanticModel, config, reporter, cancellationToken).Visit(tree.GetRoot(cancellationToken))!;
+                return tree.WithRootAndOptions(newRoot, parseOptions);
             }
-            compilation = newCompilation;
-            return;
         }
         private ImmutableArray<SourceFileInfo> _cacheResolvedFiles;
         public ImmutableArray<SourceFileInfo> ResolveFiles()
