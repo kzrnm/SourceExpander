@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -24,7 +25,7 @@ namespace SourceExpander
             AllowUnsafe = allowUnsafe;
         }
         public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
-            Create(string assemblyName, ImmutableDictionary<string, string> assemblyMetadatas)
+            Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
         {
             var errors = ImmutableArray.CreateBuilder<(string Key, string ErrorMessage)>();
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
@@ -34,22 +35,24 @@ namespace SourceExpander
             var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();
             foreach (var pair in assemblyMetadatas)
             {
-                var keyArray = pair.Key.Split('.');
+                var key = pair.Key;
+                var value= pair.Value;
+                var keyArray = key.Split('.');
                 if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
                     continue;
 
                 ParseResult r;
-                switch ((r = TryAddSourceFileInfos(keyArray, pair.Value, builder)).Result)
+                switch ((r = TryAddSourceFileInfos(keyArray, value, builder)).Result)
                 {
                     case ParseResult.Status.NotMatch:
                         break;
                     case ParseResult.Status.Success:
                         continue;
                     case ParseResult.Status.Error:
-                        errors.Add((pair.Key, r.Message));
+                        errors.Add((key, r.Message));
                         continue;
                 }
-                switch ((r = TryGetEmbedderVersion(keyArray, pair.Value, out var attrVersion)).Result)
+                switch ((r = TryGetEmbedderVersion(keyArray, value, out var attrVersion)).Result)
                 {
                     case ParseResult.Status.NotMatch:
                         break;
@@ -57,10 +60,10 @@ namespace SourceExpander
                         version = attrVersion;
                         continue;
                     case ParseResult.Status.Error:
-                        errors.Add((pair.Key, r.Message));
+                        errors.Add((key, r.Message));
                         continue;
                 }
-                switch ((r = TryGetEmbeddedLanguageVersion(keyArray, pair.Value, out var attrCSharpVersion)).Result)
+                switch ((r = TryGetEmbeddedLanguageVersion(keyArray, value, out var attrCSharpVersion)).Result)
                 {
                     case ParseResult.Status.NotMatch:
                         break;
@@ -68,10 +71,10 @@ namespace SourceExpander
                         csharpVersion = attrCSharpVersion;
                         continue;
                     case ParseResult.Status.Error:
-                        errors.Add((pair.Key, r.Message));
+                        errors.Add((key, r.Message));
                         continue;
                 }
-                switch ((r = TryGetEmbeddedAllowUnsafe(keyArray, pair.Value, out var attrAllowUnsafe)).Result)
+                switch ((r = TryGetEmbeddedAllowUnsafe(keyArray, value, out var attrAllowUnsafe)).Result)
                 {
                     case ParseResult.Status.NotMatch:
                         break;
@@ -79,7 +82,7 @@ namespace SourceExpander
                         allowUnsafe = attrAllowUnsafe;
                         continue;
                     case ParseResult.Status.Error:
-                        errors.Add((pair.Key, r.Message));
+                        errors.Add((key, r.Message));
                         continue;
                 }
             }

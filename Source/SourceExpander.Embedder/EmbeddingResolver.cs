@@ -139,7 +139,7 @@ namespace SourceExpander
             VerifyCompilation();
             UpdateCompilation();
             var depSources = new List<SourceFileInfo>();
-            foreach (var (embedded, display, errors) in AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation))
+            foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles())
             {
                 foreach (var (key, message) in errors)
                 {
@@ -147,6 +147,8 @@ namespace SourceExpander
                         Diagnostic.Create(DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError, Location.None,
                         display, key, message));
                 }
+                if (embedded.IsEmpty)
+                    continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
                     reporter.ReportDiagnostic(
