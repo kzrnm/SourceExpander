@@ -80,6 +80,10 @@ namespace SourceExpander
                     "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
 
             }
+            catch (OperationCanceledException)
+            {
+                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
+            }
             catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());

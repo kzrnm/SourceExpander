@@ -74,6 +74,10 @@ namespace SourceExpander
                 context.AddSource("SourceExpander.Expanded.cs",
                     SourceText.From(expandedCode, Encoding.UTF8));
             }
+            catch (OperationCanceledException)
+            {
+                Trace.WriteLine(nameof(ExpandGenerator) + "." + nameof(Execute) + "is Canceled.");
+            }
             catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());
