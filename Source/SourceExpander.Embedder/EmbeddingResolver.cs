@@ -186,8 +186,12 @@ namespace SourceExpander
             }
             WithoutCommonPrefix(rawInfos, $"{compilation.AssemblyName}>", ResolveCommomPrefix(rawInfos.Select(r => r.FileName)));
 
-            var infos = ResolveRaw(rawInfos, depSources).ToArray();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var infos = ResolveRaw(rawInfos, depSources);
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             _cacheResolvedFiles = ImmutableArray.Create(infos);
             if (ValidationHelpers.EnumerateEmbeddedSourcesErrors(
@@ -251,13 +255,15 @@ namespace SourceExpander
             }
             return new SourceFileInfoRaw(tree, tree.FilePath, typeNames, usings, minifiedCode);
         }
-        private IEnumerable<SourceFileInfo> ResolveRaw(SourceFileInfoRaw[] infos, IEnumerable<SourceFileInfo> otherInfos)
+        private SourceFileInfo[] ResolveRaw(SourceFileInfoRaw[] infos, IEnumerable<SourceFileInfo> otherInfos)
         {
             var dependencyInfo = infos.Cast<ISourceFileInfoSlim>()
                 .Concat(otherInfos.Select(s => new SourceFileInfoSlim(s)))
                 .ToArray();
-            IEnumerable<string> GetDependencies(SourceFileInfoRaw raw)
+            var result = new SourceFileInfo[infos.Length];
+            IEnumerable<string> GetDependencies(int index)
             {
+                var raw = infos[index];
                 var tree = raw.SyntaxTree;
                 var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
 
@@ -281,18 +287,19 @@ namespace SourceExpander
                 return dependencies;
             }
 
-
-            foreach (var raw in infos)
+            for (int i = 0; i < infos.Length; i++)
             {
-                yield return new SourceFileInfo
+                var raw = infos[i];
+                result[i] = new SourceFileInfo
                 (
                     raw.FileName,
                     raw.TypeNames,
                     raw.Usings,
-                    GetDependencies(raw),
+                    GetDependencies(i),
                     raw.CodeBody
                 );
             }
+            return result;
         }
 
         public static string ResolveCommomPrefix(IEnumerable<string> strs)
