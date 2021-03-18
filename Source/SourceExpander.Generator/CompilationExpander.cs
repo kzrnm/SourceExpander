@@ -36,13 +36,12 @@ namespace SourceExpander
             var origRoot = (CompilationUnitSyntax)origTree.GetRoot(cancellationToken);
 
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
-            if (typeFindAndUnusedUsingRemover.Visit(origRoot) is not CompilationUnitSyntax newRoot)
-                throw new InvalidOperationException($"{nameof(newRoot)} is null");
-            if (typeFindAndUnusedUsingRemover.UsedTypeNames() is not { } typeNames)
+            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
+            if (typeFindAndUnusedUsingRemover.UsedTypeNames is not { } typeNames)
                 throw new InvalidOperationException($"{nameof(typeNames)} is null");
             var requiedFiles = sourceFileContainer.ResolveDependency(typeNames, false);
 
-            var usings = typeFindAndUnusedUsingRemover.RootUsings()
+            var usings = typeFindAndUnusedUsingRemover.RootUsings
                 .Union(requiedFiles.SelectMany(s => s.Usings))
                 .ToArray();
 

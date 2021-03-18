@@ -205,22 +205,19 @@ namespace SourceExpander
         private SourceFileInfoRaw ParseSource(SyntaxTree tree)
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
-            var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
-
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, compilation.GetTypeByMetadataName(SourceExpander_NotEmbeddingSourceAttributeName), cancellationToken);
 
-            var newRoot = typeFindAndUnusedUsingRemover.Visit(root);
+            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
-            var usings = typeFindAndUnusedUsingRemover.RootUsings();
+            var usings = typeFindAndUnusedUsingRemover.RootUsings;
+            var typeNames = typeFindAndUnusedUsingRemover.DefinedTypeNames;
 
-            var typeNames = typeFindAndUnusedUsingRemover.DefinedTypeNames();
-
-            var minified = newRoot.NormalizeWhitespace("", " ");
+            SyntaxNode minified = newRoot.NormalizeWhitespace("", " ");
             if (config.EnableMinify)
             {
-                minified = new TriviaFormatter().Visit(minified)!;
+                minified = TriviaFormatter.Minified(minified)!;
             }
             string minifiedCode = minified!.ToString();
 

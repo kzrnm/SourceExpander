@@ -7,6 +7,8 @@ namespace SourceExpander.Roslyn
 {
     internal class TriviaFormatter : CSharpSyntaxRewriter
     {
+        private TriviaFormatter() { }
+        public static SyntaxNode? Minified(SyntaxNode? node) => new TriviaFormatter().Visit(node);
         static TriviaFormatter()
         {
             var splitBuilder = ImmutableHashSet.CreateBuilder<SyntaxKind>();
