@@ -19,6 +19,7 @@ namespace SourceExpander
         private readonly EmbedderConfig config;
         private readonly bool ConcurrentBuild;
         private readonly CancellationToken cancellationToken;
+
         public EmbeddingResolver(EmbeddingContext context)
             : this(context.Compilation, context.ParseOptions, context.Reporter, context.Config, context.CancellationToken)
         { }
@@ -37,7 +38,7 @@ namespace SourceExpander
             };
             var opts = compilation.Options
                 .WithSpecificDiagnosticOptions(specificDiagnosticOptions);
-            ConcurrentBuild = opts.ConcurrentBuild;
+            this.ConcurrentBuild = opts.ConcurrentBuild;
             this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
             this.compilation = compilation.WithOptions(opts);
             this.reporter = reporter;
@@ -200,12 +201,13 @@ namespace SourceExpander
             return _cacheResolvedFiles;
         }
 
+        private const string SourceExpander_NotEmbeddingSourceAttributeName = "SourceExpander.NotEmbeddingSourceAttribute";
         private SourceFileInfoRaw ParseSource(SyntaxTree tree)
         {
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
 
-            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
+            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, compilation.GetTypeByMetadataName(SourceExpander_NotEmbeddingSourceAttributeName), cancellationToken);
 
             var newRoot = typeFindAndUnusedUsingRemover.Visit(root);
             if (newRoot is null)

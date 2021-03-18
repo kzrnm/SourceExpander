@@ -13,30 +13,35 @@ namespace SourceExpander.Roslyn
         private readonly ImmutableArray<Diagnostic> diagnostics;
         private readonly CancellationToken cancellationToken;
 
-        private readonly ImmutableHashSet<string>.Builder typeNamesBuilder = ImmutableHashSet.CreateBuilder<string>();
-        public ImmutableHashSet<string> DefinedTypeNames() => typeNamesBuilder.ToImmutable();
+        private readonly ImmutableHashSet<string>.Builder definedTypesBuilder = ImmutableHashSet.CreateBuilder<string>();
+        public ImmutableHashSet<string> DefinedTypeNames() => definedTypesBuilder.ToImmutable();
+
+        private readonly ImmutableHashSet<string>.Builder usedTypesBuilder = ImmutableHashSet.CreateBuilder<string>();
+        public ImmutableHashSet<string> UsedTypeNames() => usedTypesBuilder.ToImmutable();
 
         private readonly ImmutableHashSet<string>.Builder rootUsingsBuilder = ImmutableHashSet.CreateBuilder<string>();
         public ImmutableHashSet<string> RootUsings() => rootUsingsBuilder.ToImmutable();
 
-        private readonly INamedTypeSymbol? NotEmbeddingSourceAttributeSymbol;
+        private readonly INamedTypeSymbol? SkipAttributeSymbol;
 
         public TypeFindAndUnusedUsingRemover(SemanticModel model, CancellationToken cancellationToken)
+            : this(model, null, cancellationToken) { }
+        public TypeFindAndUnusedUsingRemover(SemanticModel model, INamedTypeSymbol? skipAttributeSymbol, CancellationToken cancellationToken)
         {
             this.model = model;
-            NotEmbeddingSourceAttributeSymbol = model.Compilation.GetTypeByMetadataName("SourceExpander.NotEmbeddingSourceAttribute");
+            this.SkipAttributeSymbol = skipAttributeSymbol;
             this.cancellationToken = cancellationToken;
-            diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken);
+            this.diagnostics = model.GetDiagnostics(cancellationToken: cancellationToken);
         }
 
         private bool HasNotEmbeddingSourceAttribute(SyntaxNode? node)
         {
-            if (node is MemberDeclarationSyntax declarationSyntax)
-
+            if (SkipAttributeSymbol is not null
+                && node is MemberDeclarationSyntax declarationSyntax)
                 foreach (var attributeListSyntax in declarationSyntax.AttributeLists)
                     foreach (var attribute in attributeListSyntax.Attributes)
                         if (model.GetTypeInfo(attribute).Type is ITypeSymbol atSymbol
-                            && SymbolEqualityComparer.Default.Equals(NotEmbeddingSourceAttributeSymbol, atSymbol))
+                            && SymbolEqualityComparer.Default.Equals(SkipAttributeSymbol, atSymbol))
                             return true;
             return false;
         }
@@ -53,7 +58,7 @@ namespace SourceExpander.Roslyn
             var typeName = symbol?.ToDisplayString();
             if (typeName is not null)
             {
-                typeNamesBuilder.Add(typeName);
+                definedTypesBuilder.Add(typeName);
                 return true;
             }
             return false;
@@ -61,6 +66,8 @@ namespace SourceExpander.Roslyn
 
         public override SyntaxNode? Visit(SyntaxNode? node)
         {
+            if (node == null)
+                return null;
             if (HasNotEmbeddingSourceAttribute(node))
                 return null;
             if (node is BaseTypeDeclarationSyntax typeDeclaration)
@@ -73,6 +80,12 @@ namespace SourceExpander.Roslyn
                 if (!FindDeclaredType(delegateDeclaration))
                     return null;
             }
+            var namedTypeSymbol = RoslynUtil.GetTypeNameFromSymbol(model.GetSymbolInfo(node, cancellationToken).Symbol);
+            if (namedTypeSymbol?.ToDisplayString() is string typeName)
+            {
+                usedTypesBuilder.Add(typeName);
+            }
+
             return base.Visit(node);
         }
 
