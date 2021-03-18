@@ -175,8 +175,18 @@ namespace SourceExpander
                     .Select(ParseSource)
                     .Where(info => info.TypeNames.Any())
                     .ToArray();
-            var commonPrefix = ResolveCommomPrefix(rawInfos.Select(r => r.FileName));
-            var infos = ResolveRaw(rawInfos, commonPrefix, depSources).ToArray();
+
+            static void WithoutCommonPrefix(SourceFileInfoRaw[] rawInfos, string prefix, string commonPrefix)
+            {
+                for (int i = 0; i < rawInfos.Length; i++)
+                {
+                    var newName = string.IsNullOrEmpty(commonPrefix) ? prefix + rawInfos[i].FileName : rawInfos[i].FileName.Replace(commonPrefix, prefix);
+                    rawInfos[i] = rawInfos[i].WithFileName(newName);
+                }
+            }
+            WithoutCommonPrefix(rawInfos, $"{compilation.AssemblyName}>", ResolveCommomPrefix(rawInfos.Select(r => r.FileName)));
+
+            var infos = ResolveRaw(rawInfos, depSources).ToArray();
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
             _cacheResolvedFiles = ImmutableArray.Create(infos);
@@ -241,15 +251,8 @@ namespace SourceExpander
             }
             return new SourceFileInfoRaw(tree, tree.FilePath, typeNames, usings, minifiedCode);
         }
-        private IEnumerable<SourceFileInfo> ResolveRaw(IEnumerable<SourceFileInfoRaw> infos, string commonPrefix, IEnumerable<SourceFileInfo> otherInfos)
+        private IEnumerable<SourceFileInfo> ResolveRaw(SourceFileInfoRaw[] infos, IEnumerable<SourceFileInfo> otherInfos)
         {
-            var prefix = $"{compilation.AssemblyName}>";
-            string NewName(SourceFileInfoRaw raw)
-                => string.IsNullOrEmpty(commonPrefix) ?
-                prefix + raw.FileName :
-                raw.FileName.Replace(commonPrefix, prefix);
-            infos = infos.Select(raw => raw.WithFileName(NewName(raw)));
-
             var dependencyInfo = infos.Cast<ISourceFileInfoSlim>()
                 .Concat(otherInfos.Select(s => new SourceFileInfoSlim(s)))
                 .ToArray();
@@ -297,20 +300,20 @@ namespace SourceExpander
 
         public static string ResolveCommomPrefix(IEnumerable<string> strs)
         {
-            var sorted = new SortedSet<string>(strs, StringComparer.Ordinal);
-            if (sorted.Count < 1) return "";
-            if (sorted.Count < 2)
-            {
-                var p = sorted.Min;
-                var name = Path.GetFileName(p);
-                if (!p.EndsWith(name))
-                    return "";
+            var min = strs.FirstOrDefault();
+            var max = min;
 
-                return p.Substring(0, p.Length - name.Length);
+            if (min is null) return "";
+            foreach (var s in strs.Skip(1))
+            {
+                if (StringComparer.Ordinal.Compare(min, s) > 0)
+                    min = s;
+                else if (StringComparer.Ordinal.Compare(max, s) < 0)
+                    max = s;
             }
 
-            var min = sorted.Min;
-            var max = sorted.Max;
+            if (min == max)
+                return min.Substring(0, min.Length - Path.GetFileName(min).Length);
 
             for (int i = 0; i < min.Length && i < max.Length; i++)
             {
