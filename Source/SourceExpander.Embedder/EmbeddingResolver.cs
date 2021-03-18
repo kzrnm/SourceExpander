@@ -295,9 +295,6 @@ namespace SourceExpander
             }
         }
 
-        public bool HasType(string typeFullName)
-            => compilation.GetTypeByMetadataName(typeFullName) != null;
-
         public static string ResolveCommomPrefix(IEnumerable<string> strs)
         {
             var min = strs.FirstOrDefault();
@@ -331,8 +328,6 @@ namespace SourceExpander
         }
         private class SourceFileInfoRaw : ISourceFileInfoSlim
         {
-            public static readonly SourceFileInfoRaw Dummy
-                = new(CSharpSyntaxTree.ParseText(""), "Dummy", Array.Empty<string>(), Array.Empty<string>(), "");
             public SyntaxTree SyntaxTree { get; }
             public string FileName { get; }
             public ImmutableHashSet<string> TypeNames { get; }
