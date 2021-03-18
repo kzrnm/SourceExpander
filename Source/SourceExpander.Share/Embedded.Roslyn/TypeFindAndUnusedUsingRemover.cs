@@ -40,7 +40,7 @@ namespace SourceExpander.Roslyn
                 && node is MemberDeclarationSyntax declarationSyntax)
                 foreach (var attributeListSyntax in declarationSyntax.AttributeLists)
                     foreach (var attribute in attributeListSyntax.Attributes)
-                        if (model.GetTypeInfo(attribute).Type is ITypeSymbol atSymbol
+                        if (model.GetTypeInfo(attribute, cancellationToken).Type is ITypeSymbol atSymbol
                             && SymbolEqualityComparer.Default.Equals(SkipAttributeSymbol, atSymbol))
                             return true;
             return false;

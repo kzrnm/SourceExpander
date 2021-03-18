@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Threading;
+using Microsoft.CodeAnalysis.CSharp;
 #nullable enable
 namespace SourceExpander
 {
@@ -45,5 +48,13 @@ namespace SourceExpander
         public IEnumerable<string> Usings { get; set; }
 
         public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
+        public CSharpSyntaxTree ToSyntaxTree(CSharpParseOptions options,
+            Encoding encoding,
+            CancellationToken cancellationToken = default)
+            => (CSharpSyntaxTree)CSharpSyntaxTree.ParseText(Restore(),
+                options,
+                FileName,
+                encoding,
+                cancellationToken);
     }
 }

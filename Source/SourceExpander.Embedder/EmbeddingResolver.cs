@@ -139,8 +139,6 @@ namespace SourceExpander
             if (!config.Enabled)
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
 
-            VerifyCompilation();
-            UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
             var depSources = new List<SourceFileInfo>();
             foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken))
@@ -161,7 +159,9 @@ namespace SourceExpander
                 }
                 depSources.AddRange(embedded.Sources);
             }
-
+            cancellationToken.ThrowIfCancellationRequested();
+            VerifyCompilation();
+            UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
 
             SourceFileInfoRaw[] rawInfos;
@@ -181,7 +181,7 @@ namespace SourceExpander
 
             _cacheResolvedFiles = ImmutableArray.Create(infos);
             if (ValidationHelpers.EnumerateEmbeddedSourcesErrors(
-                compilation, parseOptions, _cacheResolvedFiles, cancellationToken).ToArray()
+                _cacheResolvedFiles, compilation.Options, compilation.References, parseOptions, cancellationToken).ToArray()
                 is { } diagnostics
                 && diagnostics.Length > 0)
             {

@@ -23,6 +23,15 @@ namespace SourceExpander.Roslyn
             this.reporter = reporter;
             this.cancellationToken = cancellationToken;
         }
+        public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
+        {
+            if (trivia.IsKind(SyntaxKind.NullableDirectiveTrivia))
+            {
+                reporter.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.EMBED0008_NullableDirective, trivia.GetLocation()));
+            }
+            return SyntaxFactory.ElasticMarker;
+        }
         public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)
         {
             if (node.Parent.IsKind(SyntaxKind.CompilationUnit))
@@ -39,15 +48,6 @@ namespace SourceExpander.Roslyn
             }
         Fin: return base.VisitUsingDirective(node);
         }
-        public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
-        {
-            if (trivia.IsKind(SyntaxKind.NullableDirectiveTrivia))
-            {
-                reporter.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0008_NullableDirective, trivia.GetLocation()));
-            }
-            return SyntaxFactory.ElasticMarker;
-        }
         public override SyntaxNode? VisitAttribute(AttributeSyntax node)
         {
             if (model.GetTypeInfo(node, cancellationToken).Type is { } typeSymbol
@@ -58,7 +58,6 @@ namespace SourceExpander.Roslyn
 
         public override SyntaxNode? VisitAttributeList(AttributeListSyntax node)
         {
-            cancellationToken.ThrowIfCancellationRequested();
             if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Any())
                 return attrs;
             return null;
