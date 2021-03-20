@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceExpander.Roslyn;
 
 namespace SourceExpander
@@ -224,6 +225,9 @@ namespace SourceExpander
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
+            var usings = typeFindAndUnusedUsingRemover.RootUsings;
+            var typeNames = typeFindAndUnusedUsingRemover.DefinedTypeNames;
+
             SyntaxNode minified = newRoot.NormalizeWhitespace("", " ");
             if (config.EnableMinify)
             {
@@ -249,33 +253,51 @@ namespace SourceExpander
                 reporter.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diffStr));
             }
-            return new SourceFileInfoRaw(tree,
-                tree.FilePath,
-                typeFindAndUnusedUsingRemover.DefinedTypeNames,
-                typeFindAndUnusedUsingRemover.UsedTypeNames,
-                typeFindAndUnusedUsingRemover.RootUsings, minifiedCode);
+            return new SourceFileInfoRaw(tree, tree.FilePath, typeNames, usings, minifiedCode);
         }
         private SourceFileInfo[] ResolveRaw(SourceFileInfoRaw[] infos, IEnumerable<SourceFileInfo> otherInfos)
         {
-            var infosSlim = infos.Concat<ISourceFileInfoSlim>(otherInfos.Select(s => new SourceFileInfoSlim(s))).ToArray();
-            var scc = TopologicalSort.SCC(infosSlim);
-
+            var dependencyInfo = infos.Cast<ISourceFileInfoSlim>()
+                .Concat(otherInfos.Select(s => new SourceFileInfoSlim(s)))
+                .ToArray();
             var result = new SourceFileInfo[infos.Length];
-            for (int si = scc.Length - 1; si >= 0; si--)
+            IEnumerable<string> GetDependencies(int index)
             {
-                var (groups, deps) = scc[si];
-                foreach (var g in groups)
-                    if ((uint)g < (uint)infos.Length)
-                    {
-                        var raw = infos[g];
-                        var fileName = infos[g].FileName;
-                        result[g] = new(
-                            raw.FileName,
-                            raw.TypeNames,
-                            raw.Usings,
-                            deps.Where(fn => fn != raw.FileName),
-                            raw.CodeBody);
-                    }
+                var raw = infos[index];
+                var tree = raw.SyntaxTree;
+                var root = (CompilationUnitSyntax)tree.GetRoot(cancellationToken);
+
+                var semanticModel = compilation.GetSemanticModel(tree, true);
+                var typeQueue = new Queue<string>(
+                    RoslynUtil.AllTypeNames(semanticModel, tree, cancellationToken));
+
+                var added = new HashSet<string>(raw.TypeNames);
+                var dependencies = new HashSet<string>();
+                while (typeQueue.Count > 0)
+                {
+                    var typeName = typeQueue.Dequeue();
+                    if (!added.Add(typeName)) continue;
+
+                    dependencies.UnionWith(
+                        dependencyInfo
+                        .Where(s => s.TypeNames.Contains(typeName))
+                        .Select(s => s.FileName));
+                }
+
+                return dependencies;
+            }
+
+            for (int i = 0; i < infos.Length; i++)
+            {
+                var raw = infos[i];
+                result[i] = new SourceFileInfo
+                (
+                    raw.FileName,
+                    raw.TypeNames,
+                    raw.Usings,
+                    GetDependencies(i),
+                    raw.CodeBody
+                );
             }
             return result;
         }
@@ -303,6 +325,54 @@ namespace SourceExpander
                     return min.Substring(0, i);
             }
             return min;
+        }
+
+
+        private interface ISourceFileInfoSlim
+        {
+            string FileName { get; }
+            ImmutableHashSet<string> TypeNames { get; }
+        }
+        private class SourceFileInfoRaw : ISourceFileInfoSlim
+        {
+            public SyntaxTree SyntaxTree { get; }
+            public string FileName { get; }
+            public ImmutableHashSet<string> TypeNames { get; }
+            public IEnumerable<string> Usings { get; }
+            public string CodeBody { get; }
+            public SourceFileInfoRaw WithFileName(string newName)
+                => new(
+                    SyntaxTree,
+                    newName,
+                    TypeNames,
+                    Usings,
+                    CodeBody);
+
+            public SourceFileInfoRaw(
+                SyntaxTree syntaxTree,
+                string fileName,
+                IEnumerable<string> typeNames,
+                IEnumerable<string> usings,
+                string codeBody)
+            {
+                SyntaxTree = syntaxTree;
+                FileName = fileName;
+                TypeNames = ImmutableHashSet.CreateRange(typeNames);
+                Usings = usings;
+                CodeBody = codeBody;
+            }
+        }
+        private class SourceFileInfoSlim : ISourceFileInfoSlim
+        {
+            public string FileName { get; }
+            public ImmutableHashSet<string> TypeNames { get; }
+
+            public SourceFileInfoSlim(SourceFileInfo file) : this(file.FileName, file.TypeNames) { }
+            public SourceFileInfoSlim(string filename, IEnumerable<string> typeNames)
+            {
+                FileName = filename;
+                TypeNames = ImmutableHashSet.CreateRange(typeNames);
+            }
         }
     }
 }
