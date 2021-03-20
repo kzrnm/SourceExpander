@@ -148,7 +148,7 @@
     <value>Needs AllowUnsafeBlocks</value>
   </data>
   <data name="EXPAND0007_Body" xml:space="preserve">
-    <value>Error config file: {0}</value>
+    <value>Error config file: Path: {0}, Message: {1}</value>
   </data>
   <data name="EXPAND0007_Title" xml:space="preserve">
     <value>Error config file</value>

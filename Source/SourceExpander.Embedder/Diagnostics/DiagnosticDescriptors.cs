@@ -1,11 +1,14 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 using SourceExpander.Diagnostics;
 
 namespace SourceExpander
 {
     public static class DiagnosticDescriptors
     {
-        public static readonly DiagnosticDescriptor EMBED0001_UnknownError = new(
+        public static Diagnostic EMBED0001_UnknownError(string message)
+            => Diagnostic.Create(EMBED0001_UnknownError_Descriptor, Location.None, message);
+        private static readonly DiagnosticDescriptor EMBED0001_UnknownError_Descriptor = new(
             "EMBED0001",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0001_Title),
@@ -18,7 +21,9 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Warning,
             true);
-        public static readonly DiagnosticDescriptor EMBED0002_OlderVersion = new(
+        public static Diagnostic EMBED0002_OlderVersion(Version embbederVersion, string assemblyName, Version assemblyEmbedderVersion)
+            => Diagnostic.Create(EMBED0002_OlderVersion_Descriptor, Location.None, embbederVersion, assemblyName, assemblyEmbedderVersion);
+        private static readonly DiagnosticDescriptor EMBED0002_OlderVersion_Descriptor = new(
             "EMBED0002",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0002_Title),
@@ -31,7 +36,9 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
-        public static readonly DiagnosticDescriptor EMBED0003_ParseConfigError = new(
+        public static Diagnostic EMBED0003_ParseConfigError(string configFile, string message)
+            => Diagnostic.Create(EMBED0003_ParseConfigError_Descriptor, Location.None, configFile, message);
+        private static readonly DiagnosticDescriptor EMBED0003_ParseConfigError_Descriptor = new(
             "EMBED0003",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0003_Title),
@@ -44,7 +51,9 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Error,
             true);
-        public static readonly DiagnosticDescriptor EMBED0004_ErrorEmbeddedSource = new(
+        public static Diagnostic EMBED0004_ErrorEmbeddedSource(string file, string message)
+            => Diagnostic.Create(EMBED0004_ErrorEmbeddedSource_Descriptor, Location.None, file, message);
+        private static readonly DiagnosticDescriptor EMBED0004_ErrorEmbeddedSource_Descriptor = new(
             "EMBED0004",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0004_Title),
@@ -57,7 +66,9 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Warning,
             true);
-        public static readonly DiagnosticDescriptor EMBED0005_EmbeddedSourceDiff = new(
+        public static Diagnostic EMBED0005_EmbeddedSourceDiff(string diffString)
+            => Diagnostic.Create(EMBED0005_EmbeddedSourceDiff_Descriptor, Location.None, diffString);
+        private static readonly DiagnosticDescriptor EMBED0005_EmbeddedSourceDiff_Descriptor = new(
             "EMBED0005",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0005_Title),
@@ -70,7 +81,9 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Error,
             true);
-        public static readonly DiagnosticDescriptor EMBED0006_AnotherAssemblyEmbeddedDataError = new(
+        public static Diagnostic EMBED0006_AnotherAssemblyEmbeddedDataError(string? assemblyName, string key, string message)
+            => Diagnostic.Create(EMBED0006_AnotherAssemblyEmbeddedDataError_Descriptor, Location.None, assemblyName, key, message);
+        private static readonly DiagnosticDescriptor EMBED0006_AnotherAssemblyEmbeddedDataError_Descriptor = new(
             "EMBED0006",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0006_Title),
@@ -83,7 +96,9 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Warning,
             true);
-        public static readonly DiagnosticDescriptor EMBED0007_NullableProject = new(
+        public static Diagnostic EMBED0007_NullableProject()
+            => Diagnostic.Create(EMBED0007_NullableProject_Descriptor, Location.None);
+        private static readonly DiagnosticDescriptor EMBED0007_NullableProject_Descriptor = new(
             "EMBED0007",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0007_Title),
@@ -96,7 +111,9 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
-        public static readonly DiagnosticDescriptor EMBED0008_NullableDirective = new(
+        public static Diagnostic EMBED0008_NullableDirective(Location location)
+            => Diagnostic.Create(EMBED0008_NullableDirective_Descriptor, location);
+        private static readonly DiagnosticDescriptor EMBED0008_NullableDirective_Descriptor = new(
             "EMBED0008",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0008_Title),
@@ -109,7 +126,9 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
-        public static readonly DiagnosticDescriptor EMBED0009_UsingStaticDirective = new(
+        public static Diagnostic EMBED0009_UsingStaticDirective(Location location)
+            => Diagnostic.Create(EMBED0009_UsingStaticDirective_Descriptor, location);
+        private static readonly DiagnosticDescriptor EMBED0009_UsingStaticDirective_Descriptor = new(
             "EMBED0009",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0009_Title),
@@ -122,7 +141,9 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Info,
             true);
-        public static readonly DiagnosticDescriptor EMBED0010_UsingAliasDirective = new(
+        public static Diagnostic EMBED0010_UsingAliasDirective(Location location)
+            => Diagnostic.Create(EMBED0010_UsingAliasDirective_Descriptor, location);
+        private static readonly DiagnosticDescriptor EMBED0010_UsingAliasDirective_Descriptor = new(
             "EMBED0010",
             new LocalizableResourceString(
                 nameof(DiagnosticsResources.EMBED0010_Title),

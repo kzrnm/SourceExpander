@@ -39,22 +39,27 @@ namespace SourceExpander
                 if (!compilation.SyntaxTrees.Any()) return;
                 if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;
 
-                var configText = context.AdditionalFiles
-                    .FirstOrDefault(a =>
-                        StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
-                    ?.GetText(context.CancellationToken);
+
+                var configFile = context.AdditionalFiles
+                        .FirstOrDefault(a =>
+                        StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
 
                 EmbedderConfig config;
-                try
+                if (configFile?.GetText(context.CancellationToken) is { } configText)
                 {
-                    config = EmbedderConfig.Parse(configText);
+                    try
+                    {
+                        config = EmbedderConfig.Parse(configText);
+                    }
+                    catch (ParseConfigException e)
+                    {
+                        context.ReportDiagnostic(
+                            DiagnosticDescriptors.EMBED0003_ParseConfigError(configFile.Path, e.Message));
+                        return;
+                    }
                 }
-                catch (ParseConfigException e)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptors.EMBED0003_ParseConfigError, Location.None, e.Message));
-                    return;
-                }
+                else config = new();
+
                 if (!config.Enabled)
                     return;
 
@@ -87,8 +92,8 @@ namespace SourceExpander
             catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0001_UnknownError, Location.None, e.Message));
+                context.ReportDiagnostic(
+                    DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
             }
         }
 

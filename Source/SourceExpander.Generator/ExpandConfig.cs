@@ -38,11 +38,11 @@ namespace SourceExpander
                 || MatchFilePatterns.Any(p => filePath.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0))
                 && IgnoreFilePatterns.All(regex => !regex.IsMatch(filePath));
 
-        public static ExpandConfig Parse(SourceText? sourceText)
+        public static ExpandConfig Parse(SourceText sourceText)
         {
             try
             {
-                if (sourceText is not null && JsonUtil.ParseJson<ExpandConfigData>(sourceText) is { } data)
+                if (JsonUtil.ParseJson<ExpandConfigData>(sourceText) is { } data)
                     return new ExpandConfig(
                         enabled: data.Enabled ?? true,
                         matchFilePatterns: data.MatchFilePattern ?? Array.Empty<string>(),

@@ -167,7 +167,7 @@ class Program
                     },
                     ExpectedDiagnostics =
                     {
-                        new DiagnosticResult("EXPAND0004", DiagnosticSeverity.Info).WithArguments(version.ToDisplayString()),
+                        new DiagnosticResult("EXPAND0004", DiagnosticSeverity.Info),
                     }
                 }
             };

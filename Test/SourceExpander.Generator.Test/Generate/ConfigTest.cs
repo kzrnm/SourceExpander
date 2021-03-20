@@ -6,7 +6,7 @@ namespace SourceExpander.Generator.Generate.Test
 {
     public class ConfigTest : ExpandGeneratorTestBase
     {
-        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText, string>
+        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText, object[]>
         {
             {
                 new InMemorySourceText("/foo/bar/SourceExpander.Generator.Config.json", @"
@@ -15,7 +15,11 @@ namespace SourceExpander.Generator.Generate.Test
     ""ignore-file-pattern-regex"": 1
 }
 "),
-                "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 4, position 34."
+                new object[]
+                {
+                    "/foo/bar/SourceExpander.Generator.Config.json",
+                    "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 4, position 34."
+                }
             },
             {
                 new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", @"
@@ -24,7 +28,11 @@ namespace SourceExpander.Generator.Generate.Test
     ""ignore-file-pattern-regex"": 1
 }
 "),
-                "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 4, position 34."
+                new object[]
+                {
+                    "/foo/bar/sourceExpander.generator.config.json",
+                    "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 4, position 34."
+                }
             },
             {
                 new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", @"
@@ -35,13 +43,17 @@ namespace SourceExpander.Generator.Generate.Test
     ]
 }
 "),
-                "Invalid pattern '(' at offset 1. Not enough )'s."
+                new object[]
+                {
+                    "/regexerror/SourceExpander.Generator.Config.json",
+                    "Invalid pattern '(' at offset 1. Not enough )'s."
+                }
             },
         };
 
         [Theory]
         [MemberData(nameof(ParseErrorJsons))]
-        public async Task ParseErrorTest(InMemorySourceText additionalText, string diagnosticsArg)
+        public async Task ParseErrorTest(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
             var others = new SourceFileCollection{
                 (

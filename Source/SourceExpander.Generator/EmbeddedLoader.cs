@@ -76,27 +76,26 @@ namespace SourceExpander
                 foreach (var (key, message) in errors)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0008_EmbeddedDataError, Location.None,
-                        display, key, message));
+                        DiagnosticDescriptors.EXPAND0008_EmbeddedDataError(display, key, message));
                 }
                 if (embedded.IsEmpty)
                     continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0002_ExpanderVersion, Location.None,
+                        DiagnosticDescriptors.EXPAND0002_ExpanderVersion(
                         AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
                 }
                 if (embedded.CSharpVersion > parseOptions.LanguageVersion)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion, Location.None,
-                        parseOptions.LanguageVersion.ToDisplayString(), embedded.AssemblyName, embedded.CSharpVersion.ToDisplayString()));
+                        DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion(
+                        parseOptions.LanguageVersion, embedded.AssemblyName, embedded.CSharpVersion));
                 }
                 if (embedded.AllowUnsafe && !compilation.Options.AllowUnsafe)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EXPAND0006_AllowUnsafe, Location.None,
+                        DiagnosticDescriptors.EXPAND0006_AllowUnsafe(
                         embedded.AssemblyName));
                 }
                 yield return embedded;

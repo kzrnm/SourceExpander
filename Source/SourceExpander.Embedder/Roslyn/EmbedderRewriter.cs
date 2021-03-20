@@ -27,8 +27,8 @@ namespace SourceExpander.Roslyn
         {
             if (trivia.IsKind(SyntaxKind.NullableDirectiveTrivia))
             {
-                reporter.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0008_NullableDirective, trivia.GetLocation()));
+                reporter.ReportDiagnostic(
+                    DiagnosticDescriptors.EMBED0008_NullableDirective(trivia.GetLocation()));
             }
             return SyntaxFactory.ElasticMarker;
         }
@@ -36,15 +36,15 @@ namespace SourceExpander.Roslyn
         {
             if (node.Parent.IsKind(SyntaxKind.CompilationUnit))
             {
-                DiagnosticDescriptor diagnosticDescriptor;
+                Diagnostic diagnostic;
                 if (node.StaticKeyword.IsKind(SyntaxKind.StaticKeyword))
-                    diagnosticDescriptor = DiagnosticDescriptors.EMBED0009_UsingStaticDirective;
+                    diagnostic = DiagnosticDescriptors.EMBED0009_UsingStaticDirective(node.GetLocation());
                 else if (node.Alias != null)
-                    diagnosticDescriptor = DiagnosticDescriptors.EMBED0010_UsingAliasDirective;
+                    diagnostic = DiagnosticDescriptors.EMBED0010_UsingAliasDirective(node.GetLocation());
                 else
                     goto Fin;
 
-                reporter.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, node.GetLocation()));
+                reporter.ReportDiagnostic(diagnostic);
             }
         Fin: return base.VisitUsingDirective(node);
         }

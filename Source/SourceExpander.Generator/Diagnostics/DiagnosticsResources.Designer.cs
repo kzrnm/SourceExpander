@@ -151,7 +151,7 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
-        ///   Error config file: {0} に類似しているローカライズされた文字列を検索します。
+        ///   Error config file: Path: {0}, Message: {1} に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EXPAND0007_Body {
             get {
