@@ -63,18 +63,18 @@ namespace SourceExpander
                 if (!config.Enabled)
                     return;
 
-                var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
-                if (loader.IsEmbeddedEmpty)
-                    context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
-
-
-                if (!HasSourceCodeClass(compilation))
+                const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
+                if (compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is null)
                 {
                     context.AddSource("SourceExpander.SourceCode.cs",
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
                 }
 
-                var expandedCode = CreateExpanded(loader.EnumerateExpandedCodes());
+                var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
+                if (loader.IsEmbeddedEmpty)
+                    context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
+
+                var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
                 context.AddSource("SourceExpander.Expanded.cs",
                     SourceText.From(expandedCode, Encoding.UTF8));
@@ -90,12 +90,6 @@ namespace SourceExpander
                     DiagnosticDescriptors.EXPAND0001_UnknownError(e.Message));
             }
         }
-        static bool HasSourceCodeClass(Compilation compilation)
-        {
-            const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
-            return compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is not null;
-        }
-
 
         static string CreateExpanded(IEnumerable<(string filePath, string expandedCode)> expanded)
         {
