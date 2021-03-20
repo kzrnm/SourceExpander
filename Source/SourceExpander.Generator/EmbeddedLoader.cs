@@ -42,7 +42,6 @@ namespace SourceExpander
             if (compilationUpdated) return;
             compilationUpdated = true;
 
-
             IEnumerable<SyntaxTree> newTrees;
             if (ConcurrentBuild)
                 newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
@@ -63,7 +62,7 @@ namespace SourceExpander
             if (!_cacheExpandedCodes.IsDefault) return _cacheExpandedCodes;
             if (!config.Enabled) return ImmutableArray<(string filePath, string expandedCode)>.Empty;
             UpdateCompilation();
-
+            cancellationToken.ThrowIfCancellationRequested();
             var expander = new CompilationExpander(compilation, container, config);
             if (ConcurrentBuild)
                 return compilation.SyntaxTrees.AsParallel(cancellationToken)

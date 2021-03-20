@@ -79,9 +79,11 @@ namespace SourceExpander
             if (!config.Enabled)
                 return result;
             var infos = ResolveFiles();
+            cancellationToken.ThrowIfCancellationRequested();
             if (infos.Length == 0)
                 return result;
             var json = JsonUtil.ToJson(infos);
+            cancellationToken.ThrowIfCancellationRequested();
 
             result.IsEnabled = true;
             result.EmbeddedAllowUnsafe = compilation.Options.AllowUnsafe;

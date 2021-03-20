@@ -30,7 +30,6 @@ namespace SourceExpander
 
         public string ExpandCode(SyntaxTree origTree, CancellationToken cancellationToken)
         {
-            var sb = new StringBuilder();
             var semanticModel = Compilation.GetSemanticModel(origTree, true);
             var origRoot = origTree.GetCompilationUnitRoot(cancellationToken);
 
@@ -44,6 +43,7 @@ namespace SourceExpander
                 .Union(requiedFiles.SelectMany(s => s.Usings))
                 .ToArray();
 
+            var sb = new StringBuilder();
             foreach (var u in SourceFileInfoUtil.SortUsings(usings))
                 sb.AppendLine(u);
 

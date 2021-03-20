@@ -44,6 +44,7 @@ namespace SourceExpander
                         .FirstOrDefault(a =>
                             StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
 
+                context.CancellationToken.ThrowIfCancellationRequested();
                 ExpandConfig config;
                 if (configFile?.GetText(context.CancellationToken) is { } configText)
                 {
@@ -70,12 +71,13 @@ namespace SourceExpander
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
                 }
 
+                context.CancellationToken.ThrowIfCancellationRequested();
                 var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
                     context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
-
                 var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
+                context.CancellationToken.ThrowIfCancellationRequested();
                 context.AddSource("SourceExpander.Expanded.cs",
                     SourceText.From(expandedCode, Encoding.UTF8));
             }

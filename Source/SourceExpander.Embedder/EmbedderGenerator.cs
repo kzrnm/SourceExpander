@@ -44,6 +44,7 @@ namespace SourceExpander
                         .FirstOrDefault(a =>
                         StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
 
+                context.CancellationToken.ThrowIfCancellationRequested();
                 EmbedderConfig config;
                 if (configFile?.GetText(context.CancellationToken) is { } configText)
                 {
@@ -63,6 +64,7 @@ namespace SourceExpander
                 if (!config.Enabled)
                     return;
 
+                context.CancellationToken.ThrowIfCancellationRequested();
                 var embeddingContext = new EmbeddingContext(
                     compilation,
                     (CSharpParseOptions)context.ParseOptions,
