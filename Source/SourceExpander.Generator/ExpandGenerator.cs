@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -47,7 +46,7 @@ namespace SourceExpander
                 ExpandConfig config;
                 try
                 {
-                    config = ExpandConfig.Parse(configText, context.CancellationToken);
+                    config = ExpandConfig.Parse(configText);
                 }
                 catch (ParseConfigException e)
                 {
@@ -64,7 +63,7 @@ namespace SourceExpander
                     context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded, Location.None));
 
 
-                if (!HasCoreReference(context.Compilation.ReferencedAssemblyNames))
+                if (!HasSourceCodeClass(compilation))
                 {
                     context.AddSource("SourceExpander.SourceCode.cs",
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
@@ -75,6 +74,10 @@ namespace SourceExpander
                 context.AddSource("SourceExpander.Expanded.cs",
                     SourceText.From(expandedCode, Encoding.UTF8));
             }
+            catch (OperationCanceledException)
+            {
+                Trace.WriteLine(nameof(ExpandGenerator) + "." + nameof(Execute) + "is Canceled.");
+            }
             catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());
@@ -82,8 +85,11 @@ namespace SourceExpander
                     DiagnosticDescriptors.EXPAND0001_UnknownError, Location.None, e.Message));
             }
         }
-        static bool HasCoreReference(IEnumerable<AssemblyIdentity> referencedAssemblyNames)
-            => referencedAssemblyNames.Any(a => a.Name.Equals("SourceExpander.Core", StringComparison.OrdinalIgnoreCase));
+        static bool HasSourceCodeClass(Compilation compilation)
+        {
+            const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
+            return compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is not null;
+        }
 
 
         static string CreateExpanded(EmbeddedLoader loader)

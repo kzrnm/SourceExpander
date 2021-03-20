@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -38,7 +37,7 @@ namespace SourceExpander
             this.parseOptions = parseOptions;
             this.config = config;
             this.cancellationToken = cancellationToken;
-            var embeddedDatas = AssemblyMetadataUtil.GetEmbeddedSourceFiles(compilation);
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
             container = new SourceFileContainer(WithCheck(embeddedDatas));
             expander = new CompilationExpander(compilation, container, config);
         }
@@ -80,6 +79,8 @@ namespace SourceExpander
                         Diagnostic.Create(DiagnosticDescriptors.EXPAND0008_EmbeddedDataError, Location.None,
                         display, key, message));
                 }
+                if (embedded.IsEmpty)
+                    continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
                     reporter.ReportDiagnostic(

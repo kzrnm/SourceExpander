@@ -47,7 +47,7 @@ namespace SourceExpander
                 EmbedderConfig config;
                 try
                 {
-                    config = EmbedderConfig.Parse(configText, context.CancellationToken);
+                    config = EmbedderConfig.Parse(configText);
                 }
                 catch (ParseConfigException e)
                 {
@@ -71,17 +71,18 @@ namespace SourceExpander
                 if (resolvedSources.Length == 0)
                     return;
 
-                var sb = CreateMetadataSource(new StringBuilder(), resolver.EnumerateAssemblyMetadata());
-
                 if (config.EmbeddingSourceClass.Enabled)
                     context.AddSource(
                         "EmbeddingSourceClass.cs",
                         CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
 
                 context.AddSource(
-                    "EmbeddedSourceCode.Metadata.cs",
-                    SourceText.From(sb.ToString(), Encoding.UTF8));
+                    "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
 
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
             }
             catch (Exception e)
             {
@@ -91,18 +92,18 @@ namespace SourceExpander
             }
         }
 
-        private static StringBuilder CreateMetadataSource(StringBuilder sb, IEnumerable<(string Key, string Value)> metadatas)
+        private static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
         {
+            StringBuilder sb = new();
             sb.AppendLine("using System.Reflection;");
             foreach (var (key, value) in metadatas)
             {
-                sb.Append("[assembly: AssemblyMetadataAttribute(");
-                sb.Append(key.ToLiteral());
-                sb.Append(",");
-                sb.Append(value.ToLiteral());
-                sb.AppendLine(")]");
+                sb.Append("[assembly: AssemblyMetadataAttribute(")
+                  .Append(key.ToLiteral()).Append(",")
+                  .Append(value.ToLiteral())
+                  .AppendLine(")]");
             }
-            return sb;
+            return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
         private static SourceText CreateEmbbedingSourceClass(

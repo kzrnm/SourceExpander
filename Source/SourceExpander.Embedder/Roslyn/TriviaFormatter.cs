@@ -7,7 +7,9 @@ namespace SourceExpander.Roslyn
 {
     internal class TriviaFormatter : CSharpSyntaxRewriter
     {
-        public TriviaFormatter()
+        private TriviaFormatter() { }
+        public static SyntaxNode? Minified(SyntaxNode? node) => new TriviaFormatter().Visit(node);
+        static TriviaFormatter()
         {
             var splitBuilder = ImmutableHashSet.CreateBuilder<SyntaxKind>();
             splitBuilder.Add(SyntaxKind.TildeToken);
@@ -83,8 +85,8 @@ namespace SourceExpander.Roslyn
             preEqualsBuilder.Add(SyntaxKind.QuestionQuestionToken);
             PreEqualsToken = preEqualsBuilder.ToImmutable();
         }
-        public ImmutableHashSet<SyntaxKind> SplitToken { get; }
-        public ImmutableHashSet<SyntaxKind> PreEqualsToken { get; }
+        public static ImmutableHashSet<SyntaxKind> SplitToken { get; }
+        public static ImmutableHashSet<SyntaxKind> PreEqualsToken { get; }
         public override SyntaxToken VisitToken(SyntaxToken token)
         {
             var res = base.VisitToken(token);

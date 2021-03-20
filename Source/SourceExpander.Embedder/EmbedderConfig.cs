@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Runtime.Serialization;
-using System.Threading;
 using Microsoft.CodeAnalysis.Text;
 
 namespace SourceExpander
@@ -38,12 +37,12 @@ namespace SourceExpander
         public bool EnableMinify { get; }
         public ImmutableHashSet<string> RemoveConditional { get; }
         public EmbeddingSourceClass EmbeddingSourceClass { get; }
-        public static EmbedderConfig Parse(SourceText? sourceText, CancellationToken cancellationToken)
+        public static EmbedderConfig Parse(SourceText? sourceText)
         {
             try
             {
                 if (sourceText is not null
-                    && JsonUtil.ParseJson<EmbedderConfigData>(sourceText, cancellationToken) is { } data)
+                    && JsonUtil.ParseJson<EmbedderConfigData>(sourceText) is { } data)
                     return data.ToImmutable();
                 return new EmbedderConfig();
             }

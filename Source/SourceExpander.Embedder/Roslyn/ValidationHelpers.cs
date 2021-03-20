@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,10 +14,10 @@ namespace SourceExpander.Roslyn
 {
     internal static class ValidationHelpers
     {
-        private static IEnumerable<Diagnostic> GetCompilationDiagnostic(Compilation compilation)
+        private static IEnumerable<Diagnostic> GetCompilationDiagnostic(Compilation compilation, CancellationToken cancellationToken = default)
         {
             using var ms = new MemoryStream();
-            return GetCompilationDiagnostic(compilation.Emit(ms));
+            return GetCompilationDiagnostic(compilation.Emit(ms, cancellationToken: cancellationToken));
         }
         private static IEnumerable<Diagnostic> GetCompilationDiagnostic(EmitResult result)
         {
@@ -24,28 +25,21 @@ namespace SourceExpander.Roslyn
                 return Array.Empty<Diagnostic>();
             return result.Diagnostics.EnumerateCompilationError();
         }
-        private static IEnumerable<Diagnostic> EnumerateCompilationError(this IEnumerable<Diagnostic> diagnostics)
+        private static IEnumerable<Diagnostic> EnumerateCompilationError(this ImmutableArray<Diagnostic> diagnostics)
             => diagnostics.Where(d => d.IsWarningAsError || d.Severity == DiagnosticSeverity.Error);
-        public static bool HasCompilationError(this IEnumerable<Diagnostic> diagnostics)
+        public static bool HasCompilationError(this ImmutableArray<Diagnostic> diagnostics)
             => diagnostics.EnumerateCompilationError().Any();
         public static IEnumerable<Diagnostic> EnumerateEmbeddedSourcesErrors(
-            CSharpCompilation compilation,
-            CSharpParseOptions parseOptions,
             ImmutableArray<SourceFileInfo> sources,
+            CSharpCompilationOptions compilationOptions,
+            IEnumerable<MetadataReference> references,
+            CSharpParseOptions parseOptions,
             CancellationToken cancellationToken = default)
         {
-            SyntaxTree ToSyntaxTree(SourceFileInfo source)
-                => CSharpSyntaxTree.ParseText(
-                    source.Restore(),
-                    parseOptions,
-                    source.FileName,
-                    cancellationToken: cancellationToken);
-
             var embeddedCompilation = CSharpCompilation.Create("NewCompilation",
-                sources.Select(s => ToSyntaxTree(s)),
-                compilation.References,
-                compilation.Options);
-            return GetCompilationDiagnostic(embeddedCompilation);
+                sources.Select(s => s.ToSyntaxTree(parseOptions, Encoding.UTF8, cancellationToken)),
+                references, compilationOptions);
+            return GetCompilationDiagnostic(embeddedCompilation, cancellationToken);
         }
 
         public static SyntaxNode? CompareSyntax(SyntaxNode orig, SyntaxNode target)

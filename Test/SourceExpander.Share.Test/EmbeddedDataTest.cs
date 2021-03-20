@@ -123,7 +123,8 @@ namespace SourceExpander.Share.Test
                 ImmutableArray<SourceFileInfo>.Empty,
                 new(3, 4, 0, 0),
                 LanguageVersion.CSharp7_3, false),
-                ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. The token '\"' was expected but found ']'."))));
+                ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode",
+                "Invalid property identifier character: ]. Path '[0]', line 1, position 2."))));
 
             EmbeddedData.Create("RawJson",
                 ImmutableDictionary.Create<string, string>()
@@ -136,7 +137,8 @@ namespace SourceExpander.Share.Test
                 ImmutableArray<SourceFileInfo>.Empty,
                 new(3, 4, 0, 0),
                 LanguageVersion.CSharp7_3, false),
-                ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. The token '\"' was expected but found ']'."))));
+                ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode",
+                "Invalid property identifier character: ]. Path '[0]', line 1, position 2."))));
         }
         [Fact]
         public void GZipBase32768()

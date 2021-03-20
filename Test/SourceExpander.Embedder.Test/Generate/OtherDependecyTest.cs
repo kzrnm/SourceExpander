@@ -333,7 +333,9 @@ namespace Mine{
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("Other", "SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.")
+                        DiagnosticResult.CompilerWarning("EMBED0006")
+                        .WithArguments("Other", "SourceExpander.EmbeddedSourceCode",
+                        "Unexpected character encountered while parsing value: }. Path '', line 1, position 1.")
                     },
                     GeneratedSources =
                     {
@@ -406,7 +408,9 @@ namespace Mine{
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerWarning("EMBED0006").WithArguments("Other", "SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character 'ã'."),
+                        DiagnosticResult.CompilerWarning("EMBED0006")
+                        .WithArguments("Other", "SourceExpander.EmbeddedSourceCode",
+                        "Unexpected character encountered while parsing value: 㘅. Path '', line 0, position 0."),
                     },
                     GeneratedSources =
                     {

@@ -67,17 +67,19 @@ static class TestUtil
            ISourceGenerator generator,
            IEnumerable<AdditionalText> additionalTexts = null,
            CSharpParseOptions parseOptions = null,
-           AnalyzerConfigOptionsProvider optionsProvider = null)
-        => RunGenerator(compilation, new[] { generator }, additionalTexts, parseOptions, optionsProvider);
+           AnalyzerConfigOptionsProvider optionsProvider = null,
+           CancellationToken cancellationToken = default)
+        => RunGenerator(compilation, new[] { generator }, additionalTexts, parseOptions, optionsProvider, cancellationToken);
     public static (Compilation outputCompilation, ImmutableArray<Diagnostic> diagnostics) RunGenerator(
            Compilation compilation,
            IEnumerable<ISourceGenerator> generators,
            IEnumerable<AdditionalText> additionalTexts = null,
            CSharpParseOptions parseOptions = null,
-           AnalyzerConfigOptionsProvider optionsProvider = null)
+           AnalyzerConfigOptionsProvider optionsProvider = null,
+           CancellationToken cancellationToken = default)
     {
         var driver = CSharpGeneratorDriver.Create(generators, additionalTexts, parseOptions, optionsProvider);
-        driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics, cancellationToken);
         return (outputCompilation, diagnostics);
     }
 }
@@ -116,25 +118,34 @@ public class Benchmark
         compilation = TestUtil.CreateCompilation(list);
     }
 
-    static readonly AdditionalText enableMinifyJson = new InMemoryAdditionalText(
-       "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
-    ""enable-minify"": true
-}
-");
+    static ImmutableArray<AdditionalText> CreateConfig(string json)
+        => ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/foo/bar/SourceExpander.Embedder.Config.json", json));
+
+    const int cancellationMilliseconds = 10000;
+
     [Benchmark]
     public Compilation Default()
     {
+        var cts = new CancellationTokenSource(cancellationMilliseconds);
         var (outCompilation, diag) = TestUtil.RunGenerator(
-            compilation, new EmbedderGenerator());
+            compilation, new EmbedderGenerator(), CreateConfig(@"
+{
+    ""enable-minify"": true
+}
+"), cancellationToken: cts.Token);
         return outCompilation;
     }
     [Benchmark]
     public Compilation Raw()
     {
+        var cts = new CancellationTokenSource(cancellationMilliseconds);
         var (outCompilation, diag) = TestUtil.RunGenerator(
-            compilation, new EmbedderGenerator(), ImmutableArray.Create(enableMinifyJson));
+            compilation, new EmbedderGenerator(), CreateConfig(@"
+{
+    ""enable-minify"": true,
+    ""embedding-type"": ""Raw"",
+}
+"), cancellationToken: cts.Token);
         return outCompilation;
     }
 }

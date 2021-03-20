@@ -66,11 +66,11 @@ csharp_preferred_modifier_order = public,private,protected,internal,abstract,sea
 #Style - qualification options
 
 #prefer fields not to be prefaced with this. or Me. in Visual Basic
-dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_field = false:none
 #prefer methods not to be prefaced with this. or Me. in Visual Basic
-dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_method = false:none
 #prefer properties not to be prefaced with this. or Me. in Visual Basic
-dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_property = false:none
 
 
 dotnet_diagnostic.IDE0005.severity = warning
