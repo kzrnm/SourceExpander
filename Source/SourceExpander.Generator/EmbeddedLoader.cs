@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,12 +11,12 @@ namespace SourceExpander
 {
     public class EmbeddedLoader
     {
-        private readonly CSharpCompilation compilation;
+        private CSharpCompilation compilation;
         private readonly CSharpParseOptions parseOptions;
         private readonly SourceFileContainer container;
-        private readonly CompilationExpander expander;
         private readonly IDiagnosticReporter reporter;
         private readonly ExpandConfig config;
+        private readonly bool ConcurrentBuild;
         private readonly CancellationToken cancellationToken;
 
         public EmbeddedLoader(
@@ -25,46 +26,57 @@ namespace SourceExpander
             ExpandConfig config,
             CancellationToken cancellationToken = default)
         {
-            var trees = compilation.SyntaxTrees;
-            foreach (var tree in trees)
-            {
-                var newOpts = tree.Options.WithDocumentationMode(DocumentationMode.Diagnose);
-                compilation = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(cancellationToken), newOpts));
-            }
-
             this.reporter = reporter;
             this.compilation = compilation;
-            this.parseOptions = parseOptions;
+            this.ConcurrentBuild = compilation.Options.ConcurrentBuild;
+            this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
             this.config = config;
             this.cancellationToken = cancellationToken;
             var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
             container = new SourceFileContainer(WithCheck(embeddedDatas));
-            expander = new CompilationExpander(compilation, container, config);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
-        public IEnumerable<(string filePath, string expandedCode)> EnumerateExpandedCodes()
+        bool compilationUpdated = false;
+        void UpdateCompilation()
         {
-            if (!config.Enabled)
-                yield break;
-            foreach (var tree in compilation.SyntaxTrees)
-            {
-                var filePath = tree.FilePath;
-                if (config.IsMatch(filePath))
-                {
-                    string expanded;
-                    try
-                    {
-                        expanded = expander.ExpandCode(tree, cancellationToken);
-                    }
-                    catch
-                    {
-                        Trace.WriteLine($"failed: {filePath}");
-                        continue;
-                    }
-                    yield return (filePath, expanded);
-                }
-            }
+            if (compilationUpdated) return;
+            compilationUpdated = true;
+
+
+            IEnumerable<SyntaxTree> newTrees;
+            if (ConcurrentBuild)
+                newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
+                    .Select(Rewrited);
+            else
+                newTrees = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                    .Select(Rewrited);
+            compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
+
+            SyntaxTree Rewrited(SyntaxTree tree)
+                => tree.WithRootAndOptions(tree.GetRoot(cancellationToken), parseOptions);
+        }
+
+        private ImmutableArray<(string filePath, string expandedCode)> _cacheExpandedCodes;
+
+        public ImmutableArray<(string filePath, string expandedCode)> ExpandedCodes()
+        {
+            if (!_cacheExpandedCodes.IsDefault) return _cacheExpandedCodes;
+            if (!config.Enabled) return ImmutableArray<(string filePath, string expandedCode)>.Empty;
+            UpdateCompilation();
+
+            var expander = new CompilationExpander(compilation, container, config);
+            if (ConcurrentBuild)
+                return compilation.SyntaxTrees.AsParallel(cancellationToken)
+                    .Where(tree => config.IsMatch(tree.FilePath))
+                    .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
+                    .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                    .ToImmutableArray();
+            else
+                return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                    .Where(tree => config.IsMatch(tree.FilePath))
+                    .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
+                    .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                    .ToImmutableArray();
         }
 
         public bool IsEmbeddedEmpty => container.Count == 0;

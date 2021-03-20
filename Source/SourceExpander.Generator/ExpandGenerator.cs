@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace SourceExpander
     public class ExpandGenerator : ISourceGenerator
     {
         private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
+        public void Initialize(GeneratorInitializationContext context) { }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         public void Execute(GeneratorExecutionContext context)
@@ -61,18 +63,18 @@ namespace SourceExpander
                 if (!config.Enabled)
                     return;
 
-                var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config);
-                if (loader.IsEmbeddedEmpty)
-                    context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
-
-
-                if (!HasSourceCodeClass(compilation))
+                const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
+                if (compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is null)
                 {
                     context.AddSource("SourceExpander.SourceCode.cs",
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
                 }
 
-                var expandedCode = CreateExpanded(loader);
+                var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
+                if (loader.IsEmbeddedEmpty)
+                    context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
+
+                var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
                 context.AddSource("SourceExpander.Expanded.cs",
                     SourceText.From(expandedCode, Encoding.UTF8));
@@ -88,14 +90,8 @@ namespace SourceExpander
                     DiagnosticDescriptors.EXPAND0001_UnknownError(e.Message));
             }
         }
-        static bool HasSourceCodeClass(Compilation compilation)
-        {
-            const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
-            return compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is not null;
-        }
 
-
-        static string CreateExpanded(EmbeddedLoader loader)
+        static string CreateExpanded(IEnumerable<(string filePath, string expandedCode)> expanded)
         {
             static void CreateSourceCodeLiteral(StringBuilder sb, string pathLiteral, string codeLiteral)
                 => sb.Append("SourceCode.FromDictionary(new Dictionary<string,object>{")
@@ -109,7 +105,7 @@ namespace SourceExpander
             sb.AppendLine("public static class ExpandedContainer{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}");
             sb.AppendLine("private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{");
-            foreach (var (path, code) in loader.EnumerateExpandedCodes())
+            foreach (var (path, code) in expanded)
             {
                 var filePathLiteral = path.ToLiteral();
                 sb.AppendDicElement(filePathLiteral, sb => CreateSourceCodeLiteral(sb, filePathLiteral, code.ToLiteral()));
@@ -120,7 +116,5 @@ namespace SourceExpander
 
             return sb.ToString();
         }
-
-        public void Initialize(GeneratorInitializationContext context) { }
     }
 }

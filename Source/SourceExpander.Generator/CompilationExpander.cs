@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceExpander.Roslyn;
 
 namespace SourceExpander
@@ -33,7 +32,7 @@ namespace SourceExpander
         {
             var sb = new StringBuilder();
             var semanticModel = Compilation.GetSemanticModel(origTree, true);
-            var origRoot = (CompilationUnitSyntax)origTree.GetRoot(cancellationToken);
+            var origRoot = origTree.GetCompilationUnitRoot(cancellationToken);
 
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
             var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;

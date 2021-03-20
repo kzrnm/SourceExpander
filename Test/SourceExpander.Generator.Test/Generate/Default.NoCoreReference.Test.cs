@@ -24,6 +24,7 @@ namespace SourceExpander.Generator.Generate.Test
 
             var test = new Test
             {
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net50,
                 SolutionTransforms =
                 {
                     (solution, projectId)
@@ -31,7 +32,6 @@ namespace SourceExpander.Generator.Generate.Test
                 },
                 TestState =
                 {
-                    ReferenceAssemblies = ReferenceAssemblies.Net.Net50,
                     Sources = {
                         (
                             @"/home/mine/Program.cs",
