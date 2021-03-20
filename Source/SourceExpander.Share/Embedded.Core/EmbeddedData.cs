@@ -24,10 +24,10 @@ namespace SourceExpander
             CSharpVersion = csharpVersion;
             AllowUnsafe = allowUnsafe;
         }
-        public static EmbeddedData Empty => new("Empty", 
-            ImmutableArray<SourceFileInfo>.Empty, 
-            new(1, 0, 0), 
-            LanguageVersion.Default, 
+        public static EmbeddedData Empty => new("Empty",
+            ImmutableArray<SourceFileInfo>.Empty,
+            new(1, 0, 0),
+            LanguageVersion.Default,
             false);
         public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
             Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)

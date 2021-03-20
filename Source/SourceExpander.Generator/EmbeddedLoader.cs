@@ -79,7 +79,7 @@ namespace SourceExpander
                         Diagnostic.Create(DiagnosticDescriptors.EXPAND0008_EmbeddedDataError, Location.None,
                         display, key, message));
                 }
-                if (embedded.IsEmpty) 
+                if (embedded.IsEmpty)
                     continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
