@@ -14,10 +14,10 @@ namespace SourceExpander.Roslyn
 {
     internal static class ValidationHelpers
     {
-        private static IEnumerable<Diagnostic> GetCompilationDiagnostic(Compilation compilation)
+        private static IEnumerable<Diagnostic> GetCompilationDiagnostic(Compilation compilation, CancellationToken cancellationToken = default)
         {
             using var ms = new MemoryStream();
-            return GetCompilationDiagnostic(compilation.Emit(ms));
+            return GetCompilationDiagnostic(compilation.Emit(ms, cancellationToken: cancellationToken));
         }
         private static IEnumerable<Diagnostic> GetCompilationDiagnostic(EmitResult result)
         {
@@ -39,7 +39,7 @@ namespace SourceExpander.Roslyn
             var embeddedCompilation = CSharpCompilation.Create("NewCompilation",
                 sources.Select(s => s.ToSyntaxTree(parseOptions, Encoding.UTF8, cancellationToken)),
                 references, compilationOptions);
-            return GetCompilationDiagnostic(embeddedCompilation);
+            return GetCompilationDiagnostic(embeddedCompilation, cancellationToken);
         }
 
         public static SyntaxNode? CompareSyntax(SyntaxNode orig, SyntaxNode target)
