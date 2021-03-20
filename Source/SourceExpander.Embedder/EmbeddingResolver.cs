@@ -106,7 +106,7 @@ namespace SourceExpander
         {
             if (compilation.Options.NullableContextOptions.AnnotationsEnabled())
                 reporter.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.EMBED0007_NullableProject, Location.None));
+                    DiagnosticDescriptors.EMBED0007_NullableProject());
         }
         private void UpdateCompilation()
         {
@@ -145,16 +145,15 @@ namespace SourceExpander
                 foreach (var (key, message) in errors)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError, Location.None,
-                        display, key, message));
+                        DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError(display, key, message));
                 }
                 if (embedded.IsEmpty)
                     continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
                     reporter.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.EMBED0002_OlderVersion, Location.None,
-                        AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
+                        DiagnosticDescriptors.EMBED0002_OlderVersion(
+                            AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
                 }
                 depSources.AddRange(embedded.Sources);
             }
@@ -205,9 +204,8 @@ namespace SourceExpander
                         continue;
 
                     if (d.GetMessage() is string message)
-                        reporter.ReportDiagnostic(Diagnostic.Create(
-                            DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource, Location.None,
-                            file, message));
+                        reporter.ReportDiagnostic(
+                            DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource(file, message));
                 }
             }
 
@@ -246,8 +244,8 @@ namespace SourceExpander
                     diffStr = diff.ToString();
                 }
 
-                reporter.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff, Location.None, diffStr));
+                reporter.ReportDiagnostic(
+                    DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff(diffStr));
             }
             return new SourceFileInfoRaw(tree,
                         tree.FilePath,

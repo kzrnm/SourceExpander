@@ -33,34 +33,37 @@ namespace SourceExpander
 
                 if ((int)opts.LanguageVersion <= (int)LanguageVersion.CSharp3)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3,
-                        Location.None, opts.LanguageVersion.ToDisplayString()));
+                    context.ReportDiagnostic(
+                        DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3());
                     return;
                 }
 
-                var configText = context.AdditionalFiles
+                var configFile = context.AdditionalFiles
                         .FirstOrDefault(a =>
-                            StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
-                        ?.GetText(context.CancellationToken);
+                            StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
 
                 ExpandConfig config;
-                try
+                if (configFile?.GetText(context.CancellationToken) is { } configText)
                 {
-                    config = ExpandConfig.Parse(configText);
+                    try
+                    {
+                        config = ExpandConfig.Parse(configText);
+                    }
+                    catch (ParseConfigException e)
+                    {
+                        context.ReportDiagnostic(
+                            DiagnosticDescriptors.EXPAND0007_ParseConfigError(configFile.Path, e.Message));
+                        return;
+                    }
                 }
-                catch (ParseConfigException e)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptors.EXPAND0007_ParseConfigError, Location.None, e.Message));
-                    return;
-                }
+                else config = new();
 
                 if (!config.Enabled)
                     return;
 
                 var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config);
                 if (loader.IsEmbeddedEmpty)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded, Location.None));
+                    context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 
 
                 if (!HasSourceCodeClass(compilation))
@@ -81,8 +84,8 @@ namespace SourceExpander
             catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.EXPAND0001_UnknownError, Location.None, e.Message));
+                context.ReportDiagnostic(
+                    DiagnosticDescriptors.EXPAND0001_UnknownError(e.Message));
             }
         }
         static bool HasSourceCodeClass(Compilation compilation)
