@@ -50,33 +50,8 @@ namespace SourceExpander
         /// <param name="typeNames"></param>
         /// <param name="typeNameMatch"></param>
         /// <returns></returns>
-        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames, bool typeNameMatch)
+        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames)
         {
-            static string ToSimpleClassName(string typeName)
-            {
-                int l, r;
-                // AtCoder.INumOperator<T> → INumOperator<T>
-                for (l = typeName.Length - 1; l >= 0; l--)
-                    if (typeName[l] == '.')
-                        break;
-                ++l;
-
-
-                // INumOperator<T> → INumOperator
-                for (r = l; r < typeName.Length; r++)
-                    if (typeName[r] == '<')
-                        break;
-
-                return typeName.Substring(l, r - l);
-            }
-            IEnumerable<SourceFileInfo> ResolveSimpleName(IEnumerable<string> typeNames)
-            {
-                typeNames = typeNames.Select(ToSimpleClassName);
-                var hs = new HashSet<string>(typeNames);
-                foreach (var s in _sourceFiles.Values)
-                    if (hs.Overlaps(s.TypeNames.Select(ToSimpleClassName)))
-                        yield return s;
-            }
             IEnumerable<SourceFileInfo> ResolveFullName(IEnumerable<string> typeNames)
             {
                 var hs = new HashSet<string>(typeNames);
@@ -85,10 +60,7 @@ namespace SourceExpander
                         yield return s;
             }
 
-            if (typeNameMatch)
-                return ResolveDependency(ResolveSimpleName(typeNames));
-            else
-                return ResolveDependency(ResolveFullName(typeNames));
+            return ResolveDependency(ResolveFullName(typeNames));
         }
         private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs)
         {
