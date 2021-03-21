@@ -53,7 +53,6 @@ README languages:
 |SourceExpander|[![NuGet version (SourceExpander)](https://img.shields.io/nuget/v/SourceExpander.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander/)|
 |SourceExpander.Core|[![NuGet version (SourceExpander.Core)](https://img.shields.io/nuget/v/SourceExpander.Core.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Core/)|
 |SourceExpander.Embedder|[![NuGet version (SourceExpander.Embedder)](https://img.shields.io/nuget/v/SourceExpander.Embedder.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder/)|
-|SourceExpander.Embedder.Analyzer|[![NuGet version (SourceExpander.Embedder.Analyzer)](https://img.shields.io/nuget/v/SourceExpander.Embedder.Analyzer.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder.Analyzer/)|
 |SourceExpander.Generator|[![NuGet version (SourceExpander.Generator)](https://img.shields.io/nuget/v/SourceExpander.Generator.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Generator/)|
 
 ## Getting started
@@ -111,12 +110,6 @@ Install-Package SourceExpander.Embedder
 #### 埋め込みたくない型への対処
 
 `SourceExpander.NotEmbeddingSourceAttribute` を適用した型については埋め込みをスキップします。
-
-#### アナライザー(optional)
-
-```
-Install-Package SourceExpander.Embedder.Analyzer
-```
 
 ### 注釈
 
