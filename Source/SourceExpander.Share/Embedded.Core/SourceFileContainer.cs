@@ -10,9 +10,11 @@ namespace SourceExpander
     public class SourceFileContainer : IEnumerable<SourceFileInfo>, IEnumerable, IReadOnlyCollection<SourceFileInfo>
     {
         private readonly Dictionary<string, SourceFileInfo> _sourceFiles;
+        private readonly Dictionary<string, List<SourceFileInfo>> _sourceFilesByTypeName;
         public SourceFileContainer(IEnumerable<EmbeddedData> embeddedDatas)
         {
-            _sourceFiles = new Dictionary<string, SourceFileInfo>();
+            _sourceFiles = new();
+            _sourceFilesByTypeName = new();
             foreach (var embedded in embeddedDatas)
                 foreach (var sf in embedded.Sources)
                 {
@@ -20,19 +22,26 @@ namespace SourceExpander
                     if (_sourceFiles.ContainsKey(sf.FileName))
                         throw new ArgumentException($"duplicate {nameof(sf.FileName)}: {sf.FileName}");
                     _sourceFiles.Add(sf.FileName, sf);
+
+                    foreach (var type in sf.TypeNames)
+                    {
+                        if (!_sourceFilesByTypeName.TryGetValue(type, out var list))
+                            _sourceFilesByTypeName[type] = list = new();
+                        list.Add(sf);
+                    }
                 }
         }
 
         public int Count => _sourceFiles.Count;
-        public SourceFileInfo this[string key]
+        public SourceFileInfo this[string filename]
         {
             set
             {
-                if (_sourceFiles.ContainsKey(key))
-                    throw new ArgumentException($"duplicate {nameof(key)}: {key}");
-                _sourceFiles.Add(key, value);
+                if (_sourceFiles.ContainsKey(filename))
+                    throw new ArgumentException($"duplicate {nameof(filename)}: {filename}");
+                _sourceFiles.Add(filename, value);
             }
-            get => _sourceFiles[key];
+            get => _sourceFiles[filename];
         }
         public IEnumerable<string> Keys => _sourceFiles.Keys;
         public IEnumerable<SourceFileInfo> Values => _sourceFiles.Values;
@@ -51,17 +60,7 @@ namespace SourceExpander
         /// <param name="typeNameMatch"></param>
         /// <returns></returns>
         public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames)
-        {
-            IEnumerable<SourceFileInfo> ResolveFullName(IEnumerable<string> typeNames)
-            {
-                var hs = new HashSet<string>(typeNames);
-                foreach (var s in _sourceFiles.Values)
-                    if (hs.Overlaps(s.TypeNames))
-                        yield return s;
-            }
-
-            return ResolveDependency(ResolveFullName(typeNames));
-        }
+            => ResolveDependency(typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type, out var list) ? list : Enumerable.Empty<SourceFileInfo>()));
         private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs)
         {
             var result = new List<SourceFileInfo>();
