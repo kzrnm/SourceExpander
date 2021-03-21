@@ -17,7 +17,6 @@ README languages:
   - [For library user](#for-library-user)
   - [For library developer](#for-library-developer)
     - [Avoid embedding some type](#avoid-embedding-some-type)
-    - [Analyzer(optional)](#analyzeroptional)
   - [Notes](#notes)
 - [Embedded data](#embedded-data)
   - [EmbedderVersion](#embedderversion)
@@ -53,7 +52,6 @@ Source generator that embed source codes.
 |SourceExpander|[![NuGet version (SourceExpander)](https://img.shields.io/nuget/v/SourceExpander.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander/)|
 |SourceExpander.Core|[![NuGet version (SourceExpander.Core)](https://img.shields.io/nuget/v/SourceExpander.Core.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Core/)|
 |SourceExpander.Embedder|[![NuGet version (SourceExpander.Embedder)](https://img.shields.io/nuget/v/SourceExpander.Embedder.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder/)|
-|SourceExpander.Embedder.Analyzer|[![NuGet version (SourceExpander.Embedder.Analyzer)](https://img.shields.io/nuget/v/SourceExpander.Embedder.Analyzer.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder.Analyzer/)|
 |SourceExpander.Generator|[![NuGet version (SourceExpander.Generator)](https://img.shields.io/nuget/v/SourceExpander.Generator.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Generator/)|
 
 ## Getting started
@@ -111,12 +109,6 @@ Install-Package SourceExpander.Embedder
 #### Avoid embedding some type
 
 Embedding is skipped for type that have `SourceExpander.NotEmbeddingSourceAttribute`.
-
-#### Analyzer(optional)
-
-```
-Install-Package SourceExpander.Embedder.Analyzer
-```
 
 ### Notes
 Because `SourceExpander.Embedder` run at compile time, the embedded source code cannot be used in the same project.
