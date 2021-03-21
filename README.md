@@ -17,7 +17,6 @@ README languages:
   - [For library user](#for-library-user)
   - [For library developer](#for-library-developer)
     - [Avoid embedding some type](#avoid-embedding-some-type)
-    - [Analyzer(optional)](#analyzeroptional)
   - [Notes](#notes)
 - [Embedded data](#embedded-data)
   - [EmbedderVersion](#embedderversion)
