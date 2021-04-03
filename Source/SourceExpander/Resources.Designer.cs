@@ -61,7 +61,7 @@ namespace SourceExpander {
         }
         
         /// <summary>
-        ///   Embedded code cannot be used in the same assembly. For embedding source code, make new DLL project. に類似しているローカライズされた文字列を検索します。
+        ///   SouceExpander.Embedder and SourceExpander cannot be used in the same project. Create a new project that uses SouceExpander.Embedder. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string HasEmbeddedSource {
             get {

@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="HasEmbeddedSource" xml:space="preserve">
-    <value>埋め込んだコードは同一のアセンブリでは使用できません。ソースコードを埋め込むためには新しいDLLプロジェクトを作成してください。</value>
+    <value>SouceExpander.Embedder と SourceExpander は同一のプロジェクトでは使用できません。SouceExpander.Embedder を使用するプロジェクトと SourceExpander を使用するプロジェクトは別にしてください。</value>
   </data>
 </root>
