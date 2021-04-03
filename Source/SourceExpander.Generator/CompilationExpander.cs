@@ -37,7 +37,8 @@ namespace SourceExpander
             var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
             if (typeFindAndUnusedUsingRemover.UsedTypeNames is not { } typeNames)
                 throw new InvalidOperationException($"{nameof(typeNames)} is null");
-            var requiedFiles = sourceFileContainer.ResolveDependency(typeNames);
+            var requiedFiles = sourceFileContainer.ResolveDependency(typeNames).ToArray();
+            Array.Sort(requiedFiles, (f1, f2) => StringComparer.Ordinal.Compare(f1.FileName, f2.FileName));
 
             var usings = typeFindAndUnusedUsingRemover.RootUsings
                 .Union(requiedFiles.SelectMany(s => s.Usings))
