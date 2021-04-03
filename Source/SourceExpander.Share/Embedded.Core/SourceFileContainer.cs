@@ -63,18 +63,16 @@ namespace SourceExpander
             => ResolveDependency(typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type, out var list) ? list : Enumerable.Empty<SourceFileInfo>()));
         private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs)
         {
-            var result = new List<SourceFileInfo>();
+            var result = new Dictionary<string, SourceFileInfo>();
             var fileNameQueue = new Queue<string>();
-            var usedFileName = new HashSet<string>();
 
             foreach (var s in origs)
             {
                 if (s.FileName == null) throw new ArgumentException($"({nameof(s.FileName)} is null");
-                usedFileName.Add(s.FileName);
-                result.Add(s);
+                result[s.FileName] = s;
             }
-            foreach (var d in origs.SelectMany(s => s.Dependencies))
-                if (usedFileName.Add(d))
+            foreach (var d in result.Values.SelectMany(s => s.Dependencies))
+                if (!result.ContainsKey(d))
                     fileNameQueue.Enqueue(d);
 
             while (fileNameQueue.Count > 0)
@@ -82,15 +80,15 @@ namespace SourceExpander
                 var dep = fileNameQueue.Dequeue();
                 if (_sourceFiles.TryGetValue(dep, out var s))
                 {
-                    result.Add(s);
+                    result[s.FileName] = s;
                     if (s.Dependencies == null) throw new ArgumentException($"({nameof(s.Dependencies)} is null");
                     foreach (var d in s.Dependencies)
-                        if (usedFileName.Add(d))
+                        if (!result.ContainsKey(d))
                             fileNameQueue.Enqueue(d);
                 }
             }
 
-            return result;
+            return result.Values;
         }
     }
 }
