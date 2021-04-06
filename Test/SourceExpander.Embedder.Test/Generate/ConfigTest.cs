@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -295,7 +296,7 @@ class Program
 
     [System.Diagnostics.Conditional(""TEST"")]
     static void T() => Console.WriteLine(2);
-}".Replace("\r\n","\n")
+}".Replace("\r\n", "\n")
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")]\\nclass Program\\n{\\n    static void Main()\\n    {\\n        Console.WriteLine(1);\\n    }\\n\\n    [System.Diagnostics.Conditional(\\\"TEST\\\")]\\n    static void T() => Console.WriteLine(2);\\n}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -1027,5 +1028,51 @@ public class SourceFileInfo{
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
+
+        public static TheoryData ObsoleteConfigProperty_Data = new TheoryData<string, (string, string)[]>
+        {
+            {
+                @"{""enable-minify"": false}",
+                new[]
+                {
+                    ("enable-minify", "minify-level"),
+                }
+            },
+            {
+                @"{""enable-minify"": true}",
+                new[]
+                {
+                    ("enable-minify", "minify-level"),
+                }
+            },
+        };
+
+        [Theory]
+        [MemberData(nameof(ObsoleteConfigProperty_Data))]
+        public async Task ObsoleteConfigProperty(string configJson, (string Obsolete, string Instead)[] diagnosticsArgs)
+        {
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", configJson);
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        additionalText,
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
+                    Sources = {
+                        ("/home/source/Program.cs", ""),
+                    },
+                }
+            };
+            foreach (var (obsolete, instead) in diagnosticsArgs)
+                test.ExpectedDiagnostics.Add(
+                    new DiagnosticResult("EMBED0011", DiagnosticSeverity.Warning)
+                            .WithArguments(obsolete, instead));
+            await test.RunAsync();
+        }
+
     }
 }

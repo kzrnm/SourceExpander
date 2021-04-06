@@ -156,5 +156,22 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Info,
             true);
+
+
+        public static Diagnostic EMBED0011_ObsoleteConfigProperty(string obsoleteProperty, string insteadProperty)
+            => Diagnostic.Create(EMBED0011_ObsoleteConfigProperty_Descriptor, Location.None, obsoleteProperty, insteadProperty);
+        private static readonly DiagnosticDescriptor EMBED0011_ObsoleteConfigProperty_Descriptor = new(
+            "EMBED0011",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0011_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EMBED0011_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "EmbedderConfig",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

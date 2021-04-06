@@ -221,5 +221,23 @@ namespace SourceExpander.Diagnostics {
                 return ResourceManager.GetString("EMBED0010_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Obsolete embedder config property. {0} is obsolete. Use {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0011_Body {
+            get {
+                return ResourceManager.GetString("EMBED0011_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Obsolete embedder config property に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0011_Title {
+            get {
+                return ResourceManager.GetString("EMBED0011_Title", resourceCulture);
+            }
+        }
     }
 }
