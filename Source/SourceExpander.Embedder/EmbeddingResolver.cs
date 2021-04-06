@@ -224,11 +224,12 @@ namespace SourceExpander
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
-            SyntaxNode minified = newRoot.NormalizeWhitespace("", " ");
-            if (config.EnableMinify)
+            SyntaxNode minified = config.MinifyLevel switch
             {
-                minified = TriviaFormatter.Minified(minified)!;
-            }
+                MinifyLevel.Off => newRoot.NormalizeWhitespace(eol: "\n"),
+                MinifyLevel.Full => TriviaFormatter.Minified(newRoot.NormalizeWhitespace("", " "))!,
+                _ => newRoot.NormalizeWhitespace("", " "),
+            };
             string minifiedCode = minified!.ToString();
 
             if (ValidationHelpers.CompareSyntax(newRoot,

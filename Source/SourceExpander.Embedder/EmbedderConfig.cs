@@ -11,13 +11,13 @@ namespace SourceExpander
             bool enabled = true,
             EmbeddingType embeddingType = EmbeddingType.GZipBase32768,
             string[]? excludeAttributes = null,
-            bool enableMinify = false,
+            MinifyLevel minifyLevel = MinifyLevel.Default,
             string[]? removeConditional = null,
             EmbeddingSourceClass? embeddingSourceClass = null)
         {
             Enabled = enabled;
             EmbeddingType = embeddingType;
-            EnableMinify = enableMinify;
+            MinifyLevel = minifyLevel;
             ExcludeAttributes = excludeAttributes switch
             {
                 null => ImmutableHashSet<string>.Empty,
@@ -34,7 +34,7 @@ namespace SourceExpander
         public bool Enabled { get; }
         public EmbeddingType EmbeddingType { get; }
         public ImmutableHashSet<string> ExcludeAttributes { get; }
-        public bool EnableMinify { get; }
+        public MinifyLevel MinifyLevel { get; }
         public ImmutableHashSet<string> RemoveConditional { get; }
         public EmbeddingSourceClass EmbeddingSourceClass { get; }
         public static EmbedderConfig Parse(SourceText? sourceText)
@@ -61,8 +61,8 @@ namespace SourceExpander
             public string? EmbeddingType { set; get; }
             [DataMember(Name = "exclude-attributes")]
             public string[]? ExcludeAttributes { set; get; }
-            [DataMember(Name = "enable-minify")]
-            public bool? EnableMinify { set; get; }
+            [DataMember(Name = "minify-level")]
+            public string? MinifyLevel { set; get; }
             [DataMember(Name = "remove-conditional")]
             public string[]? RemoveConditional { set; get; }
 
@@ -77,12 +77,20 @@ namespace SourceExpander
                     _ => SourceExpander.EmbeddingType.GZipBase32768,
                 };
 
+            static MinifyLevel ParseMinifyLevel(string? str)
+                => str?.ToLowerInvariant() switch
+                {
+                    "full" => SourceExpander.MinifyLevel.Full,
+                    "off" => SourceExpander.MinifyLevel.Off,
+                    _ => SourceExpander.MinifyLevel.Default,
+                };
+
             public EmbedderConfig ToImmutable() =>
                 new(
                         Enabled ?? true,
                         ParseEmbeddingType(EmbeddingType),
                         ExcludeAttributes,
-                        EnableMinify == true,
+                        ParseMinifyLevel(MinifyLevel),
                         RemoveConditional,
                         EmbeddingSourceClass?.ToImmutable());
         }
@@ -110,6 +118,13 @@ namespace SourceExpander
         public string ClassName { set; get; }
 
         public override string ToString() => Enabled ? $"class: {ClassName}" : "disable";
+    }
+
+    public enum MinifyLevel
+    {
+        Default,
+        Off,
+        Full,
     }
 
     public enum EmbeddingType

@@ -1047,7 +1047,7 @@ public class Def
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 "),
                     },
