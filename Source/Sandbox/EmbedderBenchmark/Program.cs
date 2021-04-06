@@ -130,7 +130,7 @@ public class Benchmark
         var (outCompilation, diag) = TestUtil.RunGenerator(
             compilation, new EmbedderGenerator(), CreateConfig(@"
 {
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 "), cancellationToken: cts.Token);
         return outCompilation;
@@ -142,7 +142,7 @@ public class Benchmark
         var (outCompilation, diag) = TestUtil.RunGenerator(
             compilation, new EmbedderGenerator(), CreateConfig(@"
 {
-    ""enable-minify"": true,
+    ""minify-level"": ""full"",
     ""embedding-type"": ""Raw"",
 }
 "), cancellationToken: cts.Token);

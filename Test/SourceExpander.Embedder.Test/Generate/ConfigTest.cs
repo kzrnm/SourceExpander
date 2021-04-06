@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -131,7 +132,7 @@ class Program
     ""exclude-attributes"": [
         ""System.Diagnostics.DebuggerDisplayAttribute""
     ],
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -267,14 +268,96 @@ class Program
         }
 
         [Fact]
-        public async Task EmbeddingRawMinify()
+        public async Task EmbeddingRawNoMinify()
         {
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
-    ""enable-minify"": true
+    ""minify-level"": ""off""
+}
+");
+
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}".Replace("\r\n", "\n")
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")]\\nclass Program\\n{\\n    static void Main()\\n    {\\n        Console.WriteLine(1);\\n    }\\n\\n    [System.Diagnostics.Conditional(\\\"TEST\\\")]\\n    static void T() => Console.WriteLine(2);\\n}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        additionalText,
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+"
+                        ),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
+"),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
+
+        [Fact]
+        public async Task EmbeddingRawFullMinify()
+        {
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""embedding-type"": ""Raw"",
+    ""minify-level"": ""full""
 }
 ");
 
@@ -346,7 +429,7 @@ class Program
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""gzip-base32768"",
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -421,7 +504,7 @@ class Program
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -493,7 +576,7 @@ class Program
     ""remove-conditional"": [
         ""DEBUG"", ""DEBUG2""
     ],
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -577,7 +660,7 @@ class Program
         ""enabled"": false,
         ""if-directive"": ""SOURCEEXPANDER""
     },
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -650,7 +733,7 @@ class Program
         ""enabled"": true,
         ""class-name"": ""Container""
     },
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -752,7 +835,7 @@ public class SourceFileInfo{
     ""embedding-source-class"": {
         ""enabled"": true
     },
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -855,7 +938,7 @@ public class SourceFileInfo{
         ""enabled"": true,
         ""class-name"": """"
     },
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 ");
 
@@ -945,5 +1028,51 @@ public class SourceFileInfo{
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
+
+        public static TheoryData ObsoleteConfigProperty_Data = new TheoryData<string, (string, string)[]>
+        {
+            {
+                @"{""enable-minify"": false}",
+                new[]
+                {
+                    ("enable-minify", "minify-level"),
+                }
+            },
+            {
+                @"{""enable-minify"": true}",
+                new[]
+                {
+                    ("enable-minify", "minify-level"),
+                }
+            },
+        };
+
+        [Theory]
+        [MemberData(nameof(ObsoleteConfigProperty_Data))]
+        public async Task ObsoleteConfigProperty(string configJson, (string Obsolete, string Instead)[] diagnosticsArgs)
+        {
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", configJson);
+            var test = new Test
+            {
+                TestState =
+                {
+                    AdditionalFiles =
+                    {
+                        additionalText,
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
+                    Sources = {
+                        ("/home/source/Program.cs", ""),
+                    },
+                }
+            };
+            foreach (var (obsolete, instead) in diagnosticsArgs)
+                test.ExpectedDiagnostics.Add(
+                    new DiagnosticResult("EMBED0011", DiagnosticSeverity.Warning)
+                            .WithArguments(obsolete, instead));
+            await test.RunAsync();
+        }
+
     }
 }

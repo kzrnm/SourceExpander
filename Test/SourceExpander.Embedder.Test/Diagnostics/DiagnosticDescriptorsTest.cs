@@ -89,5 +89,13 @@ namespace SourceExpander.Embedder.Diagnostics.Test
                 .Should()
                 .Be("Avoid using alias directive because there is a risk of name collision");
         }
+        [Fact]
+        public void EMBED0011()
+        {
+            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty("old-property", "instead-property")
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("Obsolete embedder config property. old-property is obsolete. Use instead-property.");
+        }
     }
 }

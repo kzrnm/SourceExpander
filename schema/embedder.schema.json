@@ -7,10 +7,30 @@
             "type": "boolean",
             "default": true
         },
-        "enable-minify": {
-            "type": "boolean",
-            "description": "[experimental]minify embedded source code",
-            "default": false
+        "minify-level": {
+            "description": "[experimental]minify level",
+            "type": "string",
+            "default": "default",
+            "oneOf": [
+                {
+                    "enum": [
+                        "off"
+                    ],
+                    "title": "No minify"
+                },
+                {
+                    "enum": [
+                        "default"
+                    ],
+                    "title": "Remove line break and Two or more spaces"
+                },
+                {
+                    "enum": [
+                        "full"
+                    ],
+                    "title": "Remove line break and space as much as possible"
+                }
+            ]
         },
         "embedding-source-class": {
             "type": "object",

@@ -143,7 +143,7 @@ namespace Solvers
         var (outCompilation, diag) = TestUtil.RunGenerator(
             compilation, new ExpandGenerator(), CreateConfig(@"
 {
-    ""enable-minify"": true
+    ""minify-level"": ""full""
 }
 "), cancellationToken: cts.Token);
         return outCompilation;

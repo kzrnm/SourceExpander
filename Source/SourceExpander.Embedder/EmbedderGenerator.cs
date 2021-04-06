@@ -39,7 +39,6 @@ namespace SourceExpander
                 if (!compilation.SyntaxTrees.Any()) return;
                 if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;
 
-
                 var configFile = context.AdditionalFiles
                         .FirstOrDefault(a =>
                         StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
@@ -51,6 +50,9 @@ namespace SourceExpander
                     try
                     {
                         config = EmbedderConfig.Parse(configText);
+                        foreach (var p in config.ObsoleteConfigProperties)
+                            context.ReportDiagnostic(
+                                DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(p.Name, p.Instead));
                     }
                     catch (ParseConfigException e)
                     {

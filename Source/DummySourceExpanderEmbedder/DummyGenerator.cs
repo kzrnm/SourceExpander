@@ -45,7 +45,7 @@ namespace SourceExpander
                         "System.Runtime.CompilerServices.MethodImplAttribute",
                         "System.Runtime.CompilerServices.CallerFilePathAttribute"
                     },
-                    enableMinify: true),
+                    minifyLevel: MinifyLevel.Full),
                 context.CancellationToken);
 
             context.AddSource(
