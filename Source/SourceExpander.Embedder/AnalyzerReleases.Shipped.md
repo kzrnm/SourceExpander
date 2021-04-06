@@ -3,10 +3,14 @@
 
 
 ## Release 3.1.0
+
 ### New Rules
-EMBED0011 | EmbedderConfig | Warning | Obsolete embedder config property
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+EMBED0011 | Config | Warning | DiagnosticDescriptors
 
 ## Release 3.0.0
+
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------

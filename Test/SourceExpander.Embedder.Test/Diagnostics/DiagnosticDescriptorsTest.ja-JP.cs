@@ -89,5 +89,13 @@ namespace SourceExpander.Embedder.Diagnostics.Test
                 .Should()
                 .Be("名前衝突の危険があるため using alias ディレクティブは非推奨です");
         }
+        [Fact]
+        public void EMBED0011()
+        {
+            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty("old-property", "instead-property")
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("old-property は廃止されました。代わりに instead-property を使用してください");
+        }
     }
 }

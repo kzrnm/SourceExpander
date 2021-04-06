@@ -170,7 +170,7 @@ namespace SourceExpander
                 nameof(DiagnosticsResources.EMBED0011_Body),
                 DiagnosticsResources.ResourceManager,
                 typeof(DiagnosticsResources)),
-            "EmbedderConfig",
+            "Config",
             DiagnosticSeverity.Warning,
             true);
     }

@@ -109,20 +109,6 @@ namespace SourceExpander
             }
         }
 
-        public class ObsoleteConfigProperty
-        {
-            public static ObsoleteConfigProperty EnableMinify { get; }
-                = new("enable-minify", "minify-level");
-
-            public string Name { get; }
-            public string Instead { get; }
-            private ObsoleteConfigProperty(string name, string instead)
-            {
-                Name = name;
-                Instead = instead;
-            }
-        }
-
         [DataContract]
         private class SourceClassData
         {
@@ -132,6 +118,19 @@ namespace SourceExpander
             public string? ClassName { set; get; }
 
             public EmbeddingSourceClass ToImmutable() => new(Enabled == true, ClassName);
+        }
+    }
+    public class ObsoleteConfigProperty
+    {
+        public static ObsoleteConfigProperty EnableMinify { get; }
+            = new("enable-minify", "minify-level");
+
+        public string Name { get; }
+        public string Instead { get; }
+        private ObsoleteConfigProperty(string name, string instead)
+        {
+            Name = name;
+            Instead = instead;
         }
     }
 
