@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.1.0] - 2021-04-06
 ### Added
+- SourceExpander.Embedder, SourceExpander.Generator: Add config file path to diagnostics
+
+## [3.1.0] - 2021-04-06
+### Added
 - SourceExpander.Embedder: Add `minify-level` to Embedder config
 - SourceExpander.Embedder: Add ObsoleteConfigProperty diagnostic
 ### Removed

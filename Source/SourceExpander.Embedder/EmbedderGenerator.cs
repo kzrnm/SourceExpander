@@ -52,7 +52,7 @@ namespace SourceExpander
                         config = EmbedderConfig.Parse(configText);
                         foreach (var p in config.ObsoleteConfigProperties)
                             context.ReportDiagnostic(
-                                DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(p.Name, p.Instead));
+                                DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(configFile.Path, p.Name, p.Instead));
                     }
                     catch (ParseConfigException e)
                     {

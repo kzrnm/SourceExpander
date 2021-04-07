@@ -111,7 +111,9 @@ class Program2
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerError("EXPAND0007").WithArguments(diagnosticsArg),
+                        DiagnosticResult.CompilerError("EXPAND0007")
+                            .WithSpan(additionalText.Path, 1, 1, 1, 1)
+                            .WithArguments(diagnosticsArg),
                     },
                 }
             };
