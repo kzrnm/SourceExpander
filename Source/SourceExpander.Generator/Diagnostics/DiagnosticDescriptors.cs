@@ -7,6 +7,8 @@ namespace SourceExpander
 {
     public static class DiagnosticDescriptors
     {
+        private static Location AdditionalFileLocation(string filePath) => Location.Create(filePath, new(), new());
+
         public static Diagnostic EXPAND0001_UnknownError(string message)
              => Diagnostic.Create(EXPAND0001_UnknownError_Descriptor, Location.None, message);
         private static readonly DiagnosticDescriptor EXPAND0001_UnknownError_Descriptor = new(
@@ -98,7 +100,8 @@ namespace SourceExpander
             DiagnosticSeverity.Warning,
             true);
         public static Diagnostic EXPAND0007_ParseConfigError(string configFile, string message)
-             => Diagnostic.Create(EXPAND0007_ParseConfigError_Descriptor, Location.None, configFile, message);
+             => Diagnostic.Create(EXPAND0007_ParseConfigError_Descriptor,
+                 AdditionalFileLocation(configFile), configFile, message);
         private static readonly DiagnosticDescriptor EXPAND0007_ParseConfigError_Descriptor = new(
             "EXPAND0007",
             new LocalizableResourceString(

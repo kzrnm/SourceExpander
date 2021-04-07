@@ -92,7 +92,8 @@ namespace SourceExpander.Embedder.Diagnostics.Test
         [Fact]
         public void EMBED0011()
         {
-            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty("old-property", "instead-property")
+            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(
+                "/home/user/SourceExpander.Embedder.Config.json", "old-property", "instead-property")
                 .GetMessage(formatProvider)
                 .Should()
                 .Be("old-property は廃止されました。代わりに instead-property を使用してください");

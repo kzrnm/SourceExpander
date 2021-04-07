@@ -9,17 +9,22 @@ namespace SourceExpander.Embedder.Generate.Test
 {
     public class ConfigTest : EmbedderGeneratorTestBase
     {
-        public static TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText>
+        public static TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText, object[]>
         {
             {
                 new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+                "/foo/directory/SourceExpander.Embedder.Config.json", @"
 {
     ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""exclude-attributes"": 1
 }
-")
+"),
+                new object[]
+                {
+                    "/foo/directory/SourceExpander.Embedder.Config.json",
+                    "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 5, position 27."
+                }
             },
             {
                 new InMemorySourceText(
@@ -29,13 +34,18 @@ namespace SourceExpander.Embedder.Generate.Test
     ""embedding-type"": ""Raw"",
     ""exclude-attributes"": 1
 }
-")
+"),
+                new object[]
+                {
+                    "/foo/bar/sourceExpander.embedder.config.json",
+                    "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 5, position 27."
+                }
             },
         };
 
         [Theory]
         [MemberData(nameof(ParseErrorJsons))]
-        public async Task ParseErrorTest(InMemorySourceText additionalText)
+        public async Task ParseError(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
             var test = new Test
             {
@@ -69,7 +79,9 @@ class Program
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerError("EMBED0003"),
+                        DiagnosticResult.CompilerError("EMBED0003")
+                            .WithSpan(additionalText.Path, 1, 1, 1, 1)
+                            .WithArguments(diagnosticsArg),
                     }
                 }
             };
@@ -1070,7 +1082,8 @@ public class SourceFileInfo{
             foreach (var (obsolete, instead) in diagnosticsArgs)
                 test.ExpectedDiagnostics.Add(
                     new DiagnosticResult("EMBED0011", DiagnosticSeverity.Warning)
-                            .WithArguments(obsolete, instead));
+                        .WithSpan("/foo/bar/SourceExpander.Embedder.Config.json", 1, 1, 1, 1)
+                        .WithArguments(obsolete, instead));
             await test.RunAsync();
         }
 
