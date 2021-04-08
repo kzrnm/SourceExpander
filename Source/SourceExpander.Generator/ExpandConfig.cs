@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.Text;
+using Newtonsoft.Json;
 
 namespace SourceExpander
 {
@@ -40,21 +41,22 @@ namespace SourceExpander
 
         public static ExpandConfig Parse(SourceText sourceText)
         {
-            try
-            {
-                if (JsonUtil.ParseJson<ExpandConfigData>(sourceText) is { } data)
-                    return new ExpandConfig(
-                        enabled: data.Enabled ?? true,
-                        matchFilePatterns: data.MatchFilePattern ?? Array.Empty<string>(),
-                        ignoreFilePatterns: data.IgnoreFilePatternRegex?.Select(s => new Regex(s))
-                        ?? Array.Empty<Regex>(),
-                        staticEmbeddingText: data.StaticEmbeddingText);
-                return new ExpandConfig();
-            }
-            catch (Exception e)
-            {
-                throw new ParseConfigException(e);
-            }
+            if (JsonUtil.ParseJson<ExpandConfig>(sourceText) is { } config)
+                return config;
+            return new ExpandConfig();
+        }
+        static ExpandConfig()
+        {
+            JsonUtil.Converters.Add(new ExpandConfigConverter());
+        }
+
+        private class ExpandConfigConverter : JsonConverter<ExpandConfig?>
+        {
+            public override bool CanWrite => false;
+            public override ExpandConfig? ReadJson(JsonReader reader, Type objectType, ExpandConfig? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                => serializer.Deserialize<ExpandConfigData>(reader)?.ToImmutable();
+            public override void WriteJson(JsonWriter writer, ExpandConfig? value, JsonSerializer serializer)
+                => throw new NotImplementedException("CanWrite is always false");
         }
 
         [DataContract]
@@ -68,13 +70,13 @@ namespace SourceExpander
             public string[]? IgnoreFilePatternRegex { set; get; }
             [DataMember(Name = "static-embedding-text")]
             public string? StaticEmbeddingText { set; get; }
-        }
-    }
 
-#pragma warning disable CA1032
-    internal sealed class ParseConfigException : Exception
-    {
-        public ParseConfigException() { }
-        public ParseConfigException(Exception inner) : base(inner.Message, inner) { }
+            public ExpandConfig ToImmutable() => new(
+                    enabled: this.Enabled ?? true,
+                    matchFilePatterns: this.MatchFilePattern ?? Array.Empty<string>(),
+                    ignoreFilePatterns: this.IgnoreFilePatternRegex?.Select(s => new Regex(s))
+                    ?? Array.Empty<Regex>(),
+                    staticEmbeddingText: this.StaticEmbeddingText);
+        }
     }
 }

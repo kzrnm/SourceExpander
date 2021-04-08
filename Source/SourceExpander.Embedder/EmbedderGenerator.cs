@@ -54,7 +54,7 @@ namespace SourceExpander
                             context.ReportDiagnostic(
                                 DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(configFile.Path, p.Name, p.Instead));
                     }
-                    catch (ParseConfigException e)
+                    catch (ParseJsonException e)
                     {
                         context.ReportDiagnostic(
                             DiagnosticDescriptors.EMBED0003_ParseConfigError(configFile.Path, e.Message));
