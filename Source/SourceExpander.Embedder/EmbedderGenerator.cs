@@ -45,16 +45,23 @@ namespace SourceExpander
 
                 context.CancellationToken.ThrowIfCancellationRequested();
                 EmbedderConfig config;
-                if (configFile?.GetText(context.CancellationToken) is { } configText)
+                if (configFile?.GetText(context.CancellationToken)?.ToString() is { } configText)
                 {
                     try
                     {
                         config = EmbedderConfig.Parse(configText);
-                        foreach (var p in config.ObsoleteConfigProperties)
-                            context.ReportDiagnostic(
-                                DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(configFile.Path, p.Name, p.Instead));
+                        if (config.ObsoleteConfigProperties.Any())
+                        {
+                            foreach (var p in config.ObsoleteConfigProperties)
+                            {
+                                context.ReportDiagnostic(
+                                    DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(
+                                        DiagnosticDescriptors.AdditionalFileLocation(configFile.Path),
+                                        configFile.Path, p.Name, p.Instead));
+                            }
+                        }
                     }
-                    catch (ParseConfigException e)
+                    catch (ParseJsonException e)
                     {
                         context.ReportDiagnostic(
                             DiagnosticDescriptors.EMBED0003_ParseConfigError(configFile.Path, e.Message));

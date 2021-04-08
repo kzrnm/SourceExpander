@@ -46,13 +46,13 @@ namespace SourceExpander
 
                 context.CancellationToken.ThrowIfCancellationRequested();
                 ExpandConfig config;
-                if (configFile?.GetText(context.CancellationToken) is { } configText)
+                if (configFile?.GetText(context.CancellationToken)?.ToString() is { } configText)
                 {
                     try
                     {
                         config = ExpandConfig.Parse(configText);
                     }
-                    catch (ParseConfigException e)
+                    catch (ParseJsonException e)
                     {
                         context.ReportDiagnostic(
                             DiagnosticDescriptors.EXPAND0007_ParseConfigError(configFile.Path, e.Message));

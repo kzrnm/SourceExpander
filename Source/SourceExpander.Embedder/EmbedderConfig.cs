@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Runtime.Serialization;
-using Microsoft.CodeAnalysis.Text;
+using Newtonsoft.Json;
 
 namespace SourceExpander
 {
@@ -41,19 +41,25 @@ namespace SourceExpander
         public EmbeddingSourceClass EmbeddingSourceClass { get; }
         public ImmutableArray<ObsoleteConfigProperty> ObsoleteConfigProperties { get; }
 
-        public static EmbedderConfig Parse(SourceText? sourceText)
+        public static EmbedderConfig Parse(string sourceText)
         {
-            try
-            {
-                if (sourceText is not null
-                    && JsonUtil.ParseJson<EmbedderConfigData>(sourceText) is { } data)
-                    return data.ToImmutable();
-                return new EmbedderConfig();
-            }
-            catch (Exception e)
-            {
-                throw new ParseConfigException(e);
-            }
+            if (JsonUtil.ParseJson<EmbedderConfig>(sourceText) is { } config)
+                return config;
+            return new EmbedderConfig();
+        }
+
+        static EmbedderConfig()
+        {
+            JsonUtil.Converters.Add(new EmbedderConfigConverter());
+        }
+
+        private class EmbedderConfigConverter : JsonConverter<EmbedderConfig?>
+        {
+            public override bool CanWrite => false;
+            public override EmbedderConfig? ReadJson(JsonReader reader, Type objectType, EmbedderConfig? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                => serializer.Deserialize<EmbedderConfigData>(reader)?.ToImmutable();
+            public override void WriteJson(JsonWriter writer, EmbedderConfig? value, JsonSerializer serializer)
+                => throw new NotImplementedException("CanWrite is always false");
         }
 
         [DataContract]
@@ -158,12 +164,5 @@ namespace SourceExpander
     {
         GZipBase32768,
         Raw,
-    }
-
-#pragma warning disable CA1032
-    internal sealed class ParseConfigException : Exception
-    {
-        public ParseConfigException() { }
-        public ParseConfigException(Exception inner) : base(inner.Message, inner) { }
     }
 }
