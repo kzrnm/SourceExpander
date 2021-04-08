@@ -1041,17 +1041,17 @@ public class SourceFileInfo{
                 .BeEquivalentTo(embeddedFiles);
         }
 
-        public static TheoryData ObsoleteConfigProperty_Data = new TheoryData<string, (string, string)[]>
+        public static TheoryData ObsoleteConfigProperty_Data = new TheoryData<InMemorySourceText, (string, string)[]>
         {
             {
-                @"{""enable-minify"": false}",
+                new("/foo/small/sourceExpander.embedder.config.json", @"{""notmatch"": 0, ""enable-minify"": false}"),
                 new[]
                 {
                     ("enable-minify", "minify-level"),
                 }
             },
             {
-                @"{""enable-minify"": true}",
+                new("/foo/bar/SourceExpander.Embedder.Config.json", @"{""enable-minify"": true}"),
                 new[]
                 {
                     ("enable-minify", "minify-level"),
@@ -1061,10 +1061,8 @@ public class SourceFileInfo{
 
         [Theory]
         [MemberData(nameof(ObsoleteConfigProperty_Data))]
-        public async Task ObsoleteConfigProperty(string configJson, (string Obsolete, string Instead)[] diagnosticsArgs)
+        public async Task ObsoleteConfigProperty(InMemorySourceText additionalText, (string Obsolete, string Instead)[] diagnosticsArgs)
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", configJson);
             var test = new Test
             {
                 TestState =
@@ -1082,8 +1080,8 @@ public class SourceFileInfo{
             foreach (var (obsolete, instead) in diagnosticsArgs)
                 test.ExpectedDiagnostics.Add(
                     new DiagnosticResult("EMBED0011", DiagnosticSeverity.Warning)
-                        .WithSpan("/foo/bar/SourceExpander.Embedder.Config.json", 1, 1, 1, 1)
-                        .WithArguments(obsolete, instead));
+                        .WithSpan(additionalText.Path, 1, 1, 1, 1)
+                        .WithArguments(additionalText.Path, obsolete, instead));
             await test.RunAsync();
         }
 

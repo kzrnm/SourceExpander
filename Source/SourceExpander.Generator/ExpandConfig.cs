@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json;
 
 namespace SourceExpander
@@ -39,7 +38,7 @@ namespace SourceExpander
                 || MatchFilePatterns.Any(p => filePath.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0))
                 && IgnoreFilePatterns.All(regex => !regex.IsMatch(filePath));
 
-        public static ExpandConfig Parse(SourceText sourceText)
+        public static ExpandConfig Parse(string sourceText)
         {
             if (JsonUtil.ParseJson<ExpandConfig>(sourceText) is { } config)
                 return config;

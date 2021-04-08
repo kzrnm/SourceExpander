@@ -6,7 +6,7 @@ namespace SourceExpander
 {
     public static class DiagnosticDescriptors
     {
-        private static Location AdditionalFileLocation(string filePath) => Location.Create(filePath, new(), new());
+        public static Location AdditionalFileLocation(string filePath) => Location.Create(filePath, new(), new());
 
         public static Diagnostic EMBED0001_UnknownError(string message)
             => Diagnostic.Create(EMBED0001_UnknownError_Descriptor, Location.None, message);
@@ -161,9 +161,10 @@ namespace SourceExpander
             true);
 
 
-        public static Diagnostic EMBED0011_ObsoleteConfigProperty(string configFile, string obsoleteProperty, string insteadProperty)
+        public static Diagnostic EMBED0011_ObsoleteConfigProperty(
+            Location location, string configFile, string obsoleteProperty, string insteadProperty)
             => Diagnostic.Create(EMBED0011_ObsoleteConfigProperty_Descriptor,
-                AdditionalFileLocation(configFile), obsoleteProperty, insteadProperty);
+                location, configFile, obsoleteProperty, insteadProperty);
         private static readonly DiagnosticDescriptor EMBED0011_ObsoleteConfigProperty_Descriptor = new(
             "EMBED0011",
             new LocalizableResourceString(

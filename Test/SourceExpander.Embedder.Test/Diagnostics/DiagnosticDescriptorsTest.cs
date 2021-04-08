@@ -93,10 +93,10 @@ namespace SourceExpander.Embedder.Diagnostics.Test
         public void EMBED0011()
         {
             DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(
-                "/home/user/SourceExpander.Embedder.Config.json", "old-property", "instead-property")
+                Location.None, "/home/user/SourceExpander.Embedder.Config.json", "old-property", "instead-property")
                 .GetMessage(formatProvider)
                 .Should()
-                .Be("Obsolete embedder config property. old-property is obsolete. Use instead-property.");
+                .Be("/home/user/SourceExpander.Embedder.Config.json: Obsolete embedder config property. old-property is obsolete. Use instead-property.");
         }
     }
 }

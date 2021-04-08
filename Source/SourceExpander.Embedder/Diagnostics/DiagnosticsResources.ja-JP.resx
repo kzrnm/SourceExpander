@@ -154,7 +154,7 @@
     <value>using alias ディレクティブは非推奨です</value>
   </data>
   <data name="EMBED0011_Body" xml:space="preserve">
-    <value>{0} は廃止されました。代わりに {1} を使用してください</value>
+    <value>{0}: {1} は廃止されました。代わりに {2} を使用してください</value>
   </data>
   <data name="EMBED0011_Title" xml:space="preserve">
     <value>廃止されたembedder config プロパティです</value>

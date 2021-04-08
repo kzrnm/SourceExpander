@@ -223,7 +223,7 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
-        ///   Obsolete embedder config property. {0} is obsolete. Use {1}. に類似しているローカライズされた文字列を検索します。
+        ///   {0}: Obsolete embedder config property. {1} is obsolete. Use {2}. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EMBED0011_Body {
             get {

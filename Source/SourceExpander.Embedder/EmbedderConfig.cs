@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Runtime.Serialization;
-using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json;
 
 namespace SourceExpander
@@ -42,10 +41,9 @@ namespace SourceExpander
         public EmbeddingSourceClass EmbeddingSourceClass { get; }
         public ImmutableArray<ObsoleteConfigProperty> ObsoleteConfigProperties { get; }
 
-        public static EmbedderConfig Parse(SourceText? sourceText)
+        public static EmbedderConfig Parse(string sourceText)
         {
-            if (sourceText is not null
-                && JsonUtil.ParseJson<EmbedderConfig>(sourceText) is { } config)
+            if (JsonUtil.ParseJson<EmbedderConfig>(sourceText) is { } config)
                 return config;
             return new EmbedderConfig();
         }

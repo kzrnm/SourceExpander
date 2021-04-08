@@ -46,7 +46,7 @@ namespace SourceExpander
 
                 context.CancellationToken.ThrowIfCancellationRequested();
                 ExpandConfig config;
-                if (configFile?.GetText(context.CancellationToken) is { } configText)
+                if (configFile?.GetText(context.CancellationToken)?.ToString() is { } configText)
                 {
                     try
                     {

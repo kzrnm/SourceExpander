@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace SourceExpander
 {
-    public static class JsonUtil
+    public static partial class JsonUtil
     {
         public static JsonConverterCollection Converters { get; } = new();
 
