@@ -138,10 +138,6 @@ namespace Test.F
                     },
                     ExpectedDiagnostics = {
                         new DiagnosticResult("EMBED0009", DiagnosticSeverity.Info).WithSpan("/home/source/F/N.cs", 3, 5, 3, 33),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/F/N.cs", 8, 21, 8, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/F/N.cs", 8, 21, 8, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0246").WithSpan("/home/source/F/N.cs", 23, 6, 23, 24).WithArguments("NotEmbeddingSource"),
-                        DiagnosticResult.CompilerError("CS0246").WithSpan("/home/source/F/N.cs", 23, 6, 23, 24).WithArguments("NotEmbeddingSourceAttribute"),
                     },
                 }
             };
@@ -191,11 +187,6 @@ partial class Program
 }
 "
                         ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 6, 17, 6, 35).WithArguments("NotEmbeddingSource", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 6, 17, 6, 35).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
                     },
                     GeneratedSources =
                     {
@@ -250,11 +241,6 @@ class Program
 }
 "
                         ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
                     },
                     GeneratedSources =
                     {
@@ -313,13 +299,6 @@ class Program
 "
                         ),
                     },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 7, 21, 7, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 7, 21, 7, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
-                    },
                     GeneratedSources =
                     {
                         (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
@@ -373,11 +352,6 @@ class Program
 }
 "
                         ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSource", "SourceExpander"),
-                        DiagnosticResult.CompilerError("CS0234").WithSpan("/home/source/Program.cs", 5, 21, 5, 39).WithArguments("NotEmbeddingSourceAttribute", "SourceExpander"),
                     },
                     GeneratedSources =
                     {
