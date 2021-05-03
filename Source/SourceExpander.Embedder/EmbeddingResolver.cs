@@ -217,19 +217,21 @@ namespace SourceExpander
         private const string SourceExpander_NotEmbeddingSourceAttributeName = "SourceExpander.NotEmbeddingSourceAttribute";
         private SourceFileInfoRaw ParseSource(SyntaxTree tree)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, compilation.GetTypeByMetadataName(SourceExpander_NotEmbeddingSourceAttributeName), cancellationToken);
-
             var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
             if (newRoot is null)
                 throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
+            cancellationToken.ThrowIfCancellationRequested();
             SyntaxNode minified = config.MinifyLevel switch
             {
                 MinifyLevel.Off => newRoot.NormalizeWhitespace(eol: "\n"),
                 MinifyLevel.Full => TriviaFormatter.Minified(newRoot.NormalizeWhitespace("", " "))!,
                 _ => newRoot.NormalizeWhitespace("", " "),
             };
+            cancellationToken.ThrowIfCancellationRequested();
             string minifiedCode = minified!.ToString();
 
             if (ValidationHelpers.CompareSyntax(newRoot,
@@ -237,6 +239,7 @@ namespace SourceExpander
                 parseOptions,
                 cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var diffStr = diff.ToString();
 
                 while (diffStr.Length < 10)
@@ -259,6 +262,7 @@ namespace SourceExpander
         }
         private SourceFileInfo[] ResolveRaw(SourceFileInfoRaw[] infos, IEnumerable<SourceFileInfo> otherInfos)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var dependencyInfo = new Dictionary<string, HashSet<string>>();
             foreach (var info in infos)
                 foreach (var type in info.DefinedTypeNames)
@@ -267,6 +271,7 @@ namespace SourceExpander
                         dependencyInfo[type] = deps = new();
                     deps.Add(info.FileName);
                 }
+            cancellationToken.ThrowIfCancellationRequested();
             foreach (var info in otherInfos)
                 foreach (var type in info.TypeNames)
                 {

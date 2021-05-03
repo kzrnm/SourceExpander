@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 #nullable enable
 namespace SourceExpander
 {
@@ -59,13 +60,17 @@ namespace SourceExpander
         /// <param name="typeNames"></param>
         /// <param name="typeNameMatch"></param>
         /// <returns></returns>
-        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames)
-            => ResolveDependency(typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type, out var list) ? list : Enumerable.Empty<SourceFileInfo>()));
-        private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs)
+        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
+            => ResolveDependency(
+                typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type, out var list) ? list : Enumerable.Empty<SourceFileInfo>()),
+                cancellationToken);
+        private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var result = new Dictionary<string, SourceFileInfo>();
             var fileNameQueue = new Queue<string>();
 
+            cancellationToken.ThrowIfCancellationRequested();
             foreach (var s in origs)
             {
                 if (s.FileName == null) throw new ArgumentException($"({nameof(s.FileName)} is null");
@@ -77,6 +82,7 @@ namespace SourceExpander
 
             while (fileNameQueue.Count > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var dep = fileNameQueue.Dequeue();
                 if (_sourceFiles.TryGetValue(dep, out var s))
                 {

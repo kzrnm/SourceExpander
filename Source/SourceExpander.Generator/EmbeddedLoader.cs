@@ -84,6 +84,7 @@ namespace SourceExpander
         {
             foreach (var (embedded, display, errors) in embeddedDatas)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 foreach (var (key, message) in errors)
                 {
                     reporter.ReportDiagnostic(
