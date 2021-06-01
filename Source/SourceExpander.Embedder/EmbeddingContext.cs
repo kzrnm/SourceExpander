@@ -4,9 +4,7 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-#pragma warning disable CA1815 // Override equals and operator equals on value types
-    public readonly struct EmbeddingContext
-#pragma warning restore CA1815 // Override equals and operator equals on value types
+    internal readonly struct EmbeddingContext
     {
         public CSharpCompilation Compilation { get; }
         public CSharpParseOptions ParseOptions { get; }

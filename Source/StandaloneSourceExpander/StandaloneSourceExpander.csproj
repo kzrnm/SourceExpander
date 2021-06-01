@@ -11,9 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\SourceExpander.Share\Embedded.Core\*.cs" />
-    <Compile Include="..\SourceExpander.Share\Embedded.Roslyn\*.cs" />
-    <Compile Include="..\SourceExpander.Share\Embedded.Util\*.cs" />
+    <Compile Include="..\SourceExpander.Share\Embedded.*\*.cs" />
     <Compile Include="..\SourceExpander.Generator\CompilationExpander.cs" />
     <Compile Include="..\SourceExpander.Generator\ExpandConfig.cs" />
   </ItemGroup>

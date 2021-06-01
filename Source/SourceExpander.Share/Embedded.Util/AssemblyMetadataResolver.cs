@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace SourceExpander
 {
-    public class AssemblyMetadataResolver
+    internal class AssemblyMetadataResolver
     {
         private readonly Compilation compilation;
         private INamedTypeSymbol? _System_Reflection_AssemblyMetadataAttribute;

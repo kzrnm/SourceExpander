@@ -7,7 +7,7 @@ using Kzrnm.Convert.Base32768;
 #nullable enable
 namespace SourceExpander
 {
-    public static class SourceFileInfoUtil
+    internal static class SourceFileInfoUtil
     {
         public static string ToGZipBase32768(string code)
         {

@@ -2,12 +2,12 @@
 
 namespace SourceExpander.Roslyn
 {
-    public interface IDiagnosticReporter
+    internal interface IDiagnosticReporter
     {
         void ReportDiagnostic(Diagnostic diagnostic);
     }
 
-    public class DiagnosticReporter : IDiagnosticReporter
+    internal class DiagnosticReporter : IDiagnosticReporter
     {
         private readonly GeneratorExecutionContext context;
         public DiagnosticReporter(GeneratorExecutionContext context)

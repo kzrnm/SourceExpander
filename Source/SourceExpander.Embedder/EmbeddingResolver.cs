@@ -10,7 +10,7 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    public class EmbeddingResolver
+    internal class EmbeddingResolver
     {
         private CSharpCompilation compilation;
         private readonly CSharpParseOptions parseOptions;

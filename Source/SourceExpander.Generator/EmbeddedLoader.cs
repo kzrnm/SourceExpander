@@ -9,7 +9,7 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    public class EmbeddedLoader
+    internal class EmbeddedLoader
     {
         private CSharpCompilation compilation;
         private readonly CSharpParseOptions parseOptions;

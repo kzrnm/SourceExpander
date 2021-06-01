@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace SourceExpander
 {
-    public static class CollectionExtensions
+    internal static class CollectionExtensions
     {
         public static IEnumerable<TSource> Do<TSource>(this IEnumerable<TSource> collection, Action<TSource> action)
         {

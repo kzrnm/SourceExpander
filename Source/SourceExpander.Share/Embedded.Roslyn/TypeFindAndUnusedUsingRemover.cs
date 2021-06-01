@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace SourceExpander.Roslyn
 {
-    public class TypeFindAndUnusedUsingRemover
+    internal class TypeFindAndUnusedUsingRemover
     {
         public TypeFindAndUnusedUsingRemover(SemanticModel model, CancellationToken cancellationToken) : this(model, null, cancellationToken) { }
         public TypeFindAndUnusedUsingRemover(SemanticModel model, INamedTypeSymbol? skipAttributeSymbol, CancellationToken cancellationToken)
