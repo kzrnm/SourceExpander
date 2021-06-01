@@ -7,6 +7,7 @@
     <NoWarn>1701;1702;IDE0056;IDE0057;RS2008</NoWarn>
     <RootNamespace>SourceExpander</RootNamespace>
 
+    <IsRoslynComponent>true</IsRoslynComponent>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
 

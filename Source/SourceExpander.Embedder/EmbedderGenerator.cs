@@ -28,13 +28,6 @@ namespace SourceExpander
         {
             try
             {
-#if DEBUG
-                if (!Debugger.IsAttached)
-                {
-                    //System.Diagnostics.Debugger.Launch();
-                }
-#endif
-
                 if (context.Compilation is not CSharpCompilation compilation) return;
                 if (!compilation.SyntaxTrees.Any()) return;
                 if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;

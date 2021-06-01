@@ -22,13 +22,6 @@ namespace SourceExpander
         {
             try
             {
-#if DEBUG
-                if (!Debugger.IsAttached)
-                {
-                    //System.Diagnostics.Debugger.Launch();
-                }
-#endif
-
                 if (context.Compilation is not CSharpCompilation compilation
                     || context.ParseOptions is not CSharpParseOptions opts)
                     return;

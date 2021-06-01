@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DummySourceExpanderEmbedder": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\SourceExpander\\SourceExpander.csproj"
+    }
+  }
+}

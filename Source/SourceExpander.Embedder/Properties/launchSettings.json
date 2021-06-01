@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SourceExpander.Embedder": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Sandbox\\SampleLibrary\\SampleLibrary.csproj"
+    }
+  }
+}
