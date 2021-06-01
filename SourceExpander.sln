@@ -41,9 +41,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sandbox", "Sandbox", "{6B72
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpandBenchmark", "Source\Sandbox\ExpandBenchmark\ExpandBenchmark.csproj", "{30E3E2D4-7572-473E-BB77-386A790DA9BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleLibrary", "Source\Sandbox\SampleLibrary\SampleLibrary.csproj", "{B2F7D7DF-6D25-49C5-B612-7F474FD3CCC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleLibrary", "Source\Sandbox\SampleLibrary\SampleLibrary.csproj", "{B2F7D7DF-6D25-49C5-B612-7F474FD3CCC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "Source\Sandbox\SampleApp\SampleApp.csproj", "{B60A8E45-B63D-41D3-9B49-5B946E14A79B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApp", "Source\Sandbox\SampleApp\SampleApp.csproj", "{B60A8E45-B63D-41D3-9B49-5B946E14A79B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandaloneSourceExpander", "Source\StandaloneSourceExpander\StandaloneSourceExpander.csproj", "{9AAFD3ED-6979-44C7-A19C-544B1C23BF20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,10 @@ Global
 		{B60A8E45-B63D-41D3-9B49-5B946E14A79B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B60A8E45-B63D-41D3-9B49-5B946E14A79B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B60A8E45-B63D-41D3-9B49-5B946E14A79B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AAFD3ED-6979-44C7-A19C-544B1C23BF20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AAFD3ED-6979-44C7-A19C-544B1C23BF20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AAFD3ED-6979-44C7-A19C-544B1C23BF20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AAFD3ED-6979-44C7-A19C-544B1C23BF20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

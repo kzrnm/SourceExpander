@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
@@ -52,11 +51,5 @@ namespace SourceExpander
             Array.Sort(usings, UsingComparer.Default);
             return usings;
         }
-    }
-
-    public class UsingComparer : IComparer<string>
-    {
-        public static readonly UsingComparer Default = new();
-        public int Compare(string x, string y) => StringComparer.Ordinal.Compare(x.TrimEnd(';'), y.TrimEnd(';'));
     }
 }

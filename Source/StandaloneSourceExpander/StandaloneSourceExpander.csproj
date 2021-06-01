@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>9</LangVersion>
+    <NoWarn>$(NoWarn);IDE0057</NoWarn>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <PackageId>StandaloneSourceExpander</PackageId>
+    <Description>A library that expanding embedded source code.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SourceExpander.Share\Embedded.Core\*.cs" />
+    <Compile Include="..\SourceExpander.Share\Embedded.Roslyn\*.cs" />
+    <Compile Include="..\SourceExpander.Share\Embedded.Util\*.cs" />
+    <Compile Include="..\SourceExpander.Generator\CompilationExpander.cs" />
+    <Compile Include="..\SourceExpander.Generator\ExpandConfig.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Base32768" Version="1.0.9" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
+  </ItemGroup>
+
+</Project>
