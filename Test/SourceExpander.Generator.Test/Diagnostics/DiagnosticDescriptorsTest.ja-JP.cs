@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace SourceExpander.Generator.Diagnostics.Test
+namespace SourceExpander.Diagnostics
 {
     public class DiagnosticDescriptorsTestJaJP
     {

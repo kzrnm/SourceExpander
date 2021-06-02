@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace SourceExpander.Share.Test
+namespace SourceExpander.Share
 {
     public class AllTypeNamesTest
     {

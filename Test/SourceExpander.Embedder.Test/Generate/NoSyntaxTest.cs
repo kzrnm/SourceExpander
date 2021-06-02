@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Xunit;
 
-namespace SourceExpander.Embedder.Generate.Test
+namespace SourceExpander.Generate
 {
     public class NoSyntaxTest : EmbedderGeneratorTestBase
     {

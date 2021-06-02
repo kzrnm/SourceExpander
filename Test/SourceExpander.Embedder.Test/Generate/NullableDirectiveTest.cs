@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
-namespace SourceExpander.Embedder.Generate.Test
+namespace SourceExpander.Generate
 {
     public class NullableDirectiveTest : EmbedderGeneratorTestBase
     {

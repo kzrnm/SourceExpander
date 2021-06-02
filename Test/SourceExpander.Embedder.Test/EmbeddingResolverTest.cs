@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace SourceExpander.Embedder.Test
+namespace SourceExpander
 {
     public class EmbeddingResolverTest
     {

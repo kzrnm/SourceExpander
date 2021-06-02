@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
-namespace SourceExpander.Generator.Generate.Test
+namespace SourceExpander.Generate
 {
     public class NotFoundTest : ExpandGeneratorTestBase
     {

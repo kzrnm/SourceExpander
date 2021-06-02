@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace SourceExpander.Embedder
+namespace SourceExpander
 {
     public class EmbedderGeneratorTestBase
     {

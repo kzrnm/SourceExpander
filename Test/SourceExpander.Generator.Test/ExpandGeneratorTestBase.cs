@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using SourceExpander.Expanded;
 
-namespace SourceExpander.Generator
+namespace SourceExpander
 {
     public class ExpandGeneratorTestBase
     {

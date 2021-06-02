@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Xunit;
 
-namespace SourceExpander.Embedder.Diagnostics.Test
+namespace SourceExpander.Diagnostics
 {
     public class DiagnosticDescriptorsTest
     {
