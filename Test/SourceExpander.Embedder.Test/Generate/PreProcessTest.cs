@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace SourceExpander.Embedder.Generate.Test
+namespace SourceExpander.Generate
 {
     public class PreProcessTest : EmbedderGeneratorTestBase
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace SourceExpander.Embedder.Testing.Test
+namespace SourceExpander.Embedder.Testing
 {
     public class EmbeddedDataTest
     {

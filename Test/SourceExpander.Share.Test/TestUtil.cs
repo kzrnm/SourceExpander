@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace SourceExpander.Share.Test
+namespace SourceExpander.Share
 {
     static class TestUtil
     {
