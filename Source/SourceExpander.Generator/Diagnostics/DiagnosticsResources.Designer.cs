@@ -185,5 +185,23 @@ namespace SourceExpander.Diagnostics {
                 return ResourceManager.GetString("EXPAND0008_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   MetadataEmbeddingFile is not found: name: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EXPAND0009_Body {
+            get {
+                return ResourceManager.GetString("EXPAND0009_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   MetadataEmbeddingFile is not found に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EXPAND0009_Title {
+            get {
+                return ResourceManager.GetString("EXPAND0009_Title", resourceCulture);
+            }
+        }
     }
 }

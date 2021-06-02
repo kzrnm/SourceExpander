@@ -15,24 +15,28 @@ namespace SourceExpander
                   true,
                   Array.Empty<string>(),
                   Array.Empty<Regex>(),
+                  null,
                   null)
         { }
         public ExpandConfig(
             bool enabled,
             string[] matchFilePatterns,
             IEnumerable<Regex> ignoreFilePatterns,
-            string? staticEmbeddingText)
+            string? staticEmbeddingText,
+            string? metadataExpandingFile)
         {
             Enabled = enabled;
             MatchFilePatterns = ImmutableArray.Create(matchFilePatterns);
             IgnoreFilePatterns = ImmutableArray.CreateRange(ignoreFilePatterns);
             StaticEmbeddingText = staticEmbeddingText;
+            MetadataExpandingFile = metadataExpandingFile;
         }
 
         public bool Enabled { get; }
         public ImmutableArray<string> MatchFilePatterns { get; }
         public ImmutableArray<Regex> IgnoreFilePatterns { get; }
         public string? StaticEmbeddingText { get; }
+        public string? MetadataExpandingFile { get; }
         public bool IsMatch(string filePath)
             => (MatchFilePatterns.Length == 0
                 || MatchFilePatterns.Any(p => filePath.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0))
@@ -65,6 +69,8 @@ namespace SourceExpander
             public bool? Enabled { set; get; }
             [DataMember(Name = "match-file-pattern")]
             public string[]? MatchFilePattern { set; get; }
+            [DataMember(Name = "metadata-expanding-file")]
+            public string? MetadataExpandingFile { set; get; }
             [DataMember(Name = "ignore-file-pattern-regex")]
             public string[]? IgnoreFilePatternRegex { set; get; }
             [DataMember(Name = "static-embedding-text")]
@@ -75,7 +81,8 @@ namespace SourceExpander
                     matchFilePatterns: this.MatchFilePattern ?? Array.Empty<string>(),
                     ignoreFilePatterns: this.IgnoreFilePatternRegex?.Select(s => new Regex(s))
                     ?? Array.Empty<Regex>(),
-                    staticEmbeddingText: this.StaticEmbeddingText);
+                    staticEmbeddingText: this.StaticEmbeddingText,
+                    metadataExpandingFile: MetadataExpandingFile);
         }
     }
 }

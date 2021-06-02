@@ -480,5 +480,182 @@ private static Dictionary<string, SourceCode> _Files = new Dictionary<string, So
             };
             await test.RunAsync();
         }
+
+        [Fact]
+        public async Task MetadataExpandingFileNotFound()
+        {
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
+
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""metadata-expanding-file"": ""Program0.cs"",
+    ""static-embedding-text"": ""/* Static Embedding Text */""
+}
+");
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles = { additionalText },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"
+                        ),
+                        (
+                            @"/home/mine/Program2.cs",
+                            @"using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                        DiagnosticResult.CompilerWarning("EXPAND0009").WithArguments("Program0.cs"),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+{""/home/mine/Program2.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program2.cs""},{""code"",""using Other;\r\nclass Program2\r\n{\r\n    static void M()\r\n    {\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
+        }
+
+        [Fact]
+        public async Task MetadataExpandingFile()
+        {
+            var others = new SourceFileCollection{
+                (
+                @"/home/other/C.cs",
+                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                ),
+                (
+                @"/home/other/AssemblyInfo.cs",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""1.1.1.1"")]"
+                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedLanguageVersion"",""7.2"")]"
+                ),
+            };
+
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Generator.Config.json", @"
+{
+    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""metadata-expanding-file"": ""Program.cs"",
+    ""static-embedding-text"": ""/* Static Embedding Text */""
+}
+");
+            var test = new Test
+            {
+                SolutionTransforms =
+                {
+                    (solution, projectId)
+                    => CreateOtherReference(solution, projectId, others),
+                },
+                TestState =
+                {
+                    AdditionalFiles = { additionalText },
+                    Sources = {
+                        (
+                            @"/home/mine/Program.cs",
+                            @"using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"
+                        ),
+                        (
+                            @"/home/mine/Program2.cs",
+                            @"using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"
+                        ),
+                    },
+                    ExpectedDiagnostics =
+                    {
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs", @"using System.Reflection;
+[assembly: AssemblyMetadataAttribute(""SourceExpander.Expanded.Default"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n"")]
+".ReplaceEOL()),
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", @"using System.Collections.Generic;
+namespace SourceExpander.Expanded{
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"",""using Other;\r\nusing System;\r\nclass Program\r\n{\r\n    static void Main()\r\n    {\r\n        Console.WriteLine(42);\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+{""/home/mine/Program2.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program2.cs""},{""code"",""using Other;\r\nclass Program2\r\n{\r\n    static void M()\r\n    {\r\n        C.P();\r\n    }\r\n}\r\n#region Expanded by https://github.com/naminodarie/SourceExpander\r\n/* Static Embedding Text */\r\nnamespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \r\n#endregion Expanded by https://github.com/naminodarie/SourceExpander\r\n""},})},
+};
+}}
+".ReplaceEOL())
+                    }
+                }
+            };
+            await test.RunAsync();
+        }
+
     }
 }

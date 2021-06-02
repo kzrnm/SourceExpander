@@ -68,11 +68,28 @@ namespace SourceExpander
                 var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
                     context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
+
+                if (config.MetadataExpandingFile is { Length: > 0 } metadataExpandingFile)
+                {
+                    try
+                    {
+                        var (_, code) = loader.ExpandedCodes()
+                           .First(t => t.filePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
+
+                        context.AddSource("SourceExpander.Metadata.cs",
+                            CreateMetadataSource(new (string name, string code)[] {
+                                ("SourceExpander.Expanded.Default", code),
+                            }));
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound(metadataExpandingFile));
+                    }
+                }
                 var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
                 context.CancellationToken.ThrowIfCancellationRequested();
-                context.AddSource("SourceExpander.Expanded.cs",
-                    SourceText.From(expandedCode, Encoding.UTF8));
+                context.AddSource("SourceExpander.Expanded.cs", expandedCode);
             }
             catch (OperationCanceledException)
             {
@@ -86,7 +103,7 @@ namespace SourceExpander
             }
         }
 
-        static string CreateExpanded(IEnumerable<(string filePath, string expandedCode)> expanded)
+        static SourceText CreateExpanded(IEnumerable<(string filePath, string expandedCode)> expanded)
         {
             static void CreateSourceCodeLiteral(StringBuilder sb, string pathLiteral, string codeLiteral)
                 => sb.Append("SourceCode.FromDictionary(new Dictionary<string,object>{")
@@ -108,8 +125,21 @@ namespace SourceExpander
             }
             sb.AppendLine("};");
             sb.AppendLine("}}");
+            return SourceText.From(sb.ToString(), Encoding.UTF8);
+        }
 
-            return sb.ToString();
+        static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
+        {
+            StringBuilder sb = new();
+            sb.AppendLine("using System.Reflection;");
+            foreach (var (key, value) in metadatas)
+            {
+                sb.Append("[assembly: AssemblyMetadataAttribute(")
+                  .Append(key.ToLiteral()).Append(",")
+                  .Append(value.ToLiteral())
+                  .AppendLine(")]");
+            }
+            return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
     }
 }
