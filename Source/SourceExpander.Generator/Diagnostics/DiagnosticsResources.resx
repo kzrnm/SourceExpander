@@ -159,4 +159,10 @@
   <data name="EXPAND0008_Title" xml:space="preserve">
     <value>Invalid embedded data</value>
   </data>
+  <data name="EXPAND0009_Body" xml:space="preserve">
+    <value>MetadataEmbeddingFile is not found: name: {0}</value>
+  </data>
+  <data name="EXPAND0009_Title" xml:space="preserve">
+    <value>MetadataEmbeddingFile is not found</value>
+  </data>
 </root>

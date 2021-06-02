@@ -130,5 +130,20 @@ namespace SourceExpander
             "Error",
             DiagnosticSeverity.Warning,
             true);
+        public static Diagnostic EXPAND0009_MetadataEmbeddingFileNotFound(string fileName)
+             => Diagnostic.Create(EXPAND0009_MetadataEmbeddingFileNotFound_Descriptor, Location.None, fileName);
+        private static readonly DiagnosticDescriptor EXPAND0009_MetadataEmbeddingFileNotFound_Descriptor = new(
+            "EXPAND0009",
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EXPAND0009_Title),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            new LocalizableResourceString(
+                nameof(DiagnosticsResources.EXPAND0009_Body),
+                DiagnosticsResources.ResourceManager,
+                typeof(DiagnosticsResources)),
+            "Error",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

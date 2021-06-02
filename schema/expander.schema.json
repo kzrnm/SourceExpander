@@ -15,6 +15,11 @@
                 "type": "string"
             }
         },
+        "metadata-expanding-file": {
+            "description": "file name pattern expand to metadata",
+            "type": "string",
+            "default": null
+        },
         "static-embedding-text": {
             "description": "static embedding text",
             "type": "string"

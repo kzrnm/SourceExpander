@@ -73,5 +73,13 @@ namespace SourceExpander.Generator.Diagnostics.Test
                 .Should()
                 .Be("Invalid embedded data: Anotherlib, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.");
         }
+        [Fact]
+        public void EXPAND0009()
+        {
+            DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound("Program.cs")
+                .GetMessage(formatProvider)
+                .Should()
+                .Be("MetadataEmbeddingFile is not found: name: Program.cs");
+        }
     }
 }
