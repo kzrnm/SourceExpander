@@ -1006,12 +1006,13 @@ public class Def
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedAllowUnsafe"",""true"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{testData.ExpectedJson.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{testData.ExpectedJson.ToLiteral()})]")
+                        ),
                     },
                 }
             };
@@ -1057,12 +1058,13 @@ public class Def
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedAllowUnsafe"",""true"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{testData.ExpectedMinifyJson.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{testData.ExpectedMinifyJson.ToLiteral()})]")
+                        ),
                     },
                 }
             };

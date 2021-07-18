@@ -191,11 +191,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -262,11 +263,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -344,11 +346,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -416,11 +419,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -488,11 +492,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode.GZipBase32768"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -560,11 +565,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -643,11 +649,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -716,11 +723,12 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -789,41 +797,43 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs", @"namespace SourceExpander.Embedded{
-using System;
-using System.Collections.Generic;
-public class Container{
-public class SourceFileInfo{
-  public string FileName{get;set;}
-  public string[] TypeNames{get;set;}
-  public string[] Usings{get;set;}
-  public string[] Dependencies{get;set;}
-  public string CodeBody{get;set;}
-}
-  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{
-    new SourceFileInfo{
-      FileName = ""TestProject>Program.cs"",
-      CodeBody = ""class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"",
-      TypeNames = new string[]{
-        ""Program"",
-      },
-      Usings = new string[]{
-        ""using System;"",
-        ""using System.Diagnostics;"",
-      },
-      Dependencies = new string[]{
-      },
-    },
-  };
-}
-}
-"
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                            "namespace SourceExpander.Embedded{",
+                            "using System;",
+                            "using System.Collections.Generic;",
+                            "public class Container{",
+                            "public class SourceFileInfo{",
+                            "  public string FileName{get;set;}",
+                            "  public string[] TypeNames{get;set;}",
+                            "  public string[] Usings{get;set;}",
+                            "  public string[] Dependencies{get;set;}",
+                            "  public string CodeBody{get;set;}",
+                            "}",
+                            "  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{",
+                            "    new SourceFileInfo{",
+                            "      FileName = \"TestProject>Program.cs\",",
+                            "      CodeBody = \"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",",
+                            "      TypeNames = new string[]{",
+                            "        \"Program\",",
+                            "      },",
+                            "      Usings = new string[]{",
+                            "        \"using System;\",",
+                            "        \"using System.Diagnostics;\",",
+                            "      },",
+                            "      Dependencies = new string[]{",
+                            "      },",
+                            "    },",
+                            "  };",
+                            "}",
+                            "}")
                         ),
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -891,41 +901,43 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs", @"namespace SourceExpander.Embedded{
-using System;
-using System.Collections.Generic;
-public class SourceFileInfoContainer{
-public class SourceFileInfo{
-  public string FileName{get;set;}
-  public string[] TypeNames{get;set;}
-  public string[] Usings{get;set;}
-  public string[] Dependencies{get;set;}
-  public string CodeBody{get;set;}
-}
-  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{
-    new SourceFileInfo{
-      FileName = ""TestProject>Program.cs"",
-      CodeBody = ""class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"",
-      TypeNames = new string[]{
-        ""Program"",
-      },
-      Usings = new string[]{
-        ""using System;"",
-        ""using System.Diagnostics;"",
-      },
-      Dependencies = new string[]{
-      },
-    },
-  };
-}
-}
-"
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                            "namespace SourceExpander.Embedded{",
+                            "using System;",
+                            "using System.Collections.Generic;",
+                            "public class SourceFileInfoContainer{",
+                            "public class SourceFileInfo{",
+                            "  public string FileName{get;set;}",
+                            "  public string[] TypeNames{get;set;}",
+                            "  public string[] Usings{get;set;}",
+                            "  public string[] Dependencies{get;set;}",
+                            "  public string CodeBody{get;set;}",
+                            "}",
+                            "  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{",
+                            "    new SourceFileInfo{",
+                            "      FileName = \"TestProject>Program.cs\",",
+                            "      CodeBody = \"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",",
+                            "      TypeNames = new string[]{",
+                            "        \"Program\",",
+                            "      },",
+                            "      Usings = new string[]{",
+                            "        \"using System;\",",
+                            "        \"using System.Diagnostics;\",",
+                            "      },",
+                            "      Dependencies = new string[]{",
+                            "      },",
+                            "    },",
+                            "  };",
+                            "}",
+                            "}")
                         ),
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
                     }
                 }
             };
@@ -994,41 +1006,42 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs", @"namespace SourceExpander.Embedded{
-using System;
-using System.Collections.Generic;
-public class SourceFileInfoContainer{
-public class SourceFileInfo{
-  public string FileName{get;set;}
-  public string[] TypeNames{get;set;}
-  public string[] Usings{get;set;}
-  public string[] Dependencies{get;set;}
-  public string CodeBody{get;set;}
-}
-  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{
-    new SourceFileInfo{
-      FileName = ""TestProject>Program.cs"",
-      CodeBody = ""class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"",
-      TypeNames = new string[]{
-        ""Program"",
-      },
-      Usings = new string[]{
-        ""using System;"",
-        ""using System.Diagnostics;"",
-      },
-      Dependencies = new string[]{
-      },
-    },
-  };
-}
-}
-"
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                            "namespace SourceExpander.Embedded{",
+                            "using System;",
+                            "using System.Collections.Generic;",
+                            "public class SourceFileInfoContainer{",
+                            "public class SourceFileInfo{",
+                            "  public string FileName{get;set;}",
+                            "  public string[] TypeNames{get;set;}",
+                            "  public string[] Usings{get;set;}",
+                            "  public string[] Dependencies{get;set;}",
+                            "  public string CodeBody{get;set;}",
+                            "}",
+                            "  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{",
+                            "    new SourceFileInfo{",
+                            "      FileName = \"TestProject>Program.cs\",",
+                            "      CodeBody = \"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",",
+                            "      TypeNames = new string[]{",
+                            "        \"Program\",",
+                            "      },",
+                            "      Usings = new string[]{",
+                            "        \"using System;\",",
+                            "        \"using System.Diagnostics;\",",
+                            "      },",
+                            "      Dependencies = new string[]{",
+                            "      },",
+                            "    },",
+                            "  };",
+                            "}",
+                            "}")                        ),
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", @$"using System.Reflection;
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbedderVersion"",""{EmbedderVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedLanguageVersion"",""{EmbeddedLanguageVersion}"")]
-[assembly: AssemblyMetadataAttribute(""SourceExpander.EmbeddedSourceCode"",{embeddedSourceCode.ToLiteral()})]
-"),
                     }
                 }
             };

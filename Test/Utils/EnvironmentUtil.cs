@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace SourceExpander
 {
@@ -11,6 +12,7 @@ namespace SourceExpander
                 sb.AppendLine(s);
             return sb.ToString();
         }
-        public static string ReplaceEOL(this string str) => str.Replace('\n', '\r');
+        public static string ReplaceEOL(this string str)
+            => JoinByStringBuilder(str.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None));
     }
 }
