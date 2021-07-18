@@ -51,34 +51,6 @@ namespace SourceExpander
         public static string ExpanderVersion => typeof(ExpandGenerator).Assembly.GetName().Version.ToString();
         private static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.CSharp9;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public static CSharpCompilation CreateCompilation(
             IEnumerable<SyntaxTree> syntaxTrees,
             CSharpCompilationOptions compilationOptions,
