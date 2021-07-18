@@ -28,7 +28,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Compile Include="..\Utils\EnvironmentUtil.cs" Link="Utils\EnvironmentUtil.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SourceExpander.Embedder.Testing\SourceExpander.Embedder.Testing.csproj" />
     <ProjectReference Include="..\..\Source\SourceExpander\SourceExpander.csproj" />

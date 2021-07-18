@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Compile Include="..\Verifiers\CSharpSourceGeneratorTest.cs" Link="Verifiers\CSharpSourceGeneratorTest.cs" />
+    <Compile Include="..\Utils\EnvironmentUtil.cs" Link="Utils\EnvironmentUtil.cs" />
     <Compile Include="..\Utils\InMemorySourceText.cs" Link="Utils\InMemorySourceText.cs" />
   </ItemGroup>
 
