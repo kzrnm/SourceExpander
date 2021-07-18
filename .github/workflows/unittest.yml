@@ -35,5 +35,9 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      - name: Build & Test
-        run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --logger GitHubActions
+      - name: Install dependencies
+        run: dotnet restore ${{ env.WORKFLOW_BUILD_SLN }}
+      - name: Build
+        run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} --no-restore -c Release
+      - name: Test
+        run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --no-build -c Release --logger GitHubActions
