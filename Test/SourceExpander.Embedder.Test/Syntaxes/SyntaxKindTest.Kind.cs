@@ -187,7 +187,7 @@ public class Def : Par
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Par", "Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray.Create<string>();
-        public override string ExpectedCodeBody => "public class Par { public Par(): this(0) { }  public Par(long n) { this.n = n; }  public long n; }  public class Def : Par { public Def(DateTime d, int m): base(d.Ticks * m) { } }";
+        public override string ExpectedCodeBody => "public class Par { public Par() : this(0) { }  public Par(long n) { this.n = n; }  public long n; }  public class Def : Par { public Def(DateTime d, int m) : base(d.Ticks * m) { } }";
         public override string ExpectedMinifyCodeBody => "public class Par{public Par():this(0){}public Par(long n){this.n=n;}public long n;}public class Def:Par{public Def(DateTime d,int m):base(d.Ticks*m){}}";
     }
 
@@ -419,7 +419,7 @@ public class Def
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray.Create<string>();
-        public override string ExpectedCodeBody => "public class Def { Int32[] Arr = new[]{1, 2, 3}; public void M() { _ = ((object)DateTime.Now)switch { 1 => 1, int i => i, IComparable c and long l when c.CompareTo(l) > 1 => l, DateTime d and { Ticks: 131 }  => d.Ticks, _ => 1, }  ; } }";
+        public override string ExpectedCodeBody => "public class Def { Int32[] Arr = new[]{1, 2, 3}; public void M() { _ = ((object)DateTime.Now) switch { 1 => 1, int i => i, IComparable c and long l when c.CompareTo(l) > 1 => l, DateTime d and { Ticks: 131 } => d.Ticks, _ => 1, }; } }";
         public override string ExpectedMinifyCodeBody => "public class Def{Int32[]Arr=new[]{1,2,3};public void M(){_=((object)DateTime.Now)switch{1=>1,int i=>i,IComparable c and long l when c.CompareTo(l)>1=>l,DateTime d and{Ticks:131}=>d.Ticks,_=>1,};}}";
     }
 

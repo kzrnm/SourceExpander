@@ -17,7 +17,6 @@ namespace SourceExpander
         private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
         public void Initialize(GeneratorInitializationContext context) { }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         public void Execute(GeneratorExecutionContext context)
         {
             try
@@ -65,7 +64,7 @@ namespace SourceExpander
                 }
 
                 context.CancellationToken.ThrowIfCancellationRequested();
-                var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
+                var loader = new EmbeddedLoader(compilation, opts, new GeneratorExecutionContextDiagnosticReporter(context), config, context.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
                     context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 

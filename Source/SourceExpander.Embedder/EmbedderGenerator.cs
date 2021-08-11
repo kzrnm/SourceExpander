@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -13,9 +14,105 @@ using SourceExpander.Roslyn;
 namespace SourceExpander
 {
     [Generator]
-    public class EmbedderGenerator : ISourceGenerator
+    public class EmbedderGenerator : IIncrementalGenerator
     {
         private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            context.RegisterPostInitializationOutput(ctx =>
+            {
+                foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
+                    ctx.AddSource(hintName, sourceText);
+            });
+
+            IncrementalValueProvider<(EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
+                = context.AdditionalTextsProvider.Collect().Select(ParseAdditionalTexts);
+
+            var source = context.CompilationProvider
+                .Combine(context.ParseOptionsProvider)
+                .Combine(configProvider);
+
+            context.RegisterImplementationSourceOutput(source, (ctx, source) =>
+            {
+                var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
+
+                try
+                {
+                    foreach (var diag in configDiagnostic)
+                    {
+                        ctx.ReportDiagnostic(diag);
+                    }
+
+                    if (compilationOrig is not CSharpCompilation compilation) return;
+                    if (!compilation.SyntaxTrees.Any()) return;
+                    if (compilation.GetDiagnostics(ctx.CancellationToken).HasCompilationError()) return;
+
+                    if (!config.Enabled)
+                        return;
+
+                    ctx.CancellationToken.ThrowIfCancellationRequested();
+                    var embeddingContext = new EmbeddingContext(
+                        compilation,
+                        (CSharpParseOptions)parseOptions,
+                        new SourceProductionContextDiagnosticReporter(ctx),
+                        config,
+                        ctx.CancellationToken);
+
+                    var resolver = new EmbeddingResolver(embeddingContext);
+                    var resolvedSources = resolver.ResolveFiles();
+
+                    if (resolvedSources.Length == 0)
+                        return;
+
+                    if (config.EmbeddingSourceClass.Enabled)
+                        ctx.AddSource(
+                            "EmbeddingSourceClass.cs",
+                            CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
+
+                    ctx.AddSource(
+                        "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+                }
+                catch (OperationCanceledException)
+                {
+                    Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e.ToString());
+                    ctx.ReportDiagnostic(
+                        DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
+                }
+            });
+        }
+        private static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(ImmutableArray<AdditionalText> additionalTexts, CancellationToken cancellationToken = default)
+        {
+            var at = additionalTexts.FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
+
+            if (at?.GetText(cancellationToken)?.ToString() is not { } configText)
+                return (new EmbedderConfig(), ImmutableArray<Diagnostic>.Empty);
+
+            try
+            {
+                var config = EmbedderConfig.Parse(configText);
+                var diagnosticsBuilder = ImmutableArray.CreateBuilder<Diagnostic>();
+
+                if (config.ObsoleteConfigProperties.Any())
+                {
+                    foreach (var p in config.ObsoleteConfigProperties)
+                    {
+                        diagnosticsBuilder.Add(
+                            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(DiagnosticDescriptors.AdditionalFileLocation(at.Path), at.Path, p.Name, p.Instead));
+                    }
+                }
+                return (config, diagnosticsBuilder.ToImmutable());
+            }
+            catch (ParseJsonException e)
+            {
+                return (new EmbedderConfig(), ImmutableArray.Create(DiagnosticDescriptors.EMBED0003_ParseConfigError(at.Path, e.Message)));
+            }
+        }
+
         public void Initialize(GeneratorInitializationContext context)
             => context.RegisterForPostInitialization(ctx =>
             {
@@ -23,7 +120,6 @@ namespace SourceExpander
                     ctx.AddSource(hintName, sourceText);
             });
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         public void Execute(GeneratorExecutionContext context)
         {
             try
@@ -70,7 +166,7 @@ namespace SourceExpander
                 var embeddingContext = new EmbeddingContext(
                     compilation,
                     (CSharpParseOptions)context.ParseOptions,
-                    new DiagnosticReporter(context),
+                    new GeneratorExecutionContextDiagnosticReporter(context),
                     config,
                     context.CancellationToken);
 

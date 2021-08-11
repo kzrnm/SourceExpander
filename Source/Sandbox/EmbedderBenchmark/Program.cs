@@ -128,7 +128,7 @@ public class Benchmark
     {
         var cts = new CancellationTokenSource(cancellationMilliseconds);
         var (outCompilation, diag) = TestUtil.RunGenerator(
-            compilation, new EmbedderGenerator(), CreateConfig(@"
+            compilation, new EmbedderGenerator().AsSourceGenerator(), CreateConfig(@"
 {
     ""minify-level"": ""full""
 }
@@ -140,7 +140,7 @@ public class Benchmark
     {
         var cts = new CancellationTokenSource(cancellationMilliseconds);
         var (outCompilation, diag) = TestUtil.RunGenerator(
-            compilation, new EmbedderGenerator(), CreateConfig(@"
+            compilation, new EmbedderGenerator().AsSourceGenerator(), CreateConfig(@"
 {
     ""minify-level"": ""full"",
     ""embedding-type"": ""Raw"",

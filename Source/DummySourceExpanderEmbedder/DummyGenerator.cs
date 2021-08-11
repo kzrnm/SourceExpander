@@ -8,10 +8,45 @@ using SourceExpander.Roslyn;
 namespace SourceExpander
 {
     [Generator]
-    public class DummyGenerator : ISourceGenerator
+    public class DummyGenerator : IIncrementalGenerator
     {
-        public void Initialize(GeneratorInitializationContext context) { }
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            context.RegisterImplementationSourceOutput(context.CompilationProvider.Combine(context.ParseOptionsProvider), (ctx, source) =>
+            {
+                var (compilationOrig, parseOptionsOrig) = source;
+                var parseOptions = (CSharpParseOptions)parseOptionsOrig;
+                parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp4);
+                var compilation = (CSharpCompilation)compilationOrig;
+                var rewriter = new DummyRewriter();
+                var list = new List<SyntaxTree>(compilation.SyntaxTrees.Length);
+                foreach (var tree in compilation.SyntaxTrees)
+                {
+                    if (tree.FilePath.EndsWith("Resources.Designer.cs"))
+                        continue;
+                    var newRoot = rewriter.Visit(tree.GetRoot(ctx.CancellationToken));
+                    list.Add(tree.WithRootAndOptions(newRoot, parseOptions));
+                }
+                compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(list);
 
+                var resolver = new EmbeddingResolver(
+                    compilation,
+                    parseOptions,
+                    new DummyDiagnosticReporter(),
+                    new EmbedderConfig(
+                        true,
+                        EmbeddingType.GZipBase32768,
+                        excludeAttributes: new[] {
+                        "System.Runtime.CompilerServices.MethodImplAttribute",
+                        "System.Runtime.CompilerServices.CallerFilePathAttribute"
+                        },
+                        minifyLevel: MinifyLevel.Full),
+                    ctx.CancellationToken);
+
+                ctx.AddSource(
+                    "EmbeddedSourceCode.Metadata.Generated.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+            });
+        }
         public void Execute(GeneratorExecutionContext context)
         {
             var parseOptions = (CSharpParseOptions)context.ParseOptions;
