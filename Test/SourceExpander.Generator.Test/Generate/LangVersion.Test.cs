@@ -22,7 +22,7 @@ namespace SourceExpander.Generate
                 ),
         };
 
-        [Theory]
+        [Theory(Skip = "IIncrementalGenerator needs LanguageVersion.Preview")]
         [InlineData(LanguageVersion.CSharp7_2)]
         [InlineData(LanguageVersion.CSharp8)]
         [InlineData(LanguageVersion.CSharp9)]
@@ -89,7 +89,7 @@ namespace Other { public static class C { public static void P() => System.Conso
         }
 
 
-        [Theory]
+        [Theory(Skip = "IIncrementalGenerator needs LanguageVersion.Preview")]
         [InlineData(LanguageVersion.CSharp4)]
         [InlineData(LanguageVersion.CSharp5)]
         [InlineData(LanguageVersion.CSharp6)]
@@ -158,7 +158,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             await test.RunAsync();
         }
 
-        [Theory]
+        [Theory(Skip = "IIncrementalGenerator needs LanguageVersion.Preview")]
         [InlineData(LanguageVersion.CSharp1)]
         [InlineData(LanguageVersion.CSharp2)]
         [InlineData(LanguageVersion.CSharp3)]

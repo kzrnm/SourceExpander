@@ -15,7 +15,7 @@ namespace SourceExpander
 {
     public class ExpandGeneratorTestBase
     {
-        public class Test : CSharpSourceGeneratorTest<ExpandGenerator>
+        public class Test : CSharpIncrementalGeneratorTest<ExpandGenerator>
         {
             public Test()
             {
@@ -49,7 +49,8 @@ namespace SourceExpander
         internal static ImmutableArray<PackageIdentity> Packages
             = ImmutableArray.Create(new PackageIdentity("SourceExpander.Core", "2.6.0"));
         public static string ExpanderVersion => typeof(ExpandGenerator).Assembly.GetName().Version.ToString();
-        private static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.CSharp9;
+        // TODO: LanguageVersion.Preview
+        public static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.Preview;
 
         public static CSharpCompilation CreateCompilation(
             IEnumerable<SyntaxTree> syntaxTrees,
