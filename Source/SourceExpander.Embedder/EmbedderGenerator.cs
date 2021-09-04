@@ -27,7 +27,9 @@ namespace SourceExpander
             });
 
             IncrementalValueProvider<(EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
-                = context.AdditionalTextsProvider.Collect().Select(ParseAdditionalTexts);
+                = context.AdditionalTextsProvider
+                .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+                .Collect().Select(ParseAdditionalTexts);
 
             var source = context.CompilationProvider
                 .Combine(context.ParseOptionsProvider)
@@ -87,7 +89,7 @@ namespace SourceExpander
         }
         private static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(ImmutableArray<AdditionalText> additionalTexts, CancellationToken cancellationToken = default)
         {
-            var at = additionalTexts.FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
+            var at = additionalTexts.FirstOrDefault();
 
             if (at?.GetText(cancellationToken)?.ToString() is not { } configText)
                 return (new EmbedderConfig(), ImmutableArray<Diagnostic>.Empty);
