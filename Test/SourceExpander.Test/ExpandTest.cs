@@ -46,7 +46,7 @@ class Program
             compilation.GetDiagnostics().Should().BeEmpty();
 
             var generator = new Generator::SourceExpander.ExpandGenerator();
-            var driver = CSharpGeneratorDriver.Create(new[] { generator },
+            var driver = CSharpGeneratorDriver.Create(new[] { generator.AsSourceGenerator() },
                 parseOptions:
                 new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
                     .WithLanguageVersion(LanguageVersion.CSharp4)
