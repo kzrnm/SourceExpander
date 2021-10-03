@@ -35,58 +35,61 @@ namespace SourceExpander
                 .Combine(context.ParseOptionsProvider)
                 .Combine(configProvider);
 
-            context.RegisterImplementationSourceOutput(source, (ctx, source) =>
-            {
-                var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
-
-                try
-                {
-                    foreach (var diag in configDiagnostic)
-                    {
-                        ctx.ReportDiagnostic(diag);
-                    }
-
-                    if (compilationOrig is not CSharpCompilation compilation) return;
-                    if (!compilation.SyntaxTrees.Any()) return;
-                    if (compilation.GetDiagnostics(ctx.CancellationToken).HasCompilationError()) return;
-
-                    if (!config.Enabled)
-                        return;
-
-                    ctx.CancellationToken.ThrowIfCancellationRequested();
-                    var embeddingContext = new EmbeddingContext(
-                        compilation,
-                        (CSharpParseOptions)parseOptions,
-                        new SourceProductionContextDiagnosticReporter(ctx),
-                        config,
-                        ctx.CancellationToken);
-
-                    var resolver = new EmbeddingResolver(embeddingContext);
-                    var resolvedSources = resolver.ResolveFiles();
-
-                    if (resolvedSources.Length == 0)
-                        return;
-
-                    if (config.EmbeddingSourceClass.Enabled)
-                        ctx.AddSource(
-                            "EmbeddingSourceClass.cs",
-                            CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
-
-                    ctx.AddSource(
-                        "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
-                }
-                catch (OperationCanceledException)
-                {
-                    Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e.ToString());
-                    ctx.ReportDiagnostic(
-                        DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
-                }
-            });
+            context.RegisterImplementationSourceOutput(source, Execute);
         }
+
+        private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
+        {
+            var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
+
+            try
+            {
+                foreach (var diag in configDiagnostic)
+                {
+                    ctx.ReportDiagnostic(diag);
+                }
+
+                if (compilationOrig is not CSharpCompilation compilation) return;
+                if (!compilation.SyntaxTrees.Any()) return;
+                if (compilation.GetDiagnostics(ctx.CancellationToken).HasCompilationError()) return;
+
+                if (!config.Enabled)
+                    return;
+
+                ctx.CancellationToken.ThrowIfCancellationRequested();
+                var embeddingContext = new EmbeddingContext(
+                    compilation,
+                    (CSharpParseOptions)parseOptions,
+                    new SourceProductionContextDiagnosticReporter(ctx),
+                    config,
+                    ctx.CancellationToken);
+
+                var resolver = new EmbeddingResolver(embeddingContext);
+                var resolvedSources = resolver.ResolveFiles();
+
+                if (resolvedSources.Length == 0)
+                    return;
+
+                if (config.EmbeddingSourceClass.Enabled)
+                    ctx.AddSource(
+                        "EmbeddingSourceClass.cs",
+                        CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
+
+                ctx.AddSource(
+                    "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.ToString());
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
+            }
+        }
+
         private static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(ImmutableArray<AdditionalText> additionalTexts, CancellationToken cancellationToken = default)
         {
             var at = additionalTexts.FirstOrDefault();
@@ -112,90 +115,6 @@ namespace SourceExpander
             catch (ParseJsonException e)
             {
                 return (new EmbedderConfig(), ImmutableArray.Create(DiagnosticDescriptors.EMBED0003_ParseConfigError(at.Path, e.Message)));
-            }
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-            => context.RegisterForPostInitialization(ctx =>
-            {
-                foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
-                    ctx.AddSource(hintName, sourceText);
-            });
-
-        public void Execute(GeneratorExecutionContext context)
-        {
-            try
-            {
-                if (context.Compilation is not CSharpCompilation compilation) return;
-                if (!compilation.SyntaxTrees.Any()) return;
-                if (compilation.GetDiagnostics(context.CancellationToken).HasCompilationError()) return;
-
-                var configFile = context.AdditionalFiles
-                        .FirstOrDefault(a =>
-                        StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
-
-                context.CancellationToken.ThrowIfCancellationRequested();
-                EmbedderConfig config;
-                if (configFile?.GetText(context.CancellationToken)?.ToString() is { } configText)
-                {
-                    try
-                    {
-                        config = EmbedderConfig.Parse(configText);
-                        if (config.ObsoleteConfigProperties.Any())
-                        {
-                            foreach (var p in config.ObsoleteConfigProperties)
-                            {
-                                context.ReportDiagnostic(
-                                    DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(
-                                        DiagnosticDescriptors.AdditionalFileLocation(configFile.Path),
-                                        configFile.Path, p.Name, p.Instead));
-                            }
-                        }
-                    }
-                    catch (ParseJsonException e)
-                    {
-                        context.ReportDiagnostic(
-                            DiagnosticDescriptors.EMBED0003_ParseConfigError(configFile.Path, e.Message));
-                        return;
-                    }
-                }
-                else config = new();
-
-                if (!config.Enabled)
-                    return;
-
-                context.CancellationToken.ThrowIfCancellationRequested();
-                var embeddingContext = new EmbeddingContext(
-                    compilation,
-                    (CSharpParseOptions)context.ParseOptions,
-                    new GeneratorExecutionContextDiagnosticReporter(context),
-                    config,
-                    context.CancellationToken);
-
-                var resolver = new EmbeddingResolver(embeddingContext);
-                var resolvedSources = resolver.ResolveFiles();
-
-                if (resolvedSources.Length == 0)
-                    return;
-
-                if (config.EmbeddingSourceClass.Enabled)
-                    context.AddSource(
-                        "EmbeddingSourceClass.cs",
-                        CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
-
-                context.AddSource(
-                    "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
-
-            }
-            catch (OperationCanceledException)
-            {
-                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.ToString());
-                context.ReportDiagnostic(
-                    DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
             }
         }
 

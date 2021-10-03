@@ -45,59 +45,61 @@ namespace SourceExpander
                 .Combine(context.ParseOptionsProvider)
                 .Combine(configProvider);
 
-            context.RegisterImplementationSourceOutput(source, (ctx, source) =>
+            context.RegisterImplementationSourceOutput(source, Execute);
+        }
+
+        private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
+        {
+            var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
+
+            try
             {
-                var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
-
-                try
+                if (!config.Enabled)
+                    return;
+                foreach (var diag in configDiagnostic)
                 {
-                    if (!config.Enabled)
-                        return;
-                    foreach (var diag in configDiagnostic)
+                    ctx.ReportDiagnostic(diag);
+                }
+
+                if (compilationOrig is not CSharpCompilation compilation) return;
+
+                ctx.CancellationToken.ThrowIfCancellationRequested();
+                var loader = new EmbeddedLoader(compilation, (CSharpParseOptions)parseOptions, new SourceProductionContextDiagnosticReporter(ctx), config, ctx.CancellationToken);
+                if (loader.IsEmbeddedEmpty)
+                    ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
+
+                if (config.MetadataExpandingFile is { Length: > 0 } metadataExpandingFile)
+                {
+                    try
                     {
-                        ctx.ReportDiagnostic(diag);
-                    }
+                        var (_, code) = loader.ExpandedCodes()
+                           .First(t => t.filePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
 
-                    if (compilationOrig is not CSharpCompilation compilation) return;
-
-                    ctx.CancellationToken.ThrowIfCancellationRequested();
-                    var loader = new EmbeddedLoader(compilation, (CSharpParseOptions)parseOptions, new SourceProductionContextDiagnosticReporter(ctx), config, ctx.CancellationToken);
-                    if (loader.IsEmbeddedEmpty)
-                        ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
-
-                    if (config.MetadataExpandingFile is { Length: > 0 } metadataExpandingFile)
-                    {
-                        try
-                        {
-                            var (_, code) = loader.ExpandedCodes()
-                               .First(t => t.filePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
-
-                            ctx.AddSource("SourceExpander.Metadata.cs",
-                                CreateMetadataSource(new (string name, string code)[] {
+                        ctx.AddSource("SourceExpander.Metadata.cs",
+                            CreateMetadataSource(new (string name, string code)[] {
                                 ("SourceExpander.Expanded.Default", code),
-                                }));
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound(metadataExpandingFile));
-                        }
+                            }));
                     }
-                    var expandedCode = CreateExpanded(loader.ExpandedCodes());
+                    catch (InvalidOperationException)
+                    {
+                        ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound(metadataExpandingFile));
+                    }
+                }
+                var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
-                    ctx.CancellationToken.ThrowIfCancellationRequested();
-                    ctx.AddSource("SourceExpander.Expanded.cs", expandedCode);
-                }
-                catch (OperationCanceledException)
-                {
-                    Trace.WriteLine(nameof(ExpandGenerator) + "." + nameof(context.RegisterImplementationSourceOutput) + "is Canceled.");
-                }
-                catch (Exception e)
-                {
-                    Trace.WriteLine(e.ToString());
-                    ctx.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0001_UnknownError(e.Message));
-                }
-            });
+                ctx.CancellationToken.ThrowIfCancellationRequested();
+                ctx.AddSource("SourceExpander.Expanded.cs", expandedCode);
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.WriteLine(nameof(ExpandGenerator) + "." + nameof(Execute) + "is Canceled.");
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.ToString());
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.EXPAND0001_UnknownError(e.Message));
+            }
         }
 
         static SourceText CreateExpanded(IEnumerable<(string filePath, string expandedCode)> expanded)
