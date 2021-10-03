@@ -136,16 +136,16 @@ namespace Solvers
 
     const int cancellationMilliseconds = 10000;
 
-//    [Benchmark]
-//    public Compilation Default()
-//    {
-//        var cts = new CancellationTokenSource(cancellationMilliseconds);
-//        var (outCompilation, diag) = TestUtil.RunGenerator(
-//            compilation, new ExpandGenerator(), CreateConfig(@"
-//{
-//    ""minify-level"": ""full""
-//}
-//"), cancellationToken: cts.Token);
-//        return outCompilation;
-//    }
+    //    [Benchmark]
+    //    public Compilation Default()
+    //    {
+    //        var cts = new CancellationTokenSource(cancellationMilliseconds);
+    //        var (outCompilation, diag) = TestUtil.RunGenerator(
+    //            compilation, new ExpandGenerator(), CreateConfig(@"
+    //{
+    //    ""minify-level"": ""full""
+    //}
+    //"), cancellationToken: cts.Token);
+    //        return outCompilation;
+    //    }
 }

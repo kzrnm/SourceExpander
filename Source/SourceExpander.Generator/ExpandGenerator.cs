@@ -36,7 +36,7 @@ namespace SourceExpander
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
                 }
             });
-            
+
             IncrementalValueProvider<(ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
                 = context.AdditionalTextsProvider
                 .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
