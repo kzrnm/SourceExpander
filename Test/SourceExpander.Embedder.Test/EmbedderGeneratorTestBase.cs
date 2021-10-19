@@ -8,7 +8,7 @@ namespace SourceExpander
 {
     public class EmbedderGeneratorTestBase
     {
-        public class Test : CSharpSourceGeneratorTest<EmbedderGenerator>
+        public class Test : CSharpIncrementalGeneratorTest<EmbedderGenerator>
         {
             public Test()
             {
@@ -46,8 +46,8 @@ namespace SourceExpander
             = ImmutableArray.Create(new PackageIdentity("SourceExpander.Core", "2.6.0"));
 
         public static string EmbedderVersion => typeof(EmbedderGenerator).Assembly.GetName().Version.ToString();
-        private static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.CSharp9;
-        public static string EmbeddedLanguageVersion => "9.0";
+        public static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.Preview;
+        public static string EmbeddedLanguageVersion => "preview";
 
         public static InMemorySourceText enableMinifyJson = new(
             "/foo/bar/SourceExpander.Embedder.Config.json", @"

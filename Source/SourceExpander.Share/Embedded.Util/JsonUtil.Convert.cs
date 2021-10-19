@@ -50,7 +50,6 @@ namespace SourceExpander
         }
     }
 
-#pragma warning disable CA1032
     internal sealed class ParseJsonException : Exception
     {
         public ParseJsonException(Exception inner) : base(inner.Message, inner)

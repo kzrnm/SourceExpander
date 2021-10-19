@@ -47,6 +47,16 @@ namespace SourceExpander.Generate
         [MemberData(nameof(ParseErrorJsons))]
         public async Task ParseError(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray.Create<string>(),
+                     @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
+                 ));
+            string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768(@"[{""CodeBody"":""[DebuggerDisplay(\""Name\"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\""TEST\"")] static void T() => Console.WriteLine(2); }"",""Dependencies"":[],""FileName"":""TestProject>Program.cs"",""TypeNames"":[""Program""],""Usings"":[""using System;"",""using System.Diagnostics;""]}]");
             var test = new Test
             {
                 TestState =
@@ -77,6 +87,15 @@ class Program
 "
                         ),
                     },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
+                    },
                     ExpectedDiagnostics =
                     {
                         DiagnosticResult.CompilerError("EMBED0003")
@@ -86,6 +105,14 @@ class Program
                 }
             };
             await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
+                SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
         }
 
         [Fact]

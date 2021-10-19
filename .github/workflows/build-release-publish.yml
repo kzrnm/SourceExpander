@@ -61,17 +61,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install dotnet-format
-        run: dotnet tool install --global dotnet-format
+      - name: Setup .NET Core SDK 6.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.100-rc.2.21505.57
       - name: Format
-        run: dotnet format ${{ env.WORKFLOW_BUILD_SLN }} --check
+        run: dotnet format ${{ env.WORKFLOW_BUILD_SLN }} --verify-no-changes
 
   build:
     runs-on: ubuntu-latest
     needs: [get-version]
     steps:
       - uses: actions/checkout@v2
-      - name: Setup .NET SDK
+      - name: Setup .NET SDK .NET 6
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.100-rc.2.21505.57
+      - name: Setup .NET SDK .NET 5
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
@@ -81,12 +87,8 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      - name: Install dependencies
-        run: dotnet restore ${{ env.WORKFLOW_BUILD_SLN }}
-      - name: Build
-        run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} --no-restore -c Release
-      - name: Test
-        run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --no-build -c Release --logger GitHubActions
+      - name: Build & Test
+        run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --logger GitHubActions -c Release
       - uses: actions/upload-artifact@v1
         if: ${{ needs.get-version.outputs.is-new == 'true' }}
         with:

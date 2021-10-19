@@ -16,6 +16,7 @@ namespace SourceExpander.Generate
         [InlineData(LanguageVersion.CSharp7_3)]
         [InlineData(LanguageVersion.CSharp8)]
         [InlineData(LanguageVersion.CSharp9)]
+        [InlineData(LanguageVersion.CSharp10)]
         public async Task Generate(LanguageVersion languageVersion)
         {
             var embeddedFiles = ImmutableArray.Create(

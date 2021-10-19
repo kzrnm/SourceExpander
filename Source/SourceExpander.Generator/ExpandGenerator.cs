@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -12,62 +14,63 @@ using SourceExpander.Roslyn;
 namespace SourceExpander
 {
     [Generator]
-    public class ExpandGenerator : ISourceGenerator
+    public class ExpandGenerator : IIncrementalGenerator
     {
         private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
-        public void Initialize(GeneratorInitializationContext context) { }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types")]
-        public void Execute(GeneratorExecutionContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            try
+            context.RegisterSourceOutput(context.ParseOptionsProvider, (ctx, opts) =>
             {
-                if (context.Compilation is not CSharpCompilation compilation
-                    || context.ParseOptions is not CSharpParseOptions opts)
-                    return;
-
-                if ((int)opts.LanguageVersion <= (int)LanguageVersion.CSharp3)
+                if ((CSharpParseOptions)opts is { LanguageVersion: <= LanguageVersion.CSharp3 })
                 {
-                    context.ReportDiagnostic(
+                    ctx.ReportDiagnostic(
                         DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3());
-                    return;
                 }
+            });
 
-                var configFile = context.AdditionalFiles
-                        .FirstOrDefault(a =>
-                            StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
-
-                context.CancellationToken.ThrowIfCancellationRequested();
-                ExpandConfig config;
-                if (configFile?.GetText(context.CancellationToken)?.ToString() is { } configText)
-                {
-                    try
-                    {
-                        config = ExpandConfig.Parse(configText);
-                    }
-                    catch (ParseJsonException e)
-                    {
-                        context.ReportDiagnostic(
-                            DiagnosticDescriptors.EXPAND0007_ParseConfigError(configFile.Path, e.Message));
-                        return;
-                    }
-                }
-                else config = new();
-
-                if (!config.Enabled)
-                    return;
-
+            context.RegisterSourceOutput(context.CompilationProvider, (ctx, compilation) =>
+            {
                 const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
                 if (compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is null)
                 {
-                    context.AddSource("SourceExpander.SourceCode.cs",
+                    ctx.AddSource("SourceExpander.SourceCode.cs",
                        SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
                 }
+            });
 
-                context.CancellationToken.ThrowIfCancellationRequested();
-                var loader = new EmbeddedLoader(compilation, opts, new DiagnosticReporter(context), config, context.CancellationToken);
+            IncrementalValueProvider<(ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
+                = context.AdditionalTextsProvider
+                .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+                .Collect().Select(ParseAdditionalTexts);
+            var source = context.CompilationProvider
+                .Combine(context.ParseOptionsProvider)
+                .Combine(configProvider);
+
+            context.RegisterImplementationSourceOutput(source, Execute);
+        }
+
+        private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
+        {
+            var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
+
+            try
+            {
+                if (!config.Enabled)
+                    return;
+                if ((CSharpParseOptions)parseOptions is { LanguageVersion: <= LanguageVersion.CSharp3 })
+                    return;
+
+                foreach (var diag in configDiagnostic)
+                {
+                    ctx.ReportDiagnostic(diag);
+                }
+
+                if (compilationOrig is not CSharpCompilation compilation) return;
+
+                ctx.CancellationToken.ThrowIfCancellationRequested();
+                var loader = new EmbeddedLoader(compilation, (CSharpParseOptions)parseOptions, new SourceProductionContextDiagnosticReporter(ctx), config, ctx.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
-                    context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
+                    ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 
                 if (config.MetadataExpandingFile is { Length: > 0 } metadataExpandingFile)
                 {
@@ -76,20 +79,20 @@ namespace SourceExpander
                         var (_, code) = loader.ExpandedCodes()
                            .First(t => t.filePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
 
-                        context.AddSource("SourceExpander.Metadata.cs",
+                        ctx.AddSource("SourceExpander.Metadata.cs",
                             CreateMetadataSource(new (string name, string code)[] {
                                 ("SourceExpander.Expanded.Default", code),
                             }));
                     }
                     catch (InvalidOperationException)
                     {
-                        context.ReportDiagnostic(DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound(metadataExpandingFile));
+                        ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound(metadataExpandingFile));
                     }
                 }
                 var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
-                context.CancellationToken.ThrowIfCancellationRequested();
-                context.AddSource("SourceExpander.Expanded.cs", expandedCode);
+                ctx.CancellationToken.ThrowIfCancellationRequested();
+                ctx.AddSource("SourceExpander.Expanded.cs", expandedCode);
             }
             catch (OperationCanceledException)
             {
@@ -98,7 +101,7 @@ namespace SourceExpander
             catch (Exception e)
             {
                 Trace.WriteLine(e.ToString());
-                context.ReportDiagnostic(
+                ctx.ReportDiagnostic(
                     DiagnosticDescriptors.EXPAND0001_UnknownError(e.Message));
             }
         }
@@ -140,6 +143,23 @@ namespace SourceExpander
                   .AppendLine(")]");
             }
             return SourceText.From(sb.ToString(), Encoding.UTF8);
+        }
+
+        private static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(ImmutableArray<AdditionalText> additionalTexts, CancellationToken cancellationToken = default)
+        {
+            var at = additionalTexts.FirstOrDefault();
+
+            if (at?.GetText(cancellationToken)?.ToString() is not { } configText)
+                return (new ExpandConfig(), ImmutableArray<Diagnostic>.Empty);
+
+            try
+            {
+                return (ExpandConfig.Parse(configText), ImmutableArray<Diagnostic>.Empty);
+            }
+            catch (ParseJsonException e)
+            {
+                return (new ExpandConfig(), ImmutableArray.Create(DiagnosticDescriptors.EXPAND0007_ParseConfigError(at.Path, e.Message)));
+            }
         }
     }
 }

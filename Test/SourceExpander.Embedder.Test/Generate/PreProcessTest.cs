@@ -25,10 +25,11 @@ namespace SourceExpander.Generate
 
             var test = new Test
             {
-                ParseOptions = new CSharpParseOptions(LanguageVersion.CSharp9,
-                kind: SourceCodeKind.Regular,
-                documentationMode: DocumentationMode.Parse,
-                preprocessorSymbols: new[] { "Trace", "TEST" }),
+                ParseOptions = new CSharpParseOptions(
+                    EmbeddedLanguageVersionEnum,
+                    kind: SourceCodeKind.Regular,
+                    documentationMode: DocumentationMode.Parse,
+                    preprocessorSymbols: new[] { "Trace", "TEST" }),
                 TestState =
                 {
                     AdditionalFiles =

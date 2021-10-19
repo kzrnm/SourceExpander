@@ -26,6 +26,7 @@ namespace SourceExpander.Generate
         [InlineData(LanguageVersion.CSharp7_2)]
         [InlineData(LanguageVersion.CSharp8)]
         [InlineData(LanguageVersion.CSharp9)]
+        [InlineData(LanguageVersion.CSharp10)]
         public async Task Success(LanguageVersion version)
         {
             var test = new Test
@@ -87,7 +88,6 @@ namespace Other { public static class C { public static void P() => System.Conso
             };
             await test.RunAsync();
         }
-
 
         [Theory]
         [InlineData(LanguageVersion.CSharp4)]
@@ -195,7 +195,7 @@ class Program
                     {
                         new DiagnosticResult("EXPAND0004", DiagnosticSeverity.Info),
                     }
-                }
+}
             };
             await test.RunAsync();
         }
