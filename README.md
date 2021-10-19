@@ -45,7 +45,7 @@ Source generator that embed source codes.
 
 ## Status
 
-![build](https://github.com/naminodarie/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
+![build](https://github.com/kzrnm/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
 
 |Library|NuGet|
 |:---|:---|
@@ -60,7 +60,7 @@ This library require **.NET 5 SDK** or **Visual Studio 16.8** or later because t
 
 ### For library user
 
-see [Sample](/Sample) or https://github.com/naminodarie/ac-library-csharp
+see [Sample](/Sample) or https://github.com/kzrnm/ac-library-csharp
 
 ```
 Install-Package SourceExpander
@@ -92,10 +92,10 @@ class Program
     }
 }
 
-#region Expanded by https://github.com/naminodarie/SourceExpander
+#region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] public static void Expand(string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true) { } public static string ExpandString(string inputFilePath = null, bool ignoreAnyError = true) { return ""; } } } 
 // library code
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
 ```
 
 ### For library developer
@@ -173,5 +173,5 @@ public class SourceFileInfo
 
 #### EmbeddedSourceCode.GZipBase32768
 
-gzip and [base32768](https://github.com/naminodarie/Base32768/) encoded json.
+gzip and [base32768](https://github.com/kzrnm/Base32768/) encoded json.
 

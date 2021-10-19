@@ -5,9 +5,9 @@
     <PackageTags>SourceExpander;ac-library-csharp</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/naminodarie/SourceExpander</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
-    <PackageReleaseNotes>https://github.com/naminodarie/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
 
     <Version>4.0.0-beta1</Version>
     <AssemblyVersion>4.0.0.1</AssemblyVersion>

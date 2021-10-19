@@ -86,8 +86,8 @@ class Program
         C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-#endregion Expanded by https://github.com/naminodarie/SourceExpander".ReplaceEOL().ToLiteral()
+#region Expanded by https://github.com/kzrnm/SourceExpander
+#endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL().ToLiteral()
 + @"},})},
 {""/home/mine/Program2.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program2.cs""},{""code"","
 + @"using Other;
@@ -98,8 +98,8 @@ class Program2
         C.P();
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-#endregion Expanded by https://github.com/naminodarie/SourceExpander".ReplaceEOL().ToLiteral()
+#region Expanded by https://github.com/kzrnm/SourceExpander
+#endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL().ToLiteral()
 + @"},})},
 };
 }}").ReplaceEOL())
