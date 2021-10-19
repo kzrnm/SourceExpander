@@ -9,8 +9,8 @@
     <RepositoryUrl>https://github.com/naminodarie/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/naminodarie/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
 
-    <Version>3.2.0</Version>
-    <AssemblyVersion>3.2.0.100</AssemblyVersion>
+    <Version>4.0.0-beta1</Version>
+    <AssemblyVersion>4.0.0.1</AssemblyVersion>
 
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
