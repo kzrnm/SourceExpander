@@ -63,12 +63,12 @@ namespace SourceExpander
                 line = sr.ReadLine();
             }
 
-            sb.AppendLine("#region Expanded by https://github.com/naminodarie/SourceExpander");
+            sb.AppendLine("#region Expanded by https://github.com/kzrnm/SourceExpander");
             if (!string.IsNullOrEmpty(Config.StaticEmbeddingText))
                 sb.AppendLine(Config.StaticEmbeddingText);
             foreach (var s in requiedFiles)
                 sb.AppendLine(s.CodeBody);
-            sb.AppendLine("#endregion Expanded by https://github.com/naminodarie/SourceExpander");
+            sb.AppendLine("#endregion Expanded by https://github.com/kzrnm/SourceExpander");
             return sb.ToString();
         }
     }

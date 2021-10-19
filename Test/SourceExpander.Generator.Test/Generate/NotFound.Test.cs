@@ -49,8 +49,8 @@ class Program
         Console.WriteLine(42);
     }
 }
-#region Expanded by https://github.com/naminodarie/SourceExpander
-#endregion Expanded by https://github.com/naminodarie/SourceExpander".ReplaceEOL().ToLiteral()
+#region Expanded by https://github.com/kzrnm/SourceExpander
+#endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL().ToLiteral()
 + @"},})},
 };
 }}").ReplaceEOL())
