@@ -9,13 +9,14 @@ namespace SourceExpander.Generate
 {
     public class LanguageVersionTest : EmbedderGeneratorTestBase
     {
-        [Theory(Skip = "IIncrementalGenerator needs LanguageVersion.Preview")]
+        [Theory]
         [InlineData(LanguageVersion.Latest)]
         [InlineData(LanguageVersion.LatestMajor)]
         [InlineData(LanguageVersion.Preview)]
         [InlineData(LanguageVersion.CSharp7_3)]
         [InlineData(LanguageVersion.CSharp8)]
         [InlineData(LanguageVersion.CSharp9)]
+        [InlineData(LanguageVersion.CSharp10)]
         public async Task Generate(LanguageVersion languageVersion)
         {
             var embeddedFiles = ImmutableArray.Create(

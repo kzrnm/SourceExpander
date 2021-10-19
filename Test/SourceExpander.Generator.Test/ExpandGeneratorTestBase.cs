@@ -49,7 +49,6 @@ namespace SourceExpander
         internal static ImmutableArray<PackageIdentity> Packages
             = ImmutableArray.Create(new PackageIdentity("SourceExpander.Core", "2.6.0"));
         public static string ExpanderVersion => typeof(ExpandGenerator).Assembly.GetName().Version.ToString();
-        // TODO: LanguageVersion.Preview
         public static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.Preview;
 
         public static CSharpCompilation CreateCompilation(

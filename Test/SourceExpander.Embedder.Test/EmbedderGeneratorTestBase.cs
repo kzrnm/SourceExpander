@@ -46,7 +46,6 @@ namespace SourceExpander
             = ImmutableArray.Create(new PackageIdentity("SourceExpander.Core", "2.6.0"));
 
         public static string EmbedderVersion => typeof(EmbedderGenerator).Assembly.GetName().Version.ToString();
-        // TODO: LanguageVersion.Preview
         public static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.Preview;
         public static string EmbeddedLanguageVersion => "preview";
 

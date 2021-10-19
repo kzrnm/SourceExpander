@@ -27,6 +27,7 @@ namespace SourceExpander
                         DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3());
                 }
             });
+
             context.RegisterSourceOutput(context.CompilationProvider, (ctx, compilation) =>
             {
                 const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
@@ -56,6 +57,9 @@ namespace SourceExpander
             {
                 if (!config.Enabled)
                     return;
+                if ((CSharpParseOptions)parseOptions is { LanguageVersion: <= LanguageVersion.CSharp3 })
+                    return;
+
                 foreach (var diag in configDiagnostic)
                 {
                     ctx.ReportDiagnostic(diag);
