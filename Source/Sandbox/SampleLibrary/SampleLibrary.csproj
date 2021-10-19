@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ac-library-csharp" Version="1.7.0" />
+    <PackageReference Include="ac-library-csharp" Version="1.8.0" />
     <ProjectReference Include="..\..\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>

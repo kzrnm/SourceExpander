@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.1.0" />
     <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -26,7 +26,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3-beta1.21417.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0-4.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0-5.final" />
   </ItemGroup>
 
   <ItemGroup>
