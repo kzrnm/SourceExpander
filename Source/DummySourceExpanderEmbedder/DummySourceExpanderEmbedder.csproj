@@ -1,44 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9</LangVersion>
-    <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;IDE0056;IDE0057;RS2008</NoWarn>
-    <RootNamespace>SourceExpander</RootNamespace>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9</LangVersion>
+		<Nullable>enable</Nullable>
+		<NoWarn>1701;1702;IDE0056;IDE0057;RS2008</NoWarn>
+		<RootNamespace>SourceExpander</RootNamespace>
 
-    <IsRoslynComponent>true</IsRoslynComponent>
-    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
-  </PropertyGroup>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="../SourceExpander.Share/**/*.cs" Visible="false" />
-    <Compile Include="../SourceExpander.Embedder/**/*.cs" Visible="false" />
-    <Compile Remove="../SourceExpander.Embedder/obj/**/*.cs" />
-    <Compile Remove="../SourceExpander.Embedder/EmbedderGenerator.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="../SourceExpander.Share/**/*.cs" Visible="false" />
+		<Compile Include="../SourceExpander.Embedder/**/*.cs" Visible="false" />
+		<Compile Remove="../SourceExpander.Embedder/obj/**/*.cs" />
+		<Compile Remove="../SourceExpander.Embedder/EmbedderGenerator.cs" />
+	</ItemGroup>
 
-  <ItemDefinitionGroup>
-    <PackageReference>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemDefinitionGroup>
+	<ItemDefinitionGroup>
+		<PackageReference>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemDefinitionGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
-    <PackageReference Include="Base32768" Version="1.0.9" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0-5.final" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
+		<PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+	</ItemGroup>
 
-  <Target Name="GetDependencyTargetPaths">
-    <ItemGroup>
-      <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
-    </ItemGroup>
-  </Target>
+	<ItemGroup>
+		<PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<Target Name="GetDependencyTargetPaths">
+		<ItemGroup>
+			<TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+			<TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+		</ItemGroup>
+	</Target>
 
 </Project>
