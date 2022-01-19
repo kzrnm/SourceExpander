@@ -15,7 +15,7 @@
 		<Compile Include="../SourceExpander.Share/**/*.cs" Visible="false" />
 		<Compile Include="../SourceExpander.Embedder/**/*.cs" Visible="false" />
 		<Compile Remove="../**/obj/**/*.cs" />
-		<Compile Remove="../SourceExpander.Embedder/EmbedderGenerator.cs" />
+		<Compile Remove="../SourceExpander.Embedder/**/EmbedderGenerator*.cs" />
 	</ItemGroup>
 
 	<ItemDefinitionGroup>

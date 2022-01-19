@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -13,46 +12,10 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    [Generator]
-    public class ExpandGenerator : IIncrementalGenerator
+    public class ExpandGeneratorBase
     {
-        private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
-        public void Initialize(IncrementalGeneratorInitializationContext context)
+        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, ParseOptions parseOptions, ExpandConfig config, ImmutableArray<Diagnostic> configDiagnostic)
         {
-            context.RegisterSourceOutput(context.ParseOptionsProvider, (ctx, opts) =>
-            {
-                if ((CSharpParseOptions)opts is { LanguageVersion: <= LanguageVersion.CSharp3 })
-                {
-                    ctx.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3());
-                }
-            });
-
-            context.RegisterSourceOutput(context.CompilationProvider, (ctx, compilation) =>
-            {
-                const string SourceExpander_Expanded_SourceCode = "SourceExpander.Expanded.SourceCode";
-                if (compilation.GetTypeByMetadataName(SourceExpander_Expanded_SourceCode) is null)
-                {
-                    ctx.AddSource("SourceExpander.SourceCode.cs",
-                       SourceText.From(EmbeddingCore.SourceCodeClassCode, Encoding.UTF8));
-                }
-            });
-
-            IncrementalValueProvider<(ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
-                = context.AdditionalTextsProvider
-                .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
-                .Collect().Select(ParseAdditionalTexts);
-            var source = context.CompilationProvider
-                .Combine(context.ParseOptionsProvider)
-                .Combine(configProvider);
-
-            context.RegisterImplementationSourceOutput(source, Execute);
-        }
-
-        private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
-        {
-            var ((compilationOrig, parseOptions), (config, configDiagnostic)) = source;
-
             try
             {
                 if (!config.Enabled)
@@ -65,10 +28,8 @@ namespace SourceExpander
                     ctx.ReportDiagnostic(diag);
                 }
 
-                if (compilationOrig is not CSharpCompilation compilation) return;
-
                 ctx.CancellationToken.ThrowIfCancellationRequested();
-                var loader = new EmbeddedLoader(compilation, (CSharpParseOptions)parseOptions, new SourceProductionContextDiagnosticReporter(ctx), config, ctx.CancellationToken);
+                var loader = new EmbeddedLoader(compilation, (CSharpParseOptions)parseOptions, ctx, config, ctx.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
                     ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 
@@ -145,11 +106,9 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        private static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(ImmutableArray<AdditionalText> additionalTexts, CancellationToken cancellationToken = default)
+        protected static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
         {
-            var at = additionalTexts.FirstOrDefault();
-
-            if (at?.GetText(cancellationToken)?.ToString() is not { } configText)
+            if (additionalText?.GetText(cancellationToken)?.ToString() is not { } configText)
                 return (new ExpandConfig(), ImmutableArray<Diagnostic>.Empty);
 
             try
@@ -158,7 +117,7 @@ namespace SourceExpander
             }
             catch (ParseJsonException e)
             {
-                return (new ExpandConfig(), ImmutableArray.Create(DiagnosticDescriptors.EXPAND0007_ParseConfigError(at.Path, e.Message)));
+                return (new ExpandConfig(), ImmutableArray.Create(DiagnosticDescriptors.EXPAND0007_ParseConfigError(additionalText.Path, e.Message)));
             }
         }
     }

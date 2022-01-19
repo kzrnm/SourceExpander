@@ -124,7 +124,7 @@ namespace SourceExpander.Generate
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
