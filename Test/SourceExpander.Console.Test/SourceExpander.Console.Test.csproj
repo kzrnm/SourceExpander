@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 
 		<IsPackable>false</IsPackable>
+		<ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
