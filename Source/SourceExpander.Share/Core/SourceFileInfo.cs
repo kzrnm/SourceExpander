@@ -11,7 +11,7 @@ namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]
     [DataContract]
-    public class SourceFileInfo
+    internal class SourceFileInfo
     {
         public SourceFileInfo(
         string? fileName,

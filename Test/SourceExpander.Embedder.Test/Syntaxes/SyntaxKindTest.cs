@@ -17,13 +17,13 @@ namespace SourceExpander.Embedder.Syntaxes
         public abstract string ExpectedMinifyCodeBody { get; }
 
         public InMemorySourceText Source => new("/foo/path.cs", Syntax);
-        public SourceFileInfo Expected => new(
+        internal SourceFileInfo Expected => new(
                     "TestProject>path.cs",
                     ExpectedTypeNames,
                     ExpectedUsings,
                     ExpectedDependencies,
                     ExpectedCodeBody);
-        public SourceFileInfo ExpectedMinify => new(
+        internal SourceFileInfo ExpectedMinify => new(
                     "TestProject>path.cs",
                     ExpectedTypeNames,
                     ExpectedUsings,
