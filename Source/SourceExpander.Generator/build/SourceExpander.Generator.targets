@@ -1,10 +1,20 @@
 <Project>
 
-  <PropertyGroup>
-    <SourceExpanderGeneratorConfigFile Condition=" '$(SourceExpanderGeneratorConfigFile)' == ''">$(ProjectDir)SourceExpander.Generator.Config.json</SourceExpanderGeneratorConfigFile>
-  </PropertyGroup>
-  <ItemGroup Condition="Exists($(SourceExpanderGeneratorConfigFile))">
-    <AdditionalFiles Include="$(SourceExpanderGeneratorConfigFile)" />
-  </ItemGroup>
+	<PropertyGroup>
+		<SourceExpanderGeneratorConfigFile Condition=" '$(SourceExpanderGeneratorConfigFile)' == ''">$(ProjectDir)SourceExpander.Generator.Config.json</SourceExpanderGeneratorConfigFile>
+	</PropertyGroup>
+	<ItemGroup Condition="Exists($(SourceExpanderGeneratorConfigFile))">
+		<AdditionalFiles Include="$(SourceExpanderGeneratorConfigFile)" />
+	</ItemGroup>
 
+	<Target Name="_EmbedResourceCSharpMultiTargetRoslyn3" Condition="'$(SupportsRoslynComponentVersioning)' != 'true'" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<Analyzer Remove="@(Analyzer)" Condition="$('%(Analyzer.Identity)'.EndsWith('SourceExpander.Generator.dll'))"/>
+		</ItemGroup>
+	</Target>
+	<Target Name="_EmbedResourceCSharpMultiTargetRoslyn4" Condition="'$(SupportsRoslynComponentVersioning)' == 'true'" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<Analyzer Remove="@(Analyzer)" Condition="$('%(Analyzer.Identity)'.EndsWith('SourceExpander.Generator.Roslyn3.dll'))"/>
+		</ItemGroup>
+	</Target>
 </Project>

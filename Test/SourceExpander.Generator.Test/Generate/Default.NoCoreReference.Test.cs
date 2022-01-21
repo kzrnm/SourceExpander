@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Text;
 using Xunit;
 
 namespace SourceExpander.Generate
@@ -68,7 +70,7 @@ class Program2
                     },
                     GeneratedSources =
                     {
-                        (typeof(ExpandGenerator), "SourceExpander.SourceCode.cs", EmbeddingCore.SourceCodeClassCode),
+                        (typeof(ExpandGenerator), "SourceExpander.SourceCode.cs", SourceText.From(EmbeddingCore.SourceCodeClassCode, new UTF8Encoding(false))),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{

@@ -1,10 +1,20 @@
 <Project>
 
-  <PropertyGroup>
-    <SourceExpanderEmbedderConfigFile Condition=" '$(SourceExpanderEmbedderConfigFile)' == ''">$(ProjectDir)SourceExpander.Embedder.Config.json</SourceExpanderEmbedderConfigFile>
-  </PropertyGroup>
-  <ItemGroup Condition="Exists($(SourceExpanderEmbedderConfigFile))">
-    <AdditionalFiles Include="$(SourceExpanderEmbedderConfigFile)" />
-  </ItemGroup>
+	<PropertyGroup>
+		<SourceExpanderEmbedderConfigFile Condition=" '$(SourceExpanderEmbedderConfigFile)' == ''">$(ProjectDir)SourceExpander.Embedder.Config.json</SourceExpanderEmbedderConfigFile>
+	</PropertyGroup>
+	<ItemGroup Condition="Exists($(SourceExpanderEmbedderConfigFile))">
+		<AdditionalFiles Include="$(SourceExpanderEmbedderConfigFile)" />
+	</ItemGroup>
 
+	<Target Name="_EmbedResourceCSharpMultiTargetRoslyn3" Condition="'$(SupportsRoslynComponentVersioning)' != 'true'" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<Analyzer Remove="@(Analyzer)" Condition="$('%(Analyzer.Identity)'.EndsWith('SourceExpander.Embedder.dll'))"/>
+		</ItemGroup>
+	</Target>
+	<Target Name="_EmbedResourceCSharpMultiTargetRoslyn4" Condition="'$(SupportsRoslynComponentVersioning)' == 'true'" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<Analyzer Remove="@(Analyzer)" Condition="$('%(Analyzer.Identity)'.EndsWith('SourceExpander.Embedder.Roslyn3.dll'))"/>
+		</ItemGroup>
+	</Target>
 </Project>

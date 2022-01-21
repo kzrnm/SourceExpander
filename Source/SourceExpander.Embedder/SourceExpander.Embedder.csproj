@@ -1,97 +1,107 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9</LangVersion>
-    <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;IDE0056;IDE0057</NoWarn>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9</LangVersion>
+		<Nullable>enable</Nullable>
+		<NoWarn>1701;1702;IDE0056;IDE0057</NoWarn>
 
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
-    <PackageId>SourceExpander.Embedder</PackageId>
-    <Description>A source generator that embedding source code.</Description>
+		<GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+		<PackageId>SourceExpander.Embedder</PackageId>
+		<Description>A source generator that embedding source code.</Description>
 
-    <RootNamespace>SourceExpander</RootNamespace>
+		<RootNamespace>SourceExpander</RootNamespace>
 
-  </PropertyGroup>
-  <PropertyGroup>
-    <IsRoslynComponent>true</IsRoslynComponent>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <IncludeSymbols>false</IncludeSymbols>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
-    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <DevelopmentDependency>true</DevelopmentDependency>
-  </PropertyGroup>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<IncludeSymbols>false</IncludeSymbols>
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<DevelopmentDependency>true</DevelopmentDependency>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>SourceExpander.Share.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6</_Parameter1>
-    </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>SourceExpander.Embedder.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
+		<Roslyn3ProjectPath>../SourceExpander.Embedder.Roslyn3/SourceExpander.Embedder.Roslyn3.csproj</Roslyn3ProjectPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="../SourceExpander.Share/**/*.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="SourceExpander.Share.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6" />
+		<InternalsVisibleTo Include="SourceExpander.Embedder.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="build\**" Pack="true" PackagePath="build" />
-    <Content Include="build\**" Pack="true" PackagePath="buildTransitive" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../SourceExpander.Core/SourceExpander.Core.csproj" />
+		<ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
+		<Compile Include="../SourceExpander.Share/**/*.cs" />
+	</ItemGroup>
 
-  <ItemDefinitionGroup>
-    <PackageReference>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemDefinitionGroup>
+	<ItemGroup>
+		<Content Include="build\**" Pack="true" PackagePath="build" />
+		<Content Include="build\**" Pack="true" PackagePath="buildTransitive" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="build\SourceExpander.Embedder.targets" />
-  </ItemGroup>
+	<ItemDefinitionGroup>
+		<PackageReference>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemDefinitionGroup>
 
+	<ItemGroup Condition="'$(IsRoslyn3)'=='true'">
+		<Compile Remove="**/Roslyn4/*.cs" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(IsRoslyn3)'!='true'">
+		<Compile Remove="**/Roslyn3/*.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
-    <PackageReference Include="Base32768" Version="1.0.9" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0-5.final" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
+		<PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Diagnostics\DiagnosticsResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DiagnosticsResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Diagnostics\DiagnosticsResources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>DiagnosticsResources.resx</DependentUpon>
+		</Compile>
+		<EmbeddedResource Update="Diagnostics\DiagnosticsResources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>DiagnosticsResources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Diagnostics\DiagnosticsResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>DiagnosticsResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<Target Name="GetDependencyTargetPaths">
+		<ItemGroup>
+			<TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+			<TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+		</ItemGroup>
+	</Target>
 
-  <Target Name="GetDependencyTargetPaths">
-    <ItemGroup>
-      <TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
-    </ItemGroup>
-  </Target>
+	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(TargetDir)\*.dll" PackagePath="analyzers\dotnet\cs" />
+			<TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
 
-  <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="$(TargetDir)\*.dll" PackagePath="analyzers\dotnet\cs" />
-      <TfmSpecificPackageFile Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
-      <TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
-      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
-    </ItemGroup>
-  </Target>
+			<TfmSpecificPackageFile Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
+			<TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
+		</ItemGroup>
+	</Target>
 
+	<Target Name="ReferenceCrossTargeting" BeforeTargets="_GetPackageFiles">
+		<MSBuild Projects="$(Roslyn3ProjectPath)" Targets="GetTargetPath">
+			<Output ItemName="Roslyn3Assembly" TaskParameter="TargetOutputs" />
+		</MSBuild>
+		<ItemGroup>
+			<None Include="%(Roslyn3Assembly.Identity)" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs" Visible="false" />
+		</ItemGroup>
+	</Target>
 </Project>

@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9</LangVersion>
+		<Nullable>enable</Nullable>
+		<NoWarn>$(NoWarn);1701;1702;IDE0056;IDE0057;RS2008</NoWarn>
+
+		<IsPackable>false</IsPackable>
+
+		<RootNamespace>SourceExpander</RootNamespace>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<DevelopmentDependency>true</DevelopmentDependency>
+
+		<Roslyn4ProjectPath>../SourceExpander.Embedder</Roslyn4ProjectPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="$(Roslyn4ProjectPath)/**/*.cs" Exclude="$(Roslyn4ProjectPath)/obj/**/*.cs;$(Roslyn4ProjectPath)/Roslyn4/**/*.cs" />
+		<Compile Include="../SourceExpander.Share/**/*.cs" Exclude="../SourceExpander.Share/**/Roslyn4/**/*.cs" />
+		<ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
+	</ItemGroup>
+
+	<ItemDefinitionGroup>
+		<PackageReference>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemDefinitionGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
+		<PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+</Project>
