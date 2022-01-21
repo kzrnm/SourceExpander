@@ -1,7 +1,7 @@
 ﻿using System;
 using SampleLibrary;
 
-class Program
+class Program2
 {
     static void Main()
     {
