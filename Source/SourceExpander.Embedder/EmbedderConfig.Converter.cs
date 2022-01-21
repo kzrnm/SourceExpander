@@ -7,14 +7,14 @@ namespace SourceExpander
 {
     [JsonConverter(typeof(EmbedderConfigConverter))]
     internal partial class EmbedderConfig
-	{
-		private class EmbedderConfigConverter : JsonConverter<EmbedderConfig?>
-		{
-			public override bool CanWrite => false;
-			public override EmbedderConfig? ReadJson(JsonReader reader, Type objectType, EmbedderConfig? existingValue, bool hasExistingValue, JsonSerializer serializer)
-				=> serializer.Deserialize<EmbedderConfigData>(reader)?.ToImmutable();
-			public override void WriteJson(JsonWriter writer, EmbedderConfig? value, JsonSerializer serializer)
-				=> throw new NotImplementedException("CanWrite is always false");
+    {
+        private class EmbedderConfigConverter : JsonConverter<EmbedderConfig?>
+        {
+            public override bool CanWrite => false;
+            public override EmbedderConfig? ReadJson(JsonReader reader, Type objectType, EmbedderConfig? existingValue, bool hasExistingValue, JsonSerializer serializer)
+                => serializer.Deserialize<EmbedderConfigData>(reader)?.ToImmutable();
+            public override void WriteJson(JsonWriter writer, EmbedderConfig? value, JsonSerializer serializer)
+                => throw new NotImplementedException("CanWrite is always false");
         }
 
         [DataContract]
