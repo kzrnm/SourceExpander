@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -32,19 +31,6 @@ namespace SourceExpander
             msOut.Position = 0;
             return msOut;
         }
-
-        /// <summary>
-        /// Parse json of <see cref="SourceFileInfo"/> array
-        /// </summary>
-        /// <exception cref="System.Runtime.Serialization.SerializationException">Invalid json</exception>
-        internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(string json)
-            => ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(json));
-        /// <summary>
-        /// Parse json of <see cref="SourceFileInfo"/> array
-        /// </summary>
-        /// <exception cref="System.Runtime.Serialization.SerializationException">Invalid json</exception>
-        internal static ImmutableArray<SourceFileInfo> ParseEmbeddedJson(Stream stream)
-            => ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(stream));
 
         public static string[] SortUsings(string[] usings)
         {

@@ -8,14 +8,14 @@
 		<PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
 		<PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
-		<Version>4.0.0-beta3</Version>
-		<AssemblyVersion>4.0.0.3</AssemblyVersion>
+		<Version>4.0.0-beta4</Version>
+		<AssemblyVersion>4.0.0.4</AssemblyVersion>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
 		<PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
 
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		
+
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -32,5 +32,12 @@
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
 </Project>

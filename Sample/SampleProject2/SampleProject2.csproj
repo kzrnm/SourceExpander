@@ -8,7 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
     <ProjectReference Include="..\_SampleLibrary2\_SampleLibrary2.csproj" />
-    <PackageReference Include="SourceExpander" Version="3.2.1" />
   </ItemGroup>
 
 </Project>

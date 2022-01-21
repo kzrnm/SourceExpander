@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander
 {
-    public class EmbeddedData
+    internal class EmbeddedData
     {
         public string AssemblyName { get; }
         public Version EmbedderVersion { get; }
@@ -123,9 +123,9 @@ namespace SourceExpander
                 {
                     ImmutableArray<SourceFileInfo> embedded;
                     if (Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0)
-                        embedded = SourceFileInfoUtil.ParseEmbeddedJson(SourceFileInfoUtil.FromGZipBase32768ToStream(value));
+                        embedded = ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(SourceFileInfoUtil.FromGZipBase32768ToStream(value)));
                     else
-                        embedded = SourceFileInfoUtil.ParseEmbeddedJson(value);
+                        embedded = ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(value));
                     builder.AddRange(embedded);
                     return ParseResult.Success;
                 }

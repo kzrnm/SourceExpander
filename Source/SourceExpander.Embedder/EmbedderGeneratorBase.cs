@@ -130,7 +130,7 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        protected static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
+        internal static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
         {
             if (additionalText == null || additionalText.GetText(cancellationToken)?.ToString() is not { } configText)
                 return (new EmbedderConfig(), ImmutableArray<Diagnostic>.Empty);

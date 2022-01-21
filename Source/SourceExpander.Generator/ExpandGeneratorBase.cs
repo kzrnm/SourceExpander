@@ -29,7 +29,7 @@ namespace SourceExpander
                 }
 
                 ctx.CancellationToken.ThrowIfCancellationRequested();
-                var loader = new EmbeddedLoader(compilation, (CSharpParseOptions)parseOptions, ctx, config, ctx.CancellationToken);
+                var loader = new EmbeddedLoaderWithDiagnostic(compilation, (CSharpParseOptions)parseOptions, ctx, config, ctx.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
                     ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 
@@ -106,7 +106,7 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        protected static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
+        internal static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
         {
             if (additionalText?.GetText(cancellationToken)?.ToString() is not { } configText)
                 return (new ExpandConfig(), ImmutableArray<Diagnostic>.Empty);

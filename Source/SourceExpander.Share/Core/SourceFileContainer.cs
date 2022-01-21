@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-#nullable enable
+
 namespace SourceExpander
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class SourceFileContainer : IEnumerable<SourceFileInfo>, IEnumerable, IReadOnlyCollection<SourceFileInfo>
+    internal class SourceFileContainer : IEnumerable<SourceFileInfo>, IEnumerable, IReadOnlyCollection<SourceFileInfo>
     {
         private readonly Dictionary<string, SourceFileInfo> _sourceFiles;
         private readonly Dictionary<string, List<SourceFileInfo>> _sourceFilesByTypeName;
@@ -54,11 +54,8 @@ namespace SourceExpander
 
         /// <summary>
         /// <para>return <see cref="SourceFileInfo"/> that has TypeNames that overlaps <paramref name="typeNames"/>.</para>
-        /// <para>if <paramref name="typeNameMatch"/> is true, <paramref name="typeNames"/> and <see cref="SourceFileInfo"/> is compared without namespace and type arguments.</para>
         /// <para>ex. AtCoder.INumOperator&lt;T&gt; → INumOperator</para>
         /// </summary>
-        /// <param name="typeNames"></param>
-        /// <param name="typeNameMatch"></param>
         /// <returns></returns>
         public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
             => ResolveDependency(

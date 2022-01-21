@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SourceExpander
 {
-    public static class DictionaryLiteralExtension
+    internal static class DictionaryLiteralExtension
     {
         public static StringBuilder AppendDicElement(this StringBuilder sb, string keyLiteral, string valueLiteral)
             => sb.Append('{').Append(keyLiteral).Append(',').Append(valueLiteral).Append("},");

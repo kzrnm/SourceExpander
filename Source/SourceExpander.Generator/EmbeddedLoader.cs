@@ -5,36 +5,48 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
     internal class EmbeddedLoader
     {
-        private CSharpCompilation compilation;
-        private readonly CSharpParseOptions parseOptions;
-        private readonly SourceFileContainer container;
-        private readonly IDiagnosticReporter reporter;
-        private readonly ExpandConfig config;
-        private readonly bool ConcurrentBuild;
-        private readonly CancellationToken cancellationToken;
+        protected CSharpCompilation compilation;
+        protected readonly CSharpParseOptions parseOptions;
+        protected readonly SourceFileContainer container;
+        protected readonly ExpandConfig config;
+        protected readonly bool ConcurrentBuild;
+        protected readonly CancellationToken cancellationToken;
 
         public EmbeddedLoader(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
-            IDiagnosticReporter reporter,
             ExpandConfig config,
             CancellationToken cancellationToken = default)
+            : this(compilation, parseOptions, config, ResolveEmbeddedData(compilation, cancellationToken), cancellationToken)
         {
-            this.reporter = reporter;
+        }
+
+        public EmbeddedLoader(
+            CSharpCompilation compilation,
+            CSharpParseOptions parseOptions,
+            ExpandConfig config,
+            SourceFileContainer container,
+            CancellationToken cancellationToken = default)
+        {
             this.compilation = compilation;
             this.ConcurrentBuild = compilation.Options.ConcurrentBuild;
             this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
             this.config = config;
             this.cancellationToken = cancellationToken;
-            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
-            container = new SourceFileContainer(WithCheck(embeddedDatas));
+            this.container = container;
         }
+
+        private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CancellationToken cancellationToken)
+        {
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
+            return new SourceFileContainer(embeddedDatas.Select(t => t.Data));
+        }
+
 
         bool compilationUpdated = false;
         void UpdateCompilation()
@@ -63,55 +75,27 @@ namespace SourceExpander
             if (!config.Enabled) return ImmutableArray<(string filePath, string expandedCode)>.Empty;
             UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
-            var expander = new CompilationExpander(compilation, container, config);
-            if (ConcurrentBuild)
-                return compilation.SyntaxTrees.AsParallel(cancellationToken)
-                    .Where(tree => config.IsMatch(tree.FilePath))
-                    .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
-                    .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
-                    .ToImmutableArray();
-            else
-                return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                    .Where(tree => config.IsMatch(tree.FilePath))
-                    .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
-                    .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
-                    .ToImmutableArray();
+
+            return _cacheExpandedCodes = Impl();
+
+            ImmutableArray<(string, string)> Impl()
+            {
+                var expander = new CompilationExpander(compilation, container, config);
+                if (ConcurrentBuild)
+                    return compilation.SyntaxTrees.AsParallel(cancellationToken)
+                        .Where(tree => config.IsMatch(tree.FilePath))
+                        .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
+                        .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                        .ToImmutableArray();
+                else
+                    return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                        .Where(tree => config.IsMatch(tree.FilePath))
+                        .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
+                        .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                        .ToImmutableArray();
+            }
         }
 
         public bool IsEmbeddedEmpty => container.Count == 0;
-
-        private IEnumerable<EmbeddedData> WithCheck(IEnumerable<(EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)> Errors)> embeddedDatas)
-        {
-            foreach (var (embedded, display, errors) in embeddedDatas)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                foreach (var (key, message) in errors)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0008_EmbeddedDataError(display, key, message));
-                }
-                if (embedded.IsEmpty)
-                    continue;
-                if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0002_ExpanderVersion(
-                        AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
-                }
-                if (embedded.CSharpVersion > parseOptions.LanguageVersion)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion(
-                        parseOptions.LanguageVersion, embedded.AssemblyName, embedded.CSharpVersion));
-                }
-                if (embedded.AllowUnsafe && !compilation.Options.AllowUnsafe)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0006_AllowUnsafe(
-                        embedded.AssemblyName));
-                }
-                yield return embedded;
-            }
-        }
     }
 }

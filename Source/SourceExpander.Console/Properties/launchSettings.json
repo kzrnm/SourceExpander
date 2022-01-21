@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Output file": {
+      "commandName": "Project",
+      "commandLineArgs": "../Sandbox/SampleApp/Program.cs -o obj/combined.csx",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "Output console": {
+      "commandName": "Project",
+      "commandLineArgs": "../Sandbox/SampleApp/Program.cs",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
