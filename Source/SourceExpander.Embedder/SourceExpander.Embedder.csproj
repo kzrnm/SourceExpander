@@ -20,6 +20,8 @@
 		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 		<DevelopmentDependency>true</DevelopmentDependency>
+
+		<Roslyn3ProjectPath>../SourceExpander.Embedder.Roslyn3/SourceExpander.Embedder.Roslyn3.csproj</Roslyn3ProjectPath>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,6 +30,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="../SourceExpander.Core/SourceExpander.Core.csproj" />
+		<ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
 		<Compile Include="../SourceExpander.Share/**/*.cs" />
 	</ItemGroup>
 
@@ -41,10 +45,6 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemDefinitionGroup>
-
-	<ItemGroup>
-		<None Remove="build\SourceExpander.Embedder.targets" />
-	</ItemGroup>
 
 	<ItemGroup Condition="'$(IsRoslyn3)'=='true'">
 		<Compile Remove="**/Roslyn4/*.cs" />
@@ -65,10 +65,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -93,10 +89,19 @@
 	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
 		<ItemGroup>
 			<TfmSpecificPackageFile Include="$(TargetDir)\*.dll" PackagePath="analyzers\dotnet\cs" />
+			<TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+
 			<TfmSpecificPackageFile Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
 			<TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
-			<TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
 		</ItemGroup>
 	</Target>
 
+	<Target Name="ReferenceCrossTargeting" BeforeTargets="_GetPackageFiles">
+		<MSBuild Projects="$(Roslyn3ProjectPath)" Targets="GetTargetPath">
+			<Output ItemName="Roslyn3Assembly" TaskParameter="TargetOutputs" />
+		</MSBuild>
+		<ItemGroup>
+			<None Include="%(Roslyn3Assembly.Identity)" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs" Visible="false" />
+		</ItemGroup>
+	</Target>
 </Project>

@@ -14,6 +14,8 @@
 		<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
 		<PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
 
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -24,7 +26,7 @@
 
 	<ItemGroup>
 		<None Include="$(MSBuildThisFileDirectory)3rd-party-license.txt" Pack="true" PackagePath="" Visible="false" />
-		<None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="" Visible="false" />
+		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="false" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

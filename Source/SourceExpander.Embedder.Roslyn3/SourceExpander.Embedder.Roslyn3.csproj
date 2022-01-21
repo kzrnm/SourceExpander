@@ -19,6 +19,7 @@
 	<ItemGroup>
 		<Compile Include="$(Roslyn4ProjectPath)/**/*.cs" Exclude="$(Roslyn4ProjectPath)/obj/**/*.cs;$(Roslyn4ProjectPath)/Roslyn4/**/*.cs" />
 		<Compile Include="../SourceExpander.Share/**/*.cs" Exclude="../SourceExpander.Share/**/Roslyn4/**/*.cs" />
+		<ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
 	</ItemGroup>
 
 	<ItemDefinitionGroup>
@@ -39,9 +40,5 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
 	</ItemGroup>
 </Project>
