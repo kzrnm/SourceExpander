@@ -52,7 +52,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{languageVersion.MapSpecifiedToEffectiveVersion().ToDisplayString()}\")]",

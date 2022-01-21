@@ -89,7 +89,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -218,7 +218,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -290,7 +290,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -373,7 +373,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -446,7 +446,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -519,7 +519,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -592,7 +592,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -676,7 +676,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -750,7 +750,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -824,7 +824,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddingSourceClass.cs",
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                             "namespace SourceExpander.Embedded{",
                             "using System;",
@@ -855,7 +855,7 @@ class Program
                             "}",
                             "}")
                         ),
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -928,7 +928,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddingSourceClass.cs",
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                             "namespace SourceExpander.Embedded{",
                             "using System;",
@@ -959,7 +959,7 @@ class Program
                             "}",
                             "}")
                         ),
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
@@ -1033,7 +1033,7 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddingSourceClass.cs",
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                             "namespace SourceExpander.Embedded{",
                             "using System;",
@@ -1063,7 +1063,7 @@ class Program
                             "  };",
                             "}",
                             "}")                        ),
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",

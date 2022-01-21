@@ -56,7 +56,7 @@ namespace SourceExpander.Embedder.Syntaxes
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
@@ -106,7 +106,7 @@ namespace SourceExpander.Embedder.Syntaxes
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGeneratorBase), "EmbeddedSourceCode.Metadata.cs",
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
