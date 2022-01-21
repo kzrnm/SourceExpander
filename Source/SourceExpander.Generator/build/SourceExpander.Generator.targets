@@ -9,12 +9,12 @@
 
 	<Target Name="_EmbedResourceCSharpMultiTargetRoslyn3" Condition="'$(SupportsRoslynComponentVersioning)' != 'true'" BeforeTargets="CoreCompile">
 		<ItemGroup>
-			<Analyzer Remove="@(Analyzer)" Condition="$('%(Analyzer.Identity)'.EndsWith('SourceExpander.Generator.dll'))"/>
+			<Analyzer Remove="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.Identity)').EndsWith('SourceExpander.Generator.dll'))"/>
 		</ItemGroup>
 	</Target>
 	<Target Name="_EmbedResourceCSharpMultiTargetRoslyn4" Condition="'$(SupportsRoslynComponentVersioning)' == 'true'" BeforeTargets="CoreCompile">
 		<ItemGroup>
-			<Analyzer Remove="@(Analyzer)" Condition="$('%(Analyzer.Identity)'.EndsWith('SourceExpander.Generator.Roslyn3.dll'))"/>
+			<Analyzer Remove="@(Analyzer)" Condition="$([System.String]::Copy('%(Analyzer.Identity)').EndsWith('SourceExpander.Generator.Roslyn3.dll'))"/>
 		</ItemGroup>
 	</Target>
 </Project>
