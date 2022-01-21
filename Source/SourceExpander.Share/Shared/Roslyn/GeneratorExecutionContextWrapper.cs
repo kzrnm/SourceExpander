@@ -7,7 +7,7 @@ namespace SourceExpander.Roslyn
     internal class GeneratorExecutionContextWrapper : IContextWrappter
     {
         private readonly GeneratorExecutionContext context;
-        
+
         public GeneratorExecutionContextWrapper(GeneratorExecutionContext context)
         {
             this.context = context;
