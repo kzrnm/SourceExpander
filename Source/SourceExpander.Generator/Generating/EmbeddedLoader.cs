@@ -17,7 +17,6 @@ namespace SourceExpander
         private protected readonly CSharpParseOptions parseOptions;
         private protected readonly SourceFileContainer container;
         private protected readonly ExpandConfig config;
-        private protected readonly bool ConcurrentBuild;
         private protected readonly CancellationToken cancellationToken;
 
         /// <summary>
@@ -40,7 +39,6 @@ namespace SourceExpander
             CancellationToken cancellationToken = default)
         {
             this.compilation = compilation;
-            this.ConcurrentBuild = compilation.Options.ConcurrentBuild;
             this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
             this.config = config;
             this.cancellationToken = cancellationToken;
@@ -61,7 +59,7 @@ namespace SourceExpander
             compilationUpdated = true;
 
             IEnumerable<SyntaxTree> newTrees;
-            if (ConcurrentBuild)
+            if (compilation.Options.ConcurrentBuild)
                 newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
                     .Select(Rewrited);
             else
@@ -73,24 +71,21 @@ namespace SourceExpander
                 => tree.WithRootAndOptions(tree.GetRoot(cancellationToken), parseOptions);
         }
 
-        private ImmutableArray<(string filePath, string expandedCode)> _cacheExpandedCodes;
-
         /// <summary>
         /// get expanded codes
         /// </summary>
         public ImmutableArray<(string filePath, string expandedCode)> ExpandedCodes()
         {
-            if (!_cacheExpandedCodes.IsDefault) return _cacheExpandedCodes;
             if (!config.Enabled) return ImmutableArray<(string filePath, string expandedCode)>.Empty;
             UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
 
-            return _cacheExpandedCodes = Impl();
+            return Impl();
 
             ImmutableArray<(string, string)> Impl()
             {
                 var expander = new CompilationExpander(compilation, container, config);
-                if (ConcurrentBuild)
+                if (compilation.Options.ConcurrentBuild)
                     return compilation.SyntaxTrees.AsParallel(cancellationToken)
                         .Where(tree => config.IsMatch(tree.FilePath))
                         .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
