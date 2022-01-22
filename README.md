@@ -11,13 +11,14 @@ README languages:
 - [SourceExpander](#sourceexpander)
   - [Packages](#packages)
     - [SourceExpander(library)](#sourceexpanderlibrary)
+    - [SourceExpander.Console](#sourceexpanderconsole)
     - [SourceExpander.Generator](#sourceexpandergenerator)
     - [SourceExpander.Embedder](#sourceexpanderembedder)
   - [Status](#status)
   - [Getting started](#getting-started)
     - [For library user](#for-library-user)
-      - [SourceExpander.Console](#sourceexpanderconsole)
-      - [SourceExpander.Generator](#sourceexpandergenerator-1)
+      - [Use SourceExpander.Console](#use-sourceexpanderconsole)
+      - [Use SourceExpander.Generator](#use-sourceexpandergenerator)
     - [For library developer](#for-library-developer)
       - [Avoid embedding some type](#avoid-embedding-some-type)
     - [Notes](#notes)
@@ -36,6 +37,9 @@ README languages:
 
 Library that expand embedded source codes.
 
+### SourceExpander.Console
+
+Console application that expand embedded source codes.
 
 ### SourceExpander.Generator
 
@@ -63,7 +67,7 @@ This library require **.NET 5 SDK** or **Visual Studio 16.8** or later because t
 
 ### For library user
 
-#### SourceExpander.Console
+#### Use SourceExpander.Console
 
 Install:
 ```sh
@@ -79,7 +83,7 @@ dotnet-source-expand Sample/SampleProject2/Program.cs
 dotnet-source-expand Sample/SampleProject/Put.cs -p Sample/SampleProject2/SampleProject2.csproj
 ```
 
-#### SourceExpander.Generator
+#### Use SourceExpander.Generator
 
 see [Sample](/Sample) or https://github.com/kzrnm/ac-library-csharp
 

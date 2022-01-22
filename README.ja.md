@@ -11,13 +11,14 @@ README languages:
 - [SourceExpander](#sourceexpander)
   - [Packages](#packages)
     - [SourceExpander(library)](#sourceexpanderlibrary)
+    - [SourceExpander.Console](#sourceexpanderconsole)
     - [SourceExpander.Generator](#sourceexpandergenerator)
     - [SourceExpander.Embedder](#sourceexpanderembedder)
   - [Status](#status)
   - [Getting started](#getting-started)
     - [ライブラリ利用者向け](#ライブラリ利用者向け)
-      - [SourceExpander.Console](#sourceexpanderconsole)
-      - [SourceExpander.Generator](#sourceexpandergenerator-1)
+      - [SourceExpander.Console を使う](#sourceexpanderconsole-を使う)
+      - [SourceExpander.Generator を使う](#sourceexpandergenerator-を使う)
     - [ライブラリ開発者向け](#ライブラリ開発者向け)
       - [埋め込みたくない型への対処](#埋め込みたくない型への対処)
     - [注釈](#注釈)
@@ -36,11 +37,13 @@ README languages:
 
 ソースコードをファイルに展開するライブラリです。
 
+### SourceExpander.Console
+
+ソースジェネレーターで埋め込まれたソースコードを展開するコンソールアプリです。
 
 ### SourceExpander.Generator
 
 ソースジェネレーターで埋め込まれたソースコードを展開するライブラリです。
-
 
 ### SourceExpander.Embedder
 
@@ -63,7 +66,7 @@ README languages:
 
 ### ライブラリ利用者向け
 
-#### SourceExpander.Console
+#### SourceExpander.Console を使う
 
 Install:
 ```sh
@@ -79,7 +82,7 @@ dotnet-source-expand Sample/SampleProject2/Program.cs
 dotnet-source-expand Sample/SampleProject/Put.cs -p Sample/SampleProject2/SampleProject2.csproj
 ```
 
-#### SourceExpander.Generator
+#### SourceExpander.Generator を使う
 
 [Sample](/Sample) や https://github.com/naminodarie/ac-library-csharp を参考としてください。
 
