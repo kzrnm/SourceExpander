@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace SourceExpander
 {
     [JsonConverter(typeof(ExpandConfigConverter))]
-    internal partial class ExpandConfig
+    public partial class ExpandConfig
     {
         public static ExpandConfig Parse(string sourceText)
         {

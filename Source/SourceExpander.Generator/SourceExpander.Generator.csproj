@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>9</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<NoWarn>1701;1702;IDE0056;IDE0057</NoWarn>
 
@@ -69,11 +69,6 @@
 		<None Update="EmbeddingCore.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>EmbeddingCore.cs</LastGenOutput>
-		</None>
-		<None Include="EmbeddingCore.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>EmbeddingCore.tt</DependentUpon>
 		</None>
 		<Compile Update="Diagnostics\DiagnosticsResources.Designer.cs">
 			<DesignTime>True</DesignTime>

@@ -8,14 +8,17 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander
 {
-    internal class EmbeddedLoader
+    /// <summary>
+    /// Resolve Embedded source code
+    /// </summary>
+    public class EmbeddedLoader
     {
-        protected CSharpCompilation compilation;
-        protected readonly CSharpParseOptions parseOptions;
-        protected readonly SourceFileContainer container;
-        protected readonly ExpandConfig config;
-        protected readonly bool ConcurrentBuild;
-        protected readonly CancellationToken cancellationToken;
+        private internal readonly CSharpCompilation compilation;
+        private internal readonly CSharpParseOptions parseOptions;
+        private internal readonly SourceFileContainer container;
+        private internal readonly ExpandConfig config;
+        private internal readonly bool ConcurrentBuild;
+        private internal readonly CancellationToken cancellationToken;
 
         public EmbeddedLoader(
             CSharpCompilation compilation,
@@ -26,7 +29,7 @@ namespace SourceExpander
         {
         }
 
-        public EmbeddedLoader(
+        internal EmbeddedLoader(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
             ExpandConfig config,
