@@ -26,7 +26,7 @@
 		<Compile Include="../SourceExpander.Share/**/SourceFileContainer.cs" LinkBase="Share" />
 		<Compile Include="../SourceExpander.Share/**/IContextWrappter.cs" LinkBase="Share" />
 		<Compile Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Share/**/Util/*.cs" LinkBase="Share" Exclude="../SourceExpander.Share/**/JsonUtil.cs" />
+		<Compile Include="../SourceExpander.Share/**/Util/*.cs" LinkBase="Share" />
 		<Compile Include="../SourceExpander.Generator/Generating/*.cs" LinkBase="SourceExpander.Generator" />
 	</ItemGroup>
 
