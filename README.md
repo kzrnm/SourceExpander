@@ -8,25 +8,26 @@ README languages:
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Packages](#packages)
-  - [SourceExpander(library)](#sourceexpanderlibrary)
-  - [SourceExpander.Console](#sourceexpanderconsole)
-  - [SourceExpander.Generator](#sourceexpandergenerator)
-  - [SourceExpander.Embedder](#sourceexpanderembedder)
-- [Status](#status)
-- [Getting started](#getting-started)
-  - [For library user](#for-library-user)
-    - [Use SourceExpander.Console](#use-sourceexpanderconsole)
-    - [Use SourceExpander.Generator](#use-sourceexpandergenerator)
-  - [For library developer](#for-library-developer)
-    - [Avoid embedding some type](#avoid-embedding-some-type)
-  - [Notes](#notes)
-- [Embedded data](#embedded-data)
-  - [EmbedderVersion](#embedderversion)
-  - [EmbeddedLanguageVersion](#embeddedlanguageversion)
-  - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
-  - [EmbeddedSourceCode](#embeddedsourcecode)
-    - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
+- [SourceExpander](#sourceexpander)
+  - [Packages](#packages)
+    - [SourceExpander(library)](#sourceexpanderlibrary)
+    - [SourceExpander.Console](#sourceexpanderconsole)
+    - [SourceExpander.Generator](#sourceexpandergenerator)
+    - [SourceExpander.Embedder](#sourceexpanderembedder)
+  - [Status](#status)
+  - [Getting started](#getting-started)
+    - [For library user](#for-library-user)
+      - [Use SourceExpander.Console](#use-sourceexpanderconsole)
+      - [Use SourceExpander.Generator](#use-sourceexpandergenerator)
+    - [For library developer](#for-library-developer)
+      - [Avoid embedding some type](#avoid-embedding-some-type)
+    - [Notes](#notes)
+  - [Embedded data](#embedded-data)
+    - [EmbedderVersion](#embedderversion)
+    - [EmbeddedLanguageVersion](#embeddedlanguageversion)
+    - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
+    - [EmbeddedSourceCode](#embeddedsourcecode)
+      - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -59,6 +60,7 @@ Source generator that embed source codes.
 |SourceExpander.Core|[![NuGet version (SourceExpander.Core)](https://img.shields.io/nuget/v/SourceExpander.Core.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Core/)|
 |SourceExpander.Embedder|[![NuGet version (SourceExpander.Embedder)](https://img.shields.io/nuget/v/SourceExpander.Embedder.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Embedder/)|
 |SourceExpander.Generator|[![NuGet version (SourceExpander.Generator)](https://img.shields.io/nuget/v/SourceExpander.Generator.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Generator/)|
+|SourceExpander.Console|[![NuGet version (SourceExpander.Console)](https://img.shields.io/nuget/v/SourceExpander.Console.svg?style=flat-square)](https://www.nuget.org/packages/SourceExpander.Console/)|
 
 ## Getting started
 
