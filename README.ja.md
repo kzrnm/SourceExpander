@@ -8,22 +8,25 @@ README languages:
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Packages](#packages)
-  - [SourceExpander(library)](#sourceexpanderlibrary)
-  - [SourceExpander.Generator](#sourceexpandergenerator)
-  - [SourceExpander.Embedder](#sourceexpanderembedder)
-- [Status](#status)
-- [Getting started](#getting-started)
-  - [ライブラリ利用者向け](#%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E5%88%A9%E7%94%A8%E8%80%85%E5%90%91%E3%81%91)
-  - [ライブラリ開発者向け](#%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E9%96%8B%E7%99%BA%E8%80%85%E5%90%91%E3%81%91)
-    - [埋め込みたくない型への対処](#%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BF%E3%81%9F%E3%81%8F%E3%81%AA%E3%81%84%E5%9E%8B%E3%81%B8%E3%81%AE%E5%AF%BE%E5%87%A6)
-  - [注釈](#%E6%B3%A8%E9%87%88)
-- [埋め込まれるデータ](#%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BE%E3%82%8C%E3%82%8B%E3%83%87%E3%83%BC%E3%82%BF)
-  - [EmbedderVersion](#embedderversion)
-  - [EmbeddedLanguageVersion](#embeddedlanguageversion)
-  - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
-  - [EmbeddedSourceCode](#embeddedsourcecode)
-    - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
+- [SourceExpander](#sourceexpander)
+  - [Packages](#packages)
+    - [SourceExpander(library)](#sourceexpanderlibrary)
+    - [SourceExpander.Generator](#sourceexpandergenerator)
+    - [SourceExpander.Embedder](#sourceexpanderembedder)
+  - [Status](#status)
+  - [Getting started](#getting-started)
+    - [ライブラリ利用者向け](#ライブラリ利用者向け)
+      - [SourceExpander.Console](#sourceexpanderconsole)
+      - [SourceExpander.Generator](#sourceexpandergenerator-1)
+    - [ライブラリ開発者向け](#ライブラリ開発者向け)
+      - [埋め込みたくない型への対処](#埋め込みたくない型への対処)
+    - [注釈](#注釈)
+  - [埋め込まれるデータ](#埋め込まれるデータ)
+    - [EmbedderVersion](#embedderversion)
+    - [EmbeddedLanguageVersion](#embeddedlanguageversion)
+    - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
+    - [EmbeddedSourceCode](#embeddedsourcecode)
+      - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -59,6 +62,24 @@ README languages:
 このライブラリはソースジェネレーターを使用するため、 **.NET 5 SDK** または **Visual Studio 16.8** 以降が必須です。
 
 ### ライブラリ利用者向け
+
+#### SourceExpander.Console
+
+Install:
+```sh
+dotnet tool install -g SourceExpander.Console
+```
+
+Run:
+```sh
+# minimum run
+dotnet-source-expand Sample/SampleProject2/Program.cs
+
+# specified project
+dotnet-source-expand Sample/SampleProject/Put.cs -p Sample/SampleProject2/SampleProject2.csproj
+```
+
+#### SourceExpander.Generator
 
 [Sample](/Sample) や https://github.com/naminodarie/ac-library-csharp を参考としてください。
 

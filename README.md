@@ -8,22 +8,25 @@ README languages:
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Packages](#packages)
-  - [SourceExpander(library)](#sourceexpanderlibrary)
-  - [SourceExpander.Generator](#sourceexpandergenerator)
-  - [SourceExpander.Embedder](#sourceexpanderembedder)
-- [Status](#status)
-- [Getting started](#getting-started)
-  - [For library user](#for-library-user)
-  - [For library developer](#for-library-developer)
-    - [Avoid embedding some type](#avoid-embedding-some-type)
-  - [Notes](#notes)
-- [Embedded data](#embedded-data)
-  - [EmbedderVersion](#embedderversion)
-  - [EmbeddedLanguageVersion](#embeddedlanguageversion)
-  - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
-  - [EmbeddedSourceCode](#embeddedsourcecode)
-    - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
+- [SourceExpander](#sourceexpander)
+  - [Packages](#packages)
+    - [SourceExpander(library)](#sourceexpanderlibrary)
+    - [SourceExpander.Generator](#sourceexpandergenerator)
+    - [SourceExpander.Embedder](#sourceexpanderembedder)
+  - [Status](#status)
+  - [Getting started](#getting-started)
+    - [For library user](#for-library-user)
+      - [SourceExpander.Console](#sourceexpanderconsole)
+      - [SourceExpander.Generator](#sourceexpandergenerator-1)
+    - [For library developer](#for-library-developer)
+      - [Avoid embedding some type](#avoid-embedding-some-type)
+    - [Notes](#notes)
+  - [Embedded data](#embedded-data)
+    - [EmbedderVersion](#embedderversion)
+    - [EmbeddedLanguageVersion](#embeddedlanguageversion)
+    - [EmbeddedAllowUnsafe](#embeddedallowunsafe)
+    - [EmbeddedSourceCode](#embeddedsourcecode)
+      - [EmbeddedSourceCode.GZipBase32768](#embeddedsourcecodegzipbase32768)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -59,6 +62,24 @@ Source generator that embed source codes.
 This library require **.NET 5 SDK** or **Visual Studio 16.8** or later because this library use Source Generators.
 
 ### For library user
+
+#### SourceExpander.Console
+
+Install:
+```sh
+dotnet tool install -g SourceExpander.Console
+```
+
+Run:
+```sh
+# minimum run
+dotnet-source-expand Sample/SampleProject2/Program.cs
+
+# specified project
+dotnet-source-expand Sample/SampleProject/Put.cs -p Sample/SampleProject2/SampleProject2.csproj
+```
+
+#### SourceExpander.Generator
 
 see [Sample](/Sample) or https://github.com/kzrnm/ac-library-csharp
 
