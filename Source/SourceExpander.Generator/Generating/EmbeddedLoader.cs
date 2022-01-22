@@ -54,8 +54,8 @@ namespace SourceExpander
         }
 
 
-        bool compilationUpdated = false;
-        void UpdateCompilation()
+        private bool compilationUpdated = false;
+        private void UpdateCompilation()
         {
             if (compilationUpdated) return;
             compilationUpdated = true;
