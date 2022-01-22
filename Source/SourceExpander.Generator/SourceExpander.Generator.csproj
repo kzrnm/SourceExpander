@@ -29,6 +29,7 @@
 	<ItemGroup>
 		<ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
 		<Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
+		<Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
 	</ItemGroup>
 
 	<ItemGroup>

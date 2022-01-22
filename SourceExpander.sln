@@ -47,9 +47,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Generator.Ro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{367A46DF-AE72-43DF-943D-9E28C0555CAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceExpander.Console", "Source\SourceExpander.Console\SourceExpander.Console.csproj", "{A8F11C15-174D-4751-93B8-7EA3BDED664B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Console", "Source\SourceExpander.Console\SourceExpander.Console.csproj", "{A8F11C15-174D-4751-93B8-7EA3BDED664B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceExpander.Console.Test", "Test\SourceExpander.Console.Test\SourceExpander.Console.Test.csproj", "{72604248-E785-45FA-A794-A1F8D595EB8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceExpander.Generating.Common", "Source\SourceExpander.Generating.Common\SourceExpander.Generating.Common.csproj", "{4829F152-97DB-45C0-8226-0BCBE7025FB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +127,10 @@ Global
 		{72604248-E785-45FA-A794-A1F8D595EB8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72604248-E785-45FA-A794-A1F8D595EB8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72604248-E785-45FA-A794-A1F8D595EB8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4829F152-97DB-45C0-8226-0BCBE7025FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4829F152-97DB-45C0-8226-0BCBE7025FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4829F152-97DB-45C0-8226-0BCBE7025FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4829F152-97DB-45C0-8226-0BCBE7025FB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

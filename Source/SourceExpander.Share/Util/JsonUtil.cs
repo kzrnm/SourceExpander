@@ -49,8 +49,11 @@ namespace SourceExpander
         {
             try
             {
-#if SYSTEM_TEXT_JSON
+
+#if NET6_0_OR_GREATER
                 return JsonSerializer.Deserialize<T>(jsonStream);
+#elif SYSTEM_TEXT_JSON
+                return JsonSerializer.DeserializeAsync<T>(jsonStream).Result;
 #else
                 var serializer = new JsonSerializer();
                 using var sr = new StreamReader(jsonStream);
