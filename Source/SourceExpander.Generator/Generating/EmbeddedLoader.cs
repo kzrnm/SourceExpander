@@ -13,13 +13,16 @@ namespace SourceExpander
     /// </summary>
     public class EmbeddedLoader
     {
-        private internal readonly CSharpCompilation compilation;
-        private internal readonly CSharpParseOptions parseOptions;
-        private internal readonly SourceFileContainer container;
-        private internal readonly ExpandConfig config;
-        private internal readonly bool ConcurrentBuild;
-        private internal readonly CancellationToken cancellationToken;
+        private protected CSharpCompilation compilation;
+        private protected readonly CSharpParseOptions parseOptions;
+        private protected readonly SourceFileContainer container;
+        private protected readonly ExpandConfig config;
+        private protected readonly bool ConcurrentBuild;
+        private protected readonly CancellationToken cancellationToken;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public EmbeddedLoader(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
@@ -72,6 +75,9 @@ namespace SourceExpander
 
         private ImmutableArray<(string filePath, string expandedCode)> _cacheExpandedCodes;
 
+        /// <summary>
+        /// get expanded codes
+        /// </summary>
         public ImmutableArray<(string filePath, string expandedCode)> ExpandedCodes()
         {
             if (!_cacheExpandedCodes.IsDefault) return _cacheExpandedCodes;
@@ -99,6 +105,9 @@ namespace SourceExpander
             }
         }
 
+        /// <summary>
+        /// count of embedded code.
+        /// </summary>
         public bool IsEmbeddedEmpty => container.Count == 0;
     }
 }
