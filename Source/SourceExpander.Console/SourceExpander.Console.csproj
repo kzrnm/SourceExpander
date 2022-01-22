@@ -27,7 +27,7 @@
 		<Compile Include="../SourceExpander.Share/**/IContextWrappter.cs" LinkBase="Share" />
 		<Compile Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" LinkBase="Share" />
 		<Compile Include="../SourceExpander.Share/**/Util/*.cs" LinkBase="Share" Exclude="../SourceExpander.Share/**/JsonUtil.cs" />
-		<Compile Include="../SourceExpander.Generator/*.cs" LinkBase="SourceExpander.Generator" Exclude="../SourceExpander.Generator/**/*.Converter.cs;../SourceExpander.Generator/**/ExpandGenerator*.cs;../SourceExpander.Generator/EmbeddedLoaderWithDiagnostic.cs;../SourceExpander.Generator/EmbeddingCore.cs" />
+		<Compile Include="../SourceExpander.Generator/Generating/*.cs" LinkBase="SourceExpander.Generator" />
 	</ItemGroup>
 
 	<ItemGroup>
