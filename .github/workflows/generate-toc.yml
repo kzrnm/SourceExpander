@@ -1,5 +1,7 @@
-on: 
+on:
   push:
+    paths:
+      - "**.md"
     branches-ignore:
       - "master"
 name: TOC Generator
