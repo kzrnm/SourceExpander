@@ -16,29 +16,34 @@ namespace SourceExpander.Roslyn
         {
             var rewriter = new TypeFindAndUnusedUsingRemoverRewriter(model, skipAttributeSymbol, cancellationToken);
             this.CompilationUnit = (CompilationUnitSyntax)(rewriter.Visit(model.SyntaxTree.GetRoot(cancellationToken)) ?? throw new InvalidOperationException());
-            this.DefinedTypeNames = rewriter.DefinedTypeNames();
-            this.UsedTypeNames = rewriter.UsedTypeNames();
-            this.RootUsings = rewriter.RootUsings();
+            this.DefinedTypeNames = rewriter.DefinedTypeNames.Value;
+            this.UsedTypeNames = rewriter.UsedTypeNames.Value;
+            this.RootUsings = rewriter.RootUsings.Value;
         }
         public ImmutableHashSet<string> DefinedTypeNames { get; }
         public ImmutableHashSet<string> UsedTypeNames { get; }
         public ImmutableHashSet<string> RootUsings { get; }
         public CompilationUnitSyntax CompilationUnit { get; }
 
-        internal class TypeFindAndUnusedUsingRemoverRewriter : CSharpSyntaxRewriter
+        private class TypeFindAndUnusedUsingRemoverRewriter : CSharpSyntaxRewriter
         {
+            private bool visited;
             private readonly SemanticModel model;
             private readonly ImmutableArray<TextSpan> unusedUsingSpan;
             private readonly CancellationToken cancellationToken;
 
+            private void ThrowIfNotVisited()
+            {
+                if (!visited)
+                    throw new InvalidOperationException("Not Visited");
+            }
+
             private readonly ImmutableHashSet<string>.Builder definedTypesBuilder = ImmutableHashSet.CreateBuilder<string>();
-            public ImmutableHashSet<string> DefinedTypeNames() => definedTypesBuilder.ToImmutable();
-
             private readonly ImmutableHashSet<string>.Builder usedTypesBuilder = ImmutableHashSet.CreateBuilder<string>();
-            public ImmutableHashSet<string> UsedTypeNames() => usedTypesBuilder.ToImmutable();
-
             private readonly ImmutableHashSet<string>.Builder rootUsingsBuilder = ImmutableHashSet.CreateBuilder<string>();
-            public ImmutableHashSet<string> RootUsings() => rootUsingsBuilder.ToImmutable();
+            public Lazy<ImmutableHashSet<string>> DefinedTypeNames { get; }
+            public Lazy<ImmutableHashSet<string>> UsedTypeNames { get; }
+            public Lazy<ImmutableHashSet<string>> RootUsings { get; }
 
             private readonly INamedTypeSymbol? SkipAttributeSymbol;
             public TypeFindAndUnusedUsingRemoverRewriter(SemanticModel model, INamedTypeSymbol? skipAttributeSymbol, CancellationToken cancellationToken)
@@ -50,6 +55,21 @@ namespace SourceExpander.Roslyn
                     .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
                     .Select(d => d.Location.SourceSpan)
                     .ToImmutableArray();
+                this.UsedTypeNames = new(() =>
+                {
+                    ThrowIfNotVisited();
+                    return usedTypesBuilder.ToImmutable();
+                });
+                this.RootUsings = new(() =>
+                {
+                    ThrowIfNotVisited();
+                    return rootUsingsBuilder.ToImmutable();
+                });
+                this.DefinedTypeNames = new(() =>
+                {
+                    ThrowIfNotVisited();
+                    return definedTypesBuilder.ToImmutable();
+                });
             }
 
             private bool HasNotEmbeddingSourceAttribute(SyntaxNode? node)
@@ -103,8 +123,15 @@ namespace SourceExpander.Roslyn
                 {
                     usedTypesBuilder.Add(typeName);
                 }
-
-                return base.Visit(node);
+                try
+                {
+                    return base.Visit(node);
+                }
+                finally
+                {
+                    if (node is CompilationUnitSyntax)
+                        visited = true;
+                }
             }
 
             public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)
