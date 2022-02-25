@@ -9,37 +9,17 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_NOLOGO: true
   NUGET_XMLDOC_MODE: skip
-  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   WORKFLOW_BUILD_SLN: SourceExpander.sln
 
 jobs:
   format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET Core SDK 6.0
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.100-rc.2.21505.57
-      - name: Format
-        run: dotnet format ${{ env.WORKFLOW_BUILD_SLN }} --verify-no-changes
+    uses: kzrnm/dotnet-actions/.github/workflows/format.yml@v1
+    with:
+      target: SourceExpander.sln
+      dotnet-version: 6.0.x
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET SDK .NET 6
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.100-rc.2.21505.57
-      - name: Setup .NET SDK .NET 5
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-      - uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-      - name: Build & Test
-        run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --logger GitHubActions
+    uses: kzrnm/dotnet-actions/.github/workflows/unittest.yml@v1
+    with:
+      target: SourceExpander.sln
+      dotnet-version: 6.0.x
+      test-logger: GitHubActions
