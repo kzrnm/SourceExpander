@@ -50,6 +50,7 @@ namespace SourceExpander
             public bool EmbeddedAllowUnsafe;
             public Version EmbedderVersion;
             public LanguageVersion EmbeddedLanguageVersion;
+            public string[] EmbeddedNamespaces;
             public (string Raw, string GZipBase32768) EmbeddedSourceCode;
 
             public IEnumerable<(string Key, string Value)> EnumerateMetadatas()
@@ -61,6 +62,8 @@ namespace SourceExpander
 
                 yield return ("SourceExpander.EmbedderVersion", EmbedderVersion.ToString());
                 yield return ("SourceExpander.EmbeddedLanguageVersion", EmbeddedLanguageVersion.ToDisplayString());
+
+                yield return ("SourceExpander.EmbeddedNamespaces", string.Join(",", EmbeddedNamespaces));
 
                 yield return EmbeddedSourceCode switch
                 {
@@ -89,6 +92,28 @@ namespace SourceExpander
             result.EmbeddedAllowUnsafe = compilation.Options.AllowUnsafe;
             result.EmbedderVersion = AssemblyUtil.AssemblyVersion;
             result.EmbeddedLanguageVersion = parseOptions.LanguageVersion;
+            cancellationToken.ThrowIfCancellationRequested();
+
+            {
+                var hs = new HashSet<string>();
+                foreach (var namespaceName in ParseNamespaceName(infos.SelectMany(s => s.TypeNames)))
+                    hs.Add(namespaceName);
+
+                var array = hs.ToArray();
+                Array.Sort(array, StringComparer.Ordinal);
+                result.EmbeddedNamespaces = array;
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            static IEnumerable<string> ParseNamespaceName(IEnumerable<string> typeNames)
+            {
+                foreach (var typeName in typeNames)
+                {
+                    var length = typeName.LastIndexOf('.');
+                    if (length > 0)
+                        yield return typeName.Substring(0, length);
+                }
+            }
 
             switch (config.EmbeddingType)
             {

@@ -36,6 +36,12 @@ namespace SourceExpander
         public ImmutableDictionary<string, string> AssemblyMetadatas { get; }
 
 
+        /// <summary>
+        /// C# version of embedded source code
+        /// </summary>
+        public string[]? EmbeddedNamespaces
+            => AssemblyMetadatas.GetValueOrDefault("SourceExpander.EmbeddedNamespaces")?.Split(',');
+
 
         /// <summary>
         /// embedded source code

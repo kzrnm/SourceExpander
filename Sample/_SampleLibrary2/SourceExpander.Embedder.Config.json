@@ -10,7 +10,7 @@
         "System.Diagnostics.DebuggerTypeProxyAttribute",
         "System.Diagnostics.DebuggerVisualizerAttribute"
     ],
-    "enable-minify": true,
+    "minify-level": "full",
     "remove-conditional": [
         "DEBUG"
     ]
