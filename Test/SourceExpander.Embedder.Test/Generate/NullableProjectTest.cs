@@ -12,13 +12,14 @@ namespace SourceExpander.Generate
         [Fact]
         public async Task Generate()
         {
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main()=>Console.WriteLine(0);}"
                  ));
 
@@ -51,6 +52,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }

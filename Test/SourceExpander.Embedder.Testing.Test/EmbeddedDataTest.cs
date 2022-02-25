@@ -19,12 +19,15 @@ namespace SourceExpander.Embedder.Testing
                 .ContainKeys(
                 "SourceExpander.EmbeddedLanguageVersion",
                 "SourceExpander.EmbedderVersion",
+                "SourceExpander.EmbeddedNamespaces",
                 "SourceExpander.EmbeddedSourceCode.GZipBase32768")
-                .And.HaveCount(3);
+                .And.HaveCount(4);
             embedded.EmbeddedLanguageVersion.Should().Be("6");
             embedded.AssemblyMetadatas["SourceExpander.EmbeddedLanguageVersion"].Should().Be("6");
-            embedded.EmbedderVersion.Should().Be("2.4.1.100");
-            embedded.AssemblyMetadatas["SourceExpander.EmbedderVersion"].Should().Be("2.4.1.100");
+            embedded.EmbedderVersion.Should().Be("4.0.2.100");
+            embedded.AssemblyMetadatas["SourceExpander.EmbedderVersion"].Should().Be("4.0.2.100");
+            embedded.EmbeddedNamespaces.Should().BeEquivalentTo("MathLibrary.Double", "SampleLibrary");
+            embedded.AssemblyMetadatas["SourceExpander.EmbeddedNamespaces"].Should().Be("MathLibrary.Double,SampleLibrary");
 
             embedded.SourceFiles.Should().BeEquivalentTo(new SourceFileInfo[]
             {
@@ -33,7 +36,13 @@ namespace SourceExpander.Embedder.Testing
                     new []{"SampleLibrary.Put2"},
                     null,
                    new[]{"_SampleLibrary>Put.cs"},
-                   "namespace SampleLibrary{public static class Put2{public static void Write()=>Put.WriteRandom();}}"      )
+                   "namespace SampleLibrary{public static class Put2{public static void Write()=>Put.WriteRandom();}}"),
+                new SourceFileInfo(
+                    "_SampleLibrary2>Math.cs",
+                    new []{"Ep", "MathLibrary.Double.Pi"},
+                    null,
+                   Array.Empty<string>(),
+                   "namespace MathLibrary.Double{public static class Pi{public const double PI=System.Math.PI;}}public static class Ep{public const double EP=System.Math.E;}")
             });
         }
 

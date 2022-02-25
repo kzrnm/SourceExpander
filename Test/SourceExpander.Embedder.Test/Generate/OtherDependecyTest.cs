@@ -13,6 +13,7 @@ namespace SourceExpander.Generate
         [Fact]
         public async Task OtherRaw()
         {
+            var embeddedNamespaces = ImmutableArray.Create("Mine");
             var embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
                 (
@@ -39,7 +40,9 @@ namespace SourceExpander.Generate
                 ),
                 (
                 @"/home/other/AssemblyInfo.cs",
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
+                EnvironmentUtil.JoinByStringBuilder(
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedNamespaces"", ""Other"")]",
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]")
                 ),
             };
 
@@ -95,6 +98,7 @@ namespace Mine{
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -112,6 +116,7 @@ namespace Mine{
         [Fact]
         public async Task OtherGZip()
         {
+            var embeddedNamespaces = ImmutableArray.Create("Mine");
             var embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
                 (
@@ -138,8 +143,10 @@ namespace Mine{
                 ),
                 (
                 @"/home/other/AssemblyInfo.cs",
+                EnvironmentUtil.JoinByStringBuilder(
+                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedNamespaces"", ""Other"")]",
                 "[assembly: System.Reflection.AssemblyMetadata(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\"," +
-                "\"㘅桠ҠҠҠ俶䏂⣂㹆䟗謜熬㔀Ⰳ茡毳窰廸揪㇚ᖭ引㱫焸萍瀾㡣暎㘟牟腱棋厝趼㙩闌䡉偩⎙癠㠂恓䦀砦哂叇㡙襏ꜙ㟰鲅ᯝ呡䰆濜㴞缻筷蝂島彀練䮌抸霣ݮ倉蟶㤥矖⢶觉癁荁趟㪺䡶碊赆瓁㥟圅鮀糏䑖䆷璾穗ᓞ䵫镹癠ҧ\")]"
+                "\"㘅桠ҠҠҠ俶䏂⣂㹆䟗謜熬㔀Ⰳ茡毳窰廸揪㇚ᖭ引㱫焸萍瀾㡣暎㘟牟腱棋厝趼㙩闌䡉偩⎙癠㠂恓䦀砦哂叇㡙襏ꜙ㟰鲅ᯝ呡䰆濜㴞缻筷蝂島彀練䮌抸霣ݮ倉蟶㤥矖⢶觉癁荁趟㪺䡶碊赆瓁㥟圅鮀糏䑖䆷璾穗ᓞ䵫镹癠ҧ\")]")
                 ),
             };
 
@@ -195,6 +202,7 @@ namespace Mine{
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -212,6 +220,7 @@ namespace Mine{
         [Fact]
         public async Task UsingOlderVersion()
         {
+            var embeddedNamespaces = ImmutableArray.Create("Mine");
             var embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
                 (
@@ -270,6 +279,7 @@ namespace Mine{
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -287,6 +297,7 @@ namespace Mine{
         [Fact]
         public async Task InvalidRaw()
         {
+            var embeddedNamespaces = ImmutableArray.Create("Mine");
             var embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
                 (
@@ -346,6 +357,7 @@ namespace Mine{
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -363,6 +375,7 @@ namespace Mine{
         [Fact]
         public async Task InvalidGZipBase32768()
         {
+            var embeddedNamespaces = ImmutableArray.Create("Mine");
             var embeddedFiles = ImmutableArray.Create(
                 new SourceFileInfo
                 (
@@ -422,6 +435,7 @@ namespace Mine{
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }

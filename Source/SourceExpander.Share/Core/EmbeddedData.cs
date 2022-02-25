@@ -113,7 +113,6 @@ namespace SourceExpander
             public Status Result { get; }
             public string Message { get; }
         }
-#pragma warning disable CA1031
         private static ParseResult TryAddSourceFileInfos(string[] keyArray, string value, ImmutableArray<SourceFileInfo>.Builder builder)
         {
             try
@@ -193,6 +192,5 @@ namespace SourceExpander
                 return ParseResult.Error(e.Message);
             }
         }
-#pragma warning restore CA1031
     }
 }

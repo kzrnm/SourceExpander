@@ -9,7 +9,7 @@ namespace SourceExpander
         public SyntaxTree SyntaxTree { get; }
         public string FileName { get; }
         public ImmutableHashSet<string> DefinedTypeNames { get; }
-        public ImmutableHashSet<string> UsedTypeNames { get; }
+        public ImmutableHashSet<INamedTypeSymbol> UsedTypes { get; }
         public ImmutableHashSet<string> Usings { get; }
         public string CodeBody { get; }
         public SourceFileInfoRaw WithFileName(string newName)
@@ -17,16 +17,19 @@ namespace SourceExpander
                 SyntaxTree,
                 newName,
                 DefinedTypeNames,
-                UsedTypeNames,
+                UsedTypes,
                 Usings,
                 CodeBody);
 
         public SourceFileInfo Resolve(Dictionary<string, HashSet<string>> dependencyInfo)
         {
             var deps = new HashSet<string>();
-            foreach (var type in this.UsedTypeNames)
-                if (dependencyInfo.TryGetValue(type, out var defined))
+            foreach (var type in this.UsedTypes)
+            {
+                var typeName = type.ToDisplayString();
+                if (dependencyInfo.TryGetValue(typeName, out var defined))
                     deps.UnionWith(defined);
+            }
             deps.Remove(this.FileName);
 
             return new SourceFileInfo
@@ -43,14 +46,14 @@ namespace SourceExpander
             SyntaxTree syntaxTree,
             string fileName,
             ImmutableHashSet<string> definedTypeNames,
-            ImmutableHashSet<string> usedTypeNames,
+            ImmutableHashSet<INamedTypeSymbol> usedTypes,
             ImmutableHashSet<string> usings,
             string codeBody)
         {
             SyntaxTree = syntaxTree;
             FileName = fileName;
             DefinedTypeNames = definedTypeNames;
-            UsedTypeNames = usedTypeNames;
+            UsedTypes = usedTypes;
             Usings = usings;
             CodeBody = codeBody;
         }

@@ -47,13 +47,14 @@ namespace SourceExpander.Generate
         [MemberData(nameof(ParseErrorJsons))]
         public async Task ParseError(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
                  ));
             string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768(@"[{""CodeBody"":""[DebuggerDisplay(\""Name\"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\""TEST\"")] static void T() => Console.WriteLine(2); }"",""Dependencies"":[],""FileName"":""TestProject>Program.cs"",""TypeNames"":[""Program""],""Usings"":[""using System;"",""using System.Diagnostics;""]}]");
@@ -93,6 +94,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     },
@@ -175,13 +177,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
@@ -222,6 +225,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -247,13 +251,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -294,6 +299,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -320,13 +326,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]
 class Program
 {
@@ -377,6 +384,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -403,13 +411,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -450,6 +459,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -476,13 +486,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
                  ));
             string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768("[{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]");
@@ -523,6 +534,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -552,13 +564,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -596,6 +609,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -625,13 +639,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);[Conditional(""DEBUG2"")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(""DEBUG2"")][Conditional(""Test"")]static void T8()=>Console.WriteLine(8);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);[Conditional(\\\"DEBUG2\\\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\\\"DEBUG2\\\")][Conditional(\\\"Test\\\")]static void T8()=>Console.WriteLine(8);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -680,6 +695,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -710,13 +726,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -754,6 +771,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -784,13 +802,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -859,6 +878,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -888,13 +908,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -963,6 +984,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -993,13 +1015,14 @@ class Program
 }
 ");
 
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
@@ -1067,6 +1090,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }

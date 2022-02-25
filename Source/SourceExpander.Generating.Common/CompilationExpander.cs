@@ -37,11 +37,11 @@ namespace SourceExpander
             cancellationToken.ThrowIfCancellationRequested();
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
             var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
-            if (typeFindAndUnusedUsingRemover.UsedTypeNames is not { } typeNames)
-                throw new InvalidOperationException($"{nameof(typeNames)} is null");
+            if (typeFindAndUnusedUsingRemover.UsedTypes is null)
+                throw new InvalidOperationException($"{nameof(typeFindAndUnusedUsingRemover.UsedTypes)} is null");
 
             cancellationToken.ThrowIfCancellationRequested();
-            var requiedFiles = sourceFileContainer.ResolveDependency(typeNames, cancellationToken).ToArray();
+            var requiedFiles = sourceFileContainer.ResolveDependency(typeFindAndUnusedUsingRemover.UsedTypes, cancellationToken).ToArray();
             Array.Sort(requiedFiles, (f1, f2) => StringComparer.OrdinalIgnoreCase.Compare(f1.FileName, f2.FileName));
 
             cancellationToken.ThrowIfCancellationRequested();

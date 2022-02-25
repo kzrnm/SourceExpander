@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using Microsoft.CodeAnalysis;
 
 namespace SourceExpander
 {
@@ -57,9 +58,9 @@ namespace SourceExpander
         /// <para>ex. AtCoder.INumOperator&lt;T&gt; → INumOperator</para>
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<string> typeNames, CancellationToken cancellationToken = default)
+        public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<INamedTypeSymbol> typeNames, CancellationToken cancellationToken = default)
             => ResolveDependency(
-                typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type, out var list) ? list : Enumerable.Empty<SourceFileInfo>()),
+                typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type.ToDisplayString(), out var list) ? list : Enumerable.Empty<SourceFileInfo>()),
                 cancellationToken);
         private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs, CancellationToken cancellationToken = default)
         {
