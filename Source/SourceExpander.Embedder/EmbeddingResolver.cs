@@ -98,8 +98,9 @@ namespace SourceExpander
                 var typeNames = infos.SelectMany(s => s.TypeNames).ToImmutableHashSet();
                 var hs = new HashSet<string>();
                 foreach (var namespaceName in ParseNamespaceName(typeNames))
-                    if(!typeNames.Contains(namespaceName))
+                    if (!typeNames.Contains(namespaceName))
                         hs.Add(namespaceName);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var array = hs.ToArray();
                 Array.Sort(array, StringComparer.Ordinal);
@@ -131,17 +132,16 @@ namespace SourceExpander
         }
 
         private bool updated = false;
-        private void VerifyCompilation()
-        {
-            if (compilation.Options.NullableContextOptions.AnnotationsEnabled())
-                reporter.ReportDiagnostic(
-                    DiagnosticDescriptors.EMBED0007_NullableProject());
-        }
         private void UpdateCompilation()
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (updated) return;
             updated = true;
+
+            if (compilation.Options.NullableContextOptions.AnnotationsEnabled())
+                reporter.ReportDiagnostic(
+                    DiagnosticDescriptors.EMBED0007_NullableProject());
+
             SyntaxTree[] newTrees;
             if (ConcurrentBuild)
                 newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
@@ -161,10 +161,11 @@ namespace SourceExpander
         }
 
         private ImmutableArray<SourceFileInfo> _cacheDependantFiles;
-        public ImmutableArray<SourceFileInfo> DependantFiles {
+        public ImmutableArray<SourceFileInfo> DependantFiles
+        {
             get
             {
-                if(_cacheDependantFiles.IsDefault)
+                if (_cacheDependantFiles.IsDefault)
                 {
                     var depSources = ImmutableArray.CreateBuilder<SourceFileInfo>();
                     foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken))
@@ -190,6 +191,43 @@ namespace SourceExpander
                 return _cacheDependantFiles;
             }
         }
+        private ImmutableArray<SourceFileInfoRaw> _cacheResolvedInfoRaws;
+        public ImmutableArray<SourceFileInfoRaw> ResolvedInfoRaws
+        {
+            get
+            {
+                if (_cacheResolvedInfoRaws.IsDefault)
+                {
+                    UpdateCompilation();
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    SourceFileInfoRaw[] rawInfos;
+                    if (ConcurrentBuild)
+                        rawInfos = compilation.SyntaxTrees.AsParallel(cancellationToken)
+                            .Select(ParseSource)
+                            .Where(info => info.DefinedTypeNames.Any())
+                            .ToArray();
+                    else
+                        rawInfos = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                            .Select(ParseSource)
+                            .Where(info => info.DefinedTypeNames.Any())
+                            .ToArray();
+
+                    static void WithoutCommonPrefix(SourceFileInfoRaw[] rawInfos, string prefix, string commonPrefix)
+                    {
+                        for (int i = 0; i < rawInfos.Length; i++)
+                        {
+                            var newName = string.IsNullOrEmpty(commonPrefix) ? prefix + rawInfos[i].FileName : rawInfos[i].FileName.Replace(commonPrefix, prefix);
+                            rawInfos[i] = rawInfos[i].WithFileName(newName);
+                        }
+                    }
+                    WithoutCommonPrefix(rawInfos, $"{compilation.AssemblyName}>", ResolveCommomPrefix(rawInfos.Select(r => r.FileName)));
+                    _cacheResolvedInfoRaws = ImmutableArray.Create(rawInfos);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                return _cacheResolvedInfoRaws;
+            }
+        }
 
         private ImmutableArray<SourceFileInfo> _cacheResolvedFiles;
         public ImmutableArray<SourceFileInfo> ResolveFiles()
@@ -200,35 +238,8 @@ namespace SourceExpander
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
 
             cancellationToken.ThrowIfCancellationRequested();
-            VerifyCompilation();
-            UpdateCompilation();
-            cancellationToken.ThrowIfCancellationRequested();
 
-            SourceFileInfoRaw[] rawInfos;
-            if (ConcurrentBuild)
-                rawInfos = compilation.SyntaxTrees.AsParallel(cancellationToken)
-                    .Select(ParseSource)
-                    .Where(info => info.DefinedTypeNames.Any())
-                    .ToArray();
-            else
-                rawInfos = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                    .Select(ParseSource)
-                    .Where(info => info.DefinedTypeNames.Any())
-                    .ToArray();
-
-            static void WithoutCommonPrefix(SourceFileInfoRaw[] rawInfos, string prefix, string commonPrefix)
-            {
-                for (int i = 0; i < rawInfos.Length; i++)
-                {
-                    var newName = string.IsNullOrEmpty(commonPrefix) ? prefix + rawInfos[i].FileName : rawInfos[i].FileName.Replace(commonPrefix, prefix);
-                    rawInfos[i] = rawInfos[i].WithFileName(newName);
-                }
-            }
-            WithoutCommonPrefix(rawInfos, $"{compilation.AssemblyName}>", ResolveCommomPrefix(rawInfos.Select(r => r.FileName)));
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var infos = ResolveRaw(rawInfos, DependantFiles);
+            var infos = ResolveRaw(ResolvedInfoRaws, DependantFiles);
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -296,11 +307,11 @@ namespace SourceExpander
             return new SourceFileInfoRaw(tree,
                         tree.FilePath,
                         typeFindAndUnusedUsingRemover.DefinedTypeNames,
-                        typeFindAndUnusedUsingRemover.UsedTypeNames,
+                        typeFindAndUnusedUsingRemover.UsedTypes,
                         typeFindAndUnusedUsingRemover.RootUsings,
                         minifiedCode);
         }
-        private SourceFileInfo[] ResolveRaw(SourceFileInfoRaw[] infos, IEnumerable<SourceFileInfo> otherInfos)
+        private SourceFileInfo[] ResolveRaw(ImmutableArray<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var dependencyInfo = new Dictionary<string, HashSet<string>>();

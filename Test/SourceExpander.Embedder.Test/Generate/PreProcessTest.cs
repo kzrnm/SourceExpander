@@ -28,8 +28,8 @@ namespace SourceExpander.Generate
             {
                 ParseOptions = new CSharpParseOptions(
                     EmbeddedLanguageVersionEnum,
-                    
-                    
+
+
                     kind: SourceCodeKind.Regular,
                     documentationMode: DocumentationMode.Parse,
                     preprocessorSymbols: new[] { "Trace", "TEST" }),

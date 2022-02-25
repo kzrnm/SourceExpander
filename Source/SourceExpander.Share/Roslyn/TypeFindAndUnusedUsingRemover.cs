@@ -17,11 +17,11 @@ namespace SourceExpander.Roslyn
             var rewriter = new TypeFindAndUnusedUsingRemoverRewriter(model, skipAttributeSymbol, cancellationToken);
             this.CompilationUnit = (CompilationUnitSyntax)(rewriter.Visit(model.SyntaxTree.GetRoot(cancellationToken)) ?? throw new InvalidOperationException());
             this.DefinedTypeNames = rewriter.DefinedTypeNames.Value;
-            this.UsedTypeNames = rewriter.UsedTypeNames.Value;
+            this.UsedTypes = rewriter.UsedTypes.Value;
             this.RootUsings = rewriter.RootUsings.Value;
         }
         public ImmutableHashSet<string> DefinedTypeNames { get; }
-        public ImmutableHashSet<string> UsedTypeNames { get; }
+        public ImmutableHashSet<INamedTypeSymbol> UsedTypes { get; }
         public ImmutableHashSet<string> RootUsings { get; }
         public CompilationUnitSyntax CompilationUnit { get; }
 
@@ -39,10 +39,10 @@ namespace SourceExpander.Roslyn
             }
 
             private readonly ImmutableHashSet<string>.Builder definedTypesBuilder = ImmutableHashSet.CreateBuilder<string>();
-            private readonly ImmutableHashSet<string>.Builder usedTypesBuilder = ImmutableHashSet.CreateBuilder<string>();
+            private readonly ImmutableHashSet<INamedTypeSymbol>.Builder usedTypesBuilder = ImmutableHashSet.CreateBuilder<INamedTypeSymbol>(SymbolEqualityComparer.Default);
             private readonly ImmutableHashSet<string>.Builder rootUsingsBuilder = ImmutableHashSet.CreateBuilder<string>();
             public Lazy<ImmutableHashSet<string>> DefinedTypeNames { get; }
-            public Lazy<ImmutableHashSet<string>> UsedTypeNames { get; }
+            public Lazy<ImmutableHashSet<INamedTypeSymbol>> UsedTypes { get; }
             public Lazy<ImmutableHashSet<string>> RootUsings { get; }
 
             private readonly INamedTypeSymbol? SkipAttributeSymbol;
@@ -55,7 +55,7 @@ namespace SourceExpander.Roslyn
                     .Where(d => d.Id == "CS8019" || d.Id == "CS0105" || d.Id == "CS0246")
                     .Select(d => d.Location.SourceSpan)
                     .ToImmutableArray();
-                this.UsedTypeNames = new(() =>
+                this.UsedTypes = new(() =>
                 {
                     ThrowIfNotVisited();
                     return usedTypesBuilder.ToImmutable();
@@ -119,9 +119,9 @@ namespace SourceExpander.Roslyn
                         return null;
                 }
                 var namedTypeSymbol = RoslynUtil.GetTypeNameFromSymbol(model.GetSymbolInfo(node, cancellationToken).Symbol);
-                if (namedTypeSymbol?.ToDisplayString() is string typeName)
+                if (namedTypeSymbol is not null)
                 {
-                    usedTypesBuilder.Add(typeName);
+                    usedTypesBuilder.Add(namedTypeSymbol);
                 }
                 try
                 {

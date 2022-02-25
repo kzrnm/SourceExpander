@@ -37,7 +37,7 @@ namespace SourceExpander
             cancellationToken.ThrowIfCancellationRequested();
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
             var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
-            if (typeFindAndUnusedUsingRemover.UsedTypeNames is not { } typeNames)
+            if (typeFindAndUnusedUsingRemover.UsedTypes is not { } typeNames)
                 throw new InvalidOperationException($"{nameof(typeNames)} is null");
 
             cancellationToken.ThrowIfCancellationRequested();

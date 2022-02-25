@@ -41,7 +41,7 @@ namespace SourceExpander.Embedder.Testing
                     "_SampleLibrary2>Math.cs",
                     new []{"Ep", "MathLibrary.Double.Pi"},
                     null,
-                   new string[0],
+                   Array.Empty<string>(),
                    "namespace MathLibrary.Double{public static class Pi{public const double PI=System.Math.PI;}}public static class Ep{public const double EP=System.Math.E;}")
             });
         }
