@@ -15,7 +15,7 @@ namespace SourceExpander.Embedder
         public abstract IEnumerable<string> ExpectedDependencies { get; }
         public abstract string ExpectedCodeBody { get; }
         public abstract string ExpectedMinifyCodeBody { get; }
-
+        public abstract IEnumerable<string> ExpectedNamespaces { get; }
         public InMemorySourceText Source => new("/foo/path.cs", Syntax);
         internal SourceFileInfo Expected => new(
                     "TestProject>path.cs",
@@ -61,6 +61,7 @@ namespace SourceExpander.Embedder
                         "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", ExpectedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{ExpectedJson.ToLiteral()})]")
                         ),
                     },
@@ -111,6 +112,7 @@ namespace SourceExpander.Embedder
                         "[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", ExpectedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{ExpectedMinifyJson.ToLiteral()})]")
                         ),
                     },

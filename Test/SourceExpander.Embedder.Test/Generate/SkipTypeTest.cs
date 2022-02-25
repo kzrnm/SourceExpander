@@ -12,13 +12,14 @@ namespace SourceExpander.Generate
         [Fact]
         public async Task Generate()
         {
+            var embeddedNamespaces = ImmutableArray.Create("Test,Test.F,Test.I");
             var embeddedFiles = ImmutableArray.Create(
                    new SourceFileInfo
                    (
                        "TestProject>F/NumType.cs",
                        new string[] { "Test.F.NumType" },
-                       ImmutableArray.Create<string>(),
-                       ImmutableArray.Create<string>(),
+                       ImmutableArray<string>.Empty,
+                       ImmutableArray<string>.Empty,
                        "namespace Test.F{public enum NumType{Zero,Pos,Neg,}}"
                    ), new SourceFileInfo
                    (
@@ -32,7 +33,7 @@ namespace SourceExpander.Generate
                        "TestProject>Put.cs",
                        new string[] { "Test.Put", "Test.Put.Nested" },
                        new string[] { "using System.Diagnostics;" },
-                       ImmutableArray.Create<string>(),
+                       ImmutableArray<string>.Empty,
                        "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
                    ));
 
@@ -134,6 +135,7 @@ namespace Test.F
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     },
@@ -154,13 +156,14 @@ namespace Test.F
         [Fact]
         public async Task Partial()
         {
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"partial class Program{static void Main()=>Console.WriteLine(1);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"partial class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
@@ -195,6 +198,7 @@ partial class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -212,13 +216,14 @@ partial class Program
         [Fact]
         public async Task Field()
         {
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main()=>Console.WriteLine(1);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
@@ -250,6 +255,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -268,13 +274,14 @@ class Program
         [Fact]
         public async Task Property()
         {
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main()=>Console.WriteLine(1);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
@@ -308,6 +315,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }
@@ -325,13 +333,14 @@ class Program
         [Fact]
         public async Task Method()
         {
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
-                     ImmutableArray.Create<string>(),
+                     ImmutableArray<string>.Empty,
                      @"class Program{static void Main()=>Console.WriteLine(1);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
@@ -363,6 +372,7 @@ class Program
                         EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
                         ),
                     }

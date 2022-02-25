@@ -95,9 +95,11 @@ namespace SourceExpander
             cancellationToken.ThrowIfCancellationRequested();
 
             {
+                var typeNames = infos.SelectMany(s => s.TypeNames).ToImmutableHashSet();
                 var hs = new HashSet<string>();
-                foreach (var namespaceName in ParseNamespaceName(infos.SelectMany(s => s.TypeNames)))
-                    hs.Add(namespaceName);
+                foreach (var namespaceName in ParseNamespaceName(typeNames))
+                    if(!typeNames.Contains(namespaceName))
+                        hs.Add(namespaceName);
 
                 var array = hs.ToArray();
                 Array.Sort(array, StringComparer.Ordinal);
