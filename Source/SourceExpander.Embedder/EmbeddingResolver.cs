@@ -159,6 +159,38 @@ namespace SourceExpander
                 return tree.WithRootAndOptions(newRoot, parseOptions);
             }
         }
+
+        private ImmutableArray<SourceFileInfo> _cacheDependantFiles;
+        public ImmutableArray<SourceFileInfo> DependantFiles {
+            get
+            {
+                if(_cacheDependantFiles.IsDefault)
+                {
+                    var depSources = ImmutableArray.CreateBuilder<SourceFileInfo>();
+                    foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken))
+                    {
+                        foreach (var (key, message) in errors)
+                        {
+                            reporter.ReportDiagnostic(
+                                DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError(display, key, message));
+                        }
+                        if (embedded.IsEmpty)
+                            continue;
+                        if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
+                        {
+                            reporter.ReportDiagnostic(
+                                DiagnosticDescriptors.EMBED0002_OlderVersion(
+                                    AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
+                        }
+                        depSources.AddRange(embedded.Sources);
+                    }
+                    _cacheDependantFiles = depSources.ToImmutable();
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                return _cacheDependantFiles;
+            }
+        }
+
         private ImmutableArray<SourceFileInfo> _cacheResolvedFiles;
         public ImmutableArray<SourceFileInfo> ResolveFiles()
         {
@@ -167,25 +199,6 @@ namespace SourceExpander
             if (!config.Enabled)
                 return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
 
-            cancellationToken.ThrowIfCancellationRequested();
-            var depSources = new List<SourceFileInfo>();
-            foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken))
-            {
-                foreach (var (key, message) in errors)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError(display, key, message));
-                }
-                if (embedded.IsEmpty)
-                    continue;
-                if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EMBED0002_OlderVersion(
-                            AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
-                }
-                depSources.AddRange(embedded.Sources);
-            }
             cancellationToken.ThrowIfCancellationRequested();
             VerifyCompilation();
             UpdateCompilation();
@@ -215,7 +228,7 @@ namespace SourceExpander
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var infos = ResolveRaw(rawInfos, depSources);
+            var infos = ResolveRaw(rawInfos, DependantFiles);
             Array.Sort(infos, (info1, info2) => StringComparer.OrdinalIgnoreCase.Compare(info1.FileName, info2.FileName));
 
             cancellationToken.ThrowIfCancellationRequested();
