@@ -41,7 +41,8 @@ namespace SourceExpander.Test
             var directory = Path.GetDirectoryName(typeof(object).Assembly.Location);
             foreach (var file in Directory.EnumerateFiles(directory, "System*.dll"))
             {
-                yield return MetadataReference.CreateFromFile(file);
+                if (!file.Contains(".Native"))
+                    yield return MetadataReference.CreateFromFile(file);
             }
             yield return MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0").Location);
             yield return MetadataReference.CreateFromFile(typeof(SourceCode).GetTypeInfo().Assembly.Location);
