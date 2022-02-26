@@ -17,8 +17,9 @@ namespace SourceExpander.Share
                     "Empty",
                     ImmutableArray.Create<SourceFileInfo>(),
                     new Version(1, 0, 0),
-                    LanguageVersion.CSharp1
-                    , false
+                    LanguageVersion.CSharp1,
+                    false,
+                    ImmutableArray<string>.Empty
                     ), ImmutableArray<(string Key, string Message)>.Empty));
         }
 
@@ -33,7 +34,8 @@ namespace SourceExpander.Share
                     ImmutableArray.Create<SourceFileInfo>(),
                     new Version(3, 4, 0, 0),
                     LanguageVersion.CSharp1,
-                    false
+                    false,
+                    ImmutableArray<string>.Empty
                     ), ImmutableArray<(string Key, string Message)>.Empty));
         }
 
@@ -53,7 +55,8 @@ namespace SourceExpander.Share
                     ImmutableArray.Create<SourceFileInfo>(),
                     new Version(1, 0, 0),
                     expectedVersion,
-                    false
+                    false,
+                    ImmutableArray<string>.Empty
                     ), ImmutableArray<(string Key, string Message)>.Empty));
         }
 
@@ -89,11 +92,13 @@ namespace SourceExpander.Share
                 ),
                 new Version(3, 4, 0, 0),
                 LanguageVersion.CSharp7_3,
-                false
+                    false,
+                    ImmutableArray.Create("SampleLibrary")
                 );
             EmbeddedData.Create("RawJson",
                 ImmutableDictionary.Create<string, string>()
                 .Add("SourceExpander.EmbeddedSourceCode", json)
+                .Add("SourceExpander.EmbeddedNamespaces", "SampleLibrary")
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                 .Add("SourceExpander.EmbeddedLanguageVersion", "7.3"))
                 .Should()
@@ -102,6 +107,7 @@ namespace SourceExpander.Share
             EmbeddedData.Create("RawJson",
                 ImmutableDictionary.Create<string, string>()
                .Add("SourceExpander.EmbeddedLanguageVersion", "7.3")
+                .Add("SourceExpander.EmbeddedNamespaces", "SampleLibrary")
                .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                .Add("SourceExpander.EmbeddedSourceCode", json))
                 .Should()
@@ -116,19 +122,23 @@ namespace SourceExpander.Share
                 ImmutableDictionary.Create<string, string>()
                 .Add("SourceExpander.EmbeddedSourceCode", json)
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
+                .Add("SourceExpander.EmbeddedNamespaces", "SampleLibrary")
                 .Add("SourceExpander.EmbeddedLanguageVersion", "7.3"))
                 .Should()
                 .BeEquivalentTo((
                 new EmbeddedData("RawJson",
                 ImmutableArray<SourceFileInfo>.Empty,
                 new(3, 4, 0, 0),
-                LanguageVersion.CSharp7_3, false),
+                LanguageVersion.CSharp7_3,
+                false,
+                ImmutableArray.Create("SampleLibrary")),
                 ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode",
                 "Invalid property identifier character: ]. Path '[0]', line 1, position 2."))));
 
             EmbeddedData.Create("RawJson",
                 ImmutableDictionary.Create<string, string>()
                .Add("SourceExpander.EmbeddedLanguageVersion", "7.3")
+               .Add("SourceExpander.EmbeddedNamespaces", "SampleLibrary")
                .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                .Add("SourceExpander.EmbeddedSourceCode", json))
                 .Should()
@@ -136,7 +146,9 @@ namespace SourceExpander.Share
                 new EmbeddedData("RawJson",
                 ImmutableArray<SourceFileInfo>.Empty,
                 new(3, 4, 0, 0),
-                LanguageVersion.CSharp7_3, false),
+                LanguageVersion.CSharp7_3,
+                false,
+                ImmutableArray.Create("SampleLibrary")),
                 ImmutableArray.Create<(string Key, string Message)>(("SourceExpander.EmbeddedSourceCode",
                 "Invalid property identifier character: ]. Path '[0]', line 1, position 2."))));
         }
@@ -157,11 +169,13 @@ namespace SourceExpander.Share
                 ),
                 new Version(3, 4, 0, 0),
                 LanguageVersion.CSharp1,
-                false
+                false,
+                ImmutableArray.Create("SampleLibrary")
                 );
 
             EmbeddedData.Create("GZipBase32768", ImmutableDictionary.Create<string, string>()
                 .Add("SourceExpander.EmbeddedSourceCode.GZipBase32768", gzipBase32768)
+                .Add("SourceExpander.EmbeddedNamespaces", "SampleLibrary")
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
             )
                 .Should()
@@ -169,6 +183,7 @@ namespace SourceExpander.Share
             EmbeddedData.Create("GZipBase32768", ImmutableDictionary.Create<string, string>()
                 .Add("SourceExpander.EmbedderVersion", "3.4.0.0")
                 .Add("SourceExpander.EmbeddedLanguageVersion", "1")
+                .Add("SourceExpander.EmbeddedNamespaces", "SampleLibrary")
                 .Add("SourceExpander.EmbeddedSourceCode.GZipBase32768", gzipBase32768)
             )
                 .Should()
