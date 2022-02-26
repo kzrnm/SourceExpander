@@ -74,3 +74,6 @@ dotnet_style_qualification_for_property = false:none
 
 
 dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0057
+csharp_style_prefer_range_operator = false:silent

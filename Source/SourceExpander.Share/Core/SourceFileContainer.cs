@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -17,7 +18,9 @@ namespace SourceExpander
         {
             _sourceFiles = new();
             _sourceFilesByTypeName = new();
+            var definedNamespacesBuilder = ImmutableHashSet.CreateBuilder<string>();
             foreach (var embedded in embeddedDatas)
+            {
                 foreach (var sf in embedded.Sources)
                 {
                     if (sf.FileName == null) throw new ArgumentException($"({nameof(sf.FileName)} is null");
@@ -32,7 +35,13 @@ namespace SourceExpander
                         list.Add(sf);
                     }
                 }
+                definedNamespacesBuilder.UnionWith(embedded.EmbeddedNamespaces);
+            }
+
+            DefinedNamespaces = definedNamespacesBuilder.ToImmutable();
         }
+
+        public ImmutableHashSet<string> DefinedNamespaces { get; }
 
         public int Count => _sourceFiles.Count;
         public SourceFileInfo this[string filename]

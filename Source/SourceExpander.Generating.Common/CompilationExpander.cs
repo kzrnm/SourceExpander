@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -48,8 +49,38 @@ namespace SourceExpander
             var usings = typeFindAndUnusedUsingRemover.RootUsings
                 .Union(requiedFiles.SelectMany(s => s.Usings))
                 .ToArray();
-
             cancellationToken.ThrowIfCancellationRequested();
+
+            var importButUnusedNamespaces = ImmutableArray.CreateBuilder<string>();
+            {
+                static IEnumerable<string> TypeNameToNamespaces(string typeName)
+                {
+                    var array = typeName.Split('.');
+                    var sb = new StringBuilder(typeName.Length);
+                    for (int i = 0; i + 1 < array.Length; i++)
+                    {
+                        sb.Append(array[i]);
+                        yield return sb.ToString();
+                        sb.Append('.');
+                    }
+                }
+                var usedNamespaces = requiedFiles.SelectMany(r => r.TypeNames).SelectMany(TypeNameToNamespaces).ToImmutableHashSet();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                foreach (var u in usings)
+                {
+                    if (u.Length >= 7)
+                    {
+                        var ns = u.Substring(6, u.Length - 7); // namespace
+                        if (sourceFileContainer.DefinedNamespaces.Contains(ns)
+                            && !usedNamespaces.Contains(ns))
+                            importButUnusedNamespaces.Add(ns);
+                    }
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
             var sb = new StringBuilder();
             foreach (var u in SourceFileInfoUtil.SortUsings(usings))
                 sb.AppendLine(u);
@@ -68,6 +99,12 @@ namespace SourceExpander
                 sb.AppendLine(Config.StaticEmbeddingText);
             foreach (var s in requiedFiles)
                 sb.AppendLine(s.CodeBody);
+            foreach (var ns in importButUnusedNamespaces)
+            {
+                sb.Append("namespace ");
+                sb.Append(ns);
+                sb.AppendLine("{}");
+            }
             sb.AppendLine("#endregion Expanded by https://github.com/kzrnm/SourceExpander");
             return sb.ToString();
         }

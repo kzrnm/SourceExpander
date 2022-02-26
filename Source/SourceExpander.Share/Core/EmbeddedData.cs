@@ -12,23 +12,27 @@ namespace SourceExpander
         public LanguageVersion CSharpVersion { get; }
         public ImmutableArray<SourceFileInfo> Sources { get; }
         public bool AllowUnsafe { get; }
+        public ImmutableArray<string> EmbeddedNamespaces { get; }
         public bool IsEmpty => Sources.Length == 0;
         internal EmbeddedData(string assemblyName, ImmutableArray<SourceFileInfo> sources,
             Version embedderVersion,
             LanguageVersion csharpVersion,
-            bool allowUnsafe)
+            bool allowUnsafe,
+            ImmutableArray<string> embeddedNamespaces)
         {
             AssemblyName = assemblyName;
             Sources = sources;
             EmbedderVersion = embedderVersion;
             CSharpVersion = csharpVersion;
             AllowUnsafe = allowUnsafe;
+            EmbeddedNamespaces = embeddedNamespaces;
         }
         public static EmbeddedData Empty => new("Empty",
             ImmutableArray<SourceFileInfo>.Empty,
             new(1, 0, 0),
             LanguageVersion.Default,
-            false);
+            false,
+            ImmutableArray<string>.Empty);
         public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
             Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
         {
@@ -36,6 +40,7 @@ namespace SourceExpander
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
             Version? version = new(1, 0, 0);
             bool allowUnsafe = false;
+            ImmutableArray<string> embeddedNamespaces = ImmutableArray<string>.Empty;
 
             var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();
             foreach (var pair in assemblyMetadatas)
@@ -90,8 +95,19 @@ namespace SourceExpander
                         errors.Add((key, r.Message));
                         continue;
                 }
+                switch ((r = TryGetEmbeddedNamespaces(keyArray, value, out var attrNamespaces)).Result)
+                {
+                    case ParseResult.Status.NotMatch:
+                        break;
+                    case ParseResult.Status.Success:
+                        embeddedNamespaces = attrNamespaces.ToImmutableArray();
+                        continue;
+                    case ParseResult.Status.Error:
+                        errors.Add((key, r.Message));
+                        continue;
+                }
             }
-            return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe), errors.ToImmutable());
+            return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe, embeddedNamespaces), errors.ToImmutable());
         }
         private struct ParseResult
         {
@@ -183,6 +199,24 @@ namespace SourceExpander
                     && bool.TryParse(value, out var embeddedAllowUnsafe))
                 {
                     allowUnsafe = embeddedAllowUnsafe;
+                    return ParseResult.Success;
+                }
+                return ParseResult.NotMatch;
+            }
+            catch (Exception e)
+            {
+                return ParseResult.Error(e.Message);
+            }
+        }
+        private static ParseResult TryGetEmbeddedNamespaces(string[] keyArray, string value, out string[] embeddedNamespaces)
+        {
+            embeddedNamespaces = Array.Empty<string>();
+            try
+            {
+                if (keyArray.Length == 2
+                    && keyArray[1] == "EmbeddedNamespaces")
+                {
+                    embeddedNamespaces = value.Split(',');
                     return ParseResult.Success;
                 }
                 return ParseResult.NotMatch;
