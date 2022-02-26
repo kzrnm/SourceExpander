@@ -1,6 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json",
-  "static-embedding-text": "//LICENSE: https://raw.githubusercontent.com/naminodarie/SourceExpander/master/LICENSE",
+  "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
+  "static-embedding-text": "//LICENSE: https://raw.githubusercontent.com/kzrnm/SourceExpander/master/LICENSE",
   "match-file-pattern": [
     "Program.cs"
   ]

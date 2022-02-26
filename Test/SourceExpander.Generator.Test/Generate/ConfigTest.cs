@@ -11,7 +11,7 @@ namespace SourceExpander.Generate
             {
                 new InMemorySourceText("/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": 1
 }
 "),
@@ -24,7 +24,7 @@ namespace SourceExpander.Generate
             {
                 new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": 1
 }
 "),
@@ -37,7 +37,7 @@ namespace SourceExpander.Generate
             {
                 new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": [
         ""(""
     ]
@@ -180,7 +180,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""enabled"": false
 }
 ");
@@ -257,7 +257,7 @@ class Program2
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""ignore-file-pattern-regex"": [
 " + pattern.ToLiteral() + @"
     ]
@@ -400,7 +400,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""match-file-pattern"": [
 " + pattern.ToLiteral() + @"
     ]
@@ -501,7 +501,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""static-embedding-text"": ""/* Static Embedding Text */""
 }
 ");
@@ -615,7 +615,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""metadata-expanding-file"": ""Program0.cs"",
     ""static-embedding-text"": ""/* Static Embedding Text */""
 }
@@ -731,7 +731,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Generator.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/expander.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json"",
     ""metadata-expanding-file"": ""Program.cs"",
     ""static-embedding-text"": ""/* Static Embedding Text */""
 }

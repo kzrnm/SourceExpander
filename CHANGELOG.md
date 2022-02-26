@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.2.1] - 2021-10-20
 ### Changed
-- Replace github.com/naminodarie with github.com/kzrnm
+- Replace github.com/kzrnm with github.com/kzrnm
 
 ## [3.2.0] - 2021-06-02
 ### Changed

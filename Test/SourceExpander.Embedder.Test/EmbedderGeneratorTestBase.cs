@@ -52,7 +52,7 @@ namespace SourceExpander
         public static InMemorySourceText enableMinifyJson = new(
             "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""minify-level"": ""full""
 }

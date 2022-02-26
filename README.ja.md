@@ -51,7 +51,7 @@ README languages:
 
 ## Status
 
-![build](https://github.com/naminodarie/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
+![build](https://github.com/kzrnm/SourceExpander/workflows/Build-Release-Publish/badge.svg?branch=master)
 
 |Library|NuGet|
 |:---|:---|
@@ -85,7 +85,7 @@ dotnet-source-expand Sample/SampleProject/Put.cs -p Sample/SampleProject2/Sample
 
 #### SourceExpander.Generator を使う
 
-[Sample](/Sample) や https://github.com/naminodarie/ac-library-csharp を参考としてください。
+[Sample](/Sample) や https://github.com/kzrnm/ac-library-csharp を参考としてください。
 
 ```
 Install-Package SourceExpander
@@ -117,10 +117,10 @@ class Program
     }
 }
 
-#region Expanded by https://github.com/naminodarie/SourceExpander
+#region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SourceExpander { public class Expander { [Conditional("EXPANDER")] public static void Expand(string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true) { } public static string ExpandString(string inputFilePath = null, bool ignoreAnyError = true) { return ""; } } } 
 // library code
-#endregion Expanded by https://github.com/naminodarie/SourceExpander
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
 ```
 
 ### ライブラリ開発者向け
@@ -199,4 +199,4 @@ public class SourceFileInfo
 
 #### EmbeddedSourceCode.GZipBase32768
 
-EmbeddedSourceCode の JSON を gzip 圧縮し、[base32768](https://github.com/naminodarie/Base32768/) でエンコードしたものです。
+EmbeddedSourceCode の JSON を gzip 圧縮し、[base32768](https://github.com/kzrnm/Base32768/) でエンコードしたものです。

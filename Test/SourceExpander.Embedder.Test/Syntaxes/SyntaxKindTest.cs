@@ -45,7 +45,7 @@ namespace SourceExpander.Embedder.Syntaxes
                         (
             "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw""
 }
 "),
@@ -94,7 +94,7 @@ namespace SourceExpander.Embedder.Syntaxes
                         (
             "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""minify-level"": ""full""
 }

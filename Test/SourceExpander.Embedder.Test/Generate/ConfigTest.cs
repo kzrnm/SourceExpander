@@ -15,7 +15,7 @@ namespace SourceExpander.Generate
                 new InMemorySourceText(
                 "/foo/directory/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""exclude-attributes"": 1
 }
@@ -30,7 +30,7 @@ namespace SourceExpander.Generate
                 new InMemorySourceText(
                 "/foo/bar/sourceExpander.embedder.config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""exclude-attributes"": 1
 }
@@ -123,7 +123,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""enabled"": false,
     ""exclude-attributes"": [
@@ -168,7 +168,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""exclude-attributes"": [
         ""System.Diagnostics.DebuggerDisplayAttribute""
@@ -246,7 +246,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw""
 }
 ");
@@ -320,7 +320,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""minify-level"": ""off""
 }
@@ -405,7 +405,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""minify-level"": ""full""
 }
@@ -480,7 +480,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""gzip-base32768"",
     ""minify-level"": ""full""
 }
@@ -558,7 +558,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""minify-level"": ""full""
 }
@@ -630,7 +630,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""remove-conditional"": [
         ""DEBUG"", ""DEBUG2""
@@ -716,7 +716,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""embedding-source-class"": {
         ""enabled"": false,
@@ -792,7 +792,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""embedding-source-class"": {
         ""enabled"": true,
@@ -899,7 +899,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""embedding-source-class"": {
         ""enabled"": true
@@ -1005,7 +1005,7 @@ class Program
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", @"
 {
-    ""$schema"": ""https://raw.githubusercontent.com/naminodarie/SourceExpander/master/schema/embedder.schema.json"",
+    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
     ""embedding-type"": ""Raw"",
     ""embedding-source-class"": {
         ""enabled"": true,

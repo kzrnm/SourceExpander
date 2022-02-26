@@ -1,7 +1,7 @@
 <Project>
 
 	<PropertyGroup>
-		<Authors>naminodarie</Authors>
+		<Authors>kzrnm</Authors>
 		<PackageTags>SourceExpander;ac-library-csharp</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryType>git</RepositoryType>
