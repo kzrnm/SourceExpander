@@ -16,20 +16,18 @@ namespace SourceExpander
         /// </summary>
         public ExpandConfig(
             bool enabled = true,
-            string[]? matchFilePatterns = null,
+            IEnumerable<string>? matchFilePatterns = null,
             IEnumerable<Regex>? ignoreFilePatterns = null,
             string? staticEmbeddingText = null,
-            string? metadataExpandingFile = null)
+            string? metadataExpandingFile = null,
+            IEnumerable<ReplacingConfig>? replacings = null)
         {
             Enabled = enabled;
-            MatchFilePatterns = matchFilePatterns is null
-                ? ImmutableArray<string>.Empty
-                : ImmutableArray.Create(matchFilePatterns);
-            IgnoreFilePatterns = ignoreFilePatterns is null
-                ? ImmutableArray<Regex>.Empty
-                : ImmutableArray.CreateRange(ignoreFilePatterns);
+            MatchFilePatterns = matchFilePatterns?.ToImmutableArray() ?? ImmutableArray<string>.Empty;
+            IgnoreFilePatterns = ignoreFilePatterns?.ToImmutableArray() ?? ImmutableArray<Regex>.Empty;
             StaticEmbeddingText = staticEmbeddingText;
             MetadataExpandingFile = metadataExpandingFile;
+            ReplacingConfigs = replacings?.ToImmutableArray() ?? ImmutableArray<ReplacingConfig>.Empty;
         }
 
         /// <summary>
@@ -53,11 +51,61 @@ namespace SourceExpander
         /// </summary>
         public string? MetadataExpandingFile { get; }
         /// <summary>
+        /// replace string in source code
+        /// </summary>
+        public ImmutableArray<ReplacingConfig> ReplacingConfigs { get; }
+        /// <summary>
         /// whether Generator resolve source code of <paramref name="filePath"/>.
         /// </summary>
         public bool IsMatch(string filePath)
             => (MatchFilePatterns.Length == 0
                 || MatchFilePatterns.Any(p => filePath.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0))
                 && IgnoreFilePatterns.All(regex => !regex.IsMatch(filePath));
+    }
+
+    /// <summary>
+    /// Use in <see cref="ReplacingConfig"/>
+    /// </summary>
+    public enum ReplacingType
+    {
+        /// <summary>
+        /// Replace using string
+        /// </summary>
+        String,
+        /// <summary>
+        /// Replace using regular expression
+        /// </summary>
+        Regex,
+    }
+    /// <summary>
+    /// Use in <see cref="ExpandConfig.ReplacingConfigs"/>
+    /// </summary>
+    public class ReplacingConfig
+    {
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public ReplacingConfig(
+            string oldString,
+            string replacement,
+            ReplacingType replacingType
+            )
+        {
+            OldString = oldString;
+            Replacement = replacement;
+            ReplacingType = replacingType;
+        }
+        /// <summary>
+        /// Replace method type
+        /// </summary>
+        public ReplacingType ReplacingType { get; }
+        /// <summary>
+        /// target of replacing
+        /// </summary>
+        public string OldString { get; }
+        /// <summary>
+        /// replacement 
+        /// </summary>
+        public string Replacement { get; }
     }
 }

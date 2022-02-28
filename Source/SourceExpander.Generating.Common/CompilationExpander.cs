@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -106,7 +107,29 @@ namespace SourceExpander
                 sb.AppendLine("{}");
             }
             sb.AppendLine("#endregion Expanded by https://github.com/kzrnm/SourceExpander");
-            return sb.ToString();
+            return Replace(sb);
+        }
+
+        private string Replace(StringBuilder sb)
+        {
+            var configs = Config.ReplacingConfigs;
+            int ix;
+            for (ix = 0; ix < configs.Length; ix++)
+            {
+                if (configs[ix].ReplacingType is not ReplacingType.String)
+                    break;
+                sb.Replace(configs[ix].OldString, configs[ix].Replacement);
+            }
+            var str = sb.ToString();
+            for (ix = 0; ix < configs.Length; ix++)
+            {
+                str = configs[ix].ReplacingType switch
+                {
+                    ReplacingType.Regex => Regex.Replace(str, configs[ix].OldString, configs[ix].Replacement),
+                    _ => str.Replace(configs[ix].OldString, configs[ix].Replacement),
+                };
+            }
+            return str;
         }
     }
 }
