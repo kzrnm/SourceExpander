@@ -107,18 +107,24 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        internal static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, AnalyzerConfigOptionsProvider analyzerConfigOptionsProvider, CancellationToken cancellationToken = default)
+        internal static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTextAndAnalyzerOptions(AdditionalText? additionalText, AnalyzerConfigOptionsProvider analyzerConfigOptionsProvider, CancellationToken cancellationToken = default)
         {
-            if (additionalText?.GetText(cancellationToken)?.ToString() is not { } configText)
-                return (new ExpandConfig(), ImmutableArray<Diagnostic>.Empty);
-// TODO: 
+            var isDesignTimeBuild = StringComparer.OrdinalIgnoreCase.Equals(
+                analyzerConfigOptionsProvider.GlobalOptions.GetOrNull("build_property.DesignTimeBuild"),
+                "true");
+            if (isDesignTimeBuild)
+                return (new ExpandConfig(false), ImmutableArray<Diagnostic>.Empty);
+
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                return (ExpandConfig.Parse(configText), ImmutableArray<Diagnostic>.Empty);
+                var config = ExpandConfig.Parse(additionalText?.GetText(cancellationToken)?.ToString(), analyzerConfigOptionsProvider.GlobalOptions);
+                var diagnosticsBuilder = ImmutableArray.CreateBuilder<Diagnostic>();
+                return (config, ImmutableArray<Diagnostic>.Empty);
             }
             catch (ParseJsonException e)
             {
-                return (new ExpandConfig(), ImmutableArray.Create(DiagnosticDescriptors.EXPAND0007_ParseConfigError(additionalText.Path, e.Message)));
+                return (new ExpandConfig(), ImmutableArray.Create(DiagnosticDescriptors.EXPAND0007_ParseConfigError(additionalText?.Path, e.Message)));
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
@@ -35,6 +36,12 @@ namespace SourceExpander
             if (symbol is INamedTypeSymbol named)
                 return named.ConstructedFrom;
             return symbol.ContainingType?.ConstructedFrom;
+        }
+
+        public static string? GetOrNull(this AnalyzerConfigOptions options, string key)
+        {
+            options.TryGetValue(key, out var v);
+            return v;
         }
     }
 }

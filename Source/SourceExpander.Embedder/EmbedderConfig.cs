@@ -41,13 +41,6 @@ namespace SourceExpander
         public EmbeddingSourceClass EmbeddingSourceClass { get; }
         public ImmutableArray<ObsoleteConfigProperty> ObsoleteConfigProperties { get; }
 
-        public static EmbedderConfig Parse(string sourceText)
-        {
-            if (JsonUtil.ParseJson<EmbedderConfig>(sourceText) is { } config)
-                return config;
-            return new EmbedderConfig();
-        }
-
         public override bool Equals(object? obj) => Equals(obj as EmbedderConfig);
         public bool Equals(EmbedderConfig? other) => other != null
             && Enabled == other.Enabled

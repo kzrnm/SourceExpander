@@ -1,20 +1,42 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
-    [JsonConverter(typeof(EmbedderConfigConverter))]
     internal partial class EmbedderConfig
     {
-        private class EmbedderConfigConverter : JsonConverter<EmbedderConfig?>
+        public static EmbedderConfig Parse(string? sourceText, AnalyzerConfigOptions analyzerConfigOptions)
         {
-            public override bool CanWrite => false;
-            public override EmbedderConfig? ReadJson(JsonReader reader, Type objectType, EmbedderConfig? existingValue, bool hasExistingValue, JsonSerializer serializer)
-                => serializer.Deserialize<EmbedderConfigData>(reader)?.ToImmutable();
-            public override void WriteJson(JsonWriter writer, EmbedderConfig? value, JsonSerializer serializer)
-                => throw new NotImplementedException("CanWrite is always false");
+            try
+            {
+                var data = sourceText switch
+                {
+                    { } => JsonUtil.ParseJson<EmbedderConfigData>(sourceText) ?? new(),
+                    _ => new(),
+                };
+                {
+                    const string buildPropHeader = "build_property.";
+                    const string header = buildPropHeader + "SourceExpander_Embedder_";
+                    if (analyzerConfigOptions.TryGetValue(header + "Enabled", out string? v) && !string.IsNullOrWhiteSpace(v))
+                        data.Enabled = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
+                    if (analyzerConfigOptions.TryGetValue(header + "EmbeddingType", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.EmbeddingType = v;
+                    if (analyzerConfigOptions.TryGetValue(header + "ExcludeAttributes", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.ExcludeAttributes = v.Split(';').Select(t => t.Trim()).ToArray();
+                    if (analyzerConfigOptions.TryGetValue(header + "RemoveConditional", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.RemoveConditional = v.Split(';').Select(t => t.Trim()).ToArray();
+                    if (analyzerConfigOptions.TryGetValue(header + "MinifyLevel", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.MinifyLevel = v;
+                }
+                return data.ToImmutable();
+            }
+            catch (Exception e)
+            {
+                throw new ParseJsonException(e);
+            }
         }
 
         [DataContract]
@@ -43,6 +65,7 @@ namespace SourceExpander
             [DataMember(Name = "embedding-source-class")]
             public SourceClassData? EmbeddingSourceClass { set; get; }
 
+            [Obsolete]
             [DataMember(Name = "enable-minify")]
             public bool? EnableMinify { set; get; }
 
@@ -74,8 +97,10 @@ namespace SourceExpander
             private ImmutableArray<ObsoleteConfigProperty> GetObsoleteConfigProperties()
             {
                 var builder = ImmutableArray.CreateBuilder<ObsoleteConfigProperty>();
+#pragma warning disable CS0612
                 if (EnableMinify.HasValue)
                     builder.Add(ObsoleteConfigProperty.EnableMinify);
+#pragma warning restore CS0612
                 return builder.ToImmutable();
             }
         }

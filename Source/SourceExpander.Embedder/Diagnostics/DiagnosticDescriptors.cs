@@ -6,7 +6,11 @@ namespace SourceExpander
 {
     public static class DiagnosticDescriptors
     {
-        public static Location AdditionalFileLocation(string filePath) => Location.Create(filePath, new(), new());
+        public static Location AdditionalFileLocation(string? filePath) => filePath switch
+        {
+            null => Location.None,
+            _ => Location.Create(filePath, new(), new()),
+        };
 
         public static Diagnostic EMBED0001_UnknownError(string message)
             => Diagnostic.Create(EMBED0001_UnknownError_Descriptor, Location.None, message);
@@ -38,7 +42,7 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
-        public static Diagnostic EMBED0003_ParseConfigError(string configFile, string message)
+        public static Diagnostic EMBED0003_ParseConfigError(string? configFile, string message)
             => Diagnostic.Create(EMBED0003_ParseConfigError_Descriptor,
                 AdditionalFileLocation(configFile), configFile, message);
         private static readonly DiagnosticDescriptor EMBED0003_ParseConfigError_Descriptor = new(
@@ -162,9 +166,9 @@ namespace SourceExpander
 
 
         public static Diagnostic EMBED0011_ObsoleteConfigProperty(
-            Location location, string configFile, string obsoleteProperty, string insteadProperty)
+            string? configFile, string obsoleteProperty, string insteadProperty)
             => Diagnostic.Create(EMBED0011_ObsoleteConfigProperty_Descriptor,
-                location, configFile, obsoleteProperty, insteadProperty);
+                AdditionalFileLocation(configFile), configFile ?? "Any of configs", obsoleteProperty, insteadProperty);
         private static readonly DiagnosticDescriptor EMBED0011_ObsoleteConfigProperty_Descriptor = new(
             "EMBED0011",
             new LocalizableResourceString(

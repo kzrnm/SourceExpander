@@ -2,27 +2,41 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
-    [JsonConverter(typeof(ExpandConfigConverter))]
     public partial class ExpandConfig
     {
-        public static ExpandConfig Parse(string sourceText)
+        public static ExpandConfig Parse(string? sourceText, AnalyzerConfigOptions analyzerConfigOptions)
         {
-            if (JsonUtil.ParseJson<ExpandConfig>(sourceText) is { } config)
-                return config;
-            return new ExpandConfig();
-        }
-
-        private class ExpandConfigConverter : JsonConverter<ExpandConfig?>
-        {
-            public override bool CanWrite => false;
-            public override ExpandConfig? ReadJson(JsonReader reader, Type objectType, ExpandConfig? existingValue, bool hasExistingValue, JsonSerializer serializer)
-                => serializer.Deserialize<ExpandConfigData>(reader)?.ToImmutable();
-            public override void WriteJson(JsonWriter writer, ExpandConfig? value, JsonSerializer serializer)
-                => throw new NotImplementedException("CanWrite is always false");
+            try
+            {
+                var data = sourceText switch
+                {
+                    { } => JsonUtil.ParseJson<ExpandConfigData>(sourceText) ?? new(),
+                    _ => new(),
+                };
+                {
+                    const string buildPropHeader = "build_property.";
+                    const string header = buildPropHeader + "SourceExpander_Generator_";
+                    if (analyzerConfigOptions.TryGetValue(header + "Enabled", out string? v) && !string.IsNullOrWhiteSpace(v))
+                        data.Enabled = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
+                    if (analyzerConfigOptions.TryGetValue(header + "MatchFilePattern", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.MatchFilePattern = v.Split(';').Select(t => t.Trim()).ToArray();
+                    if (analyzerConfigOptions.TryGetValue(header + "MetadataExpandingFile", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.MetadataExpandingFile = v;
+                    if (analyzerConfigOptions.TryGetValue(header + "IgnoreFilePatternRegex", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.IgnoreFilePatternRegex = new[] { v };
+                    if (analyzerConfigOptions.TryGetValue(header + "StaticEmbeddingText", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.StaticEmbeddingText = v;
+                }
+                return data.ToImmutable();
+            }
+            catch (Exception e)
+            {
+                throw new ParseJsonException(e);
+            }
         }
 
         [DataContract]

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
@@ -25,6 +26,7 @@ namespace SourceExpander
         protected override CompilationOptions CreateCompilationOptions() => CompilationOptions;
         public CSharpParseOptions ParseOptions { get; set; } = new(languageVersion: LanguageVersion.CSharp9, kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         protected override ParseOptions CreateParseOptions() => ParseOptions;
+        public AnalyzerConfigOptionsProvider AnalyzerConfigOptionsProvider { get; set; }
 
         protected override string DefaultFileExt => "cs";
         public override string Language => LanguageNames.CSharp;
@@ -34,6 +36,6 @@ namespace SourceExpander
                 sourceGenerators,
                 project.AnalyzerOptions.AdditionalFiles,
                 (CSharpParseOptions)project.ParseOptions!,
-                project.AnalyzerOptions.AnalyzerConfigOptionsProvider);
+                AnalyzerConfigOptionsProvider ?? project.AnalyzerOptions.AnalyzerConfigOptionsProvider);
     }
 }

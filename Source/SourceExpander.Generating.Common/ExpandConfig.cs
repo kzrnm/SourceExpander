@@ -52,7 +52,7 @@ namespace SourceExpander
         /// file path whose source code is written to metadata
         /// </summary>
         public string? MetadataExpandingFile { get; }
-        
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -61,9 +61,9 @@ namespace SourceExpander
         /// <inheritdoc/>
         /// </summary>
         public bool Equals(ExpandConfig? other) => other != null && Enabled == other.Enabled
-            && MatchFilePatterns.Equals(other.MatchFilePatterns) 
+            && MatchFilePatterns.Equals(other.MatchFilePatterns)
             && IgnoreFilePatterns.Equals(other.IgnoreFilePatterns)
-            && StaticEmbeddingText == other.StaticEmbeddingText 
+            && StaticEmbeddingText == other.StaticEmbeddingText
             && MetadataExpandingFile == other.MetadataExpandingFile;
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace SourceExpander
             hashCode = hashCode * -1521134295 + Enabled.GetHashCode();
             hashCode = hashCode * -1521134295 + MatchFilePatterns.GetHashCode();
             hashCode = hashCode * -1521134295 + IgnoreFilePatterns.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(StaticEmbeddingText);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(MetadataExpandingFile);
+            hashCode = hashCode * -1521134295 + (StaticEmbeddingText?.GetHashCode() ?? 0);
+            hashCode = hashCode * -1521134295 + (MetadataExpandingFile?.GetHashCode() ?? 0);
             return hashCode;
         }
 

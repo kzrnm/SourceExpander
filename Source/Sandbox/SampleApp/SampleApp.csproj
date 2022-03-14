@@ -1,9 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+	<SourceExpander_Generator_StaticEmbeddingText>// Static Generate &#x9; // Property</SourceExpander_Generator_StaticEmbeddingText>
   </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="SourceExpander_Generator_Enabled" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_MatchFilePattern" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_IgnoreFilePatternRegex" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_StaticEmbeddingText" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SampleLibrary\SampleLibrary.csproj" />
