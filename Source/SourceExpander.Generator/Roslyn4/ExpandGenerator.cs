@@ -40,7 +40,9 @@ namespace SourceExpander
                 .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
                 .Collect()
                 .Select((ats, _) => ats.FirstOrDefault())
-                .Select(ParseAdditionalTexts);
+                .Combine(context.AnalyzerConfigOptionsProvider)
+                .Select((tup, ct) => ParseAdditionalTexts(tup.Left, tup.Right, ct));
+
             var source = context.CompilationProvider
                 .Combine(context.ParseOptionsProvider)
                 .Combine(configProvider);

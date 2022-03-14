@@ -1,9 +1,11 @@
-﻿using System.Collections.Immutable;
-using System.Runtime.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace SourceExpander
 {
-    internal partial class EmbedderConfig
+    internal partial class EmbedderConfig : IEquatable<EmbedderConfig?>
     {
         public EmbedderConfig(
             bool enabled = true,
@@ -46,18 +48,30 @@ namespace SourceExpander
             return new EmbedderConfig();
         }
 
-        [DataContract]
-        private class SourceClassData
-        {
-            [DataMember(Name = "enabled")]
-            public bool? Enabled { set; get; }
-            [DataMember(Name = "class-name")]
-            public string? ClassName { set; get; }
+        public override bool Equals(object? obj) => Equals(obj as EmbedderConfig);
+        public bool Equals(EmbedderConfig? other) => other != null
+            && Enabled == other.Enabled
+            && EmbeddingType == other.EmbeddingType
+            && MinifyLevel == other.MinifyLevel
+            && ExcludeAttributes.SetEquals(other.ExcludeAttributes)
+            && RemoveConditional.SetEquals(other.RemoveConditional)
+            && EmbeddingSourceClass.Equals(other.EmbeddingSourceClass)
+            && ObsoleteConfigProperties.Equals(other.ObsoleteConfigProperties);
 
-            public EmbeddingSourceClass ToImmutable() => new(Enabled == true, ClassName);
+        public override int GetHashCode()
+        {
+            int hashCode = -608788792;
+            hashCode = hashCode * -1521134295 + Enabled.GetHashCode();
+            hashCode = hashCode * -1521134295 + EmbeddingType.GetHashCode();
+            hashCode = hashCode * -1521134295 + MinifyLevel.GetHashCode();
+            hashCode = hashCode * -1521134295 + ExcludeAttributes.FirstOrDefault()?.GetHashCode() ?? 0;
+            hashCode = hashCode * -1521134295 + RemoveConditional.FirstOrDefault()?.GetHashCode() ?? 0;
+            hashCode = hashCode * -1521134295 + EqualityComparer<EmbeddingSourceClass>.Default.GetHashCode(EmbeddingSourceClass);
+            hashCode = hashCode * -1521134295 + ObsoleteConfigProperties.GetHashCode();
+            return hashCode;
         }
     }
-    public class ObsoleteConfigProperty
+    public class ObsoleteConfigProperty : IEquatable<ObsoleteConfigProperty?>
     {
         public static ObsoleteConfigProperty EnableMinify { get; }
             = new("enable-minify", "minify-level");
@@ -69,9 +83,19 @@ namespace SourceExpander
             Name = name;
             Instead = instead;
         }
+
+        public override bool Equals(object? obj) => Equals(obj as ObsoleteConfigProperty);
+        public bool Equals(ObsoleteConfigProperty? other) => other != null && Name == other.Name && Instead == other.Instead;
+        public override int GetHashCode()
+        {
+            int hashCode = -1743611513;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Instead);
+            return hashCode;
+        }
     }
 
-    public class EmbeddingSourceClass
+    public class EmbeddingSourceClass : IEquatable<EmbeddingSourceClass?>
     {
         public EmbeddingSourceClass(bool enabled = false, string? className = null)
         {
@@ -80,6 +104,16 @@ namespace SourceExpander
         }
         public bool Enabled { set; get; }
         public string ClassName { set; get; }
+
+        public override bool Equals(object? obj) => Equals(obj as EmbeddingSourceClass);
+        public bool Equals(EmbeddingSourceClass? other) => other != null && Enabled == other.Enabled && ClassName == other.ClassName;
+        public override int GetHashCode()
+        {
+            int hashCode = -926497622;
+            hashCode = hashCode * -1521134295 + Enabled.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ClassName);
+            return hashCode;
+        }
 
         public override string ToString() => Enabled ? $"class: {ClassName}" : "disable";
     }

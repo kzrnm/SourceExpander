@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
@@ -106,11 +107,11 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        internal static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
+        internal static (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, AnalyzerConfigOptionsProvider analyzerConfigOptionsProvider, CancellationToken cancellationToken = default)
         {
             if (additionalText?.GetText(cancellationToken)?.ToString() is not { } configText)
                 return (new ExpandConfig(), ImmutableArray<Diagnostic>.Empty);
-
+// TODO: 
             try
             {
                 return (ExpandConfig.Parse(configText), ImmutableArray<Diagnostic>.Empty);

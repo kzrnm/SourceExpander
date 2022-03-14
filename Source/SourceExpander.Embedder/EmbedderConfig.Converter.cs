@@ -18,6 +18,16 @@ namespace SourceExpander
         }
 
         [DataContract]
+        private class SourceClassData
+        {
+            [DataMember(Name = "enabled")]
+            public bool? Enabled { set; get; }
+            [DataMember(Name = "class-name")]
+            public string? ClassName { set; get; }
+            public EmbeddingSourceClass ToImmutable() => new(Enabled == true, ClassName);
+        }
+
+        [DataContract]
         private class EmbedderConfigData
         {
             [DataMember(Name = "enabled")]
