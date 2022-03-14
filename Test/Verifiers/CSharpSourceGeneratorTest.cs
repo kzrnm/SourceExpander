@@ -23,8 +23,7 @@ namespace SourceExpander
     {
         public CSharpCompilationOptions CompilationOptions { get; set; } = new(OutputKind.DynamicallyLinkedLibrary);
         protected override CompilationOptions CreateCompilationOptions() => CompilationOptions;
-        // TODO: LanguageVersion
-        public CSharpParseOptions ParseOptions { get; set; } = new(languageVersion: LanguageVersion.Preview, kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
+        public CSharpParseOptions ParseOptions { get; set; } = new(languageVersion: LanguageVersion.CSharp9, kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
         protected override ParseOptions CreateParseOptions() => ParseOptions;
 
         protected override string DefaultFileExt => "cs";
