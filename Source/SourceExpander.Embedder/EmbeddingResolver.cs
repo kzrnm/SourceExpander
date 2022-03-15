@@ -213,15 +213,22 @@ namespace SourceExpander
                             .Where(info => info.DefinedTypeNames.Any())
                             .ToArray();
 
-                    static void WithoutCommonPrefix(SourceFileInfoRaw[] rawInfos, string prefix, string commonPrefix)
+                    switch (config.EmbeddingFileNameType)
                     {
-                        for (int i = 0; i < rawInfos.Length; i++)
-                        {
-                            var newName = string.IsNullOrEmpty(commonPrefix) ? prefix + rawInfos[i].FileName : rawInfos[i].FileName.Replace(commonPrefix, prefix);
-                            rawInfos[i] = rawInfos[i].WithFileName(newName);
-                        }
+                        case EmbeddingFileNameType.WithoutCommonPrefix:
+                            {
+                                var commonPrefix = ResolveCommomPrefix(rawInfos.Select(r => r.FileName));
+                                var prefix = $"{compilation.AssemblyName}>";
+                                for (int i = 0; i < rawInfos.Length; i++)
+                                {
+                                    var newName = string.IsNullOrEmpty(commonPrefix) ? prefix + rawInfos[i].FileName : rawInfos[i].FileName.Replace(commonPrefix, prefix);
+                                    rawInfos[i] = rawInfos[i].WithFileName(newName);
+                                }
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                    WithoutCommonPrefix(rawInfos, $"{compilation.AssemblyName}>", ResolveCommomPrefix(rawInfos.Select(r => r.FileName)));
                     _cacheResolvedInfoRaws = ImmutableArray.Create(rawInfos);
                     cancellationToken.ThrowIfCancellationRequested();
                 }
@@ -360,5 +367,6 @@ namespace SourceExpander
             }
             return min;
         }
+
     }
 }

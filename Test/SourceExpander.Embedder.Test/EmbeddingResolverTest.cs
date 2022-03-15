@@ -42,6 +42,5 @@ namespace SourceExpander
         [MemberData(nameof(ResolveCommomPrefixTestData))]
         public void ResolveCommomPrefixTest(IEnumerable<string> strs, string expected)
             => EmbeddingResolver.ResolveCommomPrefix(strs).Should().Be(expected);
-
     }
 }
