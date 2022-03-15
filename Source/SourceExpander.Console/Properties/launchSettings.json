@@ -12,7 +12,7 @@
     },
     "Dependency Library": {
       "commandName": "Project",
-      "commandLineArgs": "dependency ../Sandbox/SampleLibrary/SampleLibrary.csproj",
+      "commandLineArgs": "dependency ../Sandbox/SampleLibrary/SampleLibrary.csproj -p",
       "workingDirectory": "$(ProjectDir)"
     },
     "Dependency App": {

@@ -20,6 +20,13 @@ namespace SourceExpander
             this.compilation = compilation;
         }
 
+        public ImmutableDictionary<string, string> GetAssemblyMetadata()
+            => ImmutableDictionary.CreateRange(compilation.Assembly
+                .GetAttributes()
+                .Select(GetAttributeSourceCode)
+                .OfType<KeyValuePair<string, string>>());
+
+
         public (EmbeddedData Data, string? Name, ImmutableArray<(string Key, string ErrorMessage)> Errors)[] GetEmbeddedSourceFiles(bool includeSelf, CancellationToken cancellationToken)
         {
             var symbols = compilation.References

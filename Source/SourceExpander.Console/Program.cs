@@ -100,7 +100,24 @@ internal class SourceExpanderCommand : ConsoleAppBase
         if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
             throw new InvalidOperationException("Failed to get parseOptions");
 
-        var metadatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(true, Context.CancellationToken)
+        var metadataResolver = new AssemblyMetadataResolver(compilation);
+        var metadataDict = metadataResolver.GetAssemblyMetadata();
+        {
+            if (!Version.TryParse(
+                metadataDict.GetValueOrDefault("SourceExpander.EmbedderVersion")
+                ?? metadataDict.GetValueOrDefault("SourceExpander.ExpanderVersion"),
+                out var version) || version <= new Version(4, 2, 0, 2))
+            {
+                if (version is null)
+                    await Console.Error.WriteLineAsync("needs SourceExpander 4.2.0 or newer");
+                else
+                    await Console.Error.WriteLineAsync($"needs SourceExpander 4.2.0 or newer, Current: {version}");
+
+                Environment.Exit(1);
+                return;
+            }
+        }
+        var metadatas = metadataResolver.GetEmbeddedSourceFiles(true, Context.CancellationToken)
             .ToArray();
 
         var infos = metadatas.SelectMany(t => t.Data.Sources);

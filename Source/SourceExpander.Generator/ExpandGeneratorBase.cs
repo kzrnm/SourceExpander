@@ -34,6 +34,7 @@ namespace SourceExpander
                 if (loader.IsEmbeddedEmpty)
                     ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 
+                var metadata = new List<(string name, string code)>();
                 if (config.MetadataExpandingFile is { Length: > 0 } metadataExpandingFile)
                 {
                     try
@@ -41,16 +42,15 @@ namespace SourceExpander
                         var (_, code) = loader.ExpandedCodes()
                            .First(t => t.FilePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
 
-                        ctx.AddSource("SourceExpander.Metadata.cs",
-                            CreateMetadataSource(new (string name, string code)[] {
-                                ("SourceExpander.Expanded.Default", code),
-                            }));
+                        metadata.Add(("SourceExpander.Expanded.Default", code));
                     }
                     catch (InvalidOperationException)
                     {
                         ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound(metadataExpandingFile));
                     }
                 }
+                metadata.Add(("SourceExpander.ExpanderVersion", AssemblyUtil.AssemblyVersion.ToString()));
+                ctx.AddSource("SourceExpander.Metadata.cs", CreateMetadataSource(metadata));
                 var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
                 ctx.CancellationToken.ThrowIfCancellationRequested();
