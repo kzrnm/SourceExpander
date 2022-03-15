@@ -39,7 +39,7 @@ namespace SourceExpander
                     try
                     {
                         var (_, code) = loader.ExpandedCodes()
-                           .First(t => t.filePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
+                           .First(t => t.FilePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
 
                         ctx.AddSource("SourceExpander.Metadata.cs",
                             CreateMetadataSource(new (string name, string code)[] {

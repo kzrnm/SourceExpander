@@ -5,6 +5,7 @@
 	<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingType" />
 	<CompilerVisibleProperty Include="SourceExpander_Embedder_ExcludeAttributes" />
 	<CompilerVisibleProperty Include="SourceExpander_Embedder_RemoveConditional" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingFileNameType" />
   </ItemGroup>
 
   <PropertyGroup>

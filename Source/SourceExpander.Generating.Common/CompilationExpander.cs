@@ -108,5 +108,25 @@ namespace SourceExpander
             sb.AppendLine("#endregion Expanded by https://github.com/kzrnm/SourceExpander");
             return sb.ToString();
         }
+
+
+        public SourceFileInfo[] ResolveDependency(SyntaxTree origTree, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var semanticModel = Compilation.GetSemanticModel(origTree, true);
+            var origRoot = origTree.GetCompilationUnitRoot(cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
+            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
+            if (typeFindAndUnusedUsingRemover.UsedTypes is null)
+                throw new InvalidOperationException($"{nameof(typeFindAndUnusedUsingRemover.UsedTypes)} is null");
+
+            cancellationToken.ThrowIfCancellationRequested();
+            var requiedFiles = sourceFileContainer.ResolveDependency(typeFindAndUnusedUsingRemover.UsedTypes, cancellationToken).ToArray();
+            Array.Sort(requiedFiles, (f1, f2) => StringComparer.OrdinalIgnoreCase.Compare(f1.FileName, f2.FileName));
+
+            return requiedFiles;
+        }
     }
 }
