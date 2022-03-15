@@ -1,7 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+	<CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
+	<CompilerVisibleProperty Include="SourceExpander_Embedder_MinifyLevel" />
+	<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingType" />
+	<CompilerVisibleProperty Include="SourceExpander_Embedder_ExcludeAttributes" />
+	<CompilerVisibleProperty Include="SourceExpander_Embedder_RemoveConditional" />
+  </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	<SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
+	<SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
   </PropertyGroup>
 
   <ItemGroup>

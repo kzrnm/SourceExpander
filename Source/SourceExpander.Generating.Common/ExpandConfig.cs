@@ -9,7 +9,7 @@ namespace SourceExpander
     /// <summary>
     /// Config of expanding
     /// </summary>
-    public partial class ExpandConfig
+    public partial class ExpandConfig : IEquatable<ExpandConfig?>
     {
         /// <summary>
         /// constructor
@@ -52,6 +52,34 @@ namespace SourceExpander
         /// file path whose source code is written to metadata
         /// </summary>
         public string? MetadataExpandingFile { get; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override bool Equals(object? obj) => Equals(obj as ExpandConfig);
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public bool Equals(ExpandConfig? other) => other != null && Enabled == other.Enabled
+            && MatchFilePatterns.Equals(other.MatchFilePatterns)
+            && IgnoreFilePatterns.Equals(other.IgnoreFilePatterns)
+            && StaticEmbeddingText == other.StaticEmbeddingText
+            && MetadataExpandingFile == other.MetadataExpandingFile;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override int GetHashCode()
+        {
+            int hashCode = -262998452;
+            hashCode = hashCode * -1521134295 + Enabled.GetHashCode();
+            hashCode = hashCode * -1521134295 + MatchFilePatterns.GetHashCode();
+            hashCode = hashCode * -1521134295 + IgnoreFilePatterns.GetHashCode();
+            hashCode = hashCode * -1521134295 + (StaticEmbeddingText?.GetHashCode() ?? 0);
+            hashCode = hashCode * -1521134295 + (MetadataExpandingFile?.GetHashCode() ?? 0);
+            return hashCode;
+        }
+
         /// <summary>
         /// whether Generator resolve source code of <paramref name="filePath"/>.
         /// </summary>

@@ -1,0 +1,9 @@
+<Project>
+	<ItemGroup>
+		<CompilerVisibleProperty Include="SourceExpander_Generator_Enabled" />
+		<CompilerVisibleProperty Include="SourceExpander_Generator_MatchFilePattern" />
+		<CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
+		<CompilerVisibleProperty Include="SourceExpander_Generator_IgnoreFilePatternRegex" />
+		<CompilerVisibleProperty Include="SourceExpander_Generator_StaticEmbeddingText" />
+	</ItemGroup>
+</Project>

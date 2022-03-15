@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
@@ -130,14 +131,19 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        internal static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTexts(AdditionalText? additionalText, CancellationToken cancellationToken = default)
+        internal static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTextAndAnalyzerOptions(AdditionalText? additionalText, AnalyzerConfigOptionsProvider analyzerConfigOptionsProvider, CancellationToken cancellationToken = default)
         {
-            if (additionalText == null || additionalText.GetText(cancellationToken)?.ToString() is not { } configText)
-                return (new EmbedderConfig(), ImmutableArray<Diagnostic>.Empty);
+            cancellationToken.ThrowIfCancellationRequested();
+            var isDesignTimeBuild = StringComparer.OrdinalIgnoreCase.Equals(
+                analyzerConfigOptionsProvider.GlobalOptions.GetOrNull("build_property.DesignTimeBuild"),
+                "true");
+            if (isDesignTimeBuild)
+                return (new EmbedderConfig(false), ImmutableArray<Diagnostic>.Empty);
 
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                var config = EmbedderConfig.Parse(configText);
+                var config = EmbedderConfig.Parse(additionalText?.GetText(cancellationToken)?.ToString(), analyzerConfigOptionsProvider.GlobalOptions);
                 var diagnosticsBuilder = ImmutableArray.CreateBuilder<Diagnostic>();
 
                 if (config.ObsoleteConfigProperties.Any())
@@ -145,14 +151,14 @@ namespace SourceExpander
                     foreach (var p in config.ObsoleteConfigProperties)
                     {
                         diagnosticsBuilder.Add(
-                            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(DiagnosticDescriptors.AdditionalFileLocation(additionalText.Path), additionalText.Path, p.Name, p.Instead));
+                            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(additionalText?.Path, p.Name, p.Instead));
                     }
                 }
                 return (config, diagnosticsBuilder.ToImmutable());
             }
             catch (ParseJsonException e)
             {
-                return (new EmbedderConfig(), ImmutableArray.Create(DiagnosticDescriptors.EMBED0003_ParseConfigError(additionalText.Path, e.Message)));
+                return (new EmbedderConfig(), ImmutableArray.Create(DiagnosticDescriptors.EMBED0003_ParseConfigError(additionalText?.Path, e.Message)));
             }
         }
     }
