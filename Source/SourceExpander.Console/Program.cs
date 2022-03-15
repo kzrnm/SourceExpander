@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Loader;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
@@ -135,6 +136,7 @@ internal class SourceExpanderCommand : ConsoleAppBase
         {
             Converters = { new SourceFileInfoConverter() },
             WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(UnicodeRanges.BasicLatin),
         });
         Console.WriteLine(result);
 
