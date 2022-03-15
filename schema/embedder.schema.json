@@ -34,7 +34,7 @@
         },
         "embedding-source-class": {
             "type": "object",
-            "description": "(For debug)Embedding source code as class",
+            "description": "For debug. embedding source class.",
             "properties": {
                 "enabled": {
                     "type": "boolean",
@@ -59,17 +59,26 @@
         "embedding-type": {
             "description": "embedding type",
             "type": "string",
-            "default": "gzip-base32768",
+            "default": "gzipBase32768",
             "enum": [
                 "raw",
-                "gzip-base32768"
+                "gzipBase32768"
+            ]
+        },
+        "embedding-filename-type": {
+            "description": "Embedded file name type",
+            "type": "string",
+            "default": "RelativeFromProject",
+            "enum": [
+                "WithoutCommonPrefix",
+                "FullPath"
             ]
         },
         "exclude-attributes": {
-            "description": "attribute full name that remove on embedding",
+            "description": "Attribute full name that remove on embedding.",
             "type": "array",
             "items": {
-                "description": "attribute full name that remove on embedding",
+                "description": "Attribute full name that remove on embedding.",
                 "type": "string"
             }
         }

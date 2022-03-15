@@ -535,5 +535,177 @@ class Program
                 .Should()
                 .BeEquivalentTo(embeddedFiles);
         }
+
+        [Fact]
+        public async Task EmbeddingFileNameTypeWithoutCommonPrefix()
+        {
+            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+            {
+                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "withoutCommonPrefix" },
+            };
+
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "TestProject>rogram.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray<string>.Empty,
+                     @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
+                 ),
+                 new SourceFileInfo
+                 (
+                     "TestProject>.cs",
+                     new string[] { "P" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray<string>.Empty,
+                     @"class P { static void T() => Console.WriteLine(2); }"
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+            var test = new Test
+            {
+                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                TestState =
+                {
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+"
+                        ),
+                        (
+                            "/home/source/P.cs",
+                            @"
+using System;
+class P
+{
+    static void T() => Console.WriteLine(2);
+}
+"
+                        ),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
+
+        [Fact]
+        public async Task EmbeddingFileNameTypeFullPath()
+        {
+            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+            {
+                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "fullpath" },
+            };
+
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
+            var embeddedFiles = ImmutableArray.Create(
+                 new SourceFileInfo
+                 (
+                     "/home/source/Program.cs",
+                     new string[] { "Program" },
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                     ImmutableArray<string>.Empty,
+                     @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
+                 ),
+                 new SourceFileInfo
+                 (
+                     "/home/source/P.cs",
+                     new string[] { "P" },
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray<string>.Empty,
+                     @"class P { static void T() => Console.WriteLine(2); }"
+                 ));
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+            var test = new Test
+            {
+                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                TestState =
+                {
+                    Sources = {
+                        (
+                            "/home/source/Program.cs",
+                            @"
+using System;
+using System.Diagnostics;
+
+[DebuggerDisplay(""Name"")]
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(1);
+    }
+
+    [System.Diagnostics.Conditional(""TEST"")]
+    static void T() => Console.WriteLine(2);
+}
+"
+                        ),
+                        (
+                            "/home/source/P.cs",
+                            @"
+using System;
+class P
+{
+    static void T() => Console.WriteLine(2);
+}
+"
+                        ),
+                    },
+                    GeneratedSources =
+                    {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
+                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        ),
+                    }
+                }
+            };
+            await test.RunAsync();
+            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+                .Should()
+                .BeEquivalentTo(embeddedFiles);
+        }
     }
 }
