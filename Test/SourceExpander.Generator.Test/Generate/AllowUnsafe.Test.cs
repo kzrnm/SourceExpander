@@ -56,6 +56,11 @@ class Program
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                         "using System.Collections.Generic;" ,
@@ -80,7 +85,7 @@ class Program
                             "#endregion Expanded by https://github.com/kzrnm/SourceExpander").ToLiteral()
                         + "},})}," ,
                         "};" ,
-                        "}}"))
+                        "}}")),
                     }
                 }
             };
@@ -136,6 +141,11 @@ class Program
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                         "using System.Collections.Generic;" ,

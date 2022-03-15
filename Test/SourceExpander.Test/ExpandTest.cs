@@ -53,7 +53,7 @@ class Program
                 );
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
             outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 1);
+            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
 
             outputCompilation.SyntaxTrees
             .Should()

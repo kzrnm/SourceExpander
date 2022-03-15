@@ -50,6 +50,11 @@ namespace Solvers
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{

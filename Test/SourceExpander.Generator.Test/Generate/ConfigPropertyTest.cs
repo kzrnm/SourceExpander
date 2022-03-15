@@ -177,6 +177,11 @@ class Program3
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
@@ -287,6 +292,11 @@ class Program2
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
@@ -383,6 +393,11 @@ class Program2
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
@@ -496,6 +511,11 @@ class Program2
                     },
                     GeneratedSources =
                     {
+                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                         "using System.Reflection;",
+                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
+                         )),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
@@ -624,7 +644,8 @@ class Program
 /* Static Embedding Text */
 namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
 #endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL().ToLiteral()
-+@")]").ReplaceEOL()),
++$@")]
+[assembly: AssemblyMetadataAttribute(""SourceExpander.ExpanderVersion"",""{ExpanderVersion}"")]").ReplaceEOL()),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
