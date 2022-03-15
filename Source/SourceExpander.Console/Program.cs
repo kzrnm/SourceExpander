@@ -110,9 +110,9 @@ internal class SourceExpanderCommand : ConsoleAppBase
                 out var version) || version <= new Version(4, 2, 0, 2))
             {
                 if (version is null)
-                    await Console.Error.WriteLineAsync("needs SourceExpander 4.2.0 or newer");
+                    await Console.Error.WriteLineAsync("needs SourceExpander 5.0.0 or newer");
                 else
-                    await Console.Error.WriteLineAsync($"needs SourceExpander 4.2.0 or newer, Current: {version}");
+                    await Console.Error.WriteLineAsync($"needs SourceExpander 5.0.0 or newer, Current: {version}");
 
                 Environment.Exit(1);
                 return;
@@ -156,6 +156,10 @@ internal class SourceExpanderCommand : ConsoleAppBase
             writer.WriteString("FileName", info.FileName);
             writer.WriteStartArray("Dependencies");
             foreach (var d in info.Dependencies)
+                writer.WriteStringValue(d);
+            writer.WriteEndArray();
+            writer.WriteStartArray("DefinedTypes");
+            foreach (var d in info.TypeNames)
                 writer.WriteStringValue(d);
             writer.WriteEndArray();
             writer.WriteEndObject();
