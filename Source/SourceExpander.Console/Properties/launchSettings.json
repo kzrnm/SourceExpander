@@ -9,6 +9,20 @@
       "commandName": "Project",
       "commandLineArgs": "../Sandbox/SampleApp/Program.cs",
       "workingDirectory": "$(ProjectDir)"
+    },
+    "Dependency Library": {
+      "commandName": "Project",
+      "commandLineArgs": "dependency ../Sandbox/SampleLibrary/SampleLibrary.csproj",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "Dependency App": {
+      "commandName": "Project",
+      "commandLineArgs": "dependency ../Sandbox/SampleApp/Program.cs",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "no args": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
     }
   }
 }

@@ -23,7 +23,7 @@ namespace SourceExpander
 
         private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CSharpParseOptions parseOptions, IDiagnosticReporter reporter, CancellationToken cancellationToken)
         {
-            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken);
             var returnDatas = new List<EmbeddedData>(embeddedDatas.Length);
             foreach (var (embedded, display, errors) in embeddedDatas)
             {

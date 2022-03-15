@@ -47,7 +47,7 @@ namespace SourceExpander
 
         private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CancellationToken cancellationToken)
         {
-            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken);
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken);
             return new SourceFileContainer(embeddedDatas.Select(t => t.Data));
         }
 
@@ -74,9 +74,9 @@ namespace SourceExpander
         /// <summary>
         /// get expanded codes
         /// </summary>
-        public ImmutableArray<(string filePath, string expandedCode)> ExpandedCodes()
+        public ImmutableArray<(string FilePath, string expandedCode)> ExpandedCodes()
         {
-            if (!config.Enabled) return ImmutableArray<(string filePath, string expandedCode)>.Empty;
+            if (!config.Enabled) return ImmutableArray<(string FilePath, string expandedCode)>.Empty;
             UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -96,6 +96,31 @@ namespace SourceExpander
                         .Where(tree => config.IsMatch(tree.FilePath))
                         .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
                         .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                        .ToImmutableArray();
+            }
+        }
+
+        /// <summary>
+        /// get dependencies
+        /// </summary>
+        public ImmutableArray<(string FilePath, ImmutableArray<string> Dependencies)> Dependencies()
+        {
+            if (!config.Enabled) return ImmutableArray<(string FilePath, ImmutableArray<string> Dependencies)>.Empty;
+            UpdateCompilation();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Impl();
+
+            ImmutableArray<(string, ImmutableArray<string>)> Impl()
+            {
+                var expander = new CompilationExpander(compilation, container, config);
+                if (compilation.Options.ConcurrentBuild)
+                    return compilation.SyntaxTrees.AsParallel(cancellationToken)
+                        .Select(tree => (tree.FilePath, ImmutableArray.CreateRange(expander.ResolveDependency(tree, cancellationToken).Select(s => s.FileName))))
+                        .ToImmutableArray();
+                else
+                    return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                        .Select(tree => (tree.FilePath, ImmutableArray.CreateRange(expander.ResolveDependency(tree, cancellationToken).Select(s => s.FileName))))
                         .ToImmutableArray();
             }
         }

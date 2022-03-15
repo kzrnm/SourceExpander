@@ -168,7 +168,7 @@ namespace SourceExpander
                 if (_cacheDependantFiles.IsDefault)
                 {
                     var depSources = ImmutableArray.CreateBuilder<SourceFileInfo>();
-                    foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(cancellationToken))
+                    foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken))
                     {
                         foreach (var (key, message) in errors)
                         {

@@ -20,28 +20,39 @@ namespace SourceExpander
             this.compilation = compilation;
         }
 
-        public (EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)> Errors)[] GetEmbeddedSourceFiles(CancellationToken cancellationToken)
+        public (EmbeddedData Data, string? Name, ImmutableArray<(string Key, string ErrorMessage)> Errors)[] GetEmbeddedSourceFiles(bool includeSelf, CancellationToken cancellationToken)
         {
+            var symbols = compilation.References
+                .Select(r => (compilation.GetAssemblyOrModuleSymbol(r), r.Display));
+            if (includeSelf)
+            {
+#if NETCOREAPP2_0_OR_GREATER
+                symbols = symbols.Append((compilation.Assembly, compilation.AssemblyName));
+#else
+                symbols = symbols.Concat(new[] { ((ISymbol?)compilation.Assembly, compilation.AssemblyName) });
+#endif
+            }
+
             if (compilation.Options.ConcurrentBuild)
-                return compilation.References.AsParallel(cancellationToken)
+                return symbols.AsParallel(cancellationToken)
                     .Select(Load).ToArray();
             else
-                return compilation.References.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                return symbols.Do(_ => cancellationToken.ThrowIfCancellationRequested())
                     .Select(Load).ToArray();
 
-            (EmbeddedData Data, string? Display, ImmutableArray<(string Key, string ErrorMessage)>)
-                Load(MetadataReference reference)
+            (EmbeddedData Data, string? Name, ImmutableArray<(string Key, string ErrorMessage)>)
+                Load((ISymbol? symbol, string? name) tuple)
             {
-                var symbol = compilation.GetAssemblyOrModuleSymbol(reference);
+                (ISymbol? symbol, string? name) = tuple;
                 if (symbol is null)
-                    return (EmbeddedData.Empty, reference.Display, ImmutableArray<(string, string)>.Empty);
+                    return (EmbeddedData.Empty, name, ImmutableArray<(string, string)>.Empty);
 
                 var (embedded, errors) = EmbeddedData.Create(
                     symbol.Name,
                     symbol.GetAttributes()
                     .Select(GetAttributeSourceCode)
                     .OfType<KeyValuePair<string, string>>());
-                return (embedded, reference.Display, errors);
+                return (embedded, name, errors);
             }
         }
         KeyValuePair<string, string>? GetAttributeSourceCode(AttributeData attr)
