@@ -109,20 +109,23 @@ namespace SourceExpander
             UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
 
-            return Impl();
-
-            ImmutableArray<(string, ImmutableArray<string>)> Impl()
+            var expander = new CompilationExpander(compilation, container, config);
+            (string FilePath, ImmutableArray<string> Dependencies) ResolveDependency(SyntaxTree tree)
             {
-                var expander = new CompilationExpander(compilation, container, config);
-                if (compilation.Options.ConcurrentBuild)
-                    return compilation.SyntaxTrees.AsParallel(cancellationToken)
-                        .Select(tree => (tree.FilePath, ImmutableArray.CreateRange(expander.ResolveDependency(tree, cancellationToken).Select(s => s.FileName))))
-                        .ToImmutableArray();
-                else
-                    return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                        .Select(tree => (tree.FilePath, ImmutableArray.CreateRange(expander.ResolveDependency(tree, cancellationToken).Select(s => s.FileName))))
-                        .ToImmutableArray();
+                if (expander is null)
+                    throw new InvalidProgramException("expander must not be null.");
+                var deps = expander.ResolveDependency(tree, cancellationToken).Select(s => s.FileName);
+                return (tree.FilePath, ImmutableArray.CreateRange(deps));
             }
+
+            if (compilation.Options.ConcurrentBuild)
+                return compilation.SyntaxTrees.AsParallel(cancellationToken)
+                    .Select(ResolveDependency)
+                    .ToImmutableArray();
+            else
+                return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
+                    .Select(ResolveDependency)
+                    .ToImmutableArray();
         }
 
         /// <summary>
