@@ -22,7 +22,7 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
 
         var (compilation, csProject) = await GetCompilation(project);
         if (compilation is not CSharpCompilation csCompilation)
-            throw new InvalidOperationException("Failed to get parseOptions compilation");
+            throw new InvalidOperationException("Failed to get compilation");
         if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
             throw new InvalidOperationException("Failed to get parseOptions");
 

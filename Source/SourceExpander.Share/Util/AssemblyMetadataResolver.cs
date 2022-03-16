@@ -20,9 +20,9 @@ namespace SourceExpander
             this.compilation = compilation;
         }
 
-        public ImmutableDictionary<string, string> GetAssemblyMetadata()
-            => ImmutableDictionary.CreateRange(compilation.Assembly
-                .GetAttributes()
+        public ImmutableDictionary<string, string> GetAssemblyMetadata(ISymbol symbol)
+            => ImmutableDictionary.CreateRange(
+                symbol.GetAttributes()
                 .Select(GetAttributeSourceCode)
                 .OfType<KeyValuePair<string, string>>());
 

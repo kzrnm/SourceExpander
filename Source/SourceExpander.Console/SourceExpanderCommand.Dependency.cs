@@ -30,12 +30,12 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
 
         var (compilation, csProject) = await GetCompilation(project, props);
         if (compilation is not CSharpCompilation csCompilation)
-            throw new InvalidOperationException("Failed to get parseOptions compilation");
+            throw new InvalidOperationException("Failed to get compilation");
         if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
             throw new InvalidOperationException("Failed to get parseOptions");
 
         var metadataResolver = new AssemblyMetadataResolver(compilation);
-        var metadataDict = metadataResolver.GetAssemblyMetadata();
+        var metadataDict = metadataResolver.GetAssemblyMetadata(compilation.Assembly);
         {
             if (Version.TryParse(
                 metadataDict.GetValueOrDefault("SourceExpander.EmbedderVersion"),
