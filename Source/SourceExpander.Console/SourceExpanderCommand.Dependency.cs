@@ -54,7 +54,12 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
             .ToArray();
 
         var infos = metadatas.SelectMany(t => t.Data.Sources)
-            .Select(DependencySourceFileInfo.FromInfo);
+            .Select(t => new
+            {
+                t.FileName,
+                t.Dependencies,
+                t.TypeNames,
+            });
         if (metadatas.FirstOrDefault(t => t.Name == compilation.AssemblyName) is not { Data.Sources.Length: > 0 })
         {
             infos = infos.Concat(
@@ -63,7 +68,12 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
                 new ExpandConfig(),
                 Context.CancellationToken)
                 .Dependencies()
-                .Select(t => new DependencySourceFileInfo(t.FilePath, t.Dependencies, Array.Empty<string>())));
+                .Select(t => new
+                {
+                    FileName = t.FilePath,
+                    Dependencies = (IEnumerable<string>)t.Dependencies,
+                    TypeNames = Enumerable.Empty<string>(),
+                }));
         }
         var result = JsonSerializer.Serialize(infos, new JsonSerializerOptions
         {
@@ -71,10 +81,5 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         });
         Console.WriteLine(result);
-    }
-    private record DependencySourceFileInfo(string FileName, IEnumerable<string> Dependencies, IEnumerable<string> DefinedTypes)
-    {
-        public static DependencySourceFileInfo FromInfo(SourceFileInfo info)
-            => new(info.FileName, info.Dependencies, info.TypeNames);
     }
 }
