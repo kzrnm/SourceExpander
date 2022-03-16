@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -55,6 +57,39 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
 
             await File.WriteAllTextAsync(output, code);
         }
+    }
+
+    [Command("expand-all", "Show expanded codes json")]
+    public async Task ExpandAll(
+        [Option(0, "target project(.csproj)")] string project,
+        [Option("s", "static embedding text")] string? staticEmbedding = null)
+    {
+        project = Path.GetFullPath(project);
+
+        var (compilation, csProject) = await GetCompilation(project);
+        if (compilation is not CSharpCompilation csCompilation)
+            throw new InvalidOperationException("Failed to get compilation");
+        if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
+            throw new InvalidOperationException("Failed to get parseOptions");
+
+        var config = new ExpandConfig(staticEmbeddingText: staticEmbedding);
+
+        var expanded = new EmbeddedLoader(csCompilation,
+            parseOptions,
+            config,
+            Context.CancellationToken)
+            .ExpandedCodes();
+
+        var result = JsonSerializer.Serialize(expanded.Select(t => new
+        {
+            t.FilePath,
+            ExpandedCode = t.expandedCode,
+        }), new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        });
+        Console.WriteLine(result);
     }
 
     private async Task<(Compilation? Compilation, Project Project)> GetCompilation(string projectPath, IDictionary<string, string>? properties = null)

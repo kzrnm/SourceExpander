@@ -20,14 +20,19 @@
       "commandLineArgs": "dependency ../Sandbox/SampleApp/Program.cs",
       "workingDirectory": "$(ProjectDir)"
     },
+    "ExpandAll": {
+      "commandName": "Project",
+      "commandLineArgs": "expand-all ../Sandbox/SampleApp/SampleApp.csproj",
+      "workingDirectory": "$(ProjectDir)"
+    },
     "LibraryList": {
       "commandName": "Project",
       "commandLineArgs": "library-list ../Sandbox/SampleLibrary/SampleLibrary.csproj",
       "workingDirectory": "$(ProjectDir)"
     },
-      "no args": {
-        "commandName": "Project",
-        "workingDirectory": "$(ProjectDir)"
-      }
+    "no args": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
     }
+  }
 }
