@@ -134,6 +134,14 @@ namespace SourceExpander.Roslyn
                 }
             }
 
+#if USE_ROSLYN4
+            public override SyntaxNode? VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
+            {
+                node = (FileScopedNamespaceDeclarationSyntax)base.VisitFileScopedNamespaceDeclaration(node)!;
+                return SyntaxFactory.NamespaceDeclaration(node.AttributeLists, node.Modifiers, node.Name, node.Externs, node.Usings, node.Members);
+            }
+#endif
+
             public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)
             {
                 if (unusedUsingSpan.Any(s => s.Contains(node.Span)))

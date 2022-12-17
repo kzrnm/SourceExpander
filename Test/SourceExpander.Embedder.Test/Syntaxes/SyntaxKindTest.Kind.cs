@@ -120,6 +120,26 @@ namespace Foo
         public override IEnumerable<string> ExpectedNamespaces => ImmutableArray.Create("Foo");
     }
 
+    public class FileScopedNamespaceTest : EmbedderGeneratorTestBaseWithValue
+    {
+        public override string Syntax => @"
+namespace Foo;
+
+using System;
+class Def
+{
+    public object obj = null;
+    internal static DateTime date = DateTime.Now;
+}
+";
+        public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Foo.Def");
+        public override IEnumerable<string> ExpectedUsings => ImmutableArray<string>.Empty;
+        public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
+        public override string ExpectedCodeBody => "namespace Foo { using System;  class Def { public object obj = null; internal static DateTime date = DateTime.Now; } }";
+        public override string ExpectedMinifyCodeBody => "namespace Foo{using System;class Def{public object obj=null;internal static DateTime date=DateTime.Now;}}";
+        public override IEnumerable<string> ExpectedNamespaces => ImmutableArray.Create("Foo");
+    }
+
     public class PropertyTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => @"
