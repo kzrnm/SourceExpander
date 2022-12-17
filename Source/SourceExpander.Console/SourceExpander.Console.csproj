@@ -1,41 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
 
-		<RootNamespace>SourceExpander</RootNamespace>
+    <RootNamespace>SourceExpander</RootNamespace>
 
-		<GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
-		<PackageId>SourceExpander.Console</PackageId>
-		<Description>SourceExpander.Console creates expanded source code.</Description>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <PackageId>SourceExpander.Console</PackageId>
+    <Description>SourceExpander.Console creates expanded source code.</Description>
 
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<PackAsTool>true</PackAsTool>
-		<ToolCommandName>dotnet-source-expand</ToolCommandName>
-	</PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-source-expand</ToolCommandName>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="SourceExpander.Console.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6" />
-		<Using Include="SourceExpander" />
+  <ItemGroup>
+    <InternalsVisibleTo Include="SourceExpander.Console.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6" />
+    <Using Include="SourceExpander" />
 
-		<Compile Include="../SourceExpander.Share/**/EmbeddedData.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Share/**/SourceFileInfo.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Share/**/SourceFileContainer.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Share/**/IContextWrappter.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Share/**/Util/*.cs" LinkBase="Share" />
-		<Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
-	</ItemGroup>
+    <Compile Include="../SourceExpander.Share/**/EmbeddedData.cs" LinkBase="Share" />
+    <Compile Include="../SourceExpander.Share/**/SourceFileInfo.cs" LinkBase="Share" />
+    <Compile Include="../SourceExpander.Share/**/SourceFileContainer.cs" LinkBase="Share" />
+    <Compile Include="../SourceExpander.Share/**/IContextWrappter.cs" LinkBase="Share" />
+    <Compile Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" LinkBase="Share" />
+    <Compile Include="../SourceExpander.Share/**/Util/*.cs" LinkBase="Share" />
+    <Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Base32768" Version="2.0.2" />
-		<PackageReference Include="ConsoleAppFramework" Version="4.0.6" />
-		<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
-		<PackageReference Include="Microsoft.Build" Version="17.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.0.1" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Base32768" Version="2.0.2" />
+    <PackageReference Include="ConsoleAppFramework" Version="4.0.6" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+    <PackageReference Include="Microsoft.Build" Version="17.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.0.1" />
+  </ItemGroup>
 </Project>

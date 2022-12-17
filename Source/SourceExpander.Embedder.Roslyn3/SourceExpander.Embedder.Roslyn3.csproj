@@ -1,40 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
-		<NoWarn>$(NoWarn);1701;1702;IDE0056;IDE0057;RS2008</NoWarn>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);1701;1702;IDE0056;IDE0057;RS2008</NoWarn>
 
-		<IsPackable>false</IsPackable>
+    <IsPackable>false</IsPackable>
 
-		<RootNamespace>SourceExpander</RootNamespace>
-		<IsRoslynComponent>true</IsRoslynComponent>
-		<DevelopmentDependency>true</DevelopmentDependency>
+    <RootNamespace>SourceExpander</RootNamespace>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <DevelopmentDependency>true</DevelopmentDependency>
 
-		<Roslyn4ProjectPath>../SourceExpander.Embedder</Roslyn4ProjectPath>
-	</PropertyGroup>
+    <Roslyn4ProjectPath>../SourceExpander.Embedder</Roslyn4ProjectPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="$(Roslyn4ProjectPath)/**/*.cs" Exclude="$(Roslyn4ProjectPath)/obj/**/*.cs;$(Roslyn4ProjectPath)/Roslyn4/**/*.cs" />
-		<Compile Include="../SourceExpander.Share/**/*.cs" Exclude="../SourceExpander.Share/**/Roslyn4/**/*.cs" LinkBase="Share" />
-		<ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(Roslyn4ProjectPath)/**/*.cs" Exclude="$(Roslyn4ProjectPath)/obj/**/*.cs;$(Roslyn4ProjectPath)/Roslyn4/**/*.cs" />
+    <Compile Include="../SourceExpander.Share/**/*.cs" Exclude="../SourceExpander.Share/**/Roslyn4/**/*.cs" LinkBase="Share" />
+    <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
+  </ItemGroup>
 
-	<ItemDefinitionGroup>
-		<PackageReference>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-	</ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <PackageReference>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemDefinitionGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
-		<PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

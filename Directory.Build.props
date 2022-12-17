@@ -1,45 +1,45 @@
 <Project>
 
-	<PropertyGroup>
-		<Authors>kzrnm</Authors>
-		<PackageTags>SourceExpander;ac-library-csharp</PackageTags>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RepositoryType>git</RepositoryType>
-		<PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
-		<PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
-		<Version>5.0.0</Version>
-		<AssemblyVersion>5.0.0.100</AssemblyVersion>
-		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
-		<PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
+  <PropertyGroup>
+    <Authors>kzrnm</Authors>
+    <PackageTags>SourceExpander;ac-library-csharp</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <Version>5.0.0</Version>
+    <AssemblyVersion>5.0.0.100</AssemblyVersion>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
 
-		<NoWarn>$(NoWarn);CA2249</NoWarn>		
-		
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+    <NoWarn>$(NoWarn);CA2249</NoWarn>
 
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
-		<IsRoslyn3 Condition="$(MSBuildProjectName.EndsWith('.Roslyn3'))">true</IsRoslyn3>
-		<DefineConstants Condition="'$(IsRoslyn3)'!='true'">$(DefineConstants)USE_ROSLYN4</DefineConstants>
-	</PropertyGroup>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-	<ItemGroup>
-		<None Include="$(MSBuildThisFileDirectory)3rd-party-license.txt" Pack="true" PackagePath="" Visible="false" />
-		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="false" />
-	</ItemGroup>
+    <IsRoslyn3 Condition="$(MSBuildProjectName.EndsWith('.Roslyn3'))">true</IsRoslyn3>
+    <DefineConstants Condition="'$(IsRoslyn3)'!='true'">$(DefineConstants)USE_ROSLYN4</DefineConstants>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-	</PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)3rd-party-license.txt" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>
