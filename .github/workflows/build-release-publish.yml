@@ -30,22 +30,22 @@ jobs:
     runs-on: windows-latest
     needs: [get-version]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
       - name: Build
         run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} -c Release
       - name: Test
         run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --no-build --logger GitHubActions -c Release
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         if: ${{ needs.get-version.outputs.is-new == 'true' }}
         with:
           name: dist
