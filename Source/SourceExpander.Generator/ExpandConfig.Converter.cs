@@ -32,6 +32,8 @@ namespace SourceExpander
                         data.IgnoreAssemblies = v.Split(';').Select(t => t.Trim()).ToArray();
                     if (analyzerConfigOptions.TryGetValue(header + "StaticEmbeddingText", out v) && !string.IsNullOrWhiteSpace(v))
                         data.StaticEmbeddingText = v;
+                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingByGroup", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.ExpandingByGroup = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
                 }
                 return data.ToImmutable();
             }
@@ -56,6 +58,8 @@ namespace SourceExpander
             public string[]? IgnoreAssemblies { set; get; }
             [DataMember(Name = "static-embedding-text")]
             public string? StaticEmbeddingText { set; get; }
+            [DataMember(Name = "expanding-by-group")]
+            public bool? ExpandingByGroup { set; get; }
 
             public ExpandConfig ToImmutable() => new(
                     enabled: this.Enabled ?? true,
@@ -63,7 +67,8 @@ namespace SourceExpander
                     ignoreAssemblies: this.IgnoreAssemblies ?? Array.Empty<string>(),
                     ignoreFilePatterns: this.IgnoreFilePatternRegex?.Select(s => new Regex(s)) ?? Array.Empty<Regex>(),
                     staticEmbeddingText: this.StaticEmbeddingText,
-                    metadataExpandingFile: MetadataExpandingFile);
+                    metadataExpandingFile: MetadataExpandingFile,
+                    expandingByGroup: ExpandingByGroup);
         }
     }
 }
