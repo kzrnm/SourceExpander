@@ -11,15 +11,15 @@ namespace SourceExpander.Generate
         {
             var others = new SourceFileCollection{
                 (
-                @"/home/other/C.cs",
+                "/home/other/C.cs",
                 "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
                 ),
                 (
-                @"/home/other/AssemblyInfo.cs",
+                "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]",
-                    @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedNamespaces"", ""Other"")]",
-                    @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbedderVersion"",""2147483647.2147483647.2147483647.2147483647"")]")
+                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]""",
+                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]""",
+                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]""")
                 ),
             };
 
@@ -34,8 +34,9 @@ namespace SourceExpander.Generate
                 {
                     Sources = {
                         (
-                            @"/home/mine/Program.cs",
-                            @"using System;
+                            "/home/mine/Program.cs",
+                            """
+using System;
 using Other;
 using static Other.C;
 using System.Collections;
@@ -56,7 +57,7 @@ namespace Name
         }
     }
 }
-"
+"""
                         ),
                     },
                     ExpectedDiagnostics =
@@ -66,17 +67,19 @@ namespace Name
                     GeneratedSources =
                     {
                         (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder(
-                         "using System.Reflection;",
-                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
-                         )),
-                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
+                        $$"""
+                         using System.Reflection;
+                         [assembly: AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{ExpanderVersion}}")]
+                         
+                         """),
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", ($$$"""
+using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
 public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
 private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
-{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"","
-+ @"using Other;
+{"/home/mine/Program.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program.cs"},{"code",{{{"""
+using Other;
 using System;
 namespace Name 
 {
@@ -91,10 +94,11 @@ namespace Name
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
-#endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL().ToLiteral()
-+ @"},})},
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL().ToLiteral()}}}},})},
 };
-}}").ReplaceEOL())
+}}
+""").ReplaceEOL())
                     }
                 }
             };

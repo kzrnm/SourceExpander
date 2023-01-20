@@ -5,13 +5,14 @@ namespace SourceExpander.Embedder.Syntaxes
 {
     public class ClassFieldTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 class Def
 {
     public object obj = null;
     internal static DateTime date = DateTime.Now;
-}";
+}
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -22,12 +23,13 @@ class Def
 
     public class StructFieldTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 struct Def
 {
     internal static DateTime date = DateTime.Now;
-}";
+}
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -38,13 +40,14 @@ struct Def
 
     public class RecordFieldTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 record Def(string Foo)
 {
     public object obj = null;
     internal static DateTime date = DateTime.Now;
-}";
+}
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -55,10 +58,10 @@ record Def(string Foo)
 
     public class InterfaceTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public interface IDef { }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("IDef");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray<string>.Empty;
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -69,11 +72,11 @@ public interface IDef { }
 
     public class DelegateTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public delegate UIntPtr Def1();
 public delegate void Def2(uint n);
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def1", "Def2");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -84,13 +87,13 @@ public delegate void Def2(uint n);
 
     public class EnumTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 enum Def
 {
     A, B, C, D, E, F
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray<string>.Empty;
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -101,7 +104,7 @@ enum Def
 
     public class NamespaceTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 namespace Foo
 {
     using System;
@@ -111,7 +114,7 @@ namespace Foo
         internal static DateTime date = DateTime.Now;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Foo.Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray<string>.Empty;
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -122,7 +125,7 @@ namespace Foo
 
     public class FileScopedNamespaceTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 namespace Foo;
 
 using System;
@@ -131,7 +134,7 @@ class Def
     public object obj = null;
     internal static DateTime date = DateTime.Now;
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Foo.Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray<string>.Empty;
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -142,7 +145,7 @@ class Def
 
     public class PropertyTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 class Def
 {
@@ -158,7 +161,8 @@ class Def
         get => _Prop3;
     }
     public ulong Prop4 { get; } = 0;
-}";
+}
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -169,7 +173,7 @@ class Def
 
     public class EventTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 class Def
 {
@@ -186,7 +190,8 @@ class Def
         Event2 -= EventHandler;
         Event1(null, null);
     }
-}";
+}
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -197,7 +202,7 @@ class Def
 
     public class ConstructorTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Par
 {
@@ -212,7 +217,7 @@ public class Def : Par
 {
     public Def(DateTime d, int m) : base(d.Ticks * m) { }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Par", "Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -223,14 +228,14 @@ public class Def : Par
 
     public class ConversionTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
     public static implicit operator Int32(Def d) => 1;
     public static explicit operator long(Def d) => 1;
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -241,7 +246,7 @@ public class Def
 
     public class MethodTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public partial class Def : ICloneable
 {
@@ -270,7 +275,7 @@ internal static class Ext
 {
     public static int L(this string s) => s.Length;
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def", "Ext");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -281,7 +286,7 @@ internal static class Ext
 
     public class IndexerTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public partial class Def
 {
@@ -292,7 +297,7 @@ public partial class Def
         get => _arr[index] ;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -303,21 +308,21 @@ public partial class Def
 
     public class AttributesTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System.Diagnostics;
-[DebuggerDisplay(""Prop"")]
+[DebuggerDisplay("Prop")]
 public class Def
 {
     [DebuggerHidden, DebuggerNonUserCode]
     public Def() { }
-    [Conditional(""DEBUG""), DebuggerHidden, DebuggerNonUserCode]
+    [Conditional("DEBUG"), DebuggerHidden, DebuggerNonUserCode]
     public void M() { }
     [DebuggerHidden, DebuggerNonUserCode]
     public string Prop { set; [return: System.Diagnostics.CodeAnalysis.NotNull]get; }
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     public string field;
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System.Diagnostics;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -328,7 +333,7 @@ public class Def
 
     public class ArrayTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public static class Def
 {
@@ -342,7 +347,7 @@ public static class Def
     };
     public static bool[][] ArrJugged = new bool[2][];
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -353,7 +358,7 @@ public static class Def
 
     public class AnonymousTypeTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -363,7 +368,7 @@ public class Def
         var anonymous2 = new { Foo = 1, anonymous };
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -374,7 +379,7 @@ public class Def
 
     public class AnonymousMethodTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System.Linq;
 public class Def
 {
@@ -383,7 +388,7 @@ public class Def
         => Arr.Single(delegate (int i) { return i < 2; });
 }
 
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System.Linq;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -394,7 +399,7 @@ public class Def
 
     public class LambdaTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System.Linq;
 public class Def
 {
@@ -405,7 +410,7 @@ public class Def
         + Arr.Select((n, index) => n * index).First()
         + Arr.Select((int n, int index) => n * index).First();
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System.Linq;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -416,7 +421,7 @@ public class Def
 
     public class AsyncAwaitTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -426,7 +431,7 @@ public class Def
         await System.Threading.Tasks.Task.Delay(3);
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -437,7 +442,7 @@ public class Def
 
     public class PatternsTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -454,7 +459,7 @@ public class Def
         };
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -465,7 +470,7 @@ public class Def
 
     public class UnaryExpressionTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -477,7 +482,7 @@ public class Def
         _ = ~4;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -488,7 +493,7 @@ public class Def
 
     public class BinaryExpressionTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -519,7 +524,7 @@ public class Def
     }
     public static Def operator +(Def a, Def b) => null;
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -530,7 +535,7 @@ public class Def
 
     public class ConditionalTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -540,7 +545,7 @@ public class Def
         _ = true ? 1 : 2;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -551,7 +556,7 @@ public class Def
 
     public class TryCatchFinallyTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -577,7 +582,7 @@ public class Def
         }
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -588,7 +593,7 @@ public class Def
 
     public class CheckedUncheckedTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -607,7 +612,7 @@ public class Def
         }
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -618,7 +623,7 @@ public class Def
 
     public class DefaultTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -630,7 +635,7 @@ public class Def
         return a + b;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -641,22 +646,22 @@ public class Def
 
     public class DocumentationCommentTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
     Object[] Arr = new object[] { 1, 2, 3 };
     /// <summary>
-    /// <paramref name=""i""/> to <see cref=""uint""/>
+    /// <paramref name="i"/> to <see cref="uint"/>
     /// </summary>
-    /// <param name=""i"">uint</param>
+    /// <param name="i">uint</param>
     /// <returns>int</returns>
     public int M(uint i)
     {
         return (int)i;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -667,7 +672,7 @@ public class Def
 
     public class ProcessorTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 #define EXPAND
 #define EXP
 #undef EXP
@@ -701,7 +706,7 @@ public class Def
     #endregion End
 }
 
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -712,7 +717,7 @@ public class Def
 
     public class PointerTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -739,7 +744,7 @@ public class Def
         }
     } 
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -750,7 +755,7 @@ public class Def
 
     public class ForTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -766,7 +771,7 @@ public class Def
     }
 }
 
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -777,7 +782,7 @@ public class Def
 
     public class ForEachTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -793,7 +798,7 @@ public class Def
         yield break;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -804,7 +809,7 @@ public class Def
 
     public class WhileTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -824,7 +829,7 @@ public class Def
         return a;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -835,7 +840,7 @@ public class Def
 
     public class SwitchTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -858,7 +863,7 @@ public class Def
     }
 }
 
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -869,7 +874,7 @@ public class Def
 
     public class FunctionPointersTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -881,7 +886,7 @@ public class Def
     public unsafe void M2() => M(&F);
 }
 
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -892,7 +897,7 @@ public class Def
 
     public class GotoTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -904,7 +909,7 @@ public class Def
         Label: { }
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -915,7 +920,7 @@ public class Def
 
     public class GenericsTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def<T, Q> where T : ICloneable
 {
@@ -931,7 +936,7 @@ public class Def<T, Q> where T : ICloneable
         Console.WriteLine(typeof(Def<int[], long>));
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def<T, Q>");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -942,19 +947,19 @@ public class Def<T, Q> where T : ICloneable
 
     public class StringTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
     Object[] Arr = new object[] { 1, 2, 3 };
     public void M(int i)
     {
-        Console.WriteLine(""i"");
-        Console.WriteLine($""{i}"");
-        Console.WriteLine($""{i:0000}"");
+        Console.WriteLine("i");
+        Console.WriteLine($"{i}");
+        Console.WriteLine($"{i:0000}");
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -965,7 +970,7 @@ public class Def
 
     public class RangeTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -979,7 +984,7 @@ public class Def
         Console.WriteLine(Arr[^1]);
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -990,7 +995,7 @@ public class Def
 
     public class TupleTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -1002,7 +1007,7 @@ public class Def
         Console.WriteLine(t);
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -1013,7 +1018,7 @@ public class Def
 
     public class UsingTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System.IO;
 public class Def
 {
@@ -1029,7 +1034,7 @@ public class Def
         }
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System.IO;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -1040,7 +1045,7 @@ public class Def
 
     public class IfTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -1067,7 +1072,7 @@ public class Def
         }
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -1078,7 +1083,7 @@ public class Def
 
     public class LINQTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System.Linq;
 public class Def
 {
@@ -1088,7 +1093,7 @@ public class Def
         return obj.First();
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System.Linq;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -1099,7 +1104,7 @@ public class Def
 
     public class IncrementTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -1112,7 +1117,7 @@ public class Def
         c = a + ++b;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -1123,7 +1128,7 @@ public class Def
 
     public class DecrementTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
@@ -1136,7 +1141,7 @@ public class Def
         c = a - --b;
     }
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
@@ -1147,13 +1152,13 @@ public class Def
 
     public class GenericLambdaTest : EmbedderGeneratorTestBaseWithValue
     {
-        public override string Syntax => @"
+        public override string Syntax => """
 using System;
 public class Def
 {
     public int M<T>(T n) where T : IComparable<T> => n.CompareTo(default);
 }
-";
+""";
         public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
         public override IEnumerable<string> ExpectedUsings => ImmutableArray.Create("using System;");
         public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;

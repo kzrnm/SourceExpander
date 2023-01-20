@@ -16,8 +16,9 @@ namespace SourceExpander.Generate
                 {
                     Sources = {
                         (
-                            @"/home/mine/Program.cs",
-                            @"using System;
+                            "/home/mine/Program.cs",
+                            """
+using System;
 
 class Program
 {
@@ -26,7 +27,7 @@ class Program
         Console.WriteLine(42);
     }
 }
-"
+"""
                         ),
                     },
                     ExpectedDiagnostics =
@@ -36,17 +37,19 @@ class Program
                     GeneratedSources =
                     {
                         (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder(
-                         "using System.Reflection;",
-                         $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.ExpanderVersion\",\"{ExpanderVersion}\")]"
-                         )),
-                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", (@"using System.Collections.Generic;
+                        $$"""
+                         using System.Reflection;
+                         [assembly: AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{ExpanderVersion}}")]
+                         
+                         """),
+                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
+using System.Collections.Generic;
 namespace SourceExpander.Expanded{
 public static class ExpandedContainer{
 public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
 private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
-{""/home/mine/Program.cs"",SourceCode.FromDictionary(new Dictionary<string,object>{{""path"",""/home/mine/Program.cs""},{""code"","
-+ @"using System;
+{"/home/mine/Program.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program.cs"},{"code",{{{"""
+using System;
 class Program
 {
     static void Main()
@@ -55,10 +58,11 @@ class Program
     }
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
-#endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL().ToLiteral()
-+ @"},})},
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL().ToLiteral()}}}},})},
 };
-}}").ReplaceEOL())
+}}
+""".ReplaceEOL())
                     }
                 }
             };

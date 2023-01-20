@@ -20,17 +20,17 @@ namespace SourceExpander.Generate
                     Sources = {
                         (
                             "home/test/Program.cs",
-                            @"
+                            """
 class Program
 {
     public static int Method() => 1 + 2 ** 3;
 }
-"
+"""
                         ),
                     },
                     ExpectedDiagnostics =
                     {
-                        DiagnosticResult.CompilerError("CS0193").WithSpan("home/test/Program.cs", 4, 42, 4, 45),
+                        DiagnosticResult.CompilerError("CS0193").WithSpan("home/test/Program.cs", 3, 42, 3, 45),
                     },
                 }
             };

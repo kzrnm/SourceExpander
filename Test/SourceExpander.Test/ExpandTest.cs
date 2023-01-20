@@ -13,7 +13,8 @@ namespace SourceExpander.Test
         [Fact]
         public void Expand()
         {
-            const string code = @"using System;
+            const string code = """
+using System;
 using SourceExpander;
 
 class Program
@@ -23,7 +24,8 @@ class Program
         Console.WriteLine(42);
         Expander.Expand();
     }
-}";
+}
+""";
             var syntaxTrees = new[]
             {
                 CSharpSyntaxTree.ParseText(
@@ -64,7 +66,8 @@ class Program
                 .BeEquivalentTo(
                 new SourceCode(
                     path: "/home/source/Program.cs",
-                    code: @"using SourceExpander;
+                    code: """
+using SourceExpander;
 using System;
 using System.Diagnostics;
 class Program
@@ -76,8 +79,9 @@ class Program
     }
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
-namespace SourceExpander{public class Expander{[Conditional(""EXP"")]public static void Expand(string inputFilePath=null,string outputFilePath=null,bool ignoreAnyError=true){}public static string ExpandString(string inputFilePath=null,bool ignoreAnyError=true){return """";}}}
-#endregion Expanded by https://github.com/kzrnm/SourceExpander".ReplaceEOL())
+namespace SourceExpander{public class Expander{[Conditional("EXP")]public static void Expand(string inputFilePath=null,string outputFilePath=null,bool ignoreAnyError=true){}public static string ExpandString(string inputFilePath=null,bool ignoreAnyError=true){return "";}}}
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL())
                 );
         }
     }

@@ -20,7 +20,7 @@ namespace SourceExpander.Generate
                      new string[] { "Program" },
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main()=>Console.WriteLine(1);}"
+                     "class Program{static void Main()=>Console.WriteLine(1);}"
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
@@ -42,7 +42,8 @@ namespace SourceExpander.Generate
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"using System;
+                            """
+using System;
 class Program
 {
     static void Main() =>
@@ -58,17 +59,19 @@ class Program
 );
 #endif
 }
-"
+"""
                         ),
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                        using System.Reflection;
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                        
+                        """
                         ),
                     }
                 }

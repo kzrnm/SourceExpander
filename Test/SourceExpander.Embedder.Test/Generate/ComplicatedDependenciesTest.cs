@@ -60,8 +60,8 @@ namespace SourceExpander.Generate
                     },
                     Sources = {
                         (
-                            @"/home/mine/Foo1.cs",
-                            @"
+                            "/home/mine/Foo1.cs",
+                            """
 using AtCoder;
 
 namespace TestProject
@@ -71,11 +71,12 @@ namespace TestProject
         public static McfGraphInt GetMcfGraph() => new McfGraphInt(10);
         public static Foo2 GetFoo2() => new Foo2();
     }
-}"
+}
+"""
                         ),
                         (
-                            @"/home/mine/Foo2.cs",
-                            @"
+                            "/home/mine/Foo2.cs",
+                            """
 using AtCoder;
 
 namespace TestProject
@@ -84,11 +85,12 @@ namespace TestProject
     {
         public McfGraphInt Graph => new Foo3().Graph;
     }
-}"
+}
+"""
                         ),
                         (
-                            @"/home/mine/Foo3.cs",
-                            @"
+                            "/home/mine/Foo3.cs",
+                            """
 using AtCoder;
 
 namespace TestProject
@@ -99,11 +101,11 @@ namespace TestProject
         public McfGraphInt Graph => GetMcfGraph();
     }
 }
-"
+"""
                         ),
                         (
-                            @"/home/mine/Bar.cs",
-                            @"
+                            "/home/mine/Bar.cs",
+                            """
 using AtCoder;
 
 namespace TestProject
@@ -114,17 +116,19 @@ namespace TestProject
         public static Foo2 GetFoo2() => new Foo2();
     }
 }
-"
+"""
                         ),
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                        using System.Reflection;
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                        
+                        """
                         ),
                     }
                 }
