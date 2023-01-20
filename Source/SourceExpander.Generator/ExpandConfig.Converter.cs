@@ -29,7 +29,7 @@ namespace SourceExpander
                     if (analyzerConfigOptions.TryGetValue(header + "IgnoreFilePatternRegex", out v) && !string.IsNullOrWhiteSpace(v))
                         data.IgnoreFilePatternRegex = new[] { v };
                     if (analyzerConfigOptions.TryGetValue(header + "IgnoreAssemblies", out v) && !string.IsNullOrWhiteSpace(v))
-                        data.IgnoreAssemblies = new[] { v };
+                        data.IgnoreAssemblies = v.Split(';').Select(t => t.Trim()).ToArray();
                     if (analyzerConfigOptions.TryGetValue(header + "StaticEmbeddingText", out v) && !string.IsNullOrWhiteSpace(v))
                         data.StaticEmbeddingText = v;
                 }
