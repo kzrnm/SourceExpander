@@ -14,6 +14,8 @@
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
 
+    <LangVersion>latest</LangVersion>
+
     <NoWarn>$(NoWarn);CA2249</NoWarn>
 
     <PackageReadmeFile>README.md</PackageReadmeFile>

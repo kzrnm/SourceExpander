@@ -15,16 +15,17 @@ namespace SourceExpander
             ExpandConfig config,
             CancellationToken cancellationToken = default)
             : base(compilation, parseOptions, config,
-                  ResolveEmbeddedData(compilation, parseOptions, reporter, cancellationToken),
+                  ResolveEmbeddedData(compilation, parseOptions, config, reporter, cancellationToken),
                   cancellationToken)
         {
             this.reporter = reporter;
         }
 
-        private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CSharpParseOptions parseOptions, IDiagnosticReporter reporter, CancellationToken cancellationToken)
+        private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CSharpParseOptions parseOptions, ExpandConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken)
         {
             var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken);
             var returnDatas = new List<EmbeddedData>(embeddedDatas.Length);
+            var ignoreAssemblies = new HashSet<string>(config.IgnoreAssemblies);
             foreach (var (embedded, display, errors) in embeddedDatas)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -33,7 +34,7 @@ namespace SourceExpander
                     reporter.ReportDiagnostic(
                         DiagnosticDescriptors.EXPAND0008_EmbeddedDataError(display, key, message));
                 }
-                if (embedded.IsEmpty)
+                if (embedded.IsEmpty || ignoreAssemblies.Contains(embedded.AssemblyName))
                     continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {

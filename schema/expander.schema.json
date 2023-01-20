@@ -24,6 +24,14 @@
             "description": "static embedding text",
             "type": "string"
         },
+        "ignore-assemblies": {
+            "description": "assembly names that be ignored",
+            "type": "array",
+            "items": {
+                "description": "assembly names that be ignored",
+                "type": "string"
+            }
+        },
         "ignore-file-pattern-regex": {
             "description": "ignore file name regex pattern",
             "type": "array",

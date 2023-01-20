@@ -27,6 +27,8 @@ namespace SourceExpander
         internal static Solution CreateOtherReference(Solution solution,
             ProjectId projectId,
             SourceFileCollection documents,
+            string otherName = "Other",
+            string otherAssemblyName = "Other",
             CSharpCompilationOptions compilationOptions = null)
         {
             if (compilationOptions is null)
@@ -34,7 +36,7 @@ namespace SourceExpander
 
             var targetProject = solution.GetProject(projectId);
 
-            var project = solution.AddProject("Other", "Other", "C#")
+            var project = solution.AddProject(otherName, otherAssemblyName, "C#")
                 .WithMetadataReferences(targetProject.MetadataReferences)
                 .WithCompilationOptions(compilationOptions);
             foreach (var (filename, content) in documents)

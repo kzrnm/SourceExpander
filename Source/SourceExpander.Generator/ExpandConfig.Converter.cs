@@ -28,6 +28,8 @@ namespace SourceExpander
                         data.MetadataExpandingFile = v;
                     if (analyzerConfigOptions.TryGetValue(header + "IgnoreFilePatternRegex", out v) && !string.IsNullOrWhiteSpace(v))
                         data.IgnoreFilePatternRegex = new[] { v };
+                    if (analyzerConfigOptions.TryGetValue(header + "IgnoreAssemblies", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.IgnoreAssemblies = new[] { v };
                     if (analyzerConfigOptions.TryGetValue(header + "StaticEmbeddingText", out v) && !string.IsNullOrWhiteSpace(v))
                         data.StaticEmbeddingText = v;
                 }
@@ -50,12 +52,15 @@ namespace SourceExpander
             public string? MetadataExpandingFile { set; get; }
             [DataMember(Name = "ignore-file-pattern-regex")]
             public string[]? IgnoreFilePatternRegex { set; get; }
+            [DataMember(Name = "ignore-assemblies")]
+            public string[]? IgnoreAssemblies { set; get; }
             [DataMember(Name = "static-embedding-text")]
             public string? StaticEmbeddingText { set; get; }
 
             public ExpandConfig ToImmutable() => new(
                     enabled: this.Enabled ?? true,
                     matchFilePatterns: this.MatchFilePattern ?? Array.Empty<string>(),
+                    ignoreAssemblies: this.IgnoreAssemblies ?? Array.Empty<string>(),
                     ignoreFilePatterns: this.IgnoreFilePatternRegex?.Select(s => new Regex(s)) ?? Array.Empty<Regex>(),
                     staticEmbeddingText: this.StaticEmbeddingText,
                     metadataExpandingFile: MetadataExpandingFile);
