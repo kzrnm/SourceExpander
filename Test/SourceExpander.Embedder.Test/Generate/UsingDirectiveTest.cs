@@ -20,7 +20,7 @@ namespace SourceExpander.Generate
                      new string[] { "Program" },
                      ImmutableArray.Create("using List = System.Collections.Generic.List<int>;", "using System;", "using static System.Math;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}"
+                     "class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}"
                  ));
 
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using List = System.Collections.Generic.List<int>;\",\"using System;\",\"using static System.Math;\"]}]";
@@ -33,7 +33,8 @@ namespace SourceExpander.Generate
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"using System;
+                            """
+using System;
 using static System.Math;
 using List = System.Collections.Generic.List<int>;
 class Program
@@ -41,7 +42,7 @@ class Program
     static void Main() => Console.WriteLine(0);
     static List L(int x, int y) => new List(Min(x, y));
 }
-"
+"""
                         ),
                     },
                     ExpectedDiagnostics =
@@ -52,12 +53,14 @@ class Program
                     },
                     GeneratedSources =
                     {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder("using System.Reflection;",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", embeddedNamespaces)}\")]",
-                        $"[assembly: AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{embeddedSourceCode.ToLiteral()})]")
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                        using System.Reflection;
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                        
+                        """
                         ),
                     }
                 }

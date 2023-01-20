@@ -50,12 +50,12 @@ namespace SourceExpander
         public static string EmbeddedLanguageVersion => "preview";
 
         public static InMemorySourceText enableMinifyJson = new(
-            "/foo/bar/SourceExpander.Embedder.Config.json", @"
+            "/foo/bar/SourceExpander.Embedder.Config.json", """
 {
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""minify-level"": ""full""
+    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+    "embedding-type": "Raw",
+    "minify-level": "full"
 }
-");
+""");
     }
 }
