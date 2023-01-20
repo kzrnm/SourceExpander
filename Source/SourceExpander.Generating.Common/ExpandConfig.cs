@@ -17,6 +17,7 @@ namespace SourceExpander
         public ExpandConfig(
             bool enabled = true,
             string[]? matchFilePatterns = null,
+            string[]? ignoreAssemblies = null,
             IEnumerable<Regex>? ignoreFilePatterns = null,
             string? staticEmbeddingText = null,
             string? metadataExpandingFile = null)
@@ -28,6 +29,9 @@ namespace SourceExpander
             IgnoreFilePatterns = ignoreFilePatterns is null
                 ? ImmutableArray<Regex>.Empty
                 : ImmutableArray.CreateRange(ignoreFilePatterns);
+            IgnoreAssemblies = ignoreAssemblies is null
+                ? ImmutableArray<string>.Empty
+                : ImmutableArray.Create(ignoreAssemblies);
             StaticEmbeddingText = staticEmbeddingText;
             MetadataExpandingFile = metadataExpandingFile;
         }
@@ -44,6 +48,10 @@ namespace SourceExpander
         /// if a file path matches any item of <see cref="IgnoreFilePatterns"/>, Generator doesn't resolve the file's dependency.
         /// </summary>
         public ImmutableArray<Regex> IgnoreFilePatterns { get; }
+        /// <summary>
+        /// if a name of assembly matches any item of <see cref="IgnoreAssemblies"/>, Generator doesn't expand sources of the assembly.
+        /// </summary>
+        public ImmutableArray<string> IgnoreAssemblies { get; }
         /// <summary>
         /// static text that be added to source code.
         /// </summary>
@@ -63,6 +71,7 @@ namespace SourceExpander
         public bool Equals(ExpandConfig? other) => other != null && Enabled == other.Enabled
             && MatchFilePatterns.Equals(other.MatchFilePatterns)
             && IgnoreFilePatterns.Equals(other.IgnoreFilePatterns)
+            && IgnoreAssemblies.Equals(other.IgnoreAssemblies)
             && StaticEmbeddingText == other.StaticEmbeddingText
             && MetadataExpandingFile == other.MetadataExpandingFile;
 
@@ -75,6 +84,7 @@ namespace SourceExpander
             hashCode = hashCode * -1521134295 + Enabled.GetHashCode();
             hashCode = hashCode * -1521134295 + MatchFilePatterns.GetHashCode();
             hashCode = hashCode * -1521134295 + IgnoreFilePatterns.GetHashCode();
+            hashCode = hashCode * -1521134295 + IgnoreAssemblies.GetHashCode();
             hashCode = hashCode * -1521134295 + (StaticEmbeddingText?.GetHashCode() ?? 0);
             hashCode = hashCode * -1521134295 + (MetadataExpandingFile?.GetHashCode() ?? 0);
             return hashCode;
