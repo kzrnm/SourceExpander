@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
-    internal partial class EmbedderConfig
+    internal partial record EmbedderConfig
     {
         public static EmbedderConfig Parse(string? sourceText, AnalyzerConfigOptions analyzerConfigOptions)
         {

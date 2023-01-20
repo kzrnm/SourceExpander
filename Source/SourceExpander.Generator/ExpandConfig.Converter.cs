@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
-    public partial class ExpandConfig
+    public partial record ExpandConfig
     {
         public static ExpandConfig Parse(string? sourceText, AnalyzerConfigOptions analyzerConfigOptions)
         {
