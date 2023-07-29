@@ -32,6 +32,10 @@ namespace SourceExpander
                         data.MinifyLevel = v;
                     if (analyzerConfigOptions.TryGetValue(header + "EmbeddingFileNameType", out v) && !string.IsNullOrWhiteSpace(v))
                         data.EmbeddingFileNameType = v;
+#pragma warning disable CS0612
+                    if (analyzerConfigOptions.TryGetValue(header + "EnableMinify", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.EnableMinify = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
+#pragma warning restore CS0612
 
                     if (analyzerConfigOptions.TryGetValue(buildPropHeader + "ProjectDir", out v) && !string.IsNullOrWhiteSpace(v))
                         data.ProjectDir = v;
