@@ -142,6 +142,15 @@ class Program
                     },
                     GeneratedSources =
                     {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                        using System.Reflection;
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                        
+                        """
+                        ),
                         (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                             "namespace SourceExpander.Embedded{",
@@ -172,15 +181,6 @@ class Program
                             "  };",
                             "}",
                             "}")
-                        ),
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        using System.Reflection;
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
                         ),
                     }
                 }
@@ -250,6 +250,15 @@ class Program
                     },
                     GeneratedSources =
                     {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                        using System.Reflection;
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                        
+                        """
+                        ),
                         (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                             "namespace SourceExpander.Embedded{",
@@ -280,15 +289,6 @@ class Program
                             "  };",
                             "}",
                             "}")
-                        ),
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        using System.Reflection;
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
                         ),
                     }
                 }
@@ -359,6 +359,15 @@ class Program
                     },
                     GeneratedSources =
                     {
+                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                        using System.Reflection;
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                        
+                        """
+                        ),
                         (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
                         EnvironmentUtil.JoinByStringBuilder(
                             "namespace SourceExpander.Embedded{",
@@ -388,16 +397,7 @@ class Program
                             "    },",
                             "  };",
                             "}",
-                            "}")                        ),
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        using System.Reflection;
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
+                            "}")),
                     }
                 }
             };

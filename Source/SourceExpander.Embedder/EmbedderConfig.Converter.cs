@@ -32,6 +32,8 @@ namespace SourceExpander
                         data.MinifyLevel = v;
                     if (analyzerConfigOptions.TryGetValue(header + "EmbeddingFileNameType", out v) && !string.IsNullOrWhiteSpace(v))
                         data.EmbeddingFileNameType = v;
+                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingSymbol", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.ExpandingSymbol = v;
 #pragma warning disable CS0612
                     if (analyzerConfigOptions.TryGetValue(header + "EnableMinify", out v) && !string.IsNullOrWhiteSpace(v))
                         data.EnableMinify = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
@@ -75,6 +77,8 @@ namespace SourceExpander
             public SourceClassData? EmbeddingSourceClass { set; get; }
             [DataMember(Name = "embedding-filename-type")]
             public string? EmbeddingFileNameType { set; get; }
+            [DataMember(Name = "expanding-symbol")]
+            public string? ExpandingSymbol { set; get; }
 
             [Obsolete]
             [DataMember(Name = "enable-minify")]
@@ -101,7 +105,8 @@ namespace SourceExpander
                         EmbeddingSourceClass?.ToImmutable(),
                         ParsedEmbeddingFileNameType,
                         ProjectDir,
-                        GetObsoleteConfigProperties());
+                        expandingSymbol: ExpandingSymbol,
+                        obsoleteConfigProperties: GetObsoleteConfigProperties());
 
             private ImmutableArray<ObsoleteConfigProperty> GetObsoleteConfigProperties()
             {

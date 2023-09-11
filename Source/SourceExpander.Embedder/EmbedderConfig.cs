@@ -13,16 +13,18 @@ namespace SourceExpander
     /// <param name="EmbeddingSourceClass">For debug. embedding source class.</param>
     /// <param name="EmbeddingFileNameType">Embedded file name type.</param>
     /// <param name="ObsoleteConfigProperties">Obsolete config property in json.</param>
+    /// <param name="ExpandingSymbol">if <paramref name="ExpandingSymbol"/> is in preprocessor symbols, source codes will be expanded in the library.</param>
     /// <param name="ProjectDir">Project directory.</param>
     internal partial record EmbedderConfig(
          bool Enabled,
+         ImmutableArray<ObsoleteConfigProperty> ObsoleteConfigProperties,
          EmbeddingType EmbeddingType,
          ImmutableHashSet<string> ExcludeAttributes,
          MinifyLevel MinifyLevel,
          ImmutableHashSet<string> RemoveConditional,
          EmbeddingSourceClass EmbeddingSourceClass,
          EmbeddingFileNameType EmbeddingFileNameType,
-         ImmutableArray<ObsoleteConfigProperty> ObsoleteConfigProperties,
+         string? ExpandingSymbol,
          string ProjectDir
     )
     {
@@ -35,9 +37,11 @@ namespace SourceExpander
             EmbeddingSourceClass? embeddingSourceClass = null,
             EmbeddingFileNameType embeddingFileNameType = EmbeddingFileNameType.WithoutCommonPrefix,
             string? projectDir = null,
+            string? expandingSymbol = null,
             ImmutableArray<ObsoleteConfigProperty> obsoleteConfigProperties = default)
             : this(
                 Enabled: enabled,
+                ObsoleteConfigProperties: obsoleteConfigProperties.IsDefault ? ImmutableArray<ObsoleteConfigProperty>.Empty : obsoleteConfigProperties,
                 EmbeddingType: embeddingType,
                 MinifyLevel: minifyLevel,
                 ExcludeAttributes: excludeAttributes switch
@@ -52,8 +56,8 @@ namespace SourceExpander
                 },
                 EmbeddingSourceClass: embeddingSourceClass ?? new EmbeddingSourceClass(false),
                 EmbeddingFileNameType: embeddingFileNameType,
-                ProjectDir: projectDir ?? string.Empty,
-                ObsoleteConfigProperties: obsoleteConfigProperties.IsDefault ? ImmutableArray<ObsoleteConfigProperty>.Empty : obsoleteConfigProperties
+                ExpandingSymbol: expandingSymbol,
+                ProjectDir: projectDir ?? string.Empty
             )
         {
         }

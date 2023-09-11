@@ -6,5 +6,6 @@
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_ExcludeAttributes" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_RemoveConditional" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingFileNameType" />
+		<CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandingSymbol" />
 	</ItemGroup>
 </Project>

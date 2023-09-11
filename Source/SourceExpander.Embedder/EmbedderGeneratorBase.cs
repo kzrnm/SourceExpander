@@ -44,13 +44,17 @@ namespace SourceExpander
                 if (resolvedSources.Length == 0)
                     return;
 
+                ctx.AddSource(
+                    "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+
                 if (config.EmbeddingSourceClass.Enabled)
                     ctx.AddSource(
                         "EmbeddingSourceClass.cs",
                         CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
 
-                ctx.AddSource(
-                    "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+                if (config.ExpandingSymbol is { } s && parseOptions.PreprocessorSymbolNames.Contains(s))
+                    ctx.AddSource("ExpandInLibrary.cs", ExpandInLibrary(resolvedSources));
+
             }
             catch (OperationCanceledException)
             {
@@ -64,7 +68,7 @@ namespace SourceExpander
             }
         }
 
-        private static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
+        static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
         {
             StringBuilder sb = new();
             sb.AppendLine("using System.Reflection;");
@@ -78,7 +82,7 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        private static SourceText CreateEmbbedingSourceClass(
+        static SourceText CreateEmbbedingSourceClass(
             ImmutableArray<SourceFileInfo> sources,
             string className)
         {
@@ -128,6 +132,24 @@ namespace SourceExpander
             sb.AppendLine("  };");
             sb.AppendLine("}");
             sb.AppendLine("}");
+            return SourceText.From(sb.ToString(), Encoding.UTF8);
+        }
+
+        static SourceText ExpandInLibrary(ImmutableArray<SourceFileInfo> sources)
+        {
+            StringBuilder sb = new();
+            var usings = new HashSet<string>();
+
+            sb.AppendLine();
+            sb.AppendLine("namespace SourceExpander.Embedded.Expand{");
+            foreach (var s in sources)
+            {
+                usings.UnionWith(s.Usings);
+                sb.AppendLine(s.CodeBody);
+            }
+            sb.AppendLine("}");
+
+            sb.Insert(0, string.Join(Environment.NewLine, usings));
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 

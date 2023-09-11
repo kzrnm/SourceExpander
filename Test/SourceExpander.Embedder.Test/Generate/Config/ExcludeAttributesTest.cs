@@ -11,16 +11,16 @@ namespace SourceExpander.Generate.Config
         public async Task ExcludeAttributes()
         {
             var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
+                "/foo/bar/SourceExpander.Embedder.Config.json", """
 {
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""exclude-attributes"": [
-        ""System.Diagnostics.DebuggerDisplayAttribute""
+    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+    "embedding-type": "Raw",
+    "exclude-attributes": [
+        "System.Diagnostics.DebuggerDisplayAttribute"
     ],
-    ""minify-level"": ""full""
+    "minify-level": "full"
 }
-");
+""");
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(

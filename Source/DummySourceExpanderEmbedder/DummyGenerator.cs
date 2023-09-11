@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -36,14 +37,16 @@ namespace SourceExpander
                 compilation,
                 parseOptions,
                 new DummyDiagnosticReporter(),
-                new EmbedderConfig(
-                    true,
-                    EmbeddingType.GZipBase32768,
-                    excludeAttributes: new[] {
+                new EmbedderConfig()
+                {
+                    EmbeddingType = EmbeddingType.GZipBase32768,
+                    ExcludeAttributes = ImmutableHashSet.CreateRange(new[]
+                    {
                         "System.Runtime.CompilerServices.MethodImplAttribute",
                         "System.Runtime.CompilerServices.CallerFilePathAttribute"
-                    },
-                    minifyLevel: MinifyLevel.Full),
+                    }),
+                    MinifyLevel = MinifyLevel.Full,
+                },
                 ctx.CancellationToken);
 
             ctx.AddSource(
