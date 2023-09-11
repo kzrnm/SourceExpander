@@ -30,6 +30,8 @@
     <ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
     <Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
 
   <ItemGroup>

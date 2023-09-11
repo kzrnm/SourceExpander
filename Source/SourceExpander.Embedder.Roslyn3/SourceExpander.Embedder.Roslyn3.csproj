@@ -20,6 +20,8 @@
     <Compile Include="$(Roslyn4ProjectPath)/**/*.cs" Exclude="$(Roslyn4ProjectPath)/obj/**/*.cs;$(Roslyn4ProjectPath)/Roslyn4/**/*.cs" />
     <Compile Include="../SourceExpander.Share/**/*.cs" Exclude="../SourceExpander.Share/**/Roslyn4/**/*.cs" LinkBase="Share" />
     <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
+    <AdditionalFiles Include="$(Roslyn4ProjectPath)/AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="$(Roslyn4ProjectPath)/AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
 
   <ItemDefinitionGroup>
