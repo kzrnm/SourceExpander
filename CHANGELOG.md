@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v5.3.0] - 2022-09-12
+### Added
+- SourceExpander.Embedder: Add ExpandingSymbol config
+- Update libraries
+
+## [v5.2.0] - 2022-01-21
+### Added
+- SourceExpander.Generator: Add IgnoreAssemblies config
+
 ## [v5.1.0] - 2022-12-17
 ### Added
 - Accept file scoped namespace
