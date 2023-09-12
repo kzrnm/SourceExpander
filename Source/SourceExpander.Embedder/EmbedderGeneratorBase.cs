@@ -138,18 +138,19 @@ namespace SourceExpander
         static SourceText ExpandInLibrary(ImmutableArray<SourceFileInfo> sources)
         {
             StringBuilder sb = new();
+            StringBuilder inner = new();
             var usings = new HashSet<string>();
 
-            sb.AppendLine();
             sb.AppendLine("namespace SourceExpander.Embedded.Expand{");
             foreach (var s in sources)
             {
                 usings.UnionWith(s.Usings);
-                sb.AppendLine(s.CodeBody);
+                inner.AppendLine(s.CodeBody);
             }
+            sb.AppendLine(string.Join(Environment.NewLine, usings));
+            sb.AppendLine(inner.ToString());
             sb.AppendLine("}");
 
-            sb.Insert(0, string.Join(Environment.NewLine, usings));
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 

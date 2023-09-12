@@ -381,9 +381,10 @@ class Program
                         """
                         ),
                         (typeof(EmbedderGenerator), "ExpandInLibrary.cs","""
-                        using System;
                         namespace SourceExpander.Embedded.Expand{
+                        using System;
                         class Program{static void Main(){Console.WriteLine(1);}}
+
                         }
 
                         """
@@ -462,9 +463,10 @@ class Program
                         """
                         ),
                         (typeof(EmbedderGenerator), "ExpandInLibrary.cs","""
-                        using System;
                         namespace SourceExpander.Embedded.Expand{
+                        using System;
                         class Program{static void Main(){Console.WriteLine(1);}}
+
                         }
 
                         """
