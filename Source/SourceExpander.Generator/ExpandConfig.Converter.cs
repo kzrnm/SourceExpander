@@ -34,6 +34,8 @@ namespace SourceExpander
                         data.StaticEmbeddingText = v;
                     if (analyzerConfigOptions.TryGetValue(header + "ExpandingByGroup", out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExpandingByGroup = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
+                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingPosition", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.ExpandingPosition = v;
                 }
                 return data.ToImmutable();
             }
@@ -60,6 +62,10 @@ namespace SourceExpander
             public string? StaticEmbeddingText { set; get; }
             [DataMember(Name = "expanding-by-group")]
             public bool? ExpandingByGroup { set; get; }
+            [DataMember(Name = "expanding-position")]
+            public string? ExpandingPosition { set; get; }
+            private ExpandingPosition ParsedExpandingPosition
+                => Enum.TryParse(ExpandingPosition, true, out ExpandingPosition r) ? r : SourceExpander.ExpandingPosition.EndOfFile;
 
             public ExpandConfig ToImmutable() => new(
                     enabled: this.Enabled ?? true,
@@ -68,6 +74,7 @@ namespace SourceExpander
                     ignoreFilePatterns: this.IgnoreFilePatternRegex?.Select(s => new Regex(s)) ?? Array.Empty<Regex>(),
                     staticEmbeddingText: this.StaticEmbeddingText,
                     metadataExpandingFile: MetadataExpandingFile,
+                    expandingPosition: ParsedExpandingPosition,
                     expandingByGroup: ExpandingByGroup);
         }
     }

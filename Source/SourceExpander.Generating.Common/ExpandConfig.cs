@@ -16,6 +16,7 @@ namespace SourceExpander
     /// <param name="StaticEmbeddingText">static text that be added to source code.</param>
     /// <param name="MetadataExpandingFile"> file path whose source code is written to metadata</param>
     /// <param name="ExpandingByGroup">if true, generator write `#region &lt;AssemblyName&gt;`.</param>
+    /// <param name="ExpandingPosition">Position of expanded source</param>
     public partial record ExpandConfig(
          bool Enabled,
          ImmutableArray<string> MatchFilePatterns,
@@ -23,7 +24,8 @@ namespace SourceExpander
          ImmutableArray<string> IgnoreAssemblies,
          string? StaticEmbeddingText,
          string? MetadataExpandingFile,
-         bool ExpandingByGroup)
+         bool ExpandingByGroup,
+         ExpandingPosition ExpandingPosition)
     {
         /// <summary>
         /// constructor
@@ -35,7 +37,8 @@ namespace SourceExpander
             IEnumerable<Regex>? ignoreFilePatterns = null,
             string? staticEmbeddingText = null,
             string? metadataExpandingFile = null,
-            bool? expandingByGroup = null) :
+            bool? expandingByGroup = null,
+            ExpandingPosition expandingPosition = ExpandingPosition.EndOfFile) :
         this(
             Enabled: enabled,
             MatchFilePatterns: matchFilePatterns is null
@@ -49,7 +52,8 @@ namespace SourceExpander
                 : ImmutableArray.Create(ignoreAssemblies),
             StaticEmbeddingText: staticEmbeddingText,
             MetadataExpandingFile: metadataExpandingFile,
-            ExpandingByGroup: expandingByGroup ?? false
+            ExpandingByGroup: expandingByGroup ?? false,
+            ExpandingPosition: expandingPosition
         )
         { }
 
@@ -60,5 +64,21 @@ namespace SourceExpander
             => (MatchFilePatterns.Length == 0
                 || MatchFilePatterns.Any(p => filePath.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0))
                 && IgnoreFilePatterns.All(regex => !regex.IsMatch(filePath));
+    }
+
+    /// <summary>
+    /// Position of expanded source
+    /// </summary>
+    public enum ExpandingPosition
+    {
+        /// <summary>
+        /// Expanding at EOF
+        /// </summary>
+        EndOfFile,
+
+        /// <summary>
+        /// Expanding after usings
+        /// </summary>
+        AfterUsings,
     }
 }
