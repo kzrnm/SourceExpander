@@ -39,6 +39,15 @@
                 "description": "ignore file name regex pattern",
                 "type": "string"
             }
+        },
+        "expanding-position": {
+            "type": "string",
+            "description": "Position of expanded source",
+            "default": "EndOfFile",
+            "enum": [
+                "EndOfFile",
+                "AfterUsings"
+            ]
         }
     }
 }

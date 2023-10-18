@@ -88,54 +88,73 @@ namespace SourceExpander
 
             cancellationToken.ThrowIfCancellationRequested();
 
-
-            using var sr = new StringReader(newRoot.ToString());
-            var line = sr.ReadLine();
-            while (line != null)
+            switch (Config.ExpandingPosition)
             {
-                sb.AppendLine(line);
-                line = sr.ReadLine();
+                case ExpandingPosition.AfterUsings:
+                    Embedded();
+                    Target();
+                    break;
+                default:
+                    Target();
+                    Embedded();
+                    break;
             }
 
-            sb.AppendLine("#region Expanded by https://github.com/kzrnm/SourceExpander");
-            if (!string.IsNullOrEmpty(Config.StaticEmbeddingText))
-                sb.AppendLine(Config.StaticEmbeddingText);
 
-            if (Config.ExpandingByGroup)
-            {
-                var groupedCodes = new Dictionary<string, List<string>>();
-                foreach (var s in requiedFiles)
-                {
-                    var match = Regex.Match(s.FileName, "^[^>]+");
-                    var assemblyName = match?.Value ?? "<unknown assembly>";
-                    if (!groupedCodes.TryGetValue(assemblyName, out var list))
-                    {
-                        list = groupedCodes[assemblyName] = new List<string>();
-                    }
-                    list.Add(s.CodeBody);
-                }
-                foreach (var g in groupedCodes)
-                {
-                    var assemblyName = g.Key;
-                    sb.Append("#region Assembly:").AppendLine(assemblyName);
-                    foreach (var s in g.Value)
-                        sb.AppendLine(s);
-                    sb.Append("#endregion Assembly:").AppendLine(assemblyName);
-                }
-            }
-            else
-            {
-                foreach (var s in requiedFiles)
-                    sb.AppendLine(s.CodeBody);
-            }
-            cancellationToken.ThrowIfCancellationRequested();
-
-            foreach (var ns in importButUnusedNamespaces)
-            {
-                sb.Append("namespace ").Append(ns).AppendLine("{}");
-            }
-            sb.AppendLine("#endregion Expanded by https://github.com/kzrnm/SourceExpander");
             return sb.ToString();
+
+            void Target()
+            {
+                using var sr = new StringReader(newRoot.ToString());
+                var line = sr.ReadLine();
+                while (line != null)
+                {
+                    sb.AppendLine(line);
+                    line = sr.ReadLine();
+                }
+            }
+
+            void Embedded()
+            {
+                sb.AppendLine("#region Expanded by https://github.com/kzrnm/SourceExpander");
+                if (!string.IsNullOrEmpty(Config.StaticEmbeddingText))
+                    sb.AppendLine(Config.StaticEmbeddingText);
+
+                if (Config.ExpandingByGroup)
+                {
+                    var groupedCodes = new Dictionary<string, List<string>>();
+                    foreach (var s in requiedFiles)
+                    {
+                        var match = Regex.Match(s.FileName, "^[^>]+");
+                        var assemblyName = match?.Value ?? "<unknown assembly>";
+                        if (!groupedCodes.TryGetValue(assemblyName, out var list))
+                        {
+                            list = groupedCodes[assemblyName] = new List<string>();
+                        }
+                        list.Add(s.CodeBody);
+                    }
+                    foreach (var g in groupedCodes)
+                    {
+                        var assemblyName = g.Key;
+                        sb.Append("#region Assembly:").AppendLine(assemblyName);
+                        foreach (var s in g.Value)
+                            sb.AppendLine(s);
+                        sb.Append("#endregion Assembly:").AppendLine(assemblyName);
+                    }
+                }
+                else
+                {
+                    foreach (var s in requiedFiles)
+                        sb.AppendLine(s.CodeBody);
+                }
+                cancellationToken.ThrowIfCancellationRequested();
+
+                foreach (var ns in importButUnusedNamespaces)
+                {
+                    sb.Append("namespace ").Append(ns).AppendLine("{}");
+                }
+                sb.AppendLine("#endregion Expanded by https://github.com/kzrnm/SourceExpander");
+            }
         }
 
         public SourceFileInfo[] ResolveDependency(SyntaxTree origTree, CancellationToken cancellationToken)
