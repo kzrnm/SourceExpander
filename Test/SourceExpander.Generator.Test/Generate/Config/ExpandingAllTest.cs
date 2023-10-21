@@ -119,13 +119,14 @@ class Program3
                          $$$"""[assembly: AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{{ExpanderVersion}}}")]"""
                          )),
                         (typeof(ExpandGenerator), "SourceExpander.ExpandingAll.cs", """
+namespace SourceExpander.Testing{
 using System;
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
 namespace Other { public static class Unused { public static void P() => System.Console.WriteLine(); } } 
 namespace Other2 { public static class C { public static void P() => System.Console.WriteLine(); } } 
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
-
+}
 """),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
 using System.Collections.Generic;
@@ -294,13 +295,14 @@ class Program3
                          $$$"""[assembly: AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{{ExpanderVersion}}}")]"""
                          )),
                         (typeof(ExpandGenerator), "SourceExpander.ExpandingAll.cs", """
+namespace SourceExpander.Testing{
 using System;
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
 namespace Other { public static class Unused { public static void P() => System.Console.WriteLine(); } } 
 namespace Other2 { public static class C { public static void P() => System.Console.WriteLine(); } } 
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
-
+}
 """),
                         (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
 using System.Collections.Generic;

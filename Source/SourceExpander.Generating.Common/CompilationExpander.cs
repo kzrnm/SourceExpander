@@ -118,11 +118,15 @@ namespace SourceExpander
         public string ExpandAll(CancellationToken cancellationToken)
         {
             var sb = new StringBuilder();
+            sb.AppendLine("namespace SourceExpander.Testing{");
             foreach (var u in SourceFileInfoUtil.SortUsings(sourceFileContainer.SelectMany(s => s.Usings).Distinct().ToArray()))
                 sb.AppendLine(u);
 
             cancellationToken.ThrowIfCancellationRequested();
-            Embedded(sb, sourceFileContainer, Array.Empty<string>(), cancellationToken);
+            var files = sourceFileContainer.ToArray();
+            Array.Sort(files.Select(f => f.FileName).ToArray(), files);
+            Embedded(sb, files, Array.Empty<string>(), cancellationToken);
+            sb.Append("}");
             return sb.ToString();
         }
 
