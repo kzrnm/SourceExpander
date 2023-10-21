@@ -32,6 +32,8 @@ namespace SourceExpander
                         data.IgnoreAssemblies = v.Split(';').Select(t => t.Trim()).ToArray();
                     if (analyzerConfigOptions.TryGetValue(header + "StaticEmbeddingText", out v) && !string.IsNullOrWhiteSpace(v))
                         data.StaticEmbeddingText = v;
+                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingAll", out v) && !string.IsNullOrWhiteSpace(v))
+                        data.ExpandingAll = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
                     if (analyzerConfigOptions.TryGetValue(header + "ExpandingByGroup", out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExpandingByGroup = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
                     if (analyzerConfigOptions.TryGetValue(header + "ExpandingPosition", out v) && !string.IsNullOrWhiteSpace(v))
@@ -60,6 +62,8 @@ namespace SourceExpander
             public string[]? IgnoreAssemblies { set; get; }
             [DataMember(Name = "static-embedding-text")]
             public string? StaticEmbeddingText { set; get; }
+            [DataMember(Name = "expanding-all")]
+            public bool? ExpandingAll { set; get; }
             [DataMember(Name = "expanding-by-group")]
             public bool? ExpandingByGroup { set; get; }
             [DataMember(Name = "expanding-position")]
@@ -74,6 +78,7 @@ namespace SourceExpander
                     ignoreFilePatterns: this.IgnoreFilePatternRegex?.Select(s => new Regex(s)) ?? Array.Empty<Regex>(),
                     staticEmbeddingText: this.StaticEmbeddingText,
                     metadataExpandingFile: MetadataExpandingFile,
+                    expandingAll: ExpandingAll,
                     expandingPosition: ParsedExpandingPosition,
                     expandingByGroup: ExpandingByGroup);
         }

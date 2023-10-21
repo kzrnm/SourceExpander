@@ -40,6 +40,11 @@
                 "type": "string"
             }
         },
+        "expanding-all": {
+            "type": "boolean",
+            "description": "if true, the generator expand all embedded source. For Testing.",
+            "default": false
+        },
         "expanding-position": {
             "type": "string",
             "description": "Position of expanded source",

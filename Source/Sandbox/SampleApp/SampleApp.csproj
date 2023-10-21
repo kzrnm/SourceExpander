@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <SourceExpander_Generator_StaticEmbeddingText>// Static Generate &#x9; // Property</SourceExpander_Generator_StaticEmbeddingText>
     <SourceExpander_Generator_ExpandingPosition>AfterUsings</SourceExpander_Generator_ExpandingPosition>
+    <SourceExpander_Generator_ExpandingAll>false</SourceExpander_Generator_ExpandingAll>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,7 @@
     <CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_IgnoreFilePatternRegex" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_StaticEmbeddingText" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingAll" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingPosition" />
   </ItemGroup>
 

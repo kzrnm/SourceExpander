@@ -51,8 +51,15 @@ namespace SourceExpander
                 }
                 metadata.Add(("SourceExpander.ExpanderVersion", AssemblyUtil.AssemblyVersion.ToString()));
                 ctx.AddSource("SourceExpander.Metadata.cs", CreateMetadataSource(metadata));
-                var expandedCode = CreateExpanded(loader.ExpandedCodes());
 
+
+                if (config.ExpandingAll)
+                {
+                    ctx.CancellationToken.ThrowIfCancellationRequested();
+                    ctx.AddSource("SourceExpander.ExpandingAll.cs", loader.ExpandAll(ctx.CancellationToken));
+                }
+
+                var expandedCode = CreateExpanded(loader.ExpandedCodes());
                 ctx.CancellationToken.ThrowIfCancellationRequested();
                 ctx.AddSource("SourceExpander.Expanded.cs", expandedCode);
             }

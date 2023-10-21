@@ -15,7 +15,8 @@ namespace SourceExpander
     /// <param name="IgnoreAssemblies">if a name of assembly matches any item of <see cref="IgnoreAssemblies"/>, Generator doesn't expand sources of the assembly.</param>
     /// <param name="StaticEmbeddingText">static text that be added to source code.</param>
     /// <param name="MetadataExpandingFile"> file path whose source code is written to metadata</param>
-    /// <param name="ExpandingByGroup">if true, generator write `#region &lt;AssemblyName&gt;`.</param>
+    /// <param name="ExpandingAll">if true, the generator expand all embedded source. For Testing.</param>
+    /// <param name="ExpandingByGroup">if true, the generator write `#region &lt;AssemblyName&gt;`.</param>
     /// <param name="ExpandingPosition">Position of expanded source</param>
     public partial record ExpandConfig(
          bool Enabled,
@@ -24,6 +25,7 @@ namespace SourceExpander
          ImmutableArray<string> IgnoreAssemblies,
          string? StaticEmbeddingText,
          string? MetadataExpandingFile,
+         bool ExpandingAll,
          bool ExpandingByGroup,
          ExpandingPosition ExpandingPosition)
     {
@@ -37,6 +39,7 @@ namespace SourceExpander
             IEnumerable<Regex>? ignoreFilePatterns = null,
             string? staticEmbeddingText = null,
             string? metadataExpandingFile = null,
+            bool? expandingAll = null,
             bool? expandingByGroup = null,
             ExpandingPosition expandingPosition = ExpandingPosition.EndOfFile) :
         this(
@@ -52,6 +55,7 @@ namespace SourceExpander
                 : ImmutableArray.Create(ignoreAssemblies),
             StaticEmbeddingText: staticEmbeddingText,
             MetadataExpandingFile: metadataExpandingFile,
+            ExpandingAll: expandingAll ?? false,
             ExpandingByGroup: expandingByGroup ?? false,
             ExpandingPosition: expandingPosition
         )

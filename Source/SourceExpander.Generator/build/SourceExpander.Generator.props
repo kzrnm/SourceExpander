@@ -5,6 +5,7 @@
 		<CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
 		<CompilerVisibleProperty Include="SourceExpander_Generator_IgnoreFilePatternRegex" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_StaticEmbeddingText" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingAll" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingPosition" />
   </ItemGroup>
 </Project>

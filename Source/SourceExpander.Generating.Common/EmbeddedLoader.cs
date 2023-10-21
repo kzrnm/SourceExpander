@@ -132,5 +132,7 @@ namespace SourceExpander
         /// count of embedded code.
         /// </summary>
         public bool IsEmbeddedEmpty => container.Count == 0;
+
+        public string ExpandAll(CancellationToken token) => new CompilationExpander(compilation, container, config).ExpandAll(token);
     }
 }
