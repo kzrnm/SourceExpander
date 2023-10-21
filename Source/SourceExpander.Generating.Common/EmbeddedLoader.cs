@@ -133,6 +133,9 @@ namespace SourceExpander
         /// </summary>
         public bool IsEmbeddedEmpty => container.Count == 0;
 
-        public string ExpandAll(CancellationToken token) => new CompilationExpander(compilation, container, config).ExpandAll(token);
+        /// <summary>
+        /// Expand all source for testing.
+        /// </summary>
+        public string ExpandAllForTesting(CancellationToken token) => new CompilationExpander(compilation, container, config).ExpandAllForTesting(token);
     }
 }

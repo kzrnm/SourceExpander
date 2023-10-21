@@ -105,7 +105,7 @@ namespace SourceExpander
 
             static void Target(StringBuilder sb, ICompilationUnitSyntax newRoot)
             {
-                using var sr = new StringReader(newRoot.ToString());
+                using var sr = new StringReader(newRoot.ToString()!);
                 var line = sr.ReadLine();
                 while (line != null)
                 {
@@ -115,7 +115,7 @@ namespace SourceExpander
             }
         }
 
-        public string ExpandAll(CancellationToken cancellationToken)
+        public string ExpandAllForTesting(CancellationToken cancellationToken)
         {
             var sb = new StringBuilder();
             sb.AppendLine("namespace SourceExpander.Testing{");
@@ -126,7 +126,7 @@ namespace SourceExpander
             var files = sourceFileContainer.ToArray();
             Array.Sort(files.Select(f => f.FileName).ToArray(), files);
             Embedded(sb, files, Array.Empty<string>(), cancellationToken);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
         }
 

@@ -56,7 +56,7 @@ namespace SourceExpander
                 if (config.ExpandingAll)
                 {
                     ctx.CancellationToken.ThrowIfCancellationRequested();
-                    ctx.AddSource("SourceExpander.ExpandingAll.cs", loader.ExpandAll(ctx.CancellationToken));
+                    ctx.AddSource("SourceExpander.ExpandingAll.cs", loader.ExpandAllForTesting(ctx.CancellationToken));
                 }
 
                 var expandedCode = CreateExpanded(loader.ExpandedCodes());
