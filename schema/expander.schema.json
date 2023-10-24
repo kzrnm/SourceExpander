@@ -20,9 +20,13 @@
             "type": "string",
             "default": null
         },
-        "static-embedding-text": {
-            "description": "static embedding text",
-            "type": "string"
+        "ignore-file-pattern-regex": {
+            "description": "ignore file name regex pattern",
+            "type": "array",
+            "items": {
+                "description": "ignore file name regex pattern",
+                "type": "string"
+            }
         },
         "ignore-assemblies": {
             "description": "assembly names that be ignored",
@@ -32,17 +36,18 @@
                 "type": "string"
             }
         },
-        "ignore-file-pattern-regex": {
-            "description": "ignore file name regex pattern",
-            "type": "array",
-            "items": {
-                "description": "ignore file name regex pattern",
-                "type": "string"
-            }
+        "static-embedding-text": {
+            "description": "static embedding text",
+            "type": "string"
         },
         "expanding-all": {
             "type": "boolean",
             "description": "if true, the generator expand all embedded source. For Testing.",
+            "default": false
+        },
+        "expanding-by-group": {
+            "type": "boolean",
+            "description": "if true, the generator write `#region <AssemblyName>`.",
             "default": false
         },
         "expanding-position": {
