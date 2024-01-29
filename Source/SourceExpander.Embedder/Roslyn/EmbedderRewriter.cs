@@ -10,26 +10,15 @@ namespace SourceExpander.Roslyn
     /// <summary>
     /// Rewrite by <see cref="EmbedderConfig"/>
     /// </summary>
-    class EmbedderRewriter : CSharpSyntaxRewriter
+    class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken) : CSharpSyntaxRewriter
     {
-        private readonly SemanticModel model;
-        private readonly EmbedderConfig config;
-        private readonly IDiagnosticReporter reporter;
-        private readonly CancellationToken cancellationToken;
-        public EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken)
-        {
-            this.model = model;
-            this.config = config;
-            this.reporter = reporter;
-            this.cancellationToken = cancellationToken;
-        }
+        private readonly SemanticModel model = model;
+        private readonly EmbedderConfig config = config;
+        private readonly IDiagnosticReporter reporter = reporter;
+        private readonly CancellationToken cancellationToken = cancellationToken;
+
         public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)
         {
-            if (trivia.IsKind(SyntaxKind.NullableDirectiveTrivia))
-            {
-                reporter.ReportDiagnostic(
-                    DiagnosticDescriptors.EMBED0008_NullableDirective(trivia.GetLocation()));
-            }
             return SyntaxFactory.ElasticMarker;
         }
         public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)

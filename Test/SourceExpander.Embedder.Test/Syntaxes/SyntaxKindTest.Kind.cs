@@ -1166,4 +1166,27 @@ public class Def
         public override string ExpectedMinifyCodeBody => "public class Def{public int M<T>(T n)where T:IComparable<T> =>n.CompareTo(default);}";
         public override IEnumerable<string> ExpectedNamespaces => ImmutableArray<string>.Empty;
     }
+
+    public class NullableTest : EmbedderGeneratorTestBaseWithValue
+    {
+        public override string Syntax => """
+#nullable enable
+public class Def
+{
+    int? nullableStruct;
+    string? nullableClass;
+#nullable disable
+    public static void F(int? nullableStruct, string? nullableClass)
+    {
+    }
 }
+""";
+        public override IEnumerable<string> ExpectedTypeNames => ImmutableArray.Create("Def");
+        public override IEnumerable<string> ExpectedUsings => [];
+        public override IEnumerable<string> ExpectedDependencies => ImmutableArray<string>.Empty;
+        public override string ExpectedCodeBody => "public class Def { int? nullableStruct; string? nullableClass; public static void F(int? nullableStruct, string? nullableClass) { } }";
+        public override string ExpectedMinifyCodeBody => "public class Def{int?nullableStruct;string?nullableClass;public static void F(int?nullableStruct,string?nullableClass){}}";
+        public override IEnumerable<string> ExpectedNamespaces => ImmutableArray<string>.Empty;
+    }
+}
+#nullable enable

@@ -5,15 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [6.0.0] - 2024-01-30
 ### Added
 - SourceExpander.Embedder: Add include/exclude to config
 
 ### Changed
 - Update libraries
+- Accept nullable
 
 ### Removed
 - Remove SourceExpander.Generating.Common
+- Remove diagnostics EMBED0007/EMBED0008
 
 ## [5.5.1] - 2023-10-22
 ### Changed
