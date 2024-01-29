@@ -23,7 +23,7 @@ namespace SourceExpander.Generate.Config
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
@@ -96,7 +96,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
@@ -169,7 +169,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]
@@ -253,7 +253,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]
@@ -336,7 +336,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
@@ -410,7 +410,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
@@ -483,7 +483,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
@@ -560,7 +560,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")]class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"

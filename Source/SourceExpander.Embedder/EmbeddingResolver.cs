@@ -53,7 +53,7 @@ namespace SourceExpander
             public string[] EmbeddedNamespaces;
             public (string Raw, string GZipBase32768) EmbeddedSourceCode;
 
-            public IEnumerable<(string Key, string Value)> EnumerateMetadatas()
+            public readonly IEnumerable<(string Key, string Value)> EnumerateMetadatas()
             {
                 if (!IsEnabled) yield break;
 
@@ -278,9 +278,7 @@ namespace SourceExpander
             cancellationToken.ThrowIfCancellationRequested();
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, compilation.GetTypeByMetadataName(SourceExpander_NotEmbeddingSourceAttributeName), cancellationToken);
-            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
-            if (newRoot is null)
-                throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
+            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit ?? throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
 
             cancellationToken.ThrowIfCancellationRequested();
             SyntaxNode minified = config.MinifyLevel switch
@@ -326,7 +324,7 @@ namespace SourceExpander
                 foreach (var type in info.DefinedTypeNames)
                 {
                     if (!dependencyInfo.TryGetValue(type, out var deps))
-                        dependencyInfo[type] = deps = new();
+                        dependencyInfo[type] = deps = [];
                     deps.Add(info.FileName);
                 }
             cancellationToken.ThrowIfCancellationRequested();
@@ -334,7 +332,7 @@ namespace SourceExpander
                 foreach (var type in info.TypeNames)
                 {
                     if (!dependencyInfo.TryGetValue(type, out var deps))
-                        dependencyInfo[type] = deps = new();
+                        dependencyInfo[type] = deps = [];
                     deps.Add(info.FileName);
                 }
             var result = new SourceFileInfo[infos.Length];

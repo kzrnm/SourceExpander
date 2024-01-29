@@ -6,11 +6,10 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 namespace SourceExpander
 {
-    public class CSharpSourceGeneratorTest<TSourceGenerator> : CSharpSourceGeneratorTest<TSourceGenerator, XUnitVerifier>
+    public class CSharpSourceGeneratorTest<TSourceGenerator> : CSharpSourceGeneratorTest<TSourceGenerator, DefaultVerifier>
         where TSourceGenerator : ISourceGenerator, new()
     {
         public CSharpCompilationOptions CompilationOptions { get; set; } = new(OutputKind.DynamicallyLinkedLibrary);
@@ -19,7 +18,7 @@ namespace SourceExpander
         protected override ParseOptions CreateParseOptions() => ParseOptions;
     }
 
-    public class CSharpIncrementalGeneratorTest<TIncrementalGenerator> : SourceGeneratorTest<XUnitVerifier>
+    public class CSharpIncrementalGeneratorTest<TIncrementalGenerator> : SourceGeneratorTest<DefaultVerifier>
         where TIncrementalGenerator : IIncrementalGenerator, new()
     {
         public CSharpCompilationOptions CompilationOptions { get; set; } = new(OutputKind.DynamicallyLinkedLibrary);

@@ -17,7 +17,7 @@ namespace SourceExpander.Generate
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using List = System.Collections.Generic.List<int>;", "using System;", "using static System.Math;"),
                      ImmutableArray<string>.Empty,
                      "class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}"

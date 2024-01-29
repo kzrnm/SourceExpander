@@ -16,6 +16,9 @@ indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom
 
+# IDE0305: ƒRƒŒƒNƒVƒ‡ƒ“‚Ì‰Šú‰»‚ğŠÈ—ª‰»‚µ‚Ü‚·
+dotnet_style_prefer_collection_expression = true:silent
+
 [*.cs]
 #Core editorconfig formatting - indentation
 
@@ -47,7 +50,7 @@ csharp_preserve_single_line_blocks = true
 #Style - expression bodied member options
 
 #prefer expression-bodied members for methods
-csharp_style_expression_bodied_methods =when_on_single_line:suggestion
+csharp_style_expression_bodied_methods =when_on_single_line:silent
 #prefer expression-bodied members for properties
 csharp_style_expression_bodied_properties = true:suggestion
 

@@ -28,7 +28,7 @@ namespace SourceExpander.Generate.Config
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
@@ -106,7 +106,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
@@ -214,7 +214,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
@@ -323,7 +323,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"

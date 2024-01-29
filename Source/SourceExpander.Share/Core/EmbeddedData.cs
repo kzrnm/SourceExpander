@@ -38,7 +38,7 @@ namespace SourceExpander
         {
             var errors = ImmutableArray.CreateBuilder<(string Key, string ErrorMessage)>();
             LanguageVersion csharpVersion = LanguageVersion.CSharp1;
-            Version? version = new(1, 0, 0);
+            Version version = new(1, 0, 0);
             bool allowUnsafe = false;
             ImmutableArray<string> embeddedNamespaces = ImmutableArray<string>.Empty;
 

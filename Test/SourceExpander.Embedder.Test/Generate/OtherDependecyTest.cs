@@ -18,15 +18,15 @@ namespace SourceExpander.Generate
                 new SourceFileInfo
                 (
                     "TestProject>Program.cs",
-                    new string[] { "Mine.Program" },
-                    new string[] { "using OC = Other.C;" },
-                    new string[] { "OtherDependency>C.cs", "TestProject>C.cs" },
+                    ["Mine.Program"],
+                    ["using OC = Other.C;"],
+                    ["OtherDependency>C.cs", "TestProject>C.cs"],
                     "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
                 ),
                 new SourceFileInfo
                 (
                     "TestProject>C.cs",
-                    new string[] { "Mine.C" },
+                    ["Mine.C"],
                     Array.Empty<string>(),
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
@@ -123,15 +123,15 @@ namespace Mine{
                 new SourceFileInfo
                 (
                     "TestProject>Program.cs",
-                    new string[] { "Mine.Program" },
-                    new string[] { "using OC = Other.C;" },
-                    new string[] { "OtherDependency>C.cs", "TestProject>C.cs" },
+                    ["Mine.Program"],
+                    ["using OC = Other.C;"],
+                    ["OtherDependency>C.cs", "TestProject>C.cs"],
                     "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
                 ),
                 new SourceFileInfo
                 (
                     "TestProject>C.cs",
-                    new string[] { "Mine.C" },
+                    ["Mine.C"],
                     Array.Empty<string>(),
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
@@ -229,7 +229,7 @@ namespace Mine{
                 new SourceFileInfo
                 (
                     "TestProject>C.cs",
-                    new string[] { "Mine.C" },
+                    ["Mine.C"],
                     Array.Empty<string>(),
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
@@ -308,7 +308,7 @@ namespace Mine{
                 new SourceFileInfo
                 (
                     "TestProject>C.cs",
-                    new string[] { "Mine.C" },
+                    ["Mine.C"],
                     Array.Empty<string>(),
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
@@ -388,7 +388,7 @@ namespace Mine{
                 new SourceFileInfo
                 (
                     "TestProject>C.cs",
-                    new string[] { "Mine.C" },
+                    ["Mine.C"],
                     Array.Empty<string>(),
                     Array.Empty<string>(),
                     "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"

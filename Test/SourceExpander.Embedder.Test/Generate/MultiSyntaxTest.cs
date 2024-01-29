@@ -17,29 +17,29 @@ namespace SourceExpander.Generate
                    new SourceFileInfo
                    (
                        "TestProject>F/N.cs",
-                       new string[] { "Test.F.N" },
-                       new string[] { "using System;", "using System.Diagnostics;", "using static System.Console;" },
-                       new string[] { "TestProject>F/NumType.cs", "TestProject>Put.cs" },
+                       ["Test.F.N"],
+                       ["using System;", "using System.Diagnostics;", "using static System.Console;"],
+                       ["TestProject>F/NumType.cs", "TestProject>Put.cs"],
                        "namespace Test.F{class N{public static void WriteN(){Console.Write(NumType.Zero);Write(\"N\");Trace.Write(\"N\");Put.Nested.Write(\"N\");}}}"
                    ), new SourceFileInfo
                    (
                        "TestProject>F/NumType.cs",
-                       new string[] { "Test.F.NumType" },
+                       ["Test.F.NumType"],
                        ImmutableArray<string>.Empty,
                        ImmutableArray<string>.Empty,
                        "namespace Test.F{public enum NumType{Zero,Pos,Neg,}}"
                    ), new SourceFileInfo
                    (
                        "TestProject>I/D.cs",
-                       new string[] { "Test.I.IntRecord", "Test.I.D<T>" },
-                       new string[] { "using System.Diagnostics;", "using System;", "using System.Collections.Generic;" },
-                       new string[] { "TestProject>Put.cs" },
+                       ["Test.I.IntRecord", "Test.I.D<T>"],
+                       ["using System.Diagnostics;", "using System;", "using System.Collections.Generic;"],
+                       ["TestProject>Put.cs"],
                        @"namespace Test.I{public record IntRecord(int n);[System.Diagnostics.DebuggerDisplay(""TEST"")]class D<T>:IComparer<T>{public int Compare(T x,T y)=>throw new NotImplementedException();[System.Diagnostics.Conditional(""TEST"")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}}}"
                    ), new SourceFileInfo
                    (
                        "TestProject>Put.cs",
-                       new string[] { "Test.Put", "Test.Put.Nested" },
-                       new string[] { "using System.Diagnostics;" },
+                       ["Test.Put", "Test.Put.Nested"],
+                       ["using System.Diagnostics;"],
                        ImmutableArray<string>.Empty,
                        "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
                    ));
