@@ -17,33 +17,33 @@ namespace SourceExpander.Generate
                 new SourceFileInfo
                 (
                     "TestProject>Foo1.cs",
-                    new string[] { "TestProject.Foo1" },
-                    new string[] { "using AtCoder;" },
-                    new string[] { "AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs", "TestProject>Foo2.cs" },
+                    ["TestProject.Foo1"],
+                    ["using AtCoder;"],
+                    ["AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs", "TestProject>Foo2.cs"],
                     "namespace TestProject{public static class Foo1{public static McfGraphInt GetMcfGraph()=>new McfGraphInt(10);public static Foo2 GetFoo2()=>new Foo2();}}"
                 ),
                 new SourceFileInfo
                 (
                     "TestProject>Foo2.cs",
-                    new string[] { "TestProject.Foo2" },
-                    new string[] { "using AtCoder;" },
-                    new string[] { "AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs", "TestProject>Foo3.cs" },
+                    ["TestProject.Foo2"],
+                    ["using AtCoder;"],
+                    ["AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs", "TestProject>Foo3.cs"],
                     "namespace TestProject{public class Foo2{public McfGraphInt Graph=>new Foo3().Graph;}}"
                 ),
                 new SourceFileInfo
                 (
                     "TestProject>Foo3.cs",
-                    new string[] { "TestProject.Foo3" },
-                    new string[] { "using AtCoder;" },
-                    new string[] { "AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs", "TestProject>Foo1.cs" },
+                    ["TestProject.Foo3"],
+                    ["using AtCoder;"],
+                    ["AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs", "TestProject>Foo1.cs"],
                     "namespace TestProject{using static Foo1;public class Foo3{public McfGraphInt Graph=>GetMcfGraph();}}"
                 ),
                 new SourceFileInfo
                 (
                     "TestProject>Bar.cs",
-                    new string[] { "TestProject.Bar" },
-                    new string[] { "using AtCoder;" },
-                    new string[] { "AtCoderLibrary>DataStructure/Wrappers/StaticModIntFenwickTree.cs", "AtCoderLibrary>Math/StaticModInt.cs", "TestProject>Foo2.cs" },
+                    ["TestProject.Bar"],
+                    ["using AtCoder;"],
+                    ["AtCoderLibrary>DataStructure/Wrappers/StaticModIntFenwickTree.cs", "AtCoderLibrary>Math/StaticModInt.cs", "TestProject>Foo2.cs"],
                     "namespace TestProject{public struct Bar{public StaticModIntFenwickTree<Mod998244353>fenwickTree;public static Foo2 GetFoo2()=>new Foo2();}}"
                 )
             );

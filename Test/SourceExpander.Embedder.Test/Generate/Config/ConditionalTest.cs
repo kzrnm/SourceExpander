@@ -27,7 +27,7 @@ namespace SourceExpander.Generate.Config
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);[Conditional(""DEBUG2"")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(""DEBUG2"")][Conditional(""Test"")]static void T8()=>Console.WriteLine(8);}"
@@ -110,7 +110,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);[Conditional(""DEBUG2"")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(""DEBUG2"")][Conditional(""Test"")]static void T8()=>Console.WriteLine(8);}"
@@ -191,7 +191,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
@@ -262,7 +262,7 @@ class Program
                  new SourceFileInfo
                  (
                      "TestProject>Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"

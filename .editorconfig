@@ -16,6 +16,9 @@ indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom
 
+# IDE0305: ƒRƒŒƒNƒVƒ‡ƒ“‚Ì‰Šú‰»‚ğŠÈ—ª‰»‚µ‚Ü‚·
+dotnet_style_prefer_collection_expression = true:silent
+
 [*.cs]
 #Core editorconfig formatting - indentation
 

@@ -55,7 +55,7 @@ class Program
                     "System.Console",
                     "System.MathF",
                     "System.Exception",
-                    "System.IntPtr",
+                    "nint",
                     "System.IObserver<T>",
                     "System.DateTime",
                     "System.Action",

@@ -24,7 +24,7 @@ namespace SourceExpander.Generate.Config
                  new SourceFileInfo
                  (
                      "TestProject>rogram.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
@@ -32,7 +32,7 @@ namespace SourceExpander.Generate.Config
                  new SourceFileInfo
                  (
                      "TestProject>.cs",
-                     new string[] { "P" },
+                     ["P"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
                      @"class P { static void T() => Console.WriteLine(2); }"
@@ -116,7 +116,7 @@ class P
                  new SourceFileInfo
                  (
                      "TestProject>rogram.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
@@ -124,7 +124,7 @@ class P
                  new SourceFileInfo
                  (
                      "TestProject>.cs",
-                     new string[] { "P" },
+                     ["P"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
                      @"class P { static void T() => Console.WriteLine(2); }"
@@ -207,7 +207,7 @@ class P
                  new SourceFileInfo
                  (
                      "/home/source/Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
@@ -215,7 +215,7 @@ class P
                  new SourceFileInfo
                  (
                      "/home/source/P.cs",
-                     new string[] { "P" },
+                     ["P"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
                      @"class P { static void T() => Console.WriteLine(2); }"
@@ -300,7 +300,7 @@ class P
                  new SourceFileInfo
                  (
                      "/home/source/Program.cs",
-                     new string[] { "Program" },
+                     ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
@@ -308,7 +308,7 @@ class P
                  new SourceFileInfo
                  (
                      "/home/source/P.cs",
-                     new string[] { "P" },
+                     ["P"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
                      @"class P { static void T() => Console.WriteLine(2); }"
