@@ -20,23 +20,23 @@ namespace SourceExpander
                 {
                     const string buildPropHeader = "build_property.";
                     const string header = buildPropHeader + "SourceExpander_Generator_";
-                    if (analyzerConfigOptions.TryGetValue(header + "Enabled", out string? v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Enabled), out string? v) && !string.IsNullOrWhiteSpace(v))
                         data.Enabled = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-                    if (analyzerConfigOptions.TryGetValue(header + "MatchFilePattern", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.MatchFilePattern), out v) && !string.IsNullOrWhiteSpace(v))
                         data.MatchFilePattern = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + "MetadataExpandingFile", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.MetadataExpandingFile), out v) && !string.IsNullOrWhiteSpace(v))
                         data.MetadataExpandingFile = v;
-                    if (analyzerConfigOptions.TryGetValue(header + "IgnoreFilePatternRegex", out v) && !string.IsNullOrWhiteSpace(v))
-                        data.IgnoreFilePatternRegex = new[] { v };
-                    if (analyzerConfigOptions.TryGetValue(header + "IgnoreAssemblies", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.IgnoreFilePatternRegex), out v) && !string.IsNullOrWhiteSpace(v))
+                        data.IgnoreFilePatternRegex = [v];
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.IgnoreAssemblies), out v) && !string.IsNullOrWhiteSpace(v))
                         data.IgnoreAssemblies = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + "StaticEmbeddingText", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.StaticEmbeddingText), out v) && !string.IsNullOrWhiteSpace(v))
                         data.StaticEmbeddingText = v;
-                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingAll", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExpandingAll), out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExpandingAll = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingByGroup", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExpandingByGroup), out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExpandingByGroup = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingPosition", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExpandingPosition), out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExpandingPosition = v;
                 }
                 return data.ToImmutable();

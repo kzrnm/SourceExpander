@@ -20,26 +20,26 @@ namespace SourceExpander
                 {
                     const string buildPropHeader = "build_property.";
                     const string header = buildPropHeader + "SourceExpander_Embedder_";
-                    if (analyzerConfigOptions.TryGetValue(header + "Enabled", out string? v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Enabled), out string? v) && !string.IsNullOrWhiteSpace(v))
                         data.Enabled = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-                    if (analyzerConfigOptions.TryGetValue(header + "EmbeddingType", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.EmbeddingType), out v) && !string.IsNullOrWhiteSpace(v))
                         data.EmbeddingType = v;
-                    if (analyzerConfigOptions.TryGetValue(header + "ExcludeAttributes", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExcludeAttributes), out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExcludeAttributes = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + "RemoveConditional", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.RemoveConditional), out v) && !string.IsNullOrWhiteSpace(v))
                         data.RemoveConditional = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + "MinifyLevel", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.MinifyLevel), out v) && !string.IsNullOrWhiteSpace(v))
                         data.MinifyLevel = v;
-                    if (analyzerConfigOptions.TryGetValue(header + "EmbeddingFileNameType", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.EmbeddingFileNameType), out v) && !string.IsNullOrWhiteSpace(v))
                         data.EmbeddingFileNameType = v;
-                    if (analyzerConfigOptions.TryGetValue(header + "ExpandingSymbol", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExpandingSymbol), out v) && !string.IsNullOrWhiteSpace(v))
                         data.ExpandingSymbol = v;
 #pragma warning disable CS0612
-                    if (analyzerConfigOptions.TryGetValue(header + "EnableMinify", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.EnableMinify), out v) && !string.IsNullOrWhiteSpace(v))
                         data.EnableMinify = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
 #pragma warning restore CS0612
 
-                    if (analyzerConfigOptions.TryGetValue(buildPropHeader + "ProjectDir", out v) && !string.IsNullOrWhiteSpace(v))
+                    if (analyzerConfigOptions.TryGetValue(buildPropHeader + nameof(data.ProjectDir), out v) && !string.IsNullOrWhiteSpace(v))
                         data.ProjectDir = v;
                 }
                 return data.ToImmutable();
