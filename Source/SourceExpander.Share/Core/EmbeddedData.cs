@@ -67,7 +67,7 @@ namespace SourceExpander
                     case ParseResult.Status.NotMatch:
                         break;
                     case ParseResult.Status.Success:
-                        version = attrVersion;
+                        version = attrVersion!;
                         continue;
                     case ParseResult.Status.Error:
                         errors.Add((key, r.Message));
@@ -109,7 +109,7 @@ namespace SourceExpander
             }
             return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe, embeddedNamespaces), errors.ToImmutable());
         }
-        private struct ParseResult
+        private readonly struct ParseResult
         {
             private ParseResult(Status result, string message)
             {
