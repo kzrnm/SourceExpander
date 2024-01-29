@@ -58,22 +58,6 @@ namespace SourceExpander.Diagnostics
                 .Be("他のアセンブリの埋め込みデータが不正です: Other, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.");
         }
         [Fact]
-        public void EMBED0007()
-        {
-            DiagnosticDescriptors.EMBED0007_NullableProject()
-                .GetMessage(formatProvider)
-                .Should()
-                .Be("nullableなプロジェクトは未対応です");
-        }
-        [Fact]
-        public void EMBED0008()
-        {
-            DiagnosticDescriptors.EMBED0008_NullableDirective(Location.None)
-                .GetMessage(formatProvider)
-                .Should()
-                .Be("nullableディレクティブは未対応です");
-        }
-        [Fact]
         public void EMBED0009()
         {
             DiagnosticDescriptors.EMBED0009_UsingStaticDirective(Location.None)

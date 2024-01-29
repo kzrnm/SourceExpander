@@ -153,12 +153,6 @@
   <data name="EMBED0006_Title" xml:space="preserve">
     <value>Another assembly has invalid embedded data</value>
   </data>
-  <data name="EMBED0007_Title" xml:space="preserve">
-    <value>Nullable option is unsupported</value>
-  </data>
-  <data name="EMBED0008_Title" xml:space="preserve">
-    <value>Nullable directive is unsupported</value>
-  </data>
   <data name="EMBED0009_Body" xml:space="preserve">
     <value>Avoid using static directive because there is a risk of name collision</value>
   </data>

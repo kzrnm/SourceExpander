@@ -138,10 +138,6 @@ namespace SourceExpander
             if (updated) return;
             updated = true;
 
-            if (compilation.Options.NullableContextOptions.AnnotationsEnabled())
-                reporter.ReportDiagnostic(
-                    DiagnosticDescriptors.EMBED0007_NullableProject());
-
             SyntaxTree[] newTrees;
             if (ConcurrentBuild)
                 newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
