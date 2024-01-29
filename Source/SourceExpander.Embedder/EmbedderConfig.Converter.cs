@@ -22,6 +22,10 @@ namespace SourceExpander
                     const string header = buildPropHeader + "SourceExpander_Embedder_";
                     if (analyzerConfigOptions.TryGetValue(header + nameof(data.Enabled), out string? v) && !string.IsNullOrWhiteSpace(v))
                         data.Enabled = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Include), out v) && !string.IsNullOrWhiteSpace(v))
+                        data.Include = v.Split(';').Select(t => t.Trim()).ToArray();
+                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Exclude), out v) && !string.IsNullOrWhiteSpace(v))
+                        data.Exclude = v.Split(';').Select(t => t.Trim()).ToArray();
                     if (analyzerConfigOptions.TryGetValue(header + nameof(data.EmbeddingType), out v) && !string.IsNullOrWhiteSpace(v))
                         data.EmbeddingType = v;
                     if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExcludeAttributes), out v) && !string.IsNullOrWhiteSpace(v))
@@ -65,6 +69,10 @@ namespace SourceExpander
         {
             [DataMember(Name = "enabled")]
             public bool? Enabled { set; get; }
+            [DataMember(Name = "include")]
+            public string[]? Include { set; get; }
+            [DataMember(Name = "exclude")]
+            public string[]? Exclude { set; get; }
             [DataMember(Name = "embedding-type")]
             public string? EmbeddingType { set; get; }
             [DataMember(Name = "exclude-attributes")]
@@ -98,6 +106,8 @@ namespace SourceExpander
             public EmbedderConfig ToImmutable() =>
                 new(
                         Enabled ?? true,
+                        Include,
+                        Exclude,
                         ParsedEmbeddingType,
                         ExcludeAttributes,
                         ParsedMinifyLevel,
