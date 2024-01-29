@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
     <SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
     <SourceExpander_Embedder_ExpandingSymbol>DEBUG</SourceExpander_Embedder_ExpandingSymbol>
