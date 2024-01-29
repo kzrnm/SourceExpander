@@ -25,12 +25,13 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
+    <PackageReference Include="DotNet.Glob" Version="3.1.3" GeneratePathProperty="true" />
     <PackageReference Include="IsExternalInit" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" GeneratePathProperty="true" />
-    <PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -49,6 +50,7 @@
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PkgDotNet_Glob)\lib\netstandard1.1\*.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
 

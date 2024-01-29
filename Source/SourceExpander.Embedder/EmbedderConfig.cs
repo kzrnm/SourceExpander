@@ -1,4 +1,6 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
+using DotNet.Globbing;
 
 namespace SourceExpander
 {
@@ -6,6 +8,8 @@ namespace SourceExpander
     /// embedding config
     /// </summary>
     /// <param name="Enabled">if true, embedder is enabled.</param>
+    /// <param name="Include">Glob pattern of include files.</param>
+    /// <param name="Exclude">Glob pattern of exclude files.</param>
     /// <param name="EmbeddingType">GZipBase32768 or Raw</param>
     /// <param name="ExcludeAttributes">Attribute full name that remove on embedding.</param>
     /// <param name="MinifyLevel">Minify level of source code.</param>
@@ -17,6 +21,8 @@ namespace SourceExpander
     /// <param name="ProjectDir">Project directory.</param>
     internal partial record EmbedderConfig(
          bool Enabled,
+         ImmutableArray<string> Include,
+         ImmutableArray<string> Exclude,
          ImmutableArray<ObsoleteConfigProperty> ObsoleteConfigProperties,
          EmbeddingType EmbeddingType,
          ImmutableHashSet<string> ExcludeAttributes,
@@ -30,6 +36,8 @@ namespace SourceExpander
     {
         public EmbedderConfig(
             bool enabled = true,
+            string[]? include = null,
+            string[]? exclude = null,
             EmbeddingType embeddingType = EmbeddingType.GZipBase32768,
             string[]? excludeAttributes = null,
             MinifyLevel minifyLevel = MinifyLevel.Default,
@@ -41,25 +49,49 @@ namespace SourceExpander
             ImmutableArray<ObsoleteConfigProperty> obsoleteConfigProperties = default)
             : this(
                 Enabled: enabled,
+                Include: include switch { null => ImmutableArray<string>.Empty, _ => ImmutableArray.CreateRange(include) },
+                Exclude: exclude switch { null => ImmutableArray<string>.Empty, _ => ImmutableArray.CreateRange(exclude) },
                 ObsoleteConfigProperties: obsoleteConfigProperties.IsDefault ? ImmutableArray<ObsoleteConfigProperty>.Empty : obsoleteConfigProperties,
                 EmbeddingType: embeddingType,
                 MinifyLevel: minifyLevel,
-                ExcludeAttributes: excludeAttributes switch
-                {
-                    null => ImmutableHashSet<string>.Empty,
-                    _ => ImmutableHashSet.Create(excludeAttributes),
-                },
-                RemoveConditional: removeConditional switch
-                {
-                    null => ImmutableHashSet<string>.Empty,
-                    _ => ImmutableHashSet.Create(removeConditional),
-                },
+                ExcludeAttributes: CreateImmutableHashSet(excludeAttributes),
+                RemoveConditional: CreateImmutableHashSet(removeConditional),
                 EmbeddingSourceClass: embeddingSourceClass ?? new EmbeddingSourceClass(false),
                 EmbeddingFileNameType: embeddingFileNameType,
                 ExpandingSymbol: expandingSymbol,
                 ProjectDir: projectDir ?? string.Empty
             )
         {
+        }
+
+        private readonly ImmutableArray<Glob> IncludeGlobs = Include.Select(Glob.Parse).ToImmutableArray();
+        private readonly ImmutableArray<Glob> ExcludeGlobs = Exclude.Select(Glob.Parse).ToImmutableArray();
+
+        static ImmutableHashSet<string> CreateImmutableHashSet(string[]? a) => a switch
+        {
+            null => ImmutableHashSet<string>.Empty,
+            _ => ImmutableHashSet.Create(a),
+        };
+
+        public bool IsMatch(string filePath)
+        {
+            if (IncludeGlobs.Length == 0 && ExcludeGlobs.Length == 0) return true;
+            if (IncludeGlobs.Length > 0)
+            {
+                foreach (var g in IncludeGlobs)
+                {
+                    if (g.IsMatch(filePath))
+                        goto INCLUDED;
+                }
+                return false;
+            }
+        INCLUDED:
+            foreach (var g in ExcludeGlobs)
+            {
+                if (g.IsMatch(filePath))
+                    return false;
+            }
+            return true;
         }
     }
     public record ObsoleteConfigProperty(string Name, string Instead)
