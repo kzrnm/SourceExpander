@@ -7,6 +7,28 @@
             "type": "boolean",
             "default": true
         },
+        "include": {
+            "type": [
+                "array",
+                "null"
+            ],
+            "description": "Glob pattern of include files.",
+            "items": {
+                "description": "Glob pattern of include files.",
+                "type": "string"
+            }
+        },
+        "exclude": {
+            "type": [
+                "array",
+                "null"
+            ],
+            "description": "Glob pattern of exclude files.",
+            "items": {
+                "description": "Glob pattern of exclude files.",
+                "type": "string"
+            }
+        },
         "minify-level": {
             "description": "[experimental]minify level",
             "type": "string",

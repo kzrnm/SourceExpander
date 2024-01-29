@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AFAE54D6-A794-42BF-96B7-4BFEBF33B62F}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		3rd-party-license.txt = 3rd-party-license.txt
 		CHANGELOG.md = CHANGELOG.md
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md

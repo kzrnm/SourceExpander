@@ -206,11 +206,13 @@ namespace SourceExpander
                         rawInfos = compilation.SyntaxTrees.AsParallel(cancellationToken)
                             .Select(ParseSource)
                             .Where(info => info.DefinedTypeNames.Any())
+                            .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
                             .ToArray();
                     else
                         rawInfos = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
                             .Select(ParseSource)
                             .Where(info => info.DefinedTypeNames.Any())
+                            .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
                             .ToArray();
 
                     switch (config.EmbeddingFileNameType)

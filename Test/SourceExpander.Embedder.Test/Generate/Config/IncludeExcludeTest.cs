@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -24,7 +25,7 @@ namespace SourceExpander.Generate.Config
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
     "embedding-type": "Raw",
-    "include": {{{data}}},
+    "include": [{{{string.Join(",", data.Select(RoslynUtil.ToLiteral))}}}],
     "minify-level": "full"
 }
 """);
@@ -195,7 +196,7 @@ class Program
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
     "embedding-type": "Raw",
-    "exclude": "{{{data}}}",
+    "exclude": [{{{string.Join(",", data.Select(RoslynUtil.ToLiteral))}}}],
     "minify-level": "full"
 }
 """);
