@@ -12,13 +12,17 @@ env:
 
 jobs:
   format:
-    uses: kzrnm/dotnet-actions/.github/workflows/format.yml@v1
+    uses: kzrnm/dotnet-actions/.github/workflows/format.yml@v2
     with:
       target: SourceExpander.sln
-      dotnet-version: 6.0.x
+      dotnet-version: |
+        8.0.x
+        6.0.x
   test:
-    uses: kzrnm/dotnet-actions/.github/workflows/unittest.yml@v1
+    uses: kzrnm/dotnet-actions/.github/workflows/unittest.yml@v2
     with:
       target: SourceExpander.sln
-      dotnet-version: 6.0.x
+      dotnet-version: |
+        8.0.x
+        6.0.x
       test-logger: GitHubActions
