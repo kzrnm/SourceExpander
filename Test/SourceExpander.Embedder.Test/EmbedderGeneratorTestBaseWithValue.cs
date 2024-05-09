@@ -16,19 +16,22 @@ namespace SourceExpander.Embedder
         public abstract string ExpectedCodeBody { get; }
         public abstract string ExpectedMinifyCodeBody { get; }
         public abstract IEnumerable<string> ExpectedNamespaces { get; }
+        public virtual bool ExpectedUnsafe => false;
         public InMemorySourceText Source => new("/foo/path.cs", Syntax);
         internal SourceFileInfo Expected => new(
                     "TestProject>path.cs",
                     ExpectedTypeNames,
                     ExpectedUsings,
                     ExpectedDependencies,
-                    ExpectedCodeBody);
+                    ExpectedCodeBody,
+                    @unsafe: ExpectedUnsafe);
         internal SourceFileInfo ExpectedMinify => new(
                     "TestProject>path.cs",
                     ExpectedTypeNames,
                     ExpectedUsings,
                     ExpectedDependencies,
-                    ExpectedMinifyCodeBody);
+                    ExpectedMinifyCodeBody,
+                    @unsafe: ExpectedUnsafe);
         public string ExpectedJson => JsonUtil.ToJson(new[] { Expected });
         public string ExpectedMinifyJson => JsonUtil.ToJson(new[] { ExpectedMinify });
 

@@ -4,14 +4,22 @@ using Microsoft.CodeAnalysis;
 
 namespace SourceExpander
 {
-    internal class SourceFileInfoRaw
+    internal class SourceFileInfoRaw(
+        SyntaxTree syntaxTree,
+        string fileName,
+        ImmutableHashSet<string> definedTypeNames,
+        ImmutableHashSet<INamedTypeSymbol> usedTypes,
+        ImmutableHashSet<string> usings,
+        string codeBody,
+        bool @unsafe = false)
     {
-        public SyntaxTree SyntaxTree { get; }
-        public string FileName { get; }
-        public ImmutableHashSet<string> DefinedTypeNames { get; }
-        public ImmutableHashSet<INamedTypeSymbol> UsedTypes { get; }
-        public ImmutableHashSet<string> Usings { get; }
-        public string CodeBody { get; }
+        public SyntaxTree SyntaxTree { get; } = syntaxTree;
+        public string FileName { get; } = fileName;
+        public ImmutableHashSet<string> DefinedTypeNames { get; } = definedTypeNames;
+        public ImmutableHashSet<INamedTypeSymbol> UsedTypes { get; } = usedTypes;
+        public ImmutableHashSet<string> Usings { get; } = usings;
+        public string CodeBody { get; } = codeBody;
+        public bool Unsafe { get; } = @unsafe;
         public SourceFileInfoRaw WithFileName(string newName)
             => new(
                 SyntaxTree,
@@ -19,7 +27,8 @@ namespace SourceExpander
                 DefinedTypeNames,
                 UsedTypes,
                 Usings,
-                CodeBody);
+                CodeBody,
+                Unsafe);
 
         public SourceFileInfo Resolve(Dictionary<string, HashSet<string>> dependencyInfo)
         {
@@ -38,24 +47,9 @@ namespace SourceExpander
                     DefinedTypeNames,
                     Usings,
                     deps,
-                    CodeBody
+                    CodeBody,
+                    Unsafe
                 );
-        }
-
-        public SourceFileInfoRaw(
-            SyntaxTree syntaxTree,
-            string fileName,
-            ImmutableHashSet<string> definedTypeNames,
-            ImmutableHashSet<INamedTypeSymbol> usedTypes,
-            ImmutableHashSet<string> usings,
-            string codeBody)
-        {
-            SyntaxTree = syntaxTree;
-            FileName = fileName;
-            DefinedTypeNames = definedTypeNames;
-            UsedTypes = usedTypes;
-            Usings = usings;
-            CodeBody = codeBody;
         }
     }
 }
