@@ -5,21 +5,20 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    internal class EmbeddedLoaderWithDiagnostic : EmbeddedLoader
+    internal class EmbeddedLoaderWithDiagnostic(
+        CSharpCompilation compilation,
+        CSharpParseOptions parseOptions,
+        IDiagnosticReporter reporter,
+        ExpandConfig config,
+        CancellationToken cancellationToken = default)
+        : EmbeddedLoader(
+            compilation,
+            parseOptions,
+            config,
+            ResolveEmbeddedData(compilation, parseOptions, config, reporter, cancellationToken),
+            cancellationToken)
     {
-        protected readonly IDiagnosticReporter reporter;
-        public EmbeddedLoaderWithDiagnostic(
-            CSharpCompilation compilation,
-            CSharpParseOptions parseOptions,
-            IDiagnosticReporter reporter,
-            ExpandConfig config,
-            CancellationToken cancellationToken = default)
-            : base(compilation, parseOptions, config,
-                  ResolveEmbeddedData(compilation, parseOptions, config, reporter, cancellationToken),
-                  cancellationToken)
-        {
-            this.reporter = reporter;
-        }
+        protected readonly IDiagnosticReporter reporter = reporter;
 
         private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CSharpParseOptions parseOptions, ExpandConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken)
         {
@@ -48,7 +47,7 @@ namespace SourceExpander
                         DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion(
                         parseOptions.LanguageVersion, embedded.AssemblyName, embedded.CSharpVersion));
                 }
-                if (embedded.AllowUnsafe && !compilation.Options.AllowUnsafe)
+                if (embedded.EmbedderVersion <= new System.Version(6, 0, 0) && embedded.AllowUnsafe && !compilation.Options.AllowUnsafe)
                 {
                     reporter.ReportDiagnostic(
                         DiagnosticDescriptors.EXPAND0006_AllowUnsafe(
