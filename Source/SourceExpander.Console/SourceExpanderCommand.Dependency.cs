@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -75,11 +74,7 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
                     TypeNames = Enumerable.Empty<string>(),
                 }));
         }
-        var result = JsonSerializer.Serialize(infos, new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        });
+        var result = JsonSerializer.Serialize(infos, DefaultSerializerOptions);
         Console.WriteLine(result);
     }
 }

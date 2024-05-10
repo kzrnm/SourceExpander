@@ -15,13 +15,13 @@ namespace SourceExpander
 {
     public class ExpandGeneratorBase
     {
-        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, ParseOptions parseOptions, ExpandConfig config, ImmutableArray<Diagnostic> configDiagnostic)
+        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, ExpandConfig config, ImmutableArray<Diagnostic> configDiagnostic)
         {
             try
             {
                 if (!config.Enabled)
                     return;
-                if ((CSharpParseOptions)parseOptions is { LanguageVersion: <= LanguageVersion.CSharp3 })
+                if (parseOptions is { LanguageVersion: <= LanguageVersion.CSharp3 })
                     return;
 
                 foreach (var diag in configDiagnostic)
@@ -30,7 +30,7 @@ namespace SourceExpander
                 }
 
                 ctx.CancellationToken.ThrowIfCancellationRequested();
-                var loader = new EmbeddedLoaderWithDiagnostic(compilation, (CSharpParseOptions)parseOptions, ctx, config, ctx.CancellationToken);
+                var loader = new EmbeddedLoaderWithDiagnostic(compilation, parseOptions, ctx, config, ctx.CancellationToken);
                 if (loader.IsEmbeddedEmpty)
                     ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 
@@ -40,7 +40,7 @@ namespace SourceExpander
                     try
                     {
                         var (_, code) = loader.ExpandedCodes()
-                           .First(t => t.FilePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
+                           .First(rt => rt.SyntaxTree.FilePath.IndexOf(metadataExpandingFile, StringComparison.OrdinalIgnoreCase) >= 0);
 
                         metadata.Add(("SourceExpander.Expanded.Default", code));
                     }
@@ -59,9 +59,27 @@ namespace SourceExpander
                     ctx.AddSource("SourceExpander.ExpandingAll.cs", loader.ExpandAllForTesting(ctx.CancellationToken));
                 }
 
-                var expandedCode = CreateExpanded(loader.ExpandedCodes());
+                var expandedCodes = loader.ExpandedCodes();
                 ctx.CancellationToken.ThrowIfCancellationRequested();
-                ctx.AddSource("SourceExpander.Expanded.cs", expandedCode);
+
+                var expanded = CreateExpanded(expandedCodes);
+                ctx.CancellationToken.ThrowIfCancellationRequested();
+                ctx.AddSource("SourceExpander.Expanded.cs", expanded);
+
+                if (!compilation.Options.AllowUnsafe)
+                {
+                    foreach (var (tree, code) in expandedCodes)
+                    {
+                        if (code == null) continue;
+
+                        var expandedTree = CSharpSyntaxTree.ParseText(code, parseOptions, cancellationToken: ctx.CancellationToken);
+                        var root = expandedTree.GetRoot(ctx.CancellationToken);
+                        if (root.DescendantTokens().Any(t => t.IsKind(SyntaxKind.UnsafeKeyword)))
+                        {
+                            ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0010_UnsafeBlock(tree.FilePath));
+                        }
+                    }
+                }
             }
             catch (OperationCanceledException)
             {
@@ -75,7 +93,7 @@ namespace SourceExpander
             }
         }
 
-        static SourceText CreateExpanded(IEnumerable<(string filePath, string expandedCode)> expanded)
+        static SourceText CreateExpanded(IEnumerable<ExpandedResult> expanded)
         {
             static void CreateSourceCodeLiteral(StringBuilder sb, string pathLiteral, string codeLiteral)
                 => sb.Append("SourceCode.FromDictionary(new Dictionary<string,object>{")
@@ -89,9 +107,9 @@ namespace SourceExpander
             sb.AppendLine("public static class ExpandedContainer{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}");
             sb.AppendLine("private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{");
-            foreach (var (path, code) in expanded)
+            foreach (var (tree, code) in expanded)
             {
-                var filePathLiteral = path.ToLiteral();
+                var filePathLiteral = tree.FilePath.ToLiteral();
                 sb.AppendDicElement(filePathLiteral, sb => CreateSourceCodeLiteral(sb, filePathLiteral, code.ToLiteral()));
                 sb.AppendLine();
             }

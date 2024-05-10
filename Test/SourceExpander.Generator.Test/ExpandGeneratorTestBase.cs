@@ -31,8 +31,7 @@ namespace SourceExpander
             string otherAssemblyName = "Other",
             CSharpCompilationOptions compilationOptions = null)
         {
-            if (compilationOptions is null)
-                compilationOptions = new(OutputKind.DynamicallyLinkedLibrary);
+            compilationOptions ??= new(OutputKind.DynamicallyLinkedLibrary);
 
             var targetProject = solution.GetProject(projectId);
 

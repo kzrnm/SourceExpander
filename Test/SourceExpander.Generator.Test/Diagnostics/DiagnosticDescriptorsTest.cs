@@ -77,18 +77,6 @@ namespace SourceExpander.Diagnostics
                 });
         }
         [Fact]
-        public void EXPAND0006()
-        {
-            DiagnosticDescriptors.EXPAND0006_AllowUnsafe("Unsafelib")
-                .GetMessage(FormatProvider)
-                .Should()
-                .Be(FormatProvider.Name switch
-                {
-                    "ja-JP" => "Unsafelib が AllowUnsafeBlocks を持っているので AllowUnsafeBlocks が必要です",
-                    _ => "Needs AllowUnsafeBlocks because Unsafelib has AllowUnsafeBlocks",
-                });
-        }
-        [Fact]
         public void EXPAND0007()
         {
             DiagnosticDescriptors.EXPAND0007_ParseConfigError("/home/source/SourceExpander.Generator.Config.json", "any error")
@@ -119,6 +107,17 @@ namespace SourceExpander.Diagnostics
                 .Be(FormatProvider.Name switch
                 {
                     _ => "MetadataEmbeddingFile is not found: name: Program.cs",
+                });
+        }
+        [Fact]
+        public void EXPAND0010()
+        {
+            DiagnosticDescriptors.EXPAND0010_UnsafeBlock("/home/mine/P.cs")
+                .GetMessage(FormatProvider)
+                .Should()
+                .Be(FormatProvider.Name switch
+                {
+                    _ => "Expanded code has unsafe block: /home/mine/P.cs",
                 });
         }
     }

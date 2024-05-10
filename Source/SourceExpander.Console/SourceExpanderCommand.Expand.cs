@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -82,13 +81,9 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
 
         var result = JsonSerializer.Serialize(expanded.Select(t => new
         {
-            t.FilePath,
-            ExpandedCode = t.expandedCode,
-        }), new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        });
+            t.SyntaxTree.FilePath,
+            t.ExpandedCode,
+        }), DefaultSerializerOptions);
         Console.WriteLine(result);
     }
 

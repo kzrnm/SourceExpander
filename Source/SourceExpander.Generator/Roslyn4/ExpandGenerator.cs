@@ -53,7 +53,7 @@ namespace SourceExpander
         private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
         {
             var ((compilation, parseOptions), (config, configDiagnostic)) = source;
-            Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, parseOptions, config, configDiagnostic);
+            Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, (CSharpParseOptions)parseOptions, config, configDiagnostic);
         }
     }
 }

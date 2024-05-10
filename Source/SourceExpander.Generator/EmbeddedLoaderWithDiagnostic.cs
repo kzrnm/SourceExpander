@@ -47,12 +47,6 @@ namespace SourceExpander
                         DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion(
                         parseOptions.LanguageVersion, embedded.AssemblyName, embedded.CSharpVersion));
                 }
-                if (embedded.EmbedderVersion <= new System.Version(6, 0, 0) && embedded.AllowUnsafe && !compilation.Options.AllowUnsafe)
-                {
-                    reporter.ReportDiagnostic(
-                        DiagnosticDescriptors.EXPAND0006_AllowUnsafe(
-                        embedded.AssemblyName));
-                }
                 returnDatas.Add(embedded);
             }
             return new SourceFileContainer(returnDatas);

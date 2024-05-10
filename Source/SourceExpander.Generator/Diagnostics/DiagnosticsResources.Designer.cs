@@ -133,24 +133,6 @@ namespace SourceExpander.Diagnostics {
         }
         
         /// <summary>
-        ///   Needs AllowUnsafeBlocks because {0} has AllowUnsafeBlocks に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EXPAND0006_Body {
-            get {
-                return ResourceManager.GetString("EXPAND0006_Body", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Needs AllowUnsafeBlocks に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string EXPAND0006_Title {
-            get {
-                return ResourceManager.GetString("EXPAND0006_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Error config file: Path: {0}, Message: {1} に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EXPAND0007_Body {
@@ -201,6 +183,24 @@ namespace SourceExpander.Diagnostics {
         internal static string EXPAND0009_Title {
             get {
                 return ResourceManager.GetString("EXPAND0009_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Expanded code has unsafe block: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EXPAND0010_Body {
+            get {
+                return ResourceManager.GetString("EXPAND0010_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Expanded code has unsafe block に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EXPAND0010_Title {
+            get {
+                return ResourceManager.GetString("EXPAND0010_Title", resourceCulture);
             }
         }
     }

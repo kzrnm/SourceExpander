@@ -74,28 +74,28 @@ namespace SourceExpander
         /// <summary>
         /// get expanded codes
         /// </summary>
-        public ImmutableArray<(string FilePath, string expandedCode)> ExpandedCodes()
+        public ImmutableArray<ExpandedResult> ExpandedCodes()
         {
-            if (!config.Enabled) return ImmutableArray<(string FilePath, string expandedCode)>.Empty;
+            if (!config.Enabled) return ImmutableArray<ExpandedResult>.Empty;
             UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
 
             return Impl();
 
-            ImmutableArray<(string, string)> Impl()
+            ImmutableArray<ExpandedResult> Impl()
             {
                 var expander = new CompilationExpander(compilation, container, config);
                 if (compilation.Options.ConcurrentBuild)
                     return compilation.SyntaxTrees.AsParallel(cancellationToken)
                         .Where(tree => config.IsMatch(tree.FilePath))
-                        .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
-                        .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                        .Select(tree => new ExpandedResult(tree, expander.ExpandCode(tree, cancellationToken)))
+                        .OrderBy(rt => rt.SyntaxTree.FilePath, StringComparer.Ordinal)
                         .ToImmutableArray();
                 else
                     return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
                         .Where(tree => config.IsMatch(tree.FilePath))
-                        .Select(tree => (tree.FilePath, expander.ExpandCode(tree, cancellationToken)))
-                        .OrderBy(tree => tree.FilePath, StringComparer.Ordinal)
+                        .Select(tree => new ExpandedResult(tree, expander.ExpandCode(tree, cancellationToken)))
+                        .OrderBy(rt => rt.SyntaxTree.FilePath, StringComparer.Ordinal)
                         .ToImmutableArray();
             }
         }
@@ -103,19 +103,19 @@ namespace SourceExpander
         /// <summary>
         /// get dependencies
         /// </summary>
-        public ImmutableArray<(string FilePath, ImmutableArray<string> Dependencies)> Dependencies()
+        public ImmutableArray<ResolvedDependencies> Dependencies()
         {
-            if (!config.Enabled) return ImmutableArray<(string FilePath, ImmutableArray<string> Dependencies)>.Empty;
+            if (!config.Enabled) return ImmutableArray<ResolvedDependencies>.Empty;
             UpdateCompilation();
             cancellationToken.ThrowIfCancellationRequested();
 
             var expander = new CompilationExpander(compilation, container, config);
-            (string FilePath, ImmutableArray<string> Dependencies) ResolveDependency(SyntaxTree tree)
+            ResolvedDependencies ResolveDependency(SyntaxTree tree)
             {
                 if (expander is null)
                     throw new InvalidProgramException("expander must not be null.");
                 var deps = expander.ResolveDependency(tree, cancellationToken).Select(s => s.FileName);
-                return (tree.FilePath, ImmutableArray.CreateRange(deps));
+                return new(tree.FilePath, ImmutableArray.CreateRange(deps));
             }
 
             if (compilation.Options.ConcurrentBuild)
@@ -138,4 +138,13 @@ namespace SourceExpander
         /// </summary>
         public string ExpandAllForTesting(CancellationToken token) => new CompilationExpander(compilation, container, config).ExpandAllForTesting(token);
     }
+
+    /// <summary>
+    /// Result of Expanding
+    /// </summary>
+    public record struct ExpandedResult(SyntaxTree SyntaxTree, string ExpandedCode);
+    /// <summary>
+    /// Dependencies
+    /// </summary>
+    public record struct ResolvedDependencies(string FilePath, ImmutableArray<string> Dependencies);
 }

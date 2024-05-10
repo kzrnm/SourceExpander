@@ -141,7 +141,4 @@
   <data name="EXPAND0006_Body" xml:space="preserve">
     <value>{0} が AllowUnsafeBlocks を持っているので AllowUnsafeBlocks が必要です</value>
   </data>
-  <data name="EXPAND0006_Title" xml:space="preserve">
-    <value>AllowUnsafeBlocks が必要です</value>
-  </data>
 </root>

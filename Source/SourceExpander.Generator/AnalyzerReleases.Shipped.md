@@ -1,6 +1,19 @@
 ﻿; Shipped analyzer releases
 ; https://github.com/dotnet/roslyn-analyzers/blob/master/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
 
+## Release 7.0.0
+
+### New Rules
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+EXPAND0010 | Usage | Warning | Expanded code has unsafe block
+
+### Removed Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+EXPAND0006 | Usage | Warning | Needs AllowUnsafeBlocks
+
 ## Release 3.2.0
 
 ### New Rules
