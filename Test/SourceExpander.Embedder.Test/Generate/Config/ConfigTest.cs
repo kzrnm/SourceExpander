@@ -8,7 +8,7 @@ namespace SourceExpander.Generate.Config
 {
     public class ConfigTest : EmbedderGeneratorTestBase
     {
-        public static TheoryData<InMemorySourceText, object[]> ParseErrorJsons = new()
+        public static TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText, object[]>
         {
             {
                 new InMemorySourceText(

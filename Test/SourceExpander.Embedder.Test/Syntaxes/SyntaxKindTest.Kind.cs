@@ -751,7 +751,6 @@ public class Def
         public override string ExpectedCodeBody => "public class Def { public unsafe object M() { long x = 0; var p = &x; var pi = (Int32*)p; *pi = int.MaxValue; var y = x * *pi; p->CompareTo(2); return pi[1]; }  public object M2(string str) { unsafe { fixed (char* p = str) { var pi = (Int32*)p; *pi = sizeof(DateTime); return pi[1]; } } } }";
         public override string ExpectedMinifyCodeBody => "public class Def{public unsafe object M(){long x=0;var p=&x;var pi=(Int32*)p;*pi=int.MaxValue;var y=x* *pi;p->CompareTo(2);return pi[1];}public object M2(string str){unsafe{fixed(char*p=str){var pi=(Int32*)p;*pi=sizeof(DateTime);return pi[1];}}}}";
         public override IEnumerable<string> ExpectedNamespaces => ImmutableArray<string>.Empty;
-        public override bool ExpectedUnsafe => true;
     }
 
     public class ForTest : EmbedderGeneratorTestBaseWithValue
@@ -894,7 +893,6 @@ public class Def
         public override string ExpectedCodeBody => "public class Def { public unsafe void M(delegate*<int, void> f) { f(10); }  private static void F(int i) => Console.Write(i); public unsafe void M2() => M(&F); }";
         public override string ExpectedMinifyCodeBody => "public class Def{public unsafe void M(delegate*<int,void>f){f(10);}private static void F(int i)=>Console.Write(i);public unsafe void M2()=>M(&F);}";
         public override IEnumerable<string> ExpectedNamespaces => ImmutableArray<string>.Empty;
-        public override bool ExpectedUnsafe => true;
     }
 
     public class GotoTest : EmbedderGeneratorTestBaseWithValue

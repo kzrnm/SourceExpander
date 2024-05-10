@@ -11,14 +11,22 @@ namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]
     [DataContract]
-    internal class SourceFileInfo(
+    internal class SourceFileInfo
+    {
+        public SourceFileInfo(
         string? fileName,
         IEnumerable<string>? typeNames,
         IEnumerable<string>? usings,
         IEnumerable<string>? dependencies,
-        string? codeBody,
-        bool @unsafe = false)
-    {
+        string? codeBody)
+        {
+            FileName = fileName ?? "";
+            TypeNames = Sorted(typeNames, UsingComparer.Default);
+            Usings = Sorted(usings, UsingComparer.Default);
+            Dependencies = Sorted(dependencies, UsingComparer.Default);
+            CodeBody = codeBody ?? "";
+        }
+
         private static string[] Sorted(IEnumerable<string>? collection, IComparer<string> comparer)
         {
             if (collection is null)
@@ -29,17 +37,15 @@ namespace SourceExpander
         }
 
         [DataMember]
-        public string CodeBody { get; set; } = codeBody ?? "";
+        public string CodeBody { get; set; }
         [DataMember]
-        public IEnumerable<string> Dependencies { get; set; } = Sorted(dependencies, UsingComparer.Default);
+        public IEnumerable<string> Dependencies { get; set; }
         [DataMember]
-        public string FileName { get; set; } = fileName ?? "";
+        public string FileName { get; set; }
         [DataMember]
-        public IEnumerable<string> TypeNames { get; set; } = Sorted(typeNames, UsingComparer.Default);
+        public IEnumerable<string> TypeNames { get; set; }
         [DataMember]
-        public IEnumerable<string> Usings { get; set; } = Sorted(usings, UsingComparer.Default);
-        [DataMember(EmitDefaultValue = false)]
-        public bool Unsafe { get; set; } = @unsafe;
+        public IEnumerable<string> Usings { get; set; }
 
         public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
         public CSharpSyntaxTree ToSyntaxTree(CSharpParseOptions options,

@@ -307,15 +307,12 @@ namespace SourceExpander
                 reporter.ReportDiagnostic(
                     DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff(diffStr));
             }
-
-
             return new SourceFileInfoRaw(tree,
                         tree.FilePath,
                         typeFindAndUnusedUsingRemover.DefinedTypeNames,
                         typeFindAndUnusedUsingRemover.UsedTypes,
                         typeFindAndUnusedUsingRemover.RootUsings,
-                        minifiedCode,
-                        @unsafe: newRoot.DescendantTokens().Any(t => t.IsKind(SyntaxKind.UnsafeKeyword)));
+                        minifiedCode);
         }
         private SourceFileInfo[] ResolveRaw(ImmutableArray<SourceFileInfoRaw> infos, IEnumerable<SourceFileInfo> otherInfos)
         {
