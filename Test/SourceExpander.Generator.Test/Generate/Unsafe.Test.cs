@@ -10,7 +10,7 @@ namespace SourceExpander.Generate
         [Fact]
         public async Task Allow() => await Impl(true, []);
         [Fact]
-        public async Task NotAllow() => await Impl(false, [DiagnosticResult.CompilerWarning("EXPAND0010").WithSpan("/home/mine/Program.cs", 1, 1, 1, 1)]);
+        public async Task NotAllow() => await Impl(false, [DiagnosticResult.CompilerWarning("EXPAND0010").WithArguments("/home/mine/Program.cs")]);
 
         static async Task Impl(bool allowUnsafe, DiagnosticResult[] expectedDiagnostics)
         {
