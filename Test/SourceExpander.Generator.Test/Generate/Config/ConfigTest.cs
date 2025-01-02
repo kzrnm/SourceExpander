@@ -6,7 +6,7 @@ namespace SourceExpander.Generate.Config
 {
     public class ConfigTest : ExpandGeneratorTestBase
     {
-        public static readonly TheoryData ParseErrorJsons = new TheoryData<InMemorySourceText, object[]>
+        public static readonly TheoryData<InMemorySourceText, object[]> ParseErrorJsons = new()
         {
             {
                 new InMemorySourceText("/foo/bar/SourceExpander.Generator.Config.json", """
