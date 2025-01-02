@@ -16,7 +16,7 @@
 
     <LangVersion>latest</LangVersion>
 
-    <NoWarn>$(NoWarn);CA2249</NoWarn>
+    <NoWarn>$(NoWarn);CA2249;IDE0130</NoWarn>
 
     <PackageReadmeFile>README.md</PackageReadmeFile>
 

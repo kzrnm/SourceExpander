@@ -6,7 +6,7 @@ namespace SourceExpander
 {
     public class EmbeddingResolverTest
     {
-        public static TheoryData ResolveCommomPrefixTestData = new TheoryData<string[], string>
+        public static TheoryData<string[], string> ResolveCommomPrefixTestData = new()
         {
             {
                 new []{"", "foo"},

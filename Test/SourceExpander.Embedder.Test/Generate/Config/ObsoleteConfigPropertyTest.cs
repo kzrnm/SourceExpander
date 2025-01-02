@@ -7,7 +7,7 @@ namespace SourceExpander.Generate.Config
 {
     public class ObsoleteConfigTest : EmbedderGeneratorTestBase
     {
-        public static TheoryData ObsoleteConfig_Data = new TheoryData<InMemorySourceText, (string, string)[]>
+        public static TheoryData<InMemorySourceText, (string Obsolete, string Instead)[]> ObsoleteConfig_Data = new()
         {
             {
                 new("/foo/small/sourceExpander.embedder.config.json", @"{""notmatch"": 0, ""enable-minify"": false}"),
@@ -51,7 +51,7 @@ namespace SourceExpander.Generate.Config
             await test.RunAsync();
         }
 
-        public static TheoryData ObsoleteConfigProperty_Data = new TheoryData<DummyAnalyzerConfigOptionsProvider, (string, string)[]>
+        public static TheoryData<DummyAnalyzerConfigOptionsProvider, (string Obsolete, string Instead)[]> ObsoleteConfigProperty_Data = new()
         {
             {
                 new DummyAnalyzerConfigOptionsProvider
