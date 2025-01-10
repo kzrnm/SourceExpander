@@ -42,9 +42,6 @@ namespace SourceExpander
                     if (analyzerConfigOptions.TryGetValue(header + nameof(data.EnableMinify), out v) && !string.IsNullOrWhiteSpace(v))
                         data.EnableMinify = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
 #pragma warning restore CS0612
-
-                    if (analyzerConfigOptions.TryGetValue(buildPropHeader + nameof(data.ProjectDir), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.ProjectDir = v;
                 }
                 return data.ToImmutable();
             }
@@ -92,10 +89,6 @@ namespace SourceExpander
             [DataMember(Name = "enable-minify")]
             public bool? EnableMinify { set; get; }
 
-
-            [IgnoreDataMember]
-            public string? ProjectDir { set; get; }
-
             private EmbeddingType ParsedEmbeddingType
                 => Enum.TryParse(EmbeddingType, true, out EmbeddingType r) ? r : SourceExpander.EmbeddingType.GZipBase32768;
             private MinifyLevel ParsedMinifyLevel
@@ -114,7 +107,6 @@ namespace SourceExpander
                         RemoveConditional,
                         EmbeddingSourceClass?.ToImmutable(),
                         ParsedEmbeddingFileNameType,
-                        ProjectDir,
                         expandingSymbol: ExpandingSymbol,
                         obsoleteConfigProperties: GetObsoleteConfigProperties());
 

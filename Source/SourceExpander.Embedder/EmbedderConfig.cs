@@ -18,7 +18,6 @@ namespace SourceExpander
     /// <param name="EmbeddingFileNameType">Embedded file name type.</param>
     /// <param name="ObsoleteConfigProperties">Obsolete config property in json.</param>
     /// <param name="ExpandingSymbol">if <paramref name="ExpandingSymbol"/> is in preprocessor symbols, source codes will be expanded in the library.</param>
-    /// <param name="ProjectDir">Project directory.</param>
     internal partial record EmbedderConfig(
          bool Enabled,
          ImmutableArray<string> Include,
@@ -30,8 +29,7 @@ namespace SourceExpander
          ImmutableHashSet<string> RemoveConditional,
          EmbeddingSourceClass EmbeddingSourceClass,
          EmbeddingFileNameType EmbeddingFileNameType,
-         string? ExpandingSymbol,
-         string ProjectDir
+         string? ExpandingSymbol
     )
     {
         public EmbedderConfig(
@@ -44,7 +42,6 @@ namespace SourceExpander
             string[]? removeConditional = null,
             EmbeddingSourceClass? embeddingSourceClass = null,
             EmbeddingFileNameType embeddingFileNameType = EmbeddingFileNameType.WithoutCommonPrefix,
-            string? projectDir = null,
             string? expandingSymbol = null,
             ImmutableArray<ObsoleteConfigProperty> obsoleteConfigProperties = default)
             : this(
@@ -58,8 +55,7 @@ namespace SourceExpander
                 RemoveConditional: CreateImmutableHashSet(removeConditional),
                 EmbeddingSourceClass: embeddingSourceClass ?? new EmbeddingSourceClass(false),
                 EmbeddingFileNameType: embeddingFileNameType,
-                ExpandingSymbol: expandingSymbol,
-                ProjectDir: projectDir ?? string.Empty
+                ExpandingSymbol: expandingSymbol
             )
         {
         }
