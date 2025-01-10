@@ -4,16 +4,27 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-internal partial class SourceExpanderCommand : ConsoleAppBase
+partial struct SourceExpanderCommand
 {
-    [Command("dependency", "Show dependency json")]
+    /// <summary>
+    /// Show dependency json.
+    /// </summary>
+    /// <param name="target">Target project(.csproj/.cs).</param>
+    /// <param name="fullFilePath">-p,File name as full path.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    [Command("dependency")]
     public async Task Dependency(
-        [Option(0, "target project(.csproj/.cs)")] string target,
-        [Option("p", "file name as full path")] bool fullFilePath = false)
+        [Argument] string target,
+        bool fullFilePath = false,
+        CancellationToken cancellationToken = default)
     {
         var targetInfo = new FileInfo(target);
         if (!targetInfo.Exists)
@@ -27,7 +38,7 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
         if (fullFilePath)
             props.Add("SourceExpander_Embedder_EmbeddingFileNameType", "FullPath");
 
-        var (compilation, csProject) = await GetCompilation(project, props);
+        var (compilation, csProject) = await GetCompilation(project, props, cancellationToken: cancellationToken);
         if (compilation is not CSharpCompilation csCompilation)
             throw new InvalidOperationException("Failed to get compilation");
         if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
@@ -41,40 +52,39 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
                 out var version) && version < new Version(5, 0, 0, 0))
             {
                 if (version is null)
-                    await Console.Error.WriteLineAsync("needs SourceExpander.Embedder 5.0.0 or newer");
+                    await Error.WriteLineAsync("needs SourceExpander.Embedder 5.0.0 or newer");
                 else
-                    await Console.Error.WriteLineAsync($"needs SourceExpander.Embedder 5.0.0 or newer, Current: {version}");
+                    await Error.WriteLineAsync($"needs SourceExpander.Embedder 5.0.0 or newer, Current: {version}");
 
                 Environment.Exit(1);
                 return;
             }
         }
-        var metadatas = metadataResolver.GetEmbeddedSourceFiles(true, Context.CancellationToken)
+        var metadatas = metadataResolver
+            .GetEmbeddedSourceFiles(true, cancellationToken)
             .ToArray();
 
         var infos = metadatas.SelectMany(t => t.Data.Sources)
-            .Select(t => new
-            {
-                t.FileName,
-                t.Dependencies,
-                t.TypeNames,
-            });
+            .Select(t => new DependencyResult(
+                FileName: t.FileName,
+                Dependencies: t.Dependencies,
+                TypeNames: t.TypeNames
+            ));
         if (metadatas.FirstOrDefault(t => t.Name == compilation.AssemblyName) is not { Data.Sources.Length: > 0 })
         {
             infos = infos.Concat(
                 new EmbeddedLoader(csCompilation,
                 parseOptions,
                 new ExpandConfig(),
-                Context.CancellationToken)
+                cancellationToken)
                 .Dependencies()
-                .Select(t => new
-                {
-                    FileName = t.FilePath,
-                    Dependencies = (IEnumerable<string>)t.Dependencies,
-                    TypeNames = Enumerable.Empty<string>(),
-                }));
+                .Select(t => new DependencyResult(
+                    FileName: t.FilePath,
+                    Dependencies: t.Dependencies,
+                    TypeNames: Enumerable.Empty<string>()
+                )));
         }
         var result = JsonSerializer.Serialize(infos, DefaultSerializerOptions);
-        Console.WriteLine(result);
+        Output.WriteLine(result);
     }
 }

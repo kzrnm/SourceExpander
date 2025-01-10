@@ -13,6 +13,6 @@ namespace SourceExpander
             return sb.ToString();
         }
         public static string ReplaceEOL(this string str)
-            => JoinByStringBuilder(str.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None));
+            => JoinByStringBuilder(str.Split(["\r\n", "\n"], StringSplitOptions.None));
     }
 }

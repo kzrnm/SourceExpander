@@ -69,23 +69,23 @@ namespace SourceExpander.Share
                 ImmutableArray.Create(
                     new SourceFileInfo(
                         "_SampleLibrary>Bit.cs",
-                        new[] { "SampleLibrary.Bit" },
-                        new[] { "using System.Runtime.CompilerServices;", "using System.Runtime.Intrinsics.X86;" },
+                        ["SampleLibrary.Bit"],
+                        ["using System.Runtime.CompilerServices;", "using System.Runtime.Intrinsics.X86;"],
                         Array.Empty<string>(),
                         "namespace SampleLibrary { public static class Bit { [MethodImpl(MethodImplOptions.AggressiveInlining)] public static int ExtractLowestSetBit(int n) { if (Bmi1.IsSupported) { return (int)Bmi1.ExtractLowestSetBit((uint)n); } return n & -n; } } } "
                     ),
                     new SourceFileInfo(
                         "_SampleLibrary>Put.cs",
-                        new[] { "SampleLibrary.Put" },
-                        new[] { "using System.Diagnostics;" },
-                        new[] { "_SampleLibrary>Xorshift.cs" },
+                        ["SampleLibrary.Put"],
+                        ["using System.Diagnostics;"],
+                        ["_SampleLibrary>Xorshift.cs"],
                         "namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } "
                     ),
                     new SourceFileInfo
                     (
                         "_SampleLibrary>Xorshift.cs",
-                        new[] { "SampleLibrary.Xorshift" },
-                        new[] { "using System;" },
+                        ["SampleLibrary.Xorshift"],
+                        ["using System;"],
                         Array.Empty<string>(),
                         "namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } "
                     )
@@ -161,9 +161,9 @@ namespace SourceExpander.Share
                 ImmutableArray.Create(
                     new SourceFileInfo(
                         "_SampleLibrary2>Put2.cs",
-                        new[] { "SampleLibrary.Put2" },
+                        ["SampleLibrary.Put2"],
                         Array.Empty<string>(),
-                        new[] { "_SampleLibrary>Put.cs" },
+                        ["_SampleLibrary>Put.cs"],
                         "namespace SampleLibrary { public static class Put2 { public static void Write() => Put.WriteRandom(); } } "
                     )
                 ),
