@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;IDE0056;IDE0057</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;IDE0056;IDE0057</NoWarn>
 
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Generator</PackageId>
