@@ -16,4 +16,7 @@ AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) =>
 
     return null;
 };
-ConsoleApp.Run<SourceExpanderCommand>(args);
+
+var app = ConsoleApp.Create();
+app.Add<SourceExpanderCommand>();
+app.Run(args);

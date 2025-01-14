@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <SourceExpander_Generator_StaticEmbeddingText>// Static Generate 	 // Property</SourceExpander_Generator_StaticEmbeddingText>
+    <SourceExpander_Generator_ExpandingPosition>AfterUsings</SourceExpander_Generator_ExpandingPosition>
+    <SourceExpander_Generator_ExpandingAll>false</SourceExpander_Generator_ExpandingAll>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\Source\Sandbox\SampleApp\*.cs" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_Enabled" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_MatchFilePattern" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_IgnoreFilePatternRegex" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_StaticEmbeddingText" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingAll" />
+    <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingPosition" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ac-library-csharp" Version="[3.9.1-atcoder1]" />
+    <ProjectReference Include="..\..\..\Source\Sandbox\SampleLibrary\SampleLibrary.csproj" />
+    <ProjectReference Include="..\..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <StartupObject>SampleApp.Program</StartupObject>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+</Project>

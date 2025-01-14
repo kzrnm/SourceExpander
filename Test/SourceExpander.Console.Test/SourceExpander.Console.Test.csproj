@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <RootNamespace>SourceExpander</RootNamespace>
 
     <IsPackable>false</IsPackable>
     <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
@@ -12,7 +13,7 @@
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
-    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.v3" Version="1.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -21,9 +22,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <ProjectReference Include="..\..\Source\SourceExpander.Console\SourceExpander.Console.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SourceExpander.Console\SourceExpander.Console.csproj" />
+    <Compile Remove="tools/**" />
+    <None Remove="tools/**" />
   </ItemGroup>
 </Project>

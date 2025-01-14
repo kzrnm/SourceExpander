@@ -1,25 +1,32 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
-internal partial class SourceExpanderCommand : ConsoleAppBase
+partial struct SourceExpanderCommand
 {
-    [Command("library-list", @"Show embedded libraries list from dependency
-
-<assembly name>,<version>")]
+    /// <summary>
+    /// List embedded libraries from dependency.
+    /// </summary>
+    /// <param name="target">Target project(.csproj/.cs).</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    [Command("library-list")]
     public async Task LibraryList(
-        [Option(0, "target project(.csproj/.cs)")] string target)
+        [Argument] string target,
+        CancellationToken cancellationToken = default)
     {
         var targetInfo = new FileInfo(target);
         if (!targetInfo.Exists)
             throw new ArgumentException("File does not exist.", nameof(target));
         var project = targetInfo.Extension == ".csproj" ? targetInfo.FullName : PathUtil.GetProjectPath(target);
-        var (compilation, _) = await GetCompilation(project);
+        var (compilation, _) = await GetCompilation(project, cancellationToken: cancellationToken);
 
-        if (compilation is not CSharpCompilation)
+        if (compilation == null)
             throw new InvalidOperationException("Failed to get compilation");
 
         var metadataResolver = new AssemblyMetadataResolver(compilation);
@@ -31,7 +38,7 @@ internal partial class SourceExpanderCommand : ConsoleAppBase
             var dict = metadataResolver.GetAssemblyMetadata(symbol);
             if (dict.TryGetValue("SourceExpander.EmbedderVersion", out var version))
             {
-                Console.WriteLine($"{symbol.Name},{version}");
+                Output.WriteLine($"{symbol.Name},{version}");
             }
         }
     }

@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);1702;IDE0056;IDE0057</NoWarn>
 
     <RootNamespace>SourceExpander</RootNamespace>
 
@@ -20,6 +21,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="SourceExpander.Console.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6" />
     <Using Include="SourceExpander" />
+    <Using Include="ConsoleAppFramework" />
 
     <Compile Include="../SourceExpander.Share/**/EmbeddedData.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/SourceFileInfo.cs" LinkBase="Share" />
@@ -32,11 +34,13 @@
 
   <ItemGroup>
     <PackageReference Include="Base32768" Version="2.0.2" />
-    <PackageReference Include="ConsoleAppFramework" Version="4.2.4" />
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.6.10" />
-    <PackageReference Include="Microsoft.Build" Version="17.8.3" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.3.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.3.1" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="ConsoleAppFramework" Version="5.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
+    <PackageReference Include="Microsoft.Build" Version="17.11.4" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0" />
   </ItemGroup>
 </Project>
