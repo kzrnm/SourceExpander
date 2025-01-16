@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Linq;
 using DotNet.Globbing;
 
@@ -14,7 +14,7 @@ namespace SourceExpander
     /// <param name="ExcludeAttributes">Attribute full name that remove on embedding.</param>
     /// <param name="MinifyLevel">Minify level of source code.</param>
     /// <param name="RemoveConditional">Remove method with ConditionalAttribute whose argument is in <see cref="RemoveConditional"/>.</param>
-    /// <param name="EmbeddingSourceClass">For debug. embedding source class.</param>
+    /// <param name="EmbeddingSourceClassName">For debug. If not null, the generator embed source class with the class name.</param>
     /// <param name="EmbeddingFileNameType">Embedded file name type.</param>
     /// <param name="ObsoleteConfigProperties">Obsolete config property in json.</param>
     /// <param name="ExpandingSymbol">if <paramref name="ExpandingSymbol"/> is in preprocessor symbols, source codes will be expanded in the library.</param>
@@ -27,7 +27,7 @@ namespace SourceExpander
          ImmutableHashSet<string> ExcludeAttributes,
          MinifyLevel MinifyLevel,
          ImmutableHashSet<string> RemoveConditional,
-         EmbeddingSourceClass EmbeddingSourceClass,
+         string? EmbeddingSourceClassName,
          EmbeddingFileNameType EmbeddingFileNameType,
          string? ExpandingSymbol
     )
@@ -40,7 +40,7 @@ namespace SourceExpander
             string[]? excludeAttributes = null,
             MinifyLevel minifyLevel = MinifyLevel.Default,
             string[]? removeConditional = null,
-            EmbeddingSourceClass? embeddingSourceClass = null,
+            string? embeddingSourceClassName = null,
             EmbeddingFileNameType embeddingFileNameType = EmbeddingFileNameType.WithoutCommonPrefix,
             string? expandingSymbol = null,
             ImmutableArray<ObsoleteConfigProperty> obsoleteConfigProperties = default)
@@ -53,7 +53,7 @@ namespace SourceExpander
                 MinifyLevel: minifyLevel,
                 ExcludeAttributes: CreateImmutableHashSet(excludeAttributes),
                 RemoveConditional: CreateImmutableHashSet(removeConditional),
-                EmbeddingSourceClass: embeddingSourceClass ?? new EmbeddingSourceClass(false),
+                EmbeddingSourceClassName: embeddingSourceClassName,
                 EmbeddingFileNameType: embeddingFileNameType,
                 ExpandingSymbol: expandingSymbol
             )
@@ -93,14 +93,7 @@ namespace SourceExpander
     public record ObsoleteConfigProperty(string Name, string Instead)
     {
         public static ObsoleteConfigProperty EnableMinify { get; } = new("enable-minify", "minify-level");
-    }
-
-    public record EmbeddingSourceClass(bool Enabled = false, string? ClassName = null)
-    {
-        public bool Enabled { set; get; } = Enabled;
-        public string ClassName { set; get; } = string.IsNullOrWhiteSpace(ClassName) ? "SourceFileInfoContainer" : ClassName!;
-
-        public override string ToString() => Enabled ? $"class: {ClassName}" : "disable";
+        public static ObsoleteConfigProperty EmbeddingSourceClass { get; } = new("embedding-source-class", "embedding-source-class-name");
     }
 
     public enum MinifyLevel

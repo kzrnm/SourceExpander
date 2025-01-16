@@ -23,6 +23,13 @@ namespace SourceExpander.Generate.Config
                     ("enable-minify", "minify-level"),
                 }
             },
+            {
+                new("/foo/bar/SourceExpander.Embedder.Config.json", @"{""embedding-source-class"": {}}"),
+                new[]
+                {
+                    ("embedding-source-class", "embedding-source-class-name"),
+                }
+            }
         };
 
         [Theory]

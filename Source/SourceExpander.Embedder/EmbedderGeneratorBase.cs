@@ -47,10 +47,10 @@ namespace SourceExpander
                 ctx.AddSource(
                     "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
 
-                if (config.EmbeddingSourceClass.Enabled)
+                if (config.EmbeddingSourceClassName != null)
                     ctx.AddSource(
                         "EmbeddingSourceClass.cs",
-                        CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClass.ClassName));
+                        CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClassName));
 
                 if (config.ExpandingSymbol is { } s && parseOptions.PreprocessorSymbolNames.Contains(s))
                     ctx.AddSource("ExpandInLibrary.cs", ExpandInLibrary(resolvedSources));

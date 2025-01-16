@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "additionalProperties": true,
     "properties": {
@@ -54,20 +54,19 @@
                 }
             ]
         },
-        "embedding-source-class": {
-            "type": "object",
-            "description": "For debug. embedding source class.",
-            "properties": {
-                "enabled": {
-                    "type": "boolean",
-                    "default": false
+        "embedding-source-class-name": {
+            "oneOf": [
+                {
+                    "type": "string"
                 },
-                "class-name": {
-                    "description": "Embedding source code class name",
-                    "type": "string",
-                    "default": "SourceFileInfoContainer"
+                {
+                    "type": "null"
                 }
-            }
+            ],
+            "description": "For debug. If not null, the generator embed source class with the class name.",
+            "examples": [
+                "SourceFileInfoContainer"
+            ]
         },
         "remove-conditional": {
             "description": "Remove method Conditional(\"{Value}\")",

@@ -52,16 +52,6 @@ namespace SourceExpander
         }
 
         [DataContract]
-        private class SourceClassData
-        {
-            [DataMember(Name = "enabled")]
-            public bool? Enabled { set; get; }
-            [DataMember(Name = "class-name")]
-            public string? ClassName { set; get; }
-            public EmbeddingSourceClass ToImmutable() => new(Enabled == true, ClassName);
-        }
-
-        [DataContract]
         private class EmbedderConfigData
         {
             [DataMember(Name = "enabled")]
@@ -78,13 +68,16 @@ namespace SourceExpander
             public string? MinifyLevel { set; get; }
             [DataMember(Name = "remove-conditional")]
             public string[]? RemoveConditional { set; get; }
-            [DataMember(Name = "embedding-source-class")]
-            public SourceClassData? EmbeddingSourceClass { set; get; }
+            [DataMember(Name = "embedding-source-class-name")]
+            public string? EmbeddingSourceClassName { set; get; }
             [DataMember(Name = "embedding-filename-type")]
             public string? EmbeddingFileNameType { set; get; }
             [DataMember(Name = "expanding-symbol")]
             public string? ExpandingSymbol { set; get; }
 
+            [Obsolete]
+            [DataMember(Name = "embedding-source-class")]
+            public object? EmbeddingSourceClass { set; get; }
             [Obsolete]
             [DataMember(Name = "enable-minify")]
             public bool? EnableMinify { set; get; }
@@ -105,7 +98,7 @@ namespace SourceExpander
                         ExcludeAttributes,
                         ParsedMinifyLevel,
                         RemoveConditional,
-                        EmbeddingSourceClass?.ToImmutable(),
+                        EmbeddingSourceClassName,
                         ParsedEmbeddingFileNameType,
                         expandingSymbol: ExpandingSymbol,
                         obsoleteConfigProperties: GetObsoleteConfigProperties());
@@ -116,6 +109,8 @@ namespace SourceExpander
 #pragma warning disable CS0612
                 if (EnableMinify.HasValue)
                     builder.Add(ObsoleteConfigProperty.EnableMinify);
+                if (EmbeddingSourceClass != null)
+                    builder.Add(ObsoleteConfigProperty.EmbeddingSourceClass);
 #pragma warning restore CS0612
                 return builder.ToImmutable();
             }
