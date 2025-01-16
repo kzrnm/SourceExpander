@@ -12,7 +12,7 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    internal class CompilationExpander
+    internal partial class CompilationExpander
     {
         private readonly SourceFileContainer sourceFileContainer;
         private ExpandConfig Config { get; }
@@ -149,6 +149,15 @@ namespace SourceExpander
             return requiedFiles;
         }
 
+        static Match? MatchAssemblyName(string s)
+#if NET7_0_OR_GREATER
+            => MatchAssemblyNameRegex().Match(s);
+        [GeneratedRegex("^[^>]+")]
+        private static partial Regex MatchAssemblyNameRegex();
+#else
+            => Regex.Match(s, "^[^>]+");
+#endif
+
         private void Embedded(StringBuilder sb, IEnumerable<SourceFileInfo> requiedFiles, IEnumerable<string> importButUnusedNamespaces, CancellationToken cancellationToken = default)
         {
             sb.AppendLine("#region Expanded by https://github.com/kzrnm/SourceExpander");
@@ -160,8 +169,7 @@ namespace SourceExpander
                 var groupedCodes = new Dictionary<string, List<string>>();
                 foreach (var s in requiedFiles)
                 {
-                    var match = Regex.Match(s.FileName, "^[^>]+");
-                    var assemblyName = match?.Value ?? "<unknown assembly>";
+                    var assemblyName = MatchAssemblyName(s.FileName)?.Value ?? "<unknown assembly>";
                     if (!groupedCodes.TryGetValue(assemblyName, out var list))
                     {
                         list = groupedCodes[assemblyName] = new List<string>();
