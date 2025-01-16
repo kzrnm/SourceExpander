@@ -23,6 +23,7 @@
     <Using Include="SourceExpander" />
     <Using Include="ConsoleAppFramework" />
 
+    <Compile Include="../SourceExpander.Share/**/Attributes.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/EmbeddedData.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/SourceFileInfo.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/SourceFileContainer.cs" LinkBase="Share" />

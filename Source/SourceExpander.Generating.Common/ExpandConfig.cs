@@ -18,6 +18,7 @@ namespace SourceExpander
     /// <param name="ExpandingAll">if true, the generator expand all embedded source. For Testing.</param>
     /// <param name="ExpandingByGroup">if true, the generator write `#region &lt;AssemblyName&gt;`.</param>
     /// <param name="ExpandingPosition">Position of expanded source</param>
+    [GeneratorConfig]
     public partial record ExpandConfig(
          bool Enabled,
          ImmutableArray<string> MatchFilePatterns,

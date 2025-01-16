@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using DotNet.Globbing;
 
@@ -18,6 +18,7 @@ namespace SourceExpander
     /// <param name="EmbeddingFileNameType">Embedded file name type.</param>
     /// <param name="ObsoleteConfigProperties">Obsolete config property in json.</param>
     /// <param name="ExpandingSymbol">if <paramref name="ExpandingSymbol"/> is in preprocessor symbols, source codes will be expanded in the library.</param>
+    [GeneratorConfig]
     internal partial record EmbedderConfig(
          bool Enabled,
          ImmutableArray<string> Include,

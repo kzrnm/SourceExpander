@@ -30,6 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ConfigGenerator\ConfigAnalyzer.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
     <Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
@@ -55,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="build\SourceExpander.Embedder.props" />
+    <AdditionalFiles Include="build\SourceExpander.Embedder.props"/>
   </ItemGroup>
 
   <ItemGroup>

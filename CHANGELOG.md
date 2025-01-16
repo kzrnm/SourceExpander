@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### 
 - Add `auto-generated` header
+- Add missing `CompilerVisibleProperty`
 ### Changed
 - Update SourceExpander.Console
 - Use `global::` in generated code
+- **breaking change** SourceExpander.Embedder: Deprecate `EmbeddingSourceClass` in the settings and introduce `EmbeddingSourceClassName`
 
 ## [7.0.0] - 2024-01-30
 ### Added

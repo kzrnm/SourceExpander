@@ -27,6 +27,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ConfigGenerator\ConfigAnalyzer.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
     <Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
@@ -52,6 +59,7 @@
     <Compile Remove="**/Roslyn3/*.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="build\SourceExpander.Generator.props" />
     <None Remove="build\SourceExpander.Generator.props" />
   </ItemGroup>
 
