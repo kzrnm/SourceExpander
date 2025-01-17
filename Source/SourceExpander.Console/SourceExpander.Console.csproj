@@ -23,6 +23,7 @@
     <Using Include="SourceExpander" />
     <Using Include="ConsoleAppFramework" />
 
+    <Compile Include="../SourceExpander.Share/**/Attributes.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/EmbeddedData.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/SourceFileInfo.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Share/**/SourceFileContainer.cs" LinkBase="Share" />
@@ -34,13 +35,13 @@
 
   <ItemGroup>
     <PackageReference Include="Base32768" Version="2.0.2" />
-    <PackageReference Include="ConsoleAppFramework" Version="5.3.3">
+    <PackageReference Include="ConsoleAppFramework" Version="5.3.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
     <PackageReference Include="Microsoft.Build" Version="17.11.4" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.11.0" />
   </ItemGroup>
 </Project>

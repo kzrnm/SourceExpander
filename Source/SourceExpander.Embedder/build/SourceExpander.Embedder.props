@@ -1,11 +1,15 @@
 <Project>
 	<ItemGroup>
-		<CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_Include" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_Exclude" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_MinifyLevel" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingType" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_ExcludeAttributes" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_RemoveConditional" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingFileNameType" />
-		<CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandingSymbol" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandingSymbol" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandInLibrary" />
+		<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingSourceClassName" />
 	</ItemGroup>
 </Project>

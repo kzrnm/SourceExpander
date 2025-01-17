@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Embedder": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\SourceExpander.Embedder\\SourceExpander.Embedder.csproj"
+    },
+    "Generator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\SourceExpander.Generator\\SourceExpander.Generator.csproj"
+    }
+  }
+}

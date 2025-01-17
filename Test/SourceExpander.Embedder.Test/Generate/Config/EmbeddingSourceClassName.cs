@@ -5,19 +5,17 @@ using Xunit;
 
 namespace SourceExpander.Generate.Config
 {
-    public class ExcludeAttributesTest : EmbedderGeneratorTestBase
+    public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
     {
         [Fact]
-        public async Task ExcludeAttributes()
+        public async Task EmbeddingSourceClassNone()
         {
             var additionalText = new InMemorySourceText(
                 "/foo/bar/SourceExpander.Embedder.Config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
     "embedding-type": "Raw",
-    "exclude-attributes": [
-        "System.Diagnostics.DebuggerDisplayAttribute"
-    ],
+    "embedding-source-class-name": null,
     "minify-level": "full"
 }
 """);
@@ -28,11 +26,11 @@ namespace SourceExpander.Generate.Config
                  (
                      "TestProject>Program.cs",
                      ["Program"],
-                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
             var test = new Test
             {
@@ -50,16 +48,13 @@ namespace SourceExpander.Generate.Config
 using System;
 using System.Diagnostics;
 
-[DebuggerDisplay(""Name"")]
 class Program
 {
     static void Main()
     {
+        Debug.Assert(true);
         Console.WriteLine(1);
     }
-
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
 }
 "
                         ),
@@ -89,14 +84,17 @@ class Program
         }
 
         [Fact]
-        public async Task ExcludeAttributesProperty()
+        public async Task EmbeddingSourceClass()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-                { "build_property.SourceExpander_Embedder_ExcludeAttributes", "System.Diagnostics.DebuggerDisplayAttribute;System.Diagnostics.DebuggerDisplayAttribute" },
-            };
+            var additionalText = new InMemorySourceText(
+                "/foo/bar/SourceExpander.Embedder.Config.json", """
+{
+    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+    "embedding-type": "Raw",
+    "embedding-source-class-name": "Container",
+    "minify-level": "full"
+}
+""");
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
@@ -104,36 +102,37 @@ class Program
                  (
                      "TestProject>Program.cs",
                      ["Program"],
-                     ImmutableArray.Create("using System;"),
+                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     """class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);}"""
+                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
                  ));
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
                 TestState =
                 {
+                    AdditionalFiles =
+                    {
+                        additionalText,
+                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                    },
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            """
+                            @"
 using System;
 using System.Diagnostics;
 
-[DebuggerDisplay("Name")]
 class Program
 {
     static void Main()
     {
+        Debug.Assert(true);
         Console.WriteLine(1);
     }
-
-    [System.Diagnostics.Conditional("TEST")]
-    static void T() => Console.WriteLine(2);
 }
-"""
+"
                         ),
                     },
                     GeneratedSources =
@@ -147,6 +146,39 @@ class Program
                         [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
                         
                         """
+                        ),
+                        (typeof(EmbedderGenerator), "EmbeddingSourceClass.cs",
+                        EnvironmentUtil.JoinByStringBuilder(
+                            "// <auto-generated/>",
+                            "#pragma warning disable",
+                            "namespace SourceExpander.Embedded{",
+                            "using System;",
+                            "using System.Collections.Generic;",
+                            "public class Container{",
+                            "public class SourceFileInfo{",
+                            "  public string FileName{get;set;}",
+                            "  public string[] TypeNames{get;set;}",
+                            "  public string[] Usings{get;set;}",
+                            "  public string[] Dependencies{get;set;}",
+                            "  public string CodeBody{get;set;}",
+                            "}",
+                            "  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{",
+                            "    new SourceFileInfo{",
+                            "      FileName = \"TestProject>Program.cs\",",
+                            "      CodeBody = \"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",",
+                            "      TypeNames = new string[]{",
+                            "        \"Program\",",
+                            "      },",
+                            "      Usings = new string[]{",
+                            "        \"using System;\",",
+                            "        \"using System.Diagnostics;\",",
+                            "      },",
+                            "      Dependencies = new string[]{",
+                            "      },",
+                            "    },",
+                            "  };",
+                            "}",
+                            "}")
                         ),
                     }
                 }

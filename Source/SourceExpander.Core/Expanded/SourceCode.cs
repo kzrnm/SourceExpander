@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-#pragma warning disable IDE0018,IDE0034,IDE0038
+﻿#pragma warning disable IDE0001
 namespace SourceExpander.Expanded
 {
     public class SourceCode
@@ -9,7 +8,7 @@ namespace SourceExpander.Expanded
             Path = path;
             Code = code;
         }
-        private static bool TryGet<T>(Dictionary<string, object> dic, string key, out T val)
+        private static bool TryGet<T>(global::System.Collections.Generic.Dictionary<string, object> dic, string key, out T val)
         {
             object obj;
             if (dic.TryGetValue(key, out obj) && obj is T)
@@ -20,7 +19,7 @@ namespace SourceExpander.Expanded
             val = default(T);
             return false;
         }
-        public static SourceCode FromDictionary(Dictionary<string, object> dic)
+        public static SourceCode FromDictionary(global::System.Collections.Generic.Dictionary<string, object> dic)
         {
             string path;
             string code;
@@ -28,7 +27,7 @@ namespace SourceExpander.Expanded
             TryGet(dic, "code", out code);
             return new SourceCode(path, code);
         }
-        public string Path { get; }
-        public string Code { get; }
+        public string Path { private set; get; }
+        public string Code { private set; get; }
     }
 }

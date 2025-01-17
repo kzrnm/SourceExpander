@@ -1,11 +1,11 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "additionalProperties": true,
     "properties": {
         "enabled": {
             "type": "boolean",
-            "default": true
+            "default": false
         },
         "include": {
             "type": [
@@ -54,20 +54,20 @@
                 }
             ]
         },
-        "embedding-source-class": {
-            "type": "object",
-            "description": "For debug. embedding source class.",
-            "properties": {
-                "enabled": {
-                    "type": "boolean",
-                    "default": false
-                },
-                "class-name": {
-                    "description": "Embedding source code class name",
+        "embedding-source-class-name": {
+            "oneOf": [
+                {
                     "type": "string",
-                    "default": "SourceFileInfoContainer"
+                    "minLength": 1
+                },
+                {
+                    "type": "null"
                 }
-            }
+            ],
+            "description": "For debug. If not null, the generator embed source class with the class name.",
+            "examples": [
+                "SourceFileInfoContainer"
+            ]
         },
         "remove-conditional": {
             "description": "Remove method Conditional(\"{Value}\")",
@@ -96,13 +96,10 @@
                 "FullPath"
             ]
         },
-        "expanding-symbol": {
-            "description": "if expanding-symbol is in preprocessor symbols, source codes will be expanded in the library.",
-            "type": [
-                "string",
-                "null"
-            ],
-            "default": null
+        "expand-in-library": {
+            "description": "if true, source codes will be expanded in the library.",
+            "type": "boolean",
+            "default": false
         },
         "exclude-attributes": {
             "description": "Attribute full name that remove on embedding.",
