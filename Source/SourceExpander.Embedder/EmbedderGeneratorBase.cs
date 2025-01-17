@@ -52,7 +52,7 @@ namespace SourceExpander
                         "EmbeddingSourceClass.cs",
                         CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClassName));
 
-                if (config.ExpandingSymbol is { } s && parseOptions.PreprocessorSymbolNames.Contains(s))
+                if (config.ExpandInLibrary)
                     ctx.AddSource("ExpandInLibrary.cs", ExpandInLibrary(resolvedSources));
 
             }

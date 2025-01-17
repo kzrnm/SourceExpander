@@ -5,7 +5,7 @@
     "properties": {
         "enabled": {
             "type": "boolean",
-            "default": true
+            "default": false
         },
         "include": {
             "type": [
@@ -96,13 +96,10 @@
                 "FullPath"
             ]
         },
-        "expanding-symbol": {
-            "description": "if expanding-symbol is in preprocessor symbols, source codes will be expanded in the library.",
-            "type": [
-                "string",
-                "null"
-            ],
-            "default": null
+        "expand-in-library": {
+            "description": "if true, source codes will be expanded in the library.",
+            "type": "boolean",
+            "default": false
         },
         "exclude-attributes": {
             "description": "Attribute full name that remove on embedding.",

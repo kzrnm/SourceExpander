@@ -17,7 +17,7 @@ namespace SourceExpander
     /// <param name="EmbeddingSourceClassName">For debug. If not null, the generator embed source class with the class name.</param>
     /// <param name="EmbeddingFileNameType">Embedded file name type.</param>
     /// <param name="ObsoleteConfigProperties">Obsolete config property in json.</param>
-    /// <param name="ExpandingSymbol">if <paramref name="ExpandingSymbol"/> is in preprocessor symbols, source codes will be expanded in the library.</param>
+    /// <param name="ExpandInLibrary">if true, source codes will be expanded in the library.</param>
     [GeneratorConfig]
     internal partial record EmbedderConfig(
          bool Enabled,
@@ -30,7 +30,7 @@ namespace SourceExpander
          ImmutableHashSet<string> RemoveConditional,
          string? EmbeddingSourceClassName,
          EmbeddingFileNameType EmbeddingFileNameType,
-         string? ExpandingSymbol
+         bool ExpandInLibrary
     )
     {
         public EmbedderConfig(
@@ -43,7 +43,7 @@ namespace SourceExpander
             string[]? removeConditional = null,
             string? embeddingSourceClassName = null,
             EmbeddingFileNameType embeddingFileNameType = EmbeddingFileNameType.WithoutCommonPrefix,
-            string? expandingSymbol = null,
+            bool? expandInLibrary = null,
             ImmutableArray<ObsoleteConfigProperty> obsoleteConfigProperties = default)
             : this(
                 Enabled: enabled,
@@ -56,7 +56,7 @@ namespace SourceExpander
                 RemoveConditional: CreateImmutableHashSet(removeConditional),
                 EmbeddingSourceClassName: embeddingSourceClassName,
                 EmbeddingFileNameType: embeddingFileNameType,
-                ExpandingSymbol: expandingSymbol
+                ExpandInLibrary: expandInLibrary ?? false
             )
         {
         }
@@ -95,6 +95,7 @@ namespace SourceExpander
     {
         public static ObsoleteConfigProperty EnableMinify { get; } = new("enable-minify", "minify-level");
         public static ObsoleteConfigProperty EmbeddingSourceClass { get; } = new("embedding-source-class", "embedding-source-class-name");
+        public static ObsoleteConfigProperty ExpandingSymbol { get; } = new("expanding-symbol", "expand-in-library");
     }
 
     public enum MinifyLevel

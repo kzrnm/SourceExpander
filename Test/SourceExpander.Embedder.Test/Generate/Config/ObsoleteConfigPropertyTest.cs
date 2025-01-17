@@ -29,7 +29,14 @@ namespace SourceExpander.Generate.Config
                 {
                     ("embedding-source-class", "embedding-source-class-name"),
                 }
-            }
+            },
+            {
+                new("/foo/bar/SourceExpander.Embedder.Config.json", @"{""expanding-symbol"": ""SYMBOL""}"),
+                new[]
+                {
+                    ("expanding-symbol", "expand-in-library"),
+                }
+            },
         };
 
         [Theory]
@@ -78,6 +85,16 @@ namespace SourceExpander.Generate.Config
                 new[]
                 {
                     ("enable-minify", "minify-level"),
+                }
+            },
+            {
+                new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_ExpandingSymbol", "SYMBOL" },
+                },
+                new[]
+                {
+                    ("expanding-symbol", "expand-in-library"),
                 }
             },
         };

@@ -6,13 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### 
+### Added
 - Add `auto-generated` header
 - Add missing `CompilerVisibleProperty`
 ### Changed
 - Update SourceExpander.Console
 - Use `global::` in generated code
 - **breaking change** SourceExpander.Embedder: Deprecate `EmbeddingSourceClass` in the settings and introduce `EmbeddingSourceClassName`
+- **breaking change** SourceExpander.Embedder: Deprecate `ExpandingSymbol` in the settings and introduce `ExpandInLibrary`
 
 ## [7.0.0] - 2024-01-30
 ### Added

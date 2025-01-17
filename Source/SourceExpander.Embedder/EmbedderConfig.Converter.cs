@@ -27,9 +27,13 @@ namespace SourceExpander
             public string? EmbeddingSourceClassName { set; get; }
             [DataMember(Name = "embedding-filename-type")]
             public string? EmbeddingFileNameType { set; get; }
+
+            [DataMember(Name = "expand-in-library")]
+            public bool? ExpandInLibrary { set; get; }
+
+            [Obsolete]
             [DataMember(Name = "expanding-symbol")]
             public string? ExpandingSymbol { set; get; }
-
             [Obsolete]
             [DataMember(Name = "embedding-source-class")]
             public object? EmbeddingSourceClass { set; get; }
@@ -55,7 +59,7 @@ namespace SourceExpander
                         RemoveConditional,
                         EmbeddingSourceClassName,
                         ParsedEmbeddingFileNameType,
-                        expandingSymbol: ExpandingSymbol,
+                        expandInLibrary: ExpandInLibrary,
                         obsoleteConfigProperties: GetObsoleteConfigProperties());
 
             private ImmutableArray<ObsoleteConfigProperty> GetObsoleteConfigProperties()
@@ -66,6 +70,8 @@ namespace SourceExpander
                     builder.Add(ObsoleteConfigProperty.EnableMinify);
                 if (EmbeddingSourceClass != null)
                     builder.Add(ObsoleteConfigProperty.EmbeddingSourceClass);
+                if (ExpandingSymbol != null)
+                    builder.Add(ObsoleteConfigProperty.ExpandingSymbol);
 #pragma warning restore CS0612
                 return builder.ToImmutable();
             }

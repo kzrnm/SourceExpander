@@ -8,7 +8,8 @@
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_ExcludeAttributes" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_RemoveConditional" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingFileNameType" />
-		<CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandingSymbol" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandingSymbol" />
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandInLibrary" />
 		<CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingSourceClassName" />
 	</ItemGroup>
 </Project>
