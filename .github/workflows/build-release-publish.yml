@@ -44,7 +44,9 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      - name: Build
+      - name: Build(Debug)
+        run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} -c Debug
+      - name: Build(Release)
         run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} -c Release
       - name: Test
         run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --no-build --logger GitHubActions -c Release
