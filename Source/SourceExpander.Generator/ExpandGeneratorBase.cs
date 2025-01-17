@@ -104,7 +104,7 @@ namespace SourceExpander
             sb.AppendLine("public static class ExpandedContainer{");
             sb.AppendLine("public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}");
             sb.AppendLine("private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{");
-            
+
             static void CreateSourceCodeLiteral(StringBuilder sb, string pathLiteral, string codeLiteral)
                 => sb.Append("SourceCode.FromDictionary(new Dictionary<string,object>{")
                   .AppendDicElement("\"path\"", pathLiteral)
