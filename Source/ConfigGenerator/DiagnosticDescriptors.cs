@@ -13,9 +13,9 @@ public static class DiagnosticDescriptors
     public static Diagnostic XPA0001_NeedsProperty(string name, Location location)
          => Diagnostic.Create(XPA0001_NeedsProperty_Descriptor, location, name);
     private static readonly DiagnosticDescriptor XPA0001_NeedsProperty_Descriptor = new(
-        "XPA0002",
+        "XPA0001",
         "Needs CompilerVisibleProperty",
-        "Needs <CompilerVisibleProperty Include=\"{0}\"",
+        "Needs <CompilerVisibleProperty Include=\"{0}\" />",
         "Error",
         DiagnosticSeverity.Error,
         true);
@@ -35,6 +35,15 @@ public static class DiagnosticDescriptors
         "XPA0003",
         "Needs System.Runtime.Serialization.DataMemberAttribute",
         "Needs System.Runtime.Serialization.DataMemberAttribute",
+        "Error",
+        DiagnosticSeverity.Error,
+        true);
+    public static Diagnostic XPA0004_MustBeNullable(string name, Location location)
+         => Diagnostic.Create(XPA0004_MustBeNullable_Descriptor, location, name);
+    private static readonly DiagnosticDescriptor XPA0004_MustBeNullable_Descriptor = new(
+        "XPA0002",
+        "DataMember must be nullable",
+        "DataMember({0}) must be nullable",
         "Error",
         DiagnosticSeverity.Error,
         true);

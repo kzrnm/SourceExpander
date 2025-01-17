@@ -25,6 +25,13 @@
     <AdditionalFiles Include="$(Roslyn4ProjectPath)/AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ConfigGenerator\ConfigAnalyzer.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+  </ItemGroup>
+
   <ItemDefinitionGroup>
     <PackageReference>
       <PrivateAssets>all</PrivateAssets>

@@ -1,56 +1,11 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Runtime.Serialization;
-using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
     internal partial record EmbedderConfig
     {
-        public static EmbedderConfig Parse(string? sourceText, AnalyzerConfigOptions analyzerConfigOptions)
-        {
-            try
-            {
-                var data = sourceText switch
-                {
-                    { } => JsonUtil.ParseJson<EmbedderConfigData>(sourceText) ?? new(),
-                    _ => new(),
-                };
-                {
-                    const string buildPropHeader = "build_property.";
-                    const string header = buildPropHeader + "SourceExpander_Embedder_";
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Enabled), out string? v) && !string.IsNullOrWhiteSpace(v))
-                        data.Enabled = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Include), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.Include = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.Exclude), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.Exclude = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.EmbeddingType), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.EmbeddingType = v;
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExcludeAttributes), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.ExcludeAttributes = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.RemoveConditional), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.RemoveConditional = v.Split(';').Select(t => t.Trim()).ToArray();
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.MinifyLevel), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.MinifyLevel = v;
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.EmbeddingFileNameType), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.EmbeddingFileNameType = v;
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.ExpandingSymbol), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.ExpandingSymbol = v;
-#pragma warning disable CS0612
-                    if (analyzerConfigOptions.TryGetValue(header + nameof(data.EnableMinify), out v) && !string.IsNullOrWhiteSpace(v))
-                        data.EnableMinify = !StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-#pragma warning restore CS0612
-                }
-                return data.ToImmutable();
-            }
-            catch (Exception e)
-            {
-                throw new ParseJsonException(e);
-            }
-        }
-
         [DataContract]
         private class EmbedderConfigData
         {
