@@ -103,20 +103,14 @@ namespace SourceExpander
             public bool Equals(SyntaxTree x, SyntaxTree y) => x.IsEquivalentTo(y);
             public int GetHashCode(SyntaxTree obj) => obj.FilePath?.GetHashCode() ?? 0;
         }
-        protected class GeneratorResult
+        protected class GeneratorResult(
+         CSharpCompilation outputCompilation,
+         ImmutableArray<Diagnostic> diagnostics,
+         ImmutableArray<CSharpSyntaxTree> addedSyntaxTrees)
         {
-            public GeneratorResult(
-             CSharpCompilation outputCompilation,
-             ImmutableArray<Diagnostic> diagnostics,
-             ImmutableArray<CSharpSyntaxTree> addedSyntaxTrees)
-            {
-                OutputCompilation = outputCompilation;
-                Diagnostics = diagnostics;
-                AddedSyntaxTrees = addedSyntaxTrees;
-            }
-            public CSharpCompilation OutputCompilation { get; }
-            public ImmutableArray<Diagnostic> Diagnostics { get; }
-            public ImmutableArray<CSharpSyntaxTree> AddedSyntaxTrees { get; }
+            public CSharpCompilation OutputCompilation { get; } = outputCompilation;
+            public ImmutableArray<Diagnostic> Diagnostics { get; } = diagnostics;
+            public ImmutableArray<CSharpSyntaxTree> AddedSyntaxTrees { get; } = addedSyntaxTrees;
         }
         public static IReadOnlyDictionary<string, SourceCode> GetExpandedFilesWithCore(Compilation compilation)
             => (IReadOnlyDictionary<string, SourceCode>)GetExpandedFiles(compilation);

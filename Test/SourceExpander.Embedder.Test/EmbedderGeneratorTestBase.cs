@@ -13,7 +13,12 @@ namespace SourceExpander
             public Test()
             {
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50.AddPackages(Packages);
+                ReferenceAssemblies = new ReferenceAssemblies(
+                        "net8.0",
+                        new PackageIdentity(
+                            "Microsoft.NETCore.App.Ref",
+                            "8.0.0"),
+                        Path.Combine("ref", "net8.0")).AddPackages(Packages);
                 foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
                 {
                     TestState.GeneratedSources.Add((typeof(EmbedderGenerator), hintName, sourceText));
@@ -26,8 +31,7 @@ namespace SourceExpander
             SourceFileCollection documents,
             CSharpCompilationOptions compilationOptions = null)
         {
-            if (compilationOptions is null)
-                compilationOptions = new(OutputKind.DynamicallyLinkedLibrary);
+            compilationOptions ??= new(OutputKind.DynamicallyLinkedLibrary);
 
             var targetProject = solution.GetProject(projectId);
 

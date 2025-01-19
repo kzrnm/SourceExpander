@@ -258,7 +258,7 @@ namespace SourceExpander
                 foreach (var d in diagnostics)
                 {
                     var file = d.Location?.SourceTree?.FilePath;
-                    if (file is null || d.WarningLevel > 0)
+                    if (file is null || d.WarningLevel > 0 || d.Id == "CS8795")
                         continue;
 
                     if (d.GetMessage() is string message)

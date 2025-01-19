@@ -25,8 +25,6 @@ namespace SourceExpander
                 }
 
                 if (!compilation.SyntaxTrees.Any()) return;
-                if (compilation.GetDiagnostics(ctx.CancellationToken).HasCompilationError()) return;
-
                 if (!config.Enabled)
                     return;
 
