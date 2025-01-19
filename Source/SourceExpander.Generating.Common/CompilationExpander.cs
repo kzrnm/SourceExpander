@@ -33,12 +33,8 @@ namespace SourceExpander
         public string ExpandCode(SyntaxTree origTree, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var semanticModel = Compilation.GetSemanticModel(origTree, true);
-            var origRoot = origTree.GetCompilationUnitRoot(cancellationToken);
-
-            cancellationToken.ThrowIfCancellationRequested();
-            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
-            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
+            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover().Visit(origTree, Compilation, cancellationToken);
+            var newRoot = typeFindAndUnusedUsingRemover.SyntaxTree.GetRoot(cancellationToken);
             if (typeFindAndUnusedUsingRemover.UsedTypes is null)
                 throw new InvalidOperationException($"{nameof(typeFindAndUnusedUsingRemover.UsedTypes)} is null");
 
@@ -103,7 +99,7 @@ namespace SourceExpander
 
             return sb.ToString();
 
-            static void Target(StringBuilder sb, ICompilationUnitSyntax newRoot)
+            static void Target(StringBuilder sb, SyntaxNode newRoot)
             {
                 using var sr = new StringReader(newRoot.ToString()!);
                 var line = sr.ReadLine();
@@ -135,12 +131,8 @@ namespace SourceExpander
         public SourceFileInfo[] ResolveDependency(SyntaxTree origTree, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var semanticModel = Compilation.GetSemanticModel(origTree, true);
-            var origRoot = origTree.GetCompilationUnitRoot(cancellationToken);
-
-            cancellationToken.ThrowIfCancellationRequested();
-            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, cancellationToken);
-            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit;
+            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover().Visit(origTree, Compilation, cancellationToken);
+            var newRoot = typeFindAndUnusedUsingRemover.SyntaxTree.GetRoot(cancellationToken);
             if (typeFindAndUnusedUsingRemover.UsedTypes is null)
                 throw new InvalidOperationException($"{nameof(typeFindAndUnusedUsingRemover.UsedTypes)} is null");
 

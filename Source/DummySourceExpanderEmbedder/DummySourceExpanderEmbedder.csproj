@@ -15,6 +15,7 @@
   <ItemGroup>
     <Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
     <Compile Include="../SourceExpander.Embedder/**/*.cs" LinkBase="SourceExpander.Embedder" />
+    <Compile Remove="../SourceExpander.Embedder/**/EmbeddingTypeFindAndUnusedUsingRemover.cs" />
     <Compile Remove="../**/obj/**/*.cs" />
     <Compile Remove="../SourceExpander.Embedder/**/EmbedderGenerator*.cs" />
   </ItemGroup>

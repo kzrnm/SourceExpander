@@ -269,26 +269,19 @@ namespace SourceExpander
 
             return _cacheResolvedFiles;
         }
-
-        private const string SourceExpander_NotEmbeddingSourceAttributeName = "SourceExpander.NotEmbeddingSourceAttribute";
         private SourceFileInfoRaw ParseSource(SyntaxTree tree)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var semanticModel = compilation.GetSemanticModel(tree, true);
-            var typeFindAndUnusedUsingRemover = new TypeFindAndUnusedUsingRemover(semanticModel, compilation.GetTypeByMetadataName(SourceExpander_NotEmbeddingSourceAttributeName), cancellationToken);
-            var newRoot = typeFindAndUnusedUsingRemover.CompilationUnit ?? throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
-
+            var typeFindAndUnusedUsingRemover = new EmbeddingTypeFindAndUnusedUsingRemover()
+                .Visit(tree, compilation, cancellationToken);
+            var newTree = typeFindAndUnusedUsingRemover.SyntaxTree ?? throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
             cancellationToken.ThrowIfCancellationRequested();
-            SyntaxNode minified = config.MinifyLevel switch
-            {
-                MinifyLevel.Off => newRoot.NormalizeWhitespace(eol: "\n"),
-                MinifyLevel.Full => TriviaFormatter.Minified(newRoot.NormalizeWhitespace("", " "))!,
-                _ => newRoot.NormalizeWhitespace("", " "),
-            };
-            cancellationToken.ThrowIfCancellationRequested();
-            string minifiedCode = minified!.ToString();
 
-            if (ValidationHelpers.CompareSyntax(newRoot,
+            var minifiedNode = new TriviaFormatter(config.MinifyLevel).Visit(newTree.GetRoot(cancellationToken));
+            string minifiedCode = minifiedNode.ToString();
+
+            if (ValidationHelpers.CompareSyntax(
+                minifiedNode,
                 CSharpSyntaxTree.ParseText(minifiedCode,
                 parseOptions,
                 cancellationToken: cancellationToken).GetRoot(cancellationToken)) is { } diff)

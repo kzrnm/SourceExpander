@@ -5,10 +5,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SourceExpander.Roslyn
 {
-    internal class TriviaFormatter : CSharpSyntaxRewriter
+    internal class TriviaFormatter(MinifyLevel minifyLevel) : CSharpSyntaxRewriter(false)
     {
-        private TriviaFormatter() { }
-        public static SyntaxNode? Minified(SyntaxNode? node) => new TriviaFormatter().Visit(node);
+        public MinifyLevel MinifyLevel { get; } = minifyLevel;
+
         static TriviaFormatter()
         {
             var splitBuilder = ImmutableHashSet.CreateBuilder<SyntaxKind>();
@@ -87,9 +87,27 @@ namespace SourceExpander.Roslyn
         }
         public static ImmutableHashSet<SyntaxKind> SplitToken { get; }
         public static ImmutableHashSet<SyntaxKind> PreEqualsToken { get; }
+        public override SyntaxNode? VisitCompilationUnit(CompilationUnitSyntax node)
+        {
+            return base.VisitCompilationUnit(MinifyLevel switch
+            {
+                MinifyLevel.Off => node.NormalizeWhitespace(eol: "\n"),
+                MinifyLevel.Full => node.NormalizeWhitespace("", " "),
+                _ => node.NormalizeWhitespace("", " "),
+            });
+        }
+
+        public override SyntaxNode? VisitAttributeList(AttributeListSyntax node)
+            => base.VisitAttributeList(node) switch
+            {
+                AttributeListSyntax { Attributes.Count: 0 } => null,
+                var node2 => node2,
+            };
+
         public override SyntaxToken VisitToken(SyntaxToken token)
         {
             var res = base.VisitToken(token);
+            if (MinifyLevel != MinifyLevel.Full) return res;
             var kind = token.Kind();
             var previous = token.GetPreviousToken().Kind();
             var next = token.GetNextToken().Kind();
@@ -115,13 +133,16 @@ namespace SourceExpander.Roslyn
 
         public override SyntaxNode? VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
         {
+            var res = base.VisitPostfixUnaryExpression(node);
+            if (MinifyLevel != MinifyLevel.Full) return res;
             var origTrivia = node.GetTrailingTrivia();
-            return base.VisitPostfixUnaryExpression(node)?.WithTrailingTrivia(origTrivia);
+            return res?.WithTrailingTrivia(origTrivia);
         }
 
         public override SyntaxNode? VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
         {
             var res = base.VisitPrefixUnaryExpression(node);
+            if (MinifyLevel != MinifyLevel.Full) return res;
             if (node.IsKind(SyntaxKind.PreDecrementExpression)
                 || node.IsKind(SyntaxKind.PreIncrementExpression)
                 || node.IsKind(SyntaxKind.PointerIndirectionExpression))
