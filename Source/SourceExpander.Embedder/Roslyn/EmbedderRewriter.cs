@@ -47,6 +47,8 @@ namespace SourceExpander.Roslyn
 
         public override SyntaxNode? VisitAttributeList(AttributeListSyntax node)
         {
+            if (node.Target?.Identifier is { } target && (target.IsKind(SyntaxKind.AssemblyKeyword) || target.IsKind(SyntaxKind.ModuleKeyword)))
+                return null;
             if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Any())
                 return attrs;
             return null;

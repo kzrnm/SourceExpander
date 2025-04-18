@@ -310,6 +310,8 @@ public partial class Def
     {
         public override string Syntax => """
 using System.Diagnostics;
+[assembly: System.CLSCompliant(false)]
+[module: System.CLSCompliant(false)]
 [DebuggerDisplay("Prop")]
 public class Def
 {
