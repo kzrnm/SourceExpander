@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/Sandbox/">
+    <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
+    <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="3rd-party-license.txt" />
+    <File Path="CHANGELOG.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Test/">
+    <File Path="Test/Directory.Build.props" />
+    <Project Path="Test/SourceExpander.Console.Test/SourceExpander.Console.Test.csproj" />
+    <Project Path="Test/SourceExpander.Embedder.Test/SourceExpander.Embedder.Test.csproj" />
+    <Project Path="Test/SourceExpander.Embedder.Testing.Test/SourceExpander.Embedder.Testing.Test.csproj" />
+    <Project Path="Test/SourceExpander.Generator.Test/SourceExpander.Generator.Test.csproj" />
+    <Project Path="Test/SourceExpander.Share.Test/SourceExpander.Share.Test.csproj" />
+    <Project Path="Test/SourceExpander.Test/SourceExpander.Test.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Source/ConfigGenerator/ConfigAnalyzer.csproj" />
+    <Project Path="Source/DummySourceExpanderEmbedder/DummySourceExpanderEmbedder.csproj" />
+    <Project Path="Source/SourceExpander.Embedder.Roslyn3/SourceExpander.Embedder.Roslyn3.csproj" />
+    <Project Path="Source/SourceExpander.Generator.Roslyn3/SourceExpander.Generator.Roslyn3.csproj" />
+  </Folder>
+  <Project Path="Source/SourceExpander.Console/SourceExpander.Console.csproj" />
+  <Project Path="Source/SourceExpander.Core/SourceExpander.Core.csproj" />
+  <Project Path="Source/SourceExpander.Embedder.Testing/SourceExpander.Embedder.Testing.csproj" />
+  <Project Path="Source/SourceExpander.Embedder/SourceExpander.Embedder.csproj" />
+  <Project Path="Source/SourceExpander.Generator/SourceExpander.Generator.csproj" />
+  <Project Path="Source/SourceExpander/SourceExpander.csproj" />
+</Solution>

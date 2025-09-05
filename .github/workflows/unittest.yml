@@ -8,19 +8,19 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_NOLOGO: true
   NUGET_XMLDOC_MODE: skip
-  WORKFLOW_BUILD_SLN: SourceExpander.sln
+  WORKFLOW_BUILD_SLN: SourceExpander.slnx
 
 jobs:
   format:
     uses: kzrnm/dotnet-actions/.github/workflows/format.yml@v2
     with:
-      target: SourceExpander.sln
+      target: SourceExpander.slnx
       dotnet-version: |
         8.0.x
   test:
     uses: kzrnm/dotnet-actions/.github/workflows/unittest.yml@v2
     with:
-      target: SourceExpander.sln
+      target: SourceExpander.slnx
       dotnet-version: |
         8.0.x
       test-logger: GitHubActions

@@ -12,7 +12,7 @@ env:
   DOTNET_NOLOGO: true
   NUGET_XMLDOC_MODE: skip
   WORKFLOW_VERSION_PROJ: Directory.Build.props
-  WORKFLOW_BUILD_SLN: SourceExpander.sln
+  WORKFLOW_BUILD_SLN: SourceExpander.slnx
 
 jobs:
   get-version:
@@ -23,7 +23,7 @@ jobs:
   format:
     uses: kzrnm/dotnet-actions/.github/workflows/format.yml@v2
     with:
-      target: SourceExpander.sln
+      target: SourceExpander.slnx
       dotnet-version: |
         8.0.x
 
