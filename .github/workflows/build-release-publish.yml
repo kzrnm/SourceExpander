@@ -26,6 +26,8 @@ jobs:
       target: SourceExpander.slnx
       dotnet-version: |
         8.0.x
+        9.0.x
+      # Use 9.0.x for .slnx projects
 
   build:
     runs-on: windows-latest
@@ -38,6 +40,8 @@ jobs:
           dotnet-version: |
             3.1.x
             8.0.x
+            9.0.x
+          # Use 9.0.x for .slnx projects
       - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages

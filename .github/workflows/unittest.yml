@@ -17,10 +17,14 @@ jobs:
       target: SourceExpander.slnx
       dotnet-version: |
         8.0.x
+        9.0.x
+      # Use 9.0.x for .slnx projects
   test:
     uses: kzrnm/dotnet-actions/.github/workflows/unittest.yml@v2
     with:
       target: SourceExpander.slnx
       dotnet-version: |
         8.0.x
+        9.0.x
+      # Use 9.0.x for .slnx projects
       test-logger: GitHubActions
