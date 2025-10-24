@@ -14,7 +14,9 @@ namespace SourceExpander
         public bool AllowUnsafe { get; }
         public ImmutableArray<string> EmbeddedNamespaces { get; }
         public bool IsEmpty => Sources.Length == 0;
-        internal EmbeddedData(string assemblyName, ImmutableArray<SourceFileInfo> sources,
+        internal EmbeddedData(
+            string assemblyName,
+            ImmutableArray<SourceFileInfo> sources,
             Version embedderVersion,
             LanguageVersion csharpVersion,
             bool allowUnsafe,

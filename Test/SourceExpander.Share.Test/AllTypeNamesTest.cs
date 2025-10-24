@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Xunit;
 
 namespace SourceExpander.Share
 {
@@ -55,12 +53,12 @@ class Program
                     "System.Console",
                     "System.MathF",
                     "System.Exception",
+                    "System.SerializableAttribute",
                     "nint",
                     "System.IObserver<T>",
                     "System.DateTime",
                     "System.Action",
                     "System.Func<TResult>",
-                    "System.SerializableAttribute",
                     "object",
                     "string",
                     "System.TimeSpan",
@@ -77,7 +75,7 @@ class Program
         public void TypeName(TypeNameTestInput input, string[] expected)
         {
             RoslynUtil.AllTypeNames(input.Model, input.Tree, default)
-                .Should().BeEquivalentTo(expected);
+                .ShouldBe(expected);
         }
     }
 }

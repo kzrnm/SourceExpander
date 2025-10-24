@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Xunit;
 
 namespace SourceExpander.Embedder.Syntaxes
 {
@@ -70,17 +68,11 @@ namespace SourceExpander.Embedder.Syntaxes
             };
             await test.RunAsync();
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(ExpectedJson)
-                .Should()
-                .ContainSingle()
-                .Which
-                .Should()
-                .BeEquivalentTo(Expected);
+                .ShouldHaveSingleItem()
+                .ShouldBeEquivalentTo(Expected);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(ExpectedJson)
-                .Should()
-                .ContainSingle()
-                .Which
-                .Should()
-                .BeEquivalentTo(Expected);
+                .ShouldHaveSingleItem()
+                .ShouldBeEquivalentTo(Expected);
         }
 
         [Fact]
@@ -122,17 +114,11 @@ namespace SourceExpander.Embedder.Syntaxes
             };
             await test.RunAsync();
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(ExpectedMinifyJson)
-                .Should()
-                .ContainSingle()
-                .Which
-                .Should()
-                .BeEquivalentTo(ExpectedMinify);
+                .ShouldHaveSingleItem()
+                .ShouldBeEquivalentTo(ExpectedMinify);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(ExpectedMinifyJson)
-                .Should()
-                .ContainSingle()
-                .Which
-                .Should()
-                .BeEquivalentTo(ExpectedMinify);
+                .ShouldHaveSingleItem()
+                .ShouldBeEquivalentTo(ExpectedMinify);
         }
     }
 }

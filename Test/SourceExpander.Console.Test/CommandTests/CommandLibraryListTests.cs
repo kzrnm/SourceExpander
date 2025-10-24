@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
 
 namespace SourceExpander;
 
-public partial class CommandTests
+[Collection(Initializer.CommandTests)]
+public class CommandLibraryListTests
 {
     [Fact]
     public async Task LibraryListSampleAppSkipAtcoder()
@@ -14,7 +13,7 @@ public partial class CommandTests
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
         await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current.CancellationToken);
 
-        sw.ToString().ReplaceLineEndings().Should().Be(
+        sw.ToString().ReplaceLineEndings().ShouldBe(
 $"""
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
 
@@ -28,7 +27,7 @@ SampleLibrary,{AssemblyUtil.AssemblyVersion}
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "SampleApp.csproj");
         await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current.CancellationToken);
 
-        sw.ToString().ReplaceLineEndings().Should().Be(
+        sw.ToString().ReplaceLineEndings().ShouldBe(
 $"""
 ac-library-csharp,7.0.0.100
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
@@ -43,7 +42,7 @@ SampleLibrary,{AssemblyUtil.AssemblyVersion}
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleLibrary", "SampleLibrary.csproj");
         await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current.CancellationToken);
 
-        sw.ToString().ReplaceLineEndings().Should().Be(
+        sw.ToString().ReplaceLineEndings().ShouldBe(
 $"""
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
 ac-library-csharp,7.0.0.100

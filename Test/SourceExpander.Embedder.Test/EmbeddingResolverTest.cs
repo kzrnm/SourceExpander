@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using FluentAssertions;
-using Xunit;
 
 namespace SourceExpander
 {
@@ -41,6 +39,6 @@ namespace SourceExpander
         [Theory]
         [MemberData(nameof(ResolveCommomPrefixTestData))]
         public void ResolveCommomPrefixTest(IEnumerable<string> strs, string expected)
-            => EmbeddingResolver.ResolveCommomPrefix(strs).Should().Be(expected);
+            => EmbeddingResolver.ResolveCommomPrefix(strs).ShouldBe(expected);
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
 
 namespace SourceExpander.Generate.Config
 {
@@ -20,7 +18,15 @@ namespace SourceExpander.Generate.Config
 ");
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create(
+            var embeddedFiles = ImmutableArray.Create([
+                 new SourceFileInfo
+                 (
+                     "TestProject>.cs",
+                     ["P"],
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray<string>.Empty,
+                     @"class P { static void T() => Console.WriteLine(2); }"
+                 ),
                  new SourceFileInfo
                  (
                      "TestProject>rogram.cs",
@@ -29,14 +35,7 @@ namespace SourceExpander.Generate.Config
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
                  ),
-                 new SourceFileInfo
-                 (
-                     "TestProject>.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     @"class P { static void T() => Console.WriteLine(2); }"
-                 ));
+            ]);
             const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
             var test = new Test
@@ -96,11 +95,9 @@ class P
             };
             await test.RunAsync();
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
         }
 
         [Fact]
@@ -113,7 +110,15 @@ class P
             };
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create(
+            var embeddedFiles = ImmutableArray.Create([
+                 new SourceFileInfo
+                 (
+                     "TestProject>.cs",
+                     ["P"],
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray<string>.Empty,
+                     @"class P { static void T() => Console.WriteLine(2); }"
+                 ),
                  new SourceFileInfo
                  (
                      "TestProject>rogram.cs",
@@ -122,14 +127,7 @@ class P
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
                  ),
-                 new SourceFileInfo
-                 (
-                     "TestProject>.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     @"class P { static void T() => Console.WriteLine(2); }"
-                 ));
+            ]);
             const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
             var test = new Test
@@ -185,11 +183,9 @@ class P
             };
             await test.RunAsync();
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
         }
 
         [Fact]
@@ -205,7 +201,15 @@ class P
 ");
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create(
+            var embeddedFiles = ImmutableArray.Create([
+                 new SourceFileInfo
+                 (
+                     "/home/source/P.cs",
+                     ["P"],
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray<string>.Empty,
+                     @"class P { static void T() => Console.WriteLine(2); }"
+                 ),
                  new SourceFileInfo
                  (
                      "/home/source/Program.cs",
@@ -214,14 +218,7 @@ class P
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
                  ),
-                 new SourceFileInfo
-                 (
-                     "/home/source/P.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     @"class P { static void T() => Console.WriteLine(2); }"
-                 ));
+            ]);
             const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
             var test = new Test
@@ -281,11 +278,9 @@ class P
             };
             await test.RunAsync();
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
         }
 
 
@@ -299,7 +294,15 @@ class P
             };
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create(
+            var embeddedFiles = ImmutableArray.Create([
+                 new SourceFileInfo
+                 (
+                     "/home/source/P.cs",
+                     ["P"],
+                     ImmutableArray.Create("using System;"),
+                     ImmutableArray<string>.Empty,
+                     @"class P { static void T() => Console.WriteLine(2); }"
+                 ),
                  new SourceFileInfo
                  (
                      "/home/source/Program.cs",
@@ -308,14 +311,7 @@ class P
                      ImmutableArray<string>.Empty,
                      @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
                  ),
-                 new SourceFileInfo
-                 (
-                     "/home/source/P.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     @"class P { static void T() => Console.WriteLine(2); }"
-                 ));
+            ]);
             const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
             var test = new Test
@@ -371,11 +367,9 @@ class P
             };
             await test.RunAsync();
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .Should()
-                .BeEquivalentTo(embeddedFiles);
+                .ShouldBeEquivalentTo(embeddedFiles);
         }
     }
 }

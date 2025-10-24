@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
 
 namespace SourceExpander;
 
-public partial class CommandTests
+[Collection(Initializer.CommandTests)]
+public class CommandExpandTests
 {
     [Fact]
     public async Task Expand()
@@ -13,7 +12,7 @@ public partial class CommandTests
         using var sw = new StringWriter();
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
         await new SourceExpanderCommand { Stdout = sw }.Expand(target, cancellationToken: TestContext.Current.CancellationToken);
-        sw.ToString().ReplaceLineEndings().Should().Be("""
+        sw.ToString().ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using AtCoder.Internal;
 using SampleLibrary;
@@ -49,7 +48,7 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
         await new SourceExpanderCommand { Stdout = sw }.Expand(target, project: project, cancellationToken: TestContext.Current.CancellationToken);
-        sw.ToString().ReplaceLineEndings().Should().Be("""
+        sw.ToString().ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using SampleLibrary;
 using System;
@@ -78,7 +77,7 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
         using var sw = new StringWriter();
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
         await new SourceExpanderCommand { Stdout = sw }.Expand(target, staticEmbedding: "/* Wow! 🦖 */", cancellationToken: TestContext.Current.CancellationToken);
-        sw.ToString().ReplaceLineEndings().Should().Be("""
+        sw.ToString().ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using AtCoder.Internal;
 using SampleLibrary;
@@ -115,7 +114,7 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
         await new SourceExpanderCommand().Expand(target, output: output, project: project, cancellationToken: TestContext.Current.CancellationToken);
-        (await File.ReadAllTextAsync(output, TestContext.Current.CancellationToken)).ReplaceLineEndings().Should().Be("""
+        (await File.ReadAllTextAsync(output, TestContext.Current.CancellationToken)).ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using SampleLibrary;
 using System;

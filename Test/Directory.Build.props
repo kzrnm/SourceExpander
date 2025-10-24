@@ -2,6 +2,17 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <ItemGroup>
+    <Using Include="Shouldly"/>
+    <Using Include="Xunit"/>
+    <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" PrivateAssets="all" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

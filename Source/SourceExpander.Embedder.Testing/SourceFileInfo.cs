@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -12,24 +12,24 @@ namespace SourceExpander
         [JsonConstructor]
         public SourceFileInfo(
         string? fileName,
-        IEnumerable<string>? typeNames,
-        IEnumerable<string>? usings,
-        IEnumerable<string>? dependencies,
+        ImmutableArray<string> typeNames,
+        ImmutableArray<string> usings,
+        ImmutableArray<string> dependencies,
         string? codeBody)
         {
             FileName = fileName ?? "";
-            TypeNames = typeNames ?? Array.Empty<string>();
-            Usings = usings ?? Array.Empty<string>();
-            Dependencies = dependencies ?? Array.Empty<string>();
+            TypeNames = typeNames;
+            Usings = usings;
+            Dependencies = dependencies;
             CodeBody = codeBody ?? "";
         }
 
         public string FileName { get; }
-        public IEnumerable<string> TypeNames { get; }
-        public IEnumerable<string> Usings { get; }
-        public IEnumerable<string> Dependencies { get; }
+        public ImmutableArray<string> TypeNames { get; }
+        public ImmutableArray<string> Usings { get; }
+        public ImmutableArray<string> Dependencies { get; }
         public string CodeBody { get; }
 
-        public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
+        public string Restore() => string.Join("\n", Usings.Append(CodeBody));
     }
 }

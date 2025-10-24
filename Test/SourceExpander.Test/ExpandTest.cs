@@ -1,10 +1,9 @@
 ﻿extern alias Generator;
 using System.Collections.Generic;
-using FluentAssertions;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Expanded;
-using Xunit;
 
 namespace SourceExpander.Test
 {
@@ -43,9 +42,8 @@ class Program
                 .WithSpecificDiagnosticOptions(new Dictionary<string, ReportDiagnostic> {
                     { "CS8019", ReportDiagnostic.Suppress },
                 }));
-            compilation.SyntaxTrees.
-                Should().HaveCount(syntaxTrees.Length);
-            compilation.GetDiagnostics().Should().BeEmpty();
+            compilation.SyntaxTrees.Length.ShouldBe(syntaxTrees.Length);
+            compilation.GetDiagnostics().ShouldBeEmpty();
 
             var generator = new Generator::SourceExpander.ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator.AsSourceGenerator() },
@@ -54,16 +52,15 @@ class Program
                     .WithLanguageVersion(LanguageVersion.CSharp4)
                 );
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            outputCompilation.GetDiagnostics().Should().BeEmpty();
-            outputCompilation.SyntaxTrees.Should().HaveCount(syntaxTrees.Length + 2);
+            outputCompilation.GetDiagnostics().ShouldBeEmpty();
+            outputCompilation.SyntaxTrees.Count().ShouldBe(syntaxTrees.Length + 2);
 
             outputCompilation.SyntaxTrees
-            .Should()
-            .ContainSingle(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"));
+            .Where(tree => tree.FilePath.EndsWith("SourceExpander.Expanded.cs"))
+            .ShouldHaveSingleItem();
             var files = TestUtil.GetExpandedFilesWithCore(outputCompilation);
-            files.Should().HaveCount(1);
-            files["/home/source/Program.cs"].Should()
-                .BeEquivalentTo(
+            files.ShouldHaveSingleItem();
+            files["/home/source/Program.cs"].ShouldBeEquivalentTo(
                 new SourceCode(
                     path: "/home/source/Program.cs",
                     code: """

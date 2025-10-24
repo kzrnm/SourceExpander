@@ -36,6 +36,8 @@ namespace SourceExpander
             return array;
         }
 
+        #region Properties
+        // Do not change order for json testing.
         [DataMember]
         public string CodeBody { get; set; }
         [DataMember]
@@ -46,6 +48,7 @@ namespace SourceExpander
         public IEnumerable<string> TypeNames { get; set; }
         [DataMember]
         public IEnumerable<string> Usings { get; set; }
+        #endregion Properties
 
         public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));
         public CSharpSyntaxTree ToSyntaxTree(CSharpParseOptions options,

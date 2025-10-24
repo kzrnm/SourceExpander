@@ -1,7 +1,4 @@
-﻿using FluentAssertions;
-using Xunit;
-
-namespace SourceExpander.Embedder.Test
+﻿namespace SourceExpander.Embedder.Test
 {
     public class EmbedderConfigTest
     {
@@ -80,7 +77,7 @@ namespace SourceExpander.Embedder.Test
         [MemberData(nameof(IncludeExclude_Data))]
         public void IncludeExclude(string[] include, string[] exclude, string filePath, bool expected)
         {
-            new EmbedderConfig(include: include, exclude: exclude).IsMatch(filePath).Should().Be(expected);
+            new EmbedderConfig(include: include, exclude: exclude).IsMatch(filePath).ShouldBe(expected);
         }
     }
 }

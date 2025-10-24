@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
-using Xunit;
 
 namespace SourceExpander.Generate
 {
