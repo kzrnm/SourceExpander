@@ -92,7 +92,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
@@ -169,7 +169,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
@@ -261,7 +261,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
@@ -338,7 +338,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

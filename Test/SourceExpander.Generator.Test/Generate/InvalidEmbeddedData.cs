@@ -118,7 +118,7 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

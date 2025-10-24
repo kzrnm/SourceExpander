@@ -49,7 +49,7 @@ class Program
                     },
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

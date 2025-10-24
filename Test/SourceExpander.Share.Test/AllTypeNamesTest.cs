@@ -74,8 +74,7 @@ class Program
         [MemberData(nameof(GetTypeNameTestData))]
         public void TypeName(TypeNameTestInput input, string[] expected)
         {
-            RoslynUtil.AllTypeNames(input.Model, input.Tree, default)
-                .ShouldBe(expected);
+            RoslynUtil.AllTypeNames(input.Model, input.Tree, TestContext.Current.CancellationToken).ShouldBe(expected);
         }
     }
 }

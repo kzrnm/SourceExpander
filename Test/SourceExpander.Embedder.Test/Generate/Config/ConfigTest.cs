@@ -107,7 +107,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
                 SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
                 .ShouldBeEquivalentTo(embeddedFiles);
@@ -172,7 +172,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
                 SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
                 .ShouldBeEquivalentTo(embeddedFiles);
@@ -223,7 +223,7 @@ class Program
                     },
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -257,7 +257,7 @@ class Program
                     },
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

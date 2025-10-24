@@ -61,7 +61,7 @@ namespace SourceExpander.Generate.Config
                     new DiagnosticResult("EMBED0011", DiagnosticSeverity.Warning)
                         .WithSpan(additionalText.Path, 1, 1, 1, 1)
                         .WithArguments(additionalText.Path, obsolete, instead));
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
 
         public static TheoryData<DummyAnalyzerConfigOptionsProvider, (string Obsolete, string Instead)[]> ObsoleteConfigProperty_Data = new()
@@ -116,7 +116,7 @@ namespace SourceExpander.Generate.Config
                 test.ExpectedDiagnostics.Add(
                     new DiagnosticResult("EMBED0011", DiagnosticSeverity.Warning)
                     .WithArguments("Any of configs", obsolete, instead));
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

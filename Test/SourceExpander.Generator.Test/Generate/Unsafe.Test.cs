@@ -101,7 +101,7 @@ namespace Other { public static class U { public static unsafe void P() => Syste
 
             test.ExpectedDiagnostics.AddRange(expectedDiagnostics);
 
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

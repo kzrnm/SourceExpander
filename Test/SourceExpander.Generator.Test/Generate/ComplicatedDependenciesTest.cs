@@ -116,7 +116,7 @@ namespace AtCoder{public interface IAdditionOperator<T>{T Add(T x,T y);T Subtrac
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

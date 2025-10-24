@@ -105,7 +105,7 @@ namespace Other.Linq{public static class L{public static int Max(this int v)=>v;
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -210,7 +210,7 @@ namespace Other.Linq{}
                     }
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }

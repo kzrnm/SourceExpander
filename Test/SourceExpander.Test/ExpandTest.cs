@@ -31,7 +31,8 @@ class Program
                     code,
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None)
                         .WithLanguageVersion(LanguageVersion.CSharp4),
-                    path: "/home/source/Program.cs"),
+                    path: "/home/source/Program.cs",
+                    cancellationToken: TestContext.Current.CancellationToken),
             };
 
             var compilation = CSharpCompilation.Create(
@@ -43,7 +44,7 @@ class Program
                     { "CS8019", ReportDiagnostic.Suppress },
                 }));
             compilation.SyntaxTrees.Length.ShouldBe(syntaxTrees.Length);
-            compilation.GetDiagnostics().ShouldBeEmpty();
+            compilation.GetDiagnostics(TestContext.Current.CancellationToken).ShouldBeEmpty();
 
             var generator = new Generator::SourceExpander.ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator.AsSourceGenerator() },
@@ -51,8 +52,8 @@ class Program
                 new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
                     .WithLanguageVersion(LanguageVersion.CSharp4)
                 );
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            outputCompilation.GetDiagnostics().ShouldBeEmpty();
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics, TestContext.Current.CancellationToken);
+            outputCompilation.GetDiagnostics(TestContext.Current.CancellationToken).ShouldBeEmpty();
             outputCompilation.SyntaxTrees.Count().ShouldBe(syntaxTrees.Length + 2);
 
             outputCompilation.SyntaxTrees

@@ -66,7 +66,7 @@ namespace SourceExpander.Embedder.Syntaxes
                     },
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(ExpectedJson)
                 .ShouldHaveSingleItem()
                 .ShouldBeEquivalentTo(Expected);
@@ -112,7 +112,7 @@ namespace SourceExpander.Embedder.Syntaxes
                     },
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(ExpectedMinifyJson)
                 .ShouldHaveSingleItem()
                 .ShouldBeEquivalentTo(ExpectedMinify);

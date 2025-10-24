@@ -17,7 +17,7 @@ namespace SourceExpander.Generate
                     },
                 }
             };
-            await test.RunAsync();
+            await test.RunAsync(TestContext.Current.CancellationToken);
         }
     }
 }
