@@ -27,7 +27,7 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" GeneratePathProperty="true" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" GeneratePathProperty="true" />
     <PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
     <PackageReference Include="DotNet.Glob" Version="3.1.3" GeneratePathProperty="true" />
     <PackageReference Include="IsExternalInit" Version="1.0.3">

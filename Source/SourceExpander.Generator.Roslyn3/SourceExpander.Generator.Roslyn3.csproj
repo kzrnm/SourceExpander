@@ -36,7 +36,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" GeneratePathProperty="true" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" GeneratePathProperty="true" />
     <PackageReference Include="Base32768" Version="2.0.2" GeneratePathProperty="true" />
   </ItemGroup>
 </Project>

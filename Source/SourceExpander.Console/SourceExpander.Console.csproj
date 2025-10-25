@@ -35,12 +35,12 @@
 
   <ItemGroup>
     <PackageReference Include="Base32768" Version="2.0.2" />
-    <PackageReference Include="ConsoleAppFramework" Version="5.3.4">
+    <PackageReference Include="ConsoleAppFramework" Version="5.6.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
-    <PackageReference Include="Microsoft.Build" Version="17.11.4" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.10.2" />
+    <PackageReference Include="Microsoft.Build" Version="17.11.48" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0" />
   </ItemGroup>
