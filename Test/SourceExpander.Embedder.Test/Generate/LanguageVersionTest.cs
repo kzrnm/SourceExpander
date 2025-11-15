@@ -7,14 +7,14 @@ namespace SourceExpander.Generate
 {
     public class LanguageVersionTest : EmbedderGeneratorTestBase
     {
-        [Theory]
-        [InlineData(LanguageVersion.Latest)]
-        [InlineData(LanguageVersion.LatestMajor)]
-        [InlineData(LanguageVersion.Preview)]
-        [InlineData(LanguageVersion.CSharp7_3)]
-        [InlineData(LanguageVersion.CSharp8)]
-        [InlineData(LanguageVersion.CSharp9)]
-        [InlineData(LanguageVersion.CSharp10)]
+        [Test]
+        [Arguments(LanguageVersion.Latest)]
+        [Arguments(LanguageVersion.LatestMajor)]
+        [Arguments(LanguageVersion.Preview)]
+        [Arguments(LanguageVersion.CSharp7_3)]
+        [Arguments(LanguageVersion.CSharp8)]
+        [Arguments(LanguageVersion.CSharp9)]
+        [Arguments(LanguageVersion.CSharp10)]
         public async Task Generate(LanguageVersion languageVersion)
         {
             var embeddedNamespaces = ImmutableArray<string>.Empty;
@@ -63,7 +63,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

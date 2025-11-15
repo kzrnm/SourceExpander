@@ -7,7 +7,7 @@ namespace SourceExpander.Generate
 {
     public class DefaultNoCoreReferenceTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var others = new SourceFileCollection{
@@ -27,7 +27,7 @@ namespace SourceExpander.Generate
 
             var test = new Test
             {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
                 SolutionTransforms =
                 {
                     (solution, projectId)
@@ -122,7 +122,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

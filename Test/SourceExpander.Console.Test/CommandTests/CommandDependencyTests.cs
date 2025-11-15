@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace SourceExpander;
 
-[Collection(Initializer.CommandTests)]
+[NotInParallel(Initializer.CommandTests)]
 public class CommandDependencyTests
 {
-    [Fact]
+    [Test]
     public async Task DependencySampleAppSkipAtcoder()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         var obj = JsonSerializer.Deserialize<DependencyResult[]>(sw.ToString());
         obj.ShouldNotBeNull();
@@ -46,12 +46,12 @@ public class CommandDependencyTests
             ["SampleLibrary.UnsafeBlock"]));
     }
 
-    [Fact]
+    [Test]
     public async Task DependencySampleApp()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "SampleApp.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         var obj = JsonSerializer.Deserialize<DependencyResult[]>(sw.ToString());
         obj.ShouldNotBeNull();
@@ -90,12 +90,12 @@ public class CommandDependencyTests
             ["SampleLibrary.UnsafeBlock"]));
     }
 
-    [Fact]
+    [Test]
     public async Task DependencySampleLibrary()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleLibrary", "SampleLibrary.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         var obj = JsonSerializer.Deserialize<DependencyResult[]>(sw.ToString());
         obj.ShouldNotBeNull();
@@ -120,12 +120,12 @@ public class CommandDependencyTests
     }
 
 
-    [Fact]
+    [Test]
     public async Task DependencyFullFilePath()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleLibrary", "SampleLibrary.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, fullFilePath: true, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Dependency(project, fullFilePath: true, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         var obj = JsonSerializer.Deserialize<DependencyResult[]>(sw.ToString());
         obj.ShouldNotBeNull();

@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,15 +9,15 @@ namespace SourceExpander.Generate.Config
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1861", Justification = "For test")]
     public class IncludeExcludeTest : EmbedderGeneratorTestBase
     {
-        public static TheoryData<string[]> Include_Data => new()
+        public static IEnumerable<Func<string[]>> Include_Data()
         {
-            new []{ "/home/**" },
-            new []{ "/home/**/*.cs" },
-            new []{ "/home/source/Program.cs" },
-        };
+            yield return () => ["/home/**"];
+            yield return () => ["/home/**/*.cs"];
+            yield return () => ["/home/source/Program.cs"];
+        }
 
-        [Theory]
-        [MemberData(nameof(Include_Data))]
+        [Test]
+        [MethodDataSource(nameof(Include_Data))]
         public async Task Include(string[] data)
         {
             var additionalText = new InMemorySourceText(
@@ -92,14 +94,14 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task IncludeProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -169,22 +171,22 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        public static TheoryData<string[]> Exclude_Data => new()
+        public static IEnumerable<Func<string[]>> Exclude_Data()
         {
-            new []{ "/other/**" },
-            new []{ "/other/**/*.cs" },
-            new []{ "/other/Dummy.cs", "/other/Dummy2.cs" },
-        };
+            yield return () => ["/other/**"];
+            yield return () => ["/other/**/*.cs"];
+            yield return () => ["/other/Dummy.cs", "/other/Dummy2.cs"];
+        }
 
-        [Theory]
-        [MemberData(nameof(Exclude_Data))]
+        [Test]
+        [MethodDataSource(nameof(Exclude_Data))]
         public async Task Exclude(string[] data)
         {
             var additionalText = new InMemorySourceText(
@@ -261,14 +263,14 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task ExcludeProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -338,7 +340,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

@@ -8,7 +8,7 @@ namespace SourceExpander;
 public class PathUtilTest
 {
     private static string GetFilePath([CallerFilePath] string filePath = "") => filePath;
-    [Fact]
+    [Test]
     public void GetProjectPath_FileNotFound()
     {
         var currentFilePath = GetFilePath();
@@ -19,7 +19,7 @@ public class PathUtilTest
                 e => e.ParamName.ShouldBe("filePath"),
             ]);
     }
-    [Fact]
+    [Test]
     public void GetProjectPath_ProjectNotFound()
     {
         var fileInfo = new FileInfo(GetFilePath()).Directory!.Parent!.EnumerateDirectories("Utils").Single().EnumerateFiles("EnvironmentUtil.cs").Single();
@@ -29,14 +29,14 @@ public class PathUtilTest
                 e => e.Message.ShouldBe($"Not found project that contains {fileInfo.FullName}"),
             ]);
     }
-    [Fact]
+    [Test]
     public void GetProjectPath_Relative()
     {
         var currentFullPath = GetFilePath();
         var currentFilePath = Path.GetRelativePath(Environment.CurrentDirectory, currentFullPath);
         PathUtil.GetProjectPath(currentFilePath).ShouldBe(currentFullPath.Replace("PathUtilTest.cs", "SourceExpander.Console.Test.csproj"));
     }
-    [Fact]
+    [Test]
     public void GetProjectPath()
     {
         var currentFilePath = GetFilePath();

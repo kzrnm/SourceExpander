@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task EmbeddingSourceClassNone()
         {
             var additionalText = new InMemorySourceText(
@@ -72,14 +72,14 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task EmbeddingSourceClass()
         {
             var additionalText = new InMemorySourceText(
@@ -179,7 +179,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

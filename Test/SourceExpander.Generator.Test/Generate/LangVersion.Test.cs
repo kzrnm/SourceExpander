@@ -23,11 +23,11 @@ namespace SourceExpander.Generate
                 ),
         };
 
-        [Theory]
-        [InlineData(LanguageVersion.CSharp7_2)]
-        [InlineData(LanguageVersion.CSharp8)]
-        [InlineData(LanguageVersion.CSharp9)]
-        [InlineData(LanguageVersion.CSharp10)]
+        [Test]
+        [Arguments(LanguageVersion.CSharp7_2)]
+        [Arguments(LanguageVersion.CSharp8)]
+        [Arguments(LanguageVersion.CSharp9)]
+        [Arguments(LanguageVersion.CSharp10)]
         public async Task Success(LanguageVersion version)
         {
             var test = new Test
@@ -98,15 +98,15 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Theory]
-        [InlineData(LanguageVersion.CSharp4)]
-        [InlineData(LanguageVersion.CSharp5)]
-        [InlineData(LanguageVersion.CSharp6)]
-        [InlineData(LanguageVersion.CSharp7)]
-        [InlineData(LanguageVersion.CSharp7_1)]
+        [Test]
+        [Arguments(LanguageVersion.CSharp4)]
+        [Arguments(LanguageVersion.CSharp5)]
+        [Arguments(LanguageVersion.CSharp6)]
+        [Arguments(LanguageVersion.CSharp7)]
+        [Arguments(LanguageVersion.CSharp7_1)]
         public async Task Failure(LanguageVersion version)
         {
             var test = new Test
@@ -178,13 +178,13 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Theory]
-        [InlineData(LanguageVersion.CSharp1)]
-        [InlineData(LanguageVersion.CSharp2)]
-        [InlineData(LanguageVersion.CSharp3)]
+        [Test]
+        [Arguments(LanguageVersion.CSharp1)]
+        [Arguments(LanguageVersion.CSharp2)]
+        [Arguments(LanguageVersion.CSharp3)]
         public async Task FailureWithCSharp3OrOlder(LanguageVersion version)
         {
             var test = new Test
@@ -221,7 +221,7 @@ class Program
                     }
 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

@@ -4,10 +4,13 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander.Diagnostics
 {
+    [InheritsTests]
     public class DiagnosticDescriptorsTest : DiagnosticDescriptorsTestBase
     {
         protected override CultureInfo FormatProvider => CultureInfo.InvariantCulture;
     }
+
+    [InheritsTests]
     public class DiagnosticDescriptorsTestJaJp : DiagnosticDescriptorsTestBase
     {
         protected override CultureInfo FormatProvider => new("ja-JP");
@@ -15,7 +18,7 @@ namespace SourceExpander.Diagnostics
     public abstract class DiagnosticDescriptorsTestBase
     {
         protected abstract CultureInfo FormatProvider { get; }
-        [Fact]
+        [Test]
         public void EXPAND0001()
         {
             DiagnosticDescriptors.EXPAND0001_UnknownError("LX")
@@ -26,7 +29,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Unknown error: LX",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0002()
         {
             DiagnosticDescriptors.EXPAND0002_ExpanderVersion(new Version(2, 0, 0), "Newerlib", new Version(3, 0, 0))
@@ -37,7 +40,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Expander version(2.0.0) is older than embedder of Newerlib(3.0.0)",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0003()
         {
             DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded()
@@ -48,7 +51,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Not found embedded source",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0004()
         {
             DiagnosticDescriptors.EXPAND0004_MustBeNewerThanCSharp3()
@@ -58,7 +61,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Need C# 3 or later",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0005()
         {
             DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion(LanguageVersion.CSharp7, "Newerlib", LanguageVersion.CSharp8)
@@ -69,7 +72,7 @@ namespace SourceExpander.Diagnostics
                     _ => "C# version(7.0) is older than embedded Newerlib(8.0)",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0007()
         {
             DiagnosticDescriptors.EXPAND0007_ParseConfigError("/home/source/SourceExpander.Generator.Config.json", "any error")
@@ -79,7 +82,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Error config file: Path: /home/source/SourceExpander.Generator.Config.json, Message: any error",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0008()
         {
             DiagnosticDescriptors.EXPAND0008_EmbeddedDataError("Anotherlib", "SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.")
@@ -89,7 +92,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Invalid embedded data: Anotherlib, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0009()
         {
             DiagnosticDescriptors.EXPAND0009_MetadataEmbeddingFileNotFound("Program.cs")
@@ -99,7 +102,7 @@ namespace SourceExpander.Diagnostics
                     _ => "MetadataEmbeddingFile is not found: name: Program.cs",
                 });
         }
-        [Fact]
+        [Test]
         public void EXPAND0010()
         {
             DiagnosticDescriptors.EXPAND0010_UnsafeBlock("/home/mine/P.cs")

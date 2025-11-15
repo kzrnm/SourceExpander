@@ -7,7 +7,7 @@ namespace SourceExpander.Generate;
 
 public class LibraryImportTest : EmbedderGeneratorTestBase
 {
-    [Fact]
+    [Test]
     public async Task Generate()
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
@@ -89,7 +89,7 @@ public static partial class UnixConsole
                     }
                 }
         };
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
             .ShouldBeEquivalentTo(embeddedFiles);
         System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

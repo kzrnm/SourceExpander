@@ -6,7 +6,7 @@ namespace SourceExpander.Generate.Config
 {
     public class IgnoreAssembliesTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task IgnoreAssemblies()
         {
             var others = new SourceFileCollection{
@@ -130,10 +130,10 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task IgnoreAssembliesProperty()
         {
             var others = new SourceFileCollection{
@@ -254,7 +254,7 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class ExpandInLibraryTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task NotExpandJson()
         {
             InMemorySourceText additionalText = new("/foo/bar/SourceExpander.Embedder.Config.json", """
@@ -76,14 +76,14 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task NotExpandProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -147,14 +147,14 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task ExpandJson()
         {
             InMemorySourceText additionalText = new("/foo/bar/SourceExpander.Embedder.Config.json", """
@@ -236,14 +236,14 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task ExpandProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -318,7 +318,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

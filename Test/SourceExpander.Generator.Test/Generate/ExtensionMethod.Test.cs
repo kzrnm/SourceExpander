@@ -5,7 +5,7 @@ namespace SourceExpander.Generate
 {
     public class ExtensionMethodTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var others = new SourceFileCollection{
@@ -105,10 +105,10 @@ namespace Other.Linq{public static class L{public static int Max(this int v)=>v;
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task UnusedExtensionMethod()
         {
             var others = new SourceFileCollection{
@@ -210,7 +210,7 @@ namespace Other.Linq{}
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

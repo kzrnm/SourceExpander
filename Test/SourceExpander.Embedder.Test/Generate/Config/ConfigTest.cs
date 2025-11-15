@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
 
@@ -6,9 +8,9 @@ namespace SourceExpander.Generate.Config
 {
     public class ConfigTest : EmbedderGeneratorTestBase
     {
-        public static TheoryData<InMemorySourceText, object[]> ParseErrorJsons = new()
+        public static IEnumerable<Func<(InMemorySourceText, object[])>> ParseErrorJsons()
         {
-            {
+            yield return () => (
                 new InMemorySourceText(
                 "/foo/directory/SourceExpander.Embedder.Config.json", @"
 {
@@ -22,8 +24,8 @@ namespace SourceExpander.Generate.Config
                     "/foo/directory/SourceExpander.Embedder.Config.json",
                     "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 5, position 27."
                 }
-            },
-            {
+            );
+            yield return () => (
                 new InMemorySourceText(
                 "/foo/bar/sourceExpander.embedder.config.json", @"
 {
@@ -37,11 +39,11 @@ namespace SourceExpander.Generate.Config
                     "/foo/bar/sourceExpander.embedder.config.json",
                     "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 5, position 27."
                 }
-            },
-        };
+            );
+        }
 
-        [Theory]
-        [MemberData(nameof(ParseErrorJsons))]
+        [Test]
+        [MethodDataSource(nameof(ParseErrorJsons))]
         public async Task ParseError(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
             var embeddedNamespaces = ImmutableArray<string>.Empty;
@@ -107,7 +109,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
                 SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
                 .ShouldBeEquivalentTo(embeddedFiles);
@@ -116,7 +118,7 @@ class Program
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task WithoutConfig()
         {
             var embeddedNamespaces = ImmutableArray<string>.Empty;
@@ -172,7 +174,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
                 SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
                 .ShouldBeEquivalentTo(embeddedFiles);
@@ -181,7 +183,7 @@ class Program
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task NotEnabled()
         {
             var additionalText = new InMemorySourceText(
@@ -223,10 +225,10 @@ class Program
                     },
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task NotEnabledProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -257,7 +259,7 @@ class Program
                     },
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

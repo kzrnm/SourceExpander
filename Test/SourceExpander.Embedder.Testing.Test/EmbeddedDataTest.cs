@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 
@@ -9,7 +8,7 @@ namespace SourceExpander.Embedder.Testing
 {
     public class EmbeddedDataTest
     {
-        [Fact]
+        [Test]
         public async Task GZipBase32768()
         {
             var dllPath = GetTestDataPath("SampleLibrary2.dll");
@@ -43,7 +42,7 @@ namespace SourceExpander.Embedder.Testing
             ]));
         }
 
-        [Fact]
+        [Test]
         public async Task Raw()
         {
             var dllPath = GetTestDataPath("SampleLibrary.Old.dll");
@@ -84,7 +83,7 @@ namespace SourceExpander.Embedder.Testing
             }
         }
 
-        private static readonly string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        private static readonly string dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         public static string GetTestDataPath(params string[] paths)
         {
             var withDir = new string[paths.Length + 2];

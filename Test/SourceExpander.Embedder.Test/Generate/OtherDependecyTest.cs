@@ -8,7 +8,7 @@ namespace SourceExpander.Generate
 {
     public class OtherDependencyTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task OtherRaw()
         {
             var embeddedNamespaces = ImmutableArray.Create("Mine");
@@ -106,14 +106,14 @@ namespace Mine{
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task OtherGZip()
         {
             var embeddedNamespaces = ImmutableArray.Create("Mine");
@@ -212,14 +212,14 @@ namespace Mine{
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task UsingOlderVersion()
         {
             var embeddedNamespaces = ImmutableArray.Create("Mine");
@@ -290,14 +290,14 @@ namespace Mine{
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidRaw()
         {
             var embeddedNamespaces = ImmutableArray.Create("Mine");
@@ -369,14 +369,14 @@ namespace Mine{
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task InvalidGZipBase32768()
         {
             var embeddedNamespaces = ImmutableArray.Create("Mine");
@@ -448,7 +448,7 @@ namespace Mine{
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

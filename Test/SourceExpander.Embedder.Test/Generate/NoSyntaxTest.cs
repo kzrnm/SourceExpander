@@ -4,7 +4,7 @@ namespace SourceExpander.Generate
 {
     public class NoSyntaxTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var test = new Test
@@ -17,7 +17,7 @@ namespace SourceExpander.Generate
                     },
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

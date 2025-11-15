@@ -8,7 +8,7 @@ namespace SourceExpander
 {
     public class EmbedderGeneratorTestBase
     {
-        public class Test : CSharpIncrementalGeneratorTest<EmbedderGenerator>
+        public class Test : CSharpSourceGeneratorTest<EmbedderGenerator>
         {
             public Test()
             {

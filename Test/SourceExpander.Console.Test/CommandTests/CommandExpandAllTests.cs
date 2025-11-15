@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace SourceExpander;
 
-[Collection(Initializer.CommandTests)]
+[NotInParallel(Initializer.CommandTests)]
 public class CommandExpandAllTests
 {
-    [Fact]
+    [Test]
     public async Task ExpandAll()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         var obj = JsonSerializer.Deserialize<ExpandAllObject[]>(sw.ToString());
         obj.ShouldNotBeNull();
@@ -63,12 +63,12 @@ namespace SampleLibrary { public static unsafe class UnsafeBlock { public static
 """.ReplaceLineEndings());
     }
 
-    [Fact]
+    [Test]
     public async Task ExpandAllWithStaticEmbedding()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, staticEmbedding: "/* 🥇 */", cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, staticEmbedding: "/* 🥇 */", cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         var obj = JsonSerializer.Deserialize<ExpandAllObject[]>(sw.ToString());
         obj.ShouldNotBeNull();

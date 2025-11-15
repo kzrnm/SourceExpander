@@ -6,7 +6,7 @@ namespace SourceExpander.Generate
 {
     public class InvalidEmbeddedData : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var others = new SourceFileCollection{
@@ -118,7 +118,7 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

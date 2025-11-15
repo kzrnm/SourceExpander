@@ -7,7 +7,7 @@ namespace SourceExpander.Generate
 {
     public class MultiSyntaxTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var embeddedNamespaces = ImmutableArray.Create("Test,Test.F,Test.I");
@@ -132,7 +132,7 @@ namespace SourceExpander.Generate
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

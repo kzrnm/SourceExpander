@@ -5,12 +5,12 @@ namespace SourceExpander.Generate
 {
     public class ComplicatedDependenciesTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var test = new Test
             {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net80
                     .AddPackages(Packages.Add(new PackageIdentity("ac-library-csharp", "1.4.4"))),
                 TestState =
                 {
@@ -116,7 +116,7 @@ namespace AtCoder{public interface IAdditionOperator<T>{T Add(T x,T y);T Subtrac
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

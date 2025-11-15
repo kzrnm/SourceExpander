@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 
 namespace SourceExpander.Embedder.Syntaxes
 {
+    [InheritsTests]
     public class ClassFieldTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -21,6 +22,7 @@ class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class StructFieldTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -38,6 +40,7 @@ struct Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class RecordFieldTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -56,6 +59,7 @@ record Def(string Foo)
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class InterfaceTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -70,6 +74,7 @@ public interface IDef { }
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class DelegateTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -85,6 +90,7 @@ public delegate void Def2(uint n);
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class EnumTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -102,6 +108,7 @@ enum Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class NamespaceTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -123,6 +130,7 @@ namespace Foo
         public override IEnumerable<string> ExpectedNamespaces => ImmutableArray.Create("Foo");
     }
 
+    [InheritsTests]
     public class FileScopedNamespaceTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -143,6 +151,7 @@ class Def
         public override IEnumerable<string> ExpectedNamespaces => ImmutableArray.Create("Foo");
     }
 
+    [InheritsTests]
     public class PropertyTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -171,6 +180,7 @@ class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class EventTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -200,6 +210,7 @@ class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ConstructorTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -226,6 +237,7 @@ public class Def : Par
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ConversionTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -244,6 +256,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class MethodTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -284,6 +297,7 @@ internal static class Ext
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class IndexerTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -306,6 +320,7 @@ public partial class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class AttributesTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -333,6 +348,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ArrayTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -358,6 +374,7 @@ public static class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class AnonymousTypeTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -379,6 +396,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class AnonymousMethodTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -399,6 +417,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class LambdaTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -421,6 +440,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class AsyncAwaitTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -442,6 +462,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class PatternsTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -470,6 +491,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class UnaryExpressionTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -493,6 +515,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class BinaryExpressionTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -535,6 +558,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ConditionalTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -556,6 +580,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class TryCatchFinallyTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -593,6 +618,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class CheckedUncheckedTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -623,6 +649,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class DefaultTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -646,6 +673,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class DocumentationCommentTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -672,6 +700,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ProcessorTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -717,6 +746,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class PointerTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -755,6 +785,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ForTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -782,6 +813,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class ForEachTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -809,6 +841,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class WhileTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -840,6 +873,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class SwitchTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -874,6 +908,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class FunctionPointersTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -897,6 +932,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class GotoTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -920,6 +956,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class GenericsTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -947,6 +984,7 @@ public class Def<T, Q> where T : ICloneable
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class StringTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -970,6 +1008,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class RangeTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -995,6 +1034,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class TupleTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1018,6 +1058,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class UsingTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1045,6 +1086,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class IfTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1083,6 +1125,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class LINQTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1104,6 +1147,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class IncrementTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1128,6 +1172,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class DecrementTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1152,6 +1197,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class GenericLambdaTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """
@@ -1169,6 +1215,7 @@ public class Def
         public override IEnumerable<string> ExpectedNamespaces => [];
     }
 
+    [InheritsTests]
     public class NullableTest : EmbedderGeneratorTestBaseWithValue
     {
         public override string Syntax => """

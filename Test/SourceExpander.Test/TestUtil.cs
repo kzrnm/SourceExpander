@@ -44,7 +44,7 @@ namespace SourceExpander.Test
                 if (!file.Contains(".Native"))
                     yield return MetadataReference.CreateFromFile(file);
             }
-            yield return MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0").Location);
+            yield return MetadataReference.CreateFromFile(System.Reflection.Assembly.Load("netstandard, Version=2.0.0.0").Location);
             yield return MetadataReference.CreateFromFile(typeof(SourceCode).GetTypeInfo().Assembly.Location);
             yield return MetadataReference.CreateFromFile(typeof(Expander).GetTypeInfo().Assembly.Location);
         }

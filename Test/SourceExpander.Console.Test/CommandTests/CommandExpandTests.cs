@@ -3,15 +3,15 @@ using System.Threading.Tasks;
 
 namespace SourceExpander;
 
-[Collection(Initializer.CommandTests)]
+[NotInParallel(Initializer.CommandTests)]
 public class CommandExpandTests
 {
-    [Fact]
+    [Test]
     public async Task Expand()
     {
         using var sw = new StringWriter();
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
-        await new SourceExpanderCommand { Stdout = sw }.Expand(target, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Expand(target, cancellationToken: TestContext.Current!.Execution.CancellationToken);
         sw.ToString().ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using AtCoder.Internal;
@@ -41,13 +41,13 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
 """.ReplaceLineEndings());
     }
 
-    [Fact]
+    [Test]
     public async Task ExpandAnotherProject()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
-        await new SourceExpanderCommand { Stdout = sw }.Expand(target, project: project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Expand(target, project: project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
         sw.ToString().ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using SampleLibrary;
@@ -71,12 +71,12 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
 """.ReplaceLineEndings());
     }
 
-    [Fact]
+    [Test]
     public async Task ExpandWithStaticEmbedding()
     {
         using var sw = new StringWriter();
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
-        await new SourceExpanderCommand { Stdout = sw }.Expand(target, staticEmbedding: "/* Wow! 🦖 */", cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.Expand(target, staticEmbedding: "/* Wow! 🦖 */", cancellationToken: TestContext.Current!.Execution.CancellationToken);
         sw.ToString().ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using AtCoder.Internal;
@@ -107,14 +107,14 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
 """.ReplaceLineEndings());
     }
 
-    [Fact]
+    [Test]
     public async Task ExpandToFile()
     {
         var output = Path.Combine(Path.GetTempPath(), "SourceExpander.Console.Test.ExpandToFile.csx");
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
-        await new SourceExpanderCommand().Expand(target, output: output, project: project, cancellationToken: TestContext.Current.CancellationToken);
-        (await File.ReadAllTextAsync(output, TestContext.Current.CancellationToken)).ReplaceLineEndings().ShouldBe("""
+        await new SourceExpanderCommand().Expand(target, output: output, project: project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
+        (await File.ReadAllTextAsync(output, TestContext.Current!.Execution.CancellationToken)).ReplaceLineEndings().ShouldBe("""
 using AtCoder;
 using SampleLibrary;
 using System;

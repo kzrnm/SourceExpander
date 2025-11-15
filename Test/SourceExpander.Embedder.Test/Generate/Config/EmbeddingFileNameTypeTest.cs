@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class EmbeddingFileNameTypeTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task EmbeddingFileNameTypeWithoutCommonPrefix()
         {
             var additionalText = new InMemorySourceText(
@@ -93,14 +93,14 @@ class P
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task EmbeddingFileNameTypeWithoutCommonPrefixProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -181,14 +181,14 @@ class P
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
         }
 
-        [Fact]
+        [Test]
         public async Task EmbeddingFileNameTypeFullPath()
         {
             var additionalText = new InMemorySourceText(
@@ -276,7 +276,7 @@ class P
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
@@ -284,7 +284,7 @@ class P
         }
 
 
-        [Fact]
+        [Test]
         public async Task EmbeddingFileNameTypeFullPathProperty()
         {
             var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
@@ -365,7 +365,7 @@ class P
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

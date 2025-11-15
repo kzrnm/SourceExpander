@@ -9,7 +9,7 @@ namespace SourceExpander.Test
 {
     public class ExpandTest
     {
-        [Fact]
+        [Test]
         public void Expand()
         {
             const string code = """
@@ -32,7 +32,7 @@ class Program
                     options: new CSharpParseOptions(documentationMode:DocumentationMode.None)
                         .WithLanguageVersion(LanguageVersion.CSharp4),
                     path: "/home/source/Program.cs",
-                    cancellationToken: TestContext.Current.CancellationToken),
+                    cancellationToken: TestContext.Current!.Execution.CancellationToken),
             };
 
             var compilation = CSharpCompilation.Create(
@@ -44,7 +44,7 @@ class Program
                     { "CS8019", ReportDiagnostic.Suppress },
                 }));
             compilation.SyntaxTrees.Length.ShouldBe(syntaxTrees.Length);
-            compilation.GetDiagnostics(TestContext.Current.CancellationToken).ShouldBeEmpty();
+            compilation.GetDiagnostics(TestContext.Current!.Execution.CancellationToken).ShouldBeEmpty();
 
             var generator = new Generator::SourceExpander.ExpandGenerator();
             var driver = CSharpGeneratorDriver.Create(new[] { generator.AsSourceGenerator() },
@@ -52,8 +52,8 @@ class Program
                 new CSharpParseOptions(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse)
                     .WithLanguageVersion(LanguageVersion.CSharp4)
                 );
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics, TestContext.Current.CancellationToken);
-            outputCompilation.GetDiagnostics(TestContext.Current.CancellationToken).ShouldBeEmpty();
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics, TestContext.Current!.Execution.CancellationToken);
+            outputCompilation.GetDiagnostics(TestContext.Current!.Execution.CancellationToken).ShouldBeEmpty();
             outputCompilation.SyntaxTrees.Count().ShouldBe(syntaxTrees.Length + 2);
 
             outputCompilation.SyntaxTrees

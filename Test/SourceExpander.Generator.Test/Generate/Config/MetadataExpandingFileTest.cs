@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class MetadataExpandingFileTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task MetadataExpandingFileNotFound()
         {
             var others = new SourceFileCollection{
@@ -130,10 +130,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task MetadataExpandingFileNotFoundProperty()
         {
             var others = new SourceFileCollection{
@@ -255,10 +255,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task MetadataExpandingFile()
         {
             var others = new SourceFileCollection{
@@ -397,10 +397,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task MetadataExpandingFileProperty()
         {
             var others = new SourceFileCollection{
@@ -536,7 +536,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

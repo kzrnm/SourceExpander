@@ -6,9 +6,9 @@ namespace SourceExpander.Generate
 {
     public class UnsafeTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Allow() => await Impl(true, []);
-        [Fact]
+        [Test]
         public async Task NotAllow() => await Impl(false, [DiagnosticResult.CompilerWarning("EXPAND0010").WithArguments("/home/mine/Program.cs")]);
 
         static async Task Impl(bool allowUnsafe, DiagnosticResult[] expectedDiagnostics)
@@ -101,7 +101,7 @@ namespace Other { public static class U { public static unsafe void P() => Syste
 
             test.ExpectedDiagnostics.AddRange(expectedDiagnostics);
 
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

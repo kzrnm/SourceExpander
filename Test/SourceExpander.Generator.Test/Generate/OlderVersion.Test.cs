@@ -5,7 +5,7 @@ namespace SourceExpander.Generate
 {
     public class OlderVersionTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var others = new SourceFileCollection{
@@ -91,7 +91,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

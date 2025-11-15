@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class ExpandingPositionTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task ExpandingPositionEndOfFile()
         {
             var others = new SourceFileCollection{
@@ -123,10 +123,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task ExpandingPositionAfterUsings()
         {
             var others = new SourceFileCollection{
@@ -244,10 +244,10 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task ExpandingPositionEndOfFileProperty()
         {
             var others = new SourceFileCollection{
@@ -362,10 +362,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task ExpandingPositionAfterUsingsProperty()
         {
             var others = new SourceFileCollection{
@@ -480,7 +480,7 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

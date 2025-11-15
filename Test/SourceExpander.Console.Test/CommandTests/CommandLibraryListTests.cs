@@ -3,15 +3,15 @@ using System.Threading.Tasks;
 
 namespace SourceExpander;
 
-[Collection(Initializer.CommandTests)]
+[NotInParallel(Initializer.CommandTests)]
 public class CommandLibraryListTests
 {
-    [Fact]
+    [Test]
     public async Task LibraryListSampleAppSkipAtcoder()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         sw.ToString().ReplaceLineEndings().ShouldBe(
 $"""
@@ -20,12 +20,12 @@ SampleLibrary,{AssemblyUtil.AssemblyVersion}
 """.ReplaceLineEndings());
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryListSampleApp()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "SampleApp.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         sw.ToString().ReplaceLineEndings().ShouldBe(
 $"""
@@ -35,12 +35,12 @@ SampleLibrary,{AssemblyUtil.AssemblyVersion}
 """.ReplaceLineEndings());
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryListSampleLibrary()
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleLibrary", "SampleLibrary.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
 
         sw.ToString().ReplaceLineEndings().ShouldBe(
 $"""

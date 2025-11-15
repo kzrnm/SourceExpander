@@ -6,7 +6,7 @@ namespace SourceExpander.Generate
 {
     public class NotFoundTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             var test = new Test
@@ -68,7 +68,7 @@ class Program
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

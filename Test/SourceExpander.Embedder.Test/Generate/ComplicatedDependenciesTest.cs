@@ -6,7 +6,7 @@ namespace SourceExpander.Generate
 {
     public class ComplicatedDependenciesTest : EmbedderGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task Generate()
         {
             const string embeddedSourceCode = "[{\"CodeBody\":\"namespace TestProject{public struct Bar{public StaticModIntFenwickTree<Mod998244353>fenwickTree;public static Foo2 GetFoo2()=>new Foo2();}}\",\"Dependencies\":[\"AtCoderLibrary>DataStructure/Wrappers/StaticModIntFenwickTree.cs\",\"AtCoderLibrary>Math/StaticModInt.cs\",\"TestProject>Foo2.cs\"],\"FileName\":\"TestProject>Bar.cs\",\"TypeNames\":[\"TestProject.Bar\"],\"Usings\":[\"using AtCoder;\"]},{\"CodeBody\":\"namespace TestProject{public static class Foo1{public static McfGraphInt GetMcfGraph()=>new McfGraphInt(10);public static Foo2 GetFoo2()=>new Foo2();}}\",\"Dependencies\":[\"AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs\",\"TestProject>Foo2.cs\"],\"FileName\":\"TestProject>Foo1.cs\",\"TypeNames\":[\"TestProject.Foo1\"],\"Usings\":[\"using AtCoder;\"]},{\"CodeBody\":\"namespace TestProject{public class Foo2{public McfGraphInt Graph=>new Foo3().Graph;}}\",\"Dependencies\":[\"AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs\",\"TestProject>Foo3.cs\"],\"FileName\":\"TestProject>Foo2.cs\",\"TypeNames\":[\"TestProject.Foo2\"],\"Usings\":[\"using AtCoder;\"]},{\"CodeBody\":\"namespace TestProject{using static Foo1;public class Foo3{public McfGraphInt Graph=>GetMcfGraph();}}\",\"Dependencies\":[\"AtCoderLibrary>Graph/Wrappers/MinCostFlowWrapper.cs\",\"TestProject>Foo1.cs\"],\"FileName\":\"TestProject>Foo3.cs\",\"TypeNames\":[\"TestProject.Foo3\"],\"Usings\":[\"using AtCoder;\"]}]";
@@ -48,7 +48,7 @@ namespace SourceExpander.Generate
 
             var test = new Test
             {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net80
                     .AddPackages(Packages.Add(new PackageIdentity("ac-library-csharp", "1.4.4"))),
                 TestState =
                 {
@@ -132,7 +132,7 @@ namespace TestProject
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
             Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
                 .ShouldBeEquivalentTo(embeddedFiles);
             System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)

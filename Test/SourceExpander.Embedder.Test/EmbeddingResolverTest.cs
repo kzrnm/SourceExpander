@@ -1,43 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SourceExpander
 {
     public class EmbeddingResolverTest
     {
-        public static TheoryData<string[], string> ResolveCommomPrefixTestData = new()
+        public static IEnumerable<Func<(string[], string)>> ResolveCommomPrefixTestData()
         {
-            {
-                new []{"", "foo"},
+            yield return () => (
+                ["", "foo"],
                 ""
-            },
-            {
-                new []{"f", "foo"},
+            );
+            yield return () => (
+                ["f", "foo"],
                 "f"
-            },
-            {
-                new []{"/mnt/c/source/test/Foo.cs", "/mnt/c/source/test/Bar.cs"},
+            );
+            yield return () => (
+                ["/mnt/c/source/test/Foo.cs", "/mnt/c/source/test/Bar.cs"],
                 "/mnt/c/source/test/"
-            },
-            {
-                new []{"../source/test/Foo.cs", "../source/test/Bar.cs"},
+            );
+            yield return () => (
+                ["../source/test/Foo.cs", "../source/test/Bar.cs"],
                 "../source/test/"
-            },
-            {
-                new []{"/home/Foo.cs", "/mnt/c/source/test/Bar.cs"},
+            );
+            yield return () => (
+                ["/home/Foo.cs", "/mnt/c/source/test/Bar.cs"],
                 "/"
-            },
-            {
-                new []{"/home/Foo.cs"},
+            );
+            yield return () => (
+                ["/home/Foo.cs"],
                 "/home/"
-            },
-            {
-                new []{"/Foo.cs"},
+            );
+            yield return () => (
+                ["/Foo.cs"],
                 "/"
-            },
-        };
+            );
+        }
 
-        [Theory]
-        [MemberData(nameof(ResolveCommomPrefixTestData))]
+        [Test]
+        [MethodDataSource(nameof(ResolveCommomPrefixTestData))]
         public void ResolveCommomPrefixTest(IEnumerable<string> strs, string expected)
             => EmbeddingResolver.ResolveCommomPrefix(strs).ShouldBe(expected);
     }

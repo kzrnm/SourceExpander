@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class ExpandingByGroupTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task ExpandingByGroup()
         {
             var others1 = new SourceFileCollection{
@@ -178,10 +178,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task ExpandingByGroupProperty()
         {
             var others1 = new SourceFileCollection{
@@ -351,7 +351,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

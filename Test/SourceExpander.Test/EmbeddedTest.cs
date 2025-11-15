@@ -5,7 +5,7 @@ namespace SourceExpander.Test
 {
     public class EmbeddedTest
     {
-        [Fact]
+        [Test]
         public async Task Embedded()
         {
             var embedded = await EmbeddedData.LoadFromAssembly(typeof(Expander));

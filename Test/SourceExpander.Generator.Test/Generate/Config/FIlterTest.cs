@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class FIlterTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task IgnoreFile()
         {
             var others = new SourceFileCollection{
@@ -160,10 +160,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task IgnoreFileProperty()
         {
             var others = new SourceFileCollection{
@@ -315,10 +315,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task Whitelist()
         {
             var others = new SourceFileCollection{
@@ -426,10 +426,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task WhitelistProperty()
         {
             var others = new SourceFileCollection{
@@ -535,7 +535,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

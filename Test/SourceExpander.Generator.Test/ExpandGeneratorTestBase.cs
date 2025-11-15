@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,12 +14,12 @@ namespace SourceExpander
 {
     public class ExpandGeneratorTestBase
     {
-        public class Test : CSharpIncrementalGeneratorTest<ExpandGenerator>
+        public class Test : CSharpSourceGeneratorTest<ExpandGenerator>
         {
             public Test()
             {
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net50.AddPackages(Packages);
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net80.AddPackages(Packages);
             }
         }
 
@@ -47,8 +46,7 @@ namespace SourceExpander
         }
 
 
-        internal static ImmutableArray<PackageIdentity> Packages
-            = ImmutableArray.Create(new PackageIdentity("SourceExpander.Core", "2.6.0"));
+        internal static ImmutableArray<PackageIdentity> Packages = [new PackageIdentity("SourceExpander.Core", "2.6.0")];
         public static string ExpanderVersion => typeof(ExpandGenerator).Assembly.GetName().Version.ToString();
         public static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.Preview;
 
@@ -133,7 +131,7 @@ namespace SourceExpander
             }
         }
 
-        private static readonly string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        private static readonly string dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         public static string GetTestDataPath(params string[] paths)
         {
             var withDir = new string[paths.Length + 2];

@@ -4,10 +4,13 @@ using Microsoft.CodeAnalysis;
 
 namespace SourceExpander.Diagnostics
 {
+    [InheritsTests]
     public class DiagnosticDescriptorsTest : DiagnosticDescriptorsTestBase
     {
         protected override CultureInfo FormatProvider => CultureInfo.InvariantCulture;
     }
+
+    [InheritsTests]
     public class DiagnosticDescriptorsTestJaJp : DiagnosticDescriptorsTestBase
     {
         protected override CultureInfo FormatProvider => new("ja-JP");
@@ -15,7 +18,7 @@ namespace SourceExpander.Diagnostics
     public abstract class DiagnosticDescriptorsTestBase
     {
         protected abstract CultureInfo FormatProvider { get; }
-        [Fact]
+        [Test]
         public void EMBED0001()
         {
             DiagnosticDescriptors.EMBED0001_UnknownError("LX")
@@ -26,7 +29,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Unknown error: LX",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0002()
         {
             DiagnosticDescriptors.EMBED0002_OlderVersion(new Version(2, 0, 0), "Newerlib", new Version(3, 0, 0))
@@ -37,7 +40,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Embeder version(2.0.0) is older than embedder of Newerlib(3.0.0)",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0003()
         {
             DiagnosticDescriptors.EMBED0003_ParseConfigError("/home/source/SourceExpander.Embedder.Config.json", "any error")
@@ -47,7 +50,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Error config file: /home/source/SourceExpander.Embedder.Config.json",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0004()
         {
             DiagnosticDescriptors.EMBED0004_ErrorEmbeddedSource("P.cs", "any error")
@@ -57,7 +60,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Error embedded source: File: P.cs, Message: any error",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0005()
         {
             DiagnosticDescriptors.EMBED0005_EmbeddedSourceDiff("Uns")
@@ -67,7 +70,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Different syntax: near Uns. This is Embedder error, please report this to GitHub repository.",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0006()
         {
             DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError("Other", "SourceExpander.EmbeddedSourceCode", "There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.")
@@ -78,7 +81,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Another assembly has invalid embedded data: Other, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0009()
         {
             DiagnosticDescriptors.EMBED0009_UsingStaticDirective(Location.None)
@@ -89,7 +92,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Avoid using static directive because there is a risk of name collision",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0010()
         {
             DiagnosticDescriptors.EMBED0010_UsingAliasDirective(Location.None)
@@ -100,7 +103,7 @@ namespace SourceExpander.Diagnostics
                     _ => "Avoid using alias directive because there is a risk of name collision",
                 });
         }
-        [Fact]
+        [Test]
         public void EMBED0011()
         {
             DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(

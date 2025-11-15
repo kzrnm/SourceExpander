@@ -6,7 +6,7 @@ namespace SourceExpander.Share
 {
     public class EmbeddedDataTest
     {
-        [Fact]
+        [Test]
         public void Empty()
         {
             var (data, errors) = EmbeddedData.Create("Empty", ImmutableDictionary.Create<string, string>());
@@ -21,7 +21,7 @@ namespace SourceExpander.Share
                     ));
         }
 
-        [Fact]
+        [Test]
         public void Version()
         {
             var (data, errors) = EmbeddedData.Create("Version",
@@ -38,13 +38,12 @@ namespace SourceExpander.Share
         }
 
 
-        [Theory]
-        [InlineData("5", LanguageVersion.CSharp5)]
-        [InlineData("7.3", LanguageVersion.CSharp7_3)]
-        [InlineData("9.0", LanguageVersion.CSharp9)]
+        [Test]
+        [Arguments("5", LanguageVersion.CSharp5)]
+        [Arguments("7.3", LanguageVersion.CSharp7_3)]
+        [Arguments("9.0", LanguageVersion.CSharp9)]
         public void CSharpLanguageVersion(string embbeddedVersion, LanguageVersion expectedVersion)
         {
-
             var (data, errors) = EmbeddedData.Create("CSharpLanguageVersion",
                 ImmutableDictionary.Create<string, string>().Add("SourceExpander.EmbeddedLanguageVersion", embbeddedVersion));
             errors.ShouldBeEmpty();
@@ -58,7 +57,7 @@ namespace SourceExpander.Share
                     ));
         }
 
-        [Fact]
+        [Test]
         public void RawJson()
         {
             string json = "[{\"CodeBody\":\"namespace SampleLibrary { public static class Bit { [MethodImpl(MethodImplOptions.AggressiveInlining)] public static int ExtractLowestSetBit(int n) { if (Bmi1.IsSupported) { return (int)Bmi1.ExtractLowestSetBit((uint)n); } return n & -n; } } } \",\"Dependencies\":[],\"FileName\":\"_SampleLibrary>Bit.cs\",\"TypeNames\":[\"SampleLibrary.Bit\"],\"Usings\":[\"using System.Runtime.CompilerServices;\",\"using System.Runtime.Intrinsics.X86;\"]},{\"CodeBody\":\"namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } \",\"Dependencies\":[\"_SampleLibrary>Xorshift.cs\"],\"FileName\":\"_SampleLibrary>Put.cs\",\"TypeNames\":[\"SampleLibrary.Put\"],\"Usings\":[\"using System.Diagnostics;\"]},{\"CodeBody\":\"namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 \\/ uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } \",\"Dependencies\":[],\"FileName\":\"_SampleLibrary>Xorshift.cs\",\"TypeNames\":[\"SampleLibrary.Xorshift\"],\"Usings\":[\"using System;\"]}]";
@@ -111,7 +110,7 @@ namespace SourceExpander.Share
             data.ShouldBeEquivalentTo(expected);
         }
 
-        [Fact]
+        [Test]
         public void RawJsonError()
         {
             string json = "[{]}]";
@@ -145,7 +144,7 @@ namespace SourceExpander.Share
                 false,
                 ["SampleLibrary"]));
         }
-        [Fact]
+        [Test]
         public void GZipBase32768()
         {
             string gzipBase32768 = "㘅桠ҠҠԀᆖ䏚⢃㹈䝗錛㽸㨇栂祯嵔傅患踑⛩柀炁㢡垀鞽瑜䬌睜翶ꚹ㺻許ᖝᯌ劑㿯喁姬▿粻䣋鲣珳ᯀ堽羉譁䔹纼㻳纍薬卟眵䯀ꈰ疩ឝ焐疏呁猕㽿䩻勁㹡歖傠冩憅椓觇瀌鞱ꑶ⭟ᅀ篕┆盐诪ᗊ檲葷䏑唱嬻亜䞨ꂙ嫽邍韆媞害䀀ꊠҠƟ";

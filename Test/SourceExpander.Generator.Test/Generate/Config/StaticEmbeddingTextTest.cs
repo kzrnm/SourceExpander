@@ -5,7 +5,7 @@ namespace SourceExpander.Generate.Config
 {
     public class StaticEmbeddingTextTest : ExpandGeneratorTestBase
     {
-        [Fact]
+        [Test]
         public async Task StaticEmbeddingText()
         {
             var others = new SourceFileCollection{
@@ -128,10 +128,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task StaticEmbeddingTextProperty()
         {
             var others = new SourceFileCollection{
@@ -251,7 +251,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }

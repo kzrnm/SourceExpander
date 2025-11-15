@@ -1,13 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Generate.Config
 {
     public class ConfigTest : ExpandGeneratorTestBase
     {
-        public static readonly TheoryData<InMemorySourceText, object[]> ParseErrorJsons = new()
+        public static IEnumerable<Func<(InMemorySourceText, object[])>> ParseErrorJsons()
         {
-            {
+            yield return () => (
                 new InMemorySourceText("/foo/bar/SourceExpander.Generator.Config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
@@ -19,8 +21,8 @@ namespace SourceExpander.Generate.Config
                     "/foo/bar/SourceExpander.Generator.Config.json",
                     "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
                 }
-            },
-            {
+            );
+            yield return () => (
                 new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
@@ -32,8 +34,8 @@ namespace SourceExpander.Generate.Config
                     "/foo/bar/sourceExpander.generator.config.json",
                     "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
                 }
-            },
-            {
+            );
+            yield return () => (
                 new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
@@ -47,11 +49,11 @@ namespace SourceExpander.Generate.Config
                     "/regexerror/SourceExpander.Generator.Config.json",
                     "Invalid pattern '(' at offset 1. Not enough )'s."
                 }
-            },
-        };
+            );
+        }
 
-        [Theory]
-        [MemberData(nameof(ParseErrorJsons))]
+        [Test]
+        [MethodDataSource(nameof(ParseErrorJsons))]
         public async Task ParseErrorTest(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
             var others = new SourceFileCollection{
@@ -168,11 +170,11 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
 
-        [Fact]
+        [Test]
         public async Task WithoutConfig()
         {
             var others = new SourceFileCollection{
@@ -282,10 +284,10 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task NotEnabled()
         {
             var others = new SourceFileCollection{
@@ -357,10 +359,10 @@ class Program2
                     },
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        [Fact]
+        [Test]
         public async Task NotEnabledProperty()
         {
             var others = new SourceFileCollection{
@@ -430,7 +432,7 @@ class Program2
                     },
                 }
             };
-            await test.RunAsync(TestContext.Current.CancellationToken);
+            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
     }
 }
