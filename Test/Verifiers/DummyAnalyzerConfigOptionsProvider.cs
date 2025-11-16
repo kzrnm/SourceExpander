@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace SourceExpander
 {
-    public class DummyAnalyzerConfigOptionsProvider : AnalyzerConfigOptionsProvider, IEnumerable<KeyValuePair<string, string>>
+    public class DummyAnalyzerConfigOptionsProvider2 : AnalyzerConfigOptionsProvider, IEnumerable<KeyValuePair<string, string>>
     {
         public void Add(string key, string value) => impl.dict.Add(key, value);
         private readonly DummyAnalyzerConfigOptions impl = new();

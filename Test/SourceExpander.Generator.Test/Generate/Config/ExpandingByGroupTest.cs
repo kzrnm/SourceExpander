@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Generate.Config
@@ -250,7 +249,7 @@ namespace Other { public static class C { public static void P() => System.Conso
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Generator_ExpandingByGroup", "true" },
                 },

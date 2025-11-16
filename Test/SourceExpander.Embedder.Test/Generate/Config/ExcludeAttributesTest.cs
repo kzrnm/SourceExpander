@@ -99,7 +99,7 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
                     { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },

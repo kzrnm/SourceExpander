@@ -136,7 +136,7 @@ namespace Other { public static class C { public static void P() => System.Conso
         {
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Generator_StaticEmbeddingText", "/* Static Embedding Text */" },
                     { "build_property.SourceExpander_Generator_MetadataExpandingFile", "Program0.cs" },
@@ -396,7 +396,7 @@ namespace Other { public static class C { public static void P() => System.Conso
         {
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Generator_StaticEmbeddingText", "/* Static Embedding Text */" },
                     { "build_property.SourceExpander_Generator_MetadataExpandingFile", "Program.cs" },

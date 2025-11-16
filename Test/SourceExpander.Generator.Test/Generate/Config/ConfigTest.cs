@@ -355,7 +355,7 @@ class Program2
         {
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Generator_Enabled", "false" },
                 },

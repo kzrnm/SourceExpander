@@ -101,7 +101,7 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Embedder_ExpandInLibrary", "False" },
                     { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
@@ -260,7 +260,7 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Embedder_ExpandInLibrary", "true" },
                     { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },

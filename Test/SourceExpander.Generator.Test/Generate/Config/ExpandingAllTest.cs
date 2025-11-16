@@ -261,7 +261,7 @@ namespace Other { public static class C { public static void P() => System.Conso
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                AnalyzerConfigOptions =
                 {
                     { "build_property.SourceExpander_Generator_ExpandingAll", "true" },
                 },

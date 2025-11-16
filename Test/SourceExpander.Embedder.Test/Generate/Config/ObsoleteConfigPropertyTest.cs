@@ -66,10 +66,10 @@ namespace SourceExpander.Generate.Config
             await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
         }
 
-        public static IEnumerable<Func<(DummyAnalyzerConfigOptionsProvider, (string Obsolete, string Instead)[])>> ObsoleteConfigProperty_Data()
+        public static IEnumerable<Func<(DummyAnalyzerConfigOptions, (string Obsolete, string Instead)[])>> ObsoleteConfigProperty_Data()
         {
             yield return () => (
-                new DummyAnalyzerConfigOptionsProvider
+                new DummyAnalyzerConfigOptions
                 {
                     { "build_property.SourceExpander_Embedder_EnableMinify", "false" },
                 },
@@ -79,7 +79,7 @@ namespace SourceExpander.Generate.Config
                 }
             );
             yield return () => (
-                new DummyAnalyzerConfigOptionsProvider
+                new DummyAnalyzerConfigOptions
                 {
                     { "build_property.SourceExpander_Embedder_EnableMinify", "True" },
                 },
@@ -89,7 +89,7 @@ namespace SourceExpander.Generate.Config
                 }
             );
             yield return () => (
-                new DummyAnalyzerConfigOptionsProvider
+                new DummyAnalyzerConfigOptions
                 {
                     { "build_property.SourceExpander_Embedder_ExpandingSymbol", "SYMBOL" },
                 },
@@ -102,11 +102,14 @@ namespace SourceExpander.Generate.Config
 
         [Test]
         [MethodDataSource(nameof(ObsoleteConfigProperty_Data))]
-        public async Task ObsoleteConfigProperty(DummyAnalyzerConfigOptionsProvider analyzerConfigOptionsProvider, (string Obsolete, string Instead)[] diagnosticsArgs)
+        public async Task ObsoleteConfigProperty(DummyAnalyzerConfigOptions analyzerConfigOptionsProvider, (string Obsolete, string Instead)[] diagnosticsArgs)
         {
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptions =
+                {
+                    analyzerConfigOptionsProvider
+                },
                 TestState =
                 {
                     Sources = {
