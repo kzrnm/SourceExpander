@@ -12,14 +12,20 @@ namespace SourceExpander.Generate
             var others = new SourceFileCollection{
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[-]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[-]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+                    """)
                 ),
             };
 

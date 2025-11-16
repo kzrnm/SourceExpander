@@ -11,33 +11,33 @@ namespace SourceExpander.Generate.Config
         public static IEnumerable<Func<(InMemorySourceText, object[])>> ParseErrorJsons()
         {
             yield return () => (
-                new InMemorySourceText(
-                "/foo/directory/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""exclude-attributes"": 1
-}
-"),
+                new(
+                "/foo/directory/SourceExpander.Embedder.Config.json", """
+                {
+                    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                    "embedding-type": "Raw",
+                    "exclude-attributes": 1
+                }
+                """),
                 new object[]
                 {
                     "/foo/directory/SourceExpander.Embedder.Config.json",
-                    "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 5, position 27."
+                    "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 4, position 27."
                 }
             );
             yield return () => (
-                new InMemorySourceText(
-                "/foo/bar/sourceExpander.embedder.config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""exclude-attributes"": 1
-}
-"),
+                new(
+                "/foo/bar/sourceExpander.embedder.config.json", """
+                {
+                    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                    "embedding-type": "Raw",
+                    "exclude-attributes": 1
+                }
+                """),
                 new object[]
                 {
                     "/foo/bar/sourceExpander.embedder.config.json",
-                    "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 5, position 27."
+                    "Error converting value 1 to type 'System.String[]'. Path 'exclude-attributes', line 4, position 27."
                 }
             );
         }
@@ -64,7 +64,7 @@ namespace SourceExpander.Generate.Config
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -186,26 +186,25 @@ class Program
         [Test]
         public async Task NotEnabled()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""enabled"": false,
-    ""exclude-attributes"": [
-        ""System.Diagnostics.DebuggerDisplayAttribute""
-    ]
-}
-");
-
             var test = new Test
             {
                 TestState =
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "enabled": false,
+                            "exclude-attributes": [
+                                "System.Diagnostics.DebuggerDisplayAttribute"
+                            ]
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -231,14 +230,12 @@ class Program
         [Test]
         public async Task NotEnabledProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_Enabled", "false" },
-            };
-
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_Enabled", "false" },
+                },
                 TestState =
                 {
                     Sources = {

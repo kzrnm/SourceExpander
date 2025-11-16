@@ -15,15 +15,23 @@ namespace SourceExpander.Generate.Config
                 ),
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other { public static class Unused { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>Unused.cs\",\"TypeNames\":[\"Other.Unused\"],\"Usings\":[\"using System;\"]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other { public static class Unused { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>Unused.cs\",\"TypeNames\":[\"Other.Unused\"],\"Usings\":[\"using System;\"]}]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+                    """)
                 ),
             };
             var others2 = new SourceFileCollection{
@@ -34,20 +42,21 @@ namespace SourceExpander.Generate.Config
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other2 { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency2>C.cs\",\"TypeNames\":[\"Other2.C\"],\"Usings\":[]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other2 { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency2>C.cs\",\"TypeNames\":[\"Other2.C\"],\"Usings\":[]}]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+                    """)
                 ),
             };
 
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Generator.Config.json", """
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
-    "expanding-all": true
-}
-""");
             var test = new Test
             {
                 SolutionTransforms =
@@ -60,7 +69,16 @@ namespace SourceExpander.Generate.Config
                 },
                 TestState =
                 {
-                    AdditionalFiles = { additionalText },
+                    AdditionalFiles = {
+                        (
+                        "/foo/bar/SourceExpander.Generator.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
+                            "expanding-all": true
+                        }
+                        """)
+                    },
                     Sources = {
                         (
                             "/home/mine/Program.cs",
@@ -199,15 +217,23 @@ namespace Other { public static class C { public static void P() => System.Conso
                 ),
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other { public static class Unused { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>Unused.cs\",\"TypeNames\":[\"Other.Unused\"],\"Usings\":[\"using System;\"]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other { public static class Unused { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>Unused.cs\",\"TypeNames\":[\"Other.Unused\"],\"Usings\":[\"using System;\"]}]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+                    """)
                 ),
             };
             var others2 = new SourceFileCollection{
@@ -218,20 +244,27 @@ namespace Other { public static class C { public static void P() => System.Conso
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other2 { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency2>C.cs\",\"TypeNames\":[\"Other2.C\"],\"Usings\":[]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other2 { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency2>C.cs\",\"TypeNames\":[\"Other2.C\"],\"Usings\":[]}]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+                    """)
                 ),
             };
 
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Generator_ExpandingAll", "true" },
-            };
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Generator_ExpandingAll", "true" },
+                },
                 SolutionTransforms =
                 {
                     (solution, projectId) =>

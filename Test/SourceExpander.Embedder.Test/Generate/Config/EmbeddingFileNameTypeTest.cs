@@ -8,15 +8,6 @@ namespace SourceExpander.Generate.Config
         [Test]
         public async Task EmbeddingFileNameTypeWithoutCommonPrefix()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""embedding-filename-type"": ""withoutCommonPrefix""
-}
-");
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create([
                  new SourceFileInfo
@@ -44,8 +35,16 @@ namespace SourceExpander.Generate.Config
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "embedding-filename-type": "withoutCommonPrefix"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -103,12 +102,6 @@ class P
         [Test]
         public async Task EmbeddingFileNameTypeWithoutCommonPrefixProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "withoutCommonPrefix" },
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create([
                  new SourceFileInfo
@@ -132,7 +125,11 @@ class P
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "withoutCommonPrefix" },
+                },
                 TestState =
                 {
                     Sources = {
@@ -191,15 +188,6 @@ class P
         [Test]
         public async Task EmbeddingFileNameTypeFullPath()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""embedding-filename-type"": ""fullpath""
-}
-");
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create([
                  new SourceFileInfo
@@ -227,8 +215,16 @@ class P
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "embedding-filename-type": "fullpath"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -287,12 +283,6 @@ class P
         [Test]
         public async Task EmbeddingFileNameTypeFullPathProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "fullpath" },
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create([
                  new SourceFileInfo
@@ -316,7 +306,11 @@ class P
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "fullpath" },
+                },
                 TestState =
                 {
                     Sources = {

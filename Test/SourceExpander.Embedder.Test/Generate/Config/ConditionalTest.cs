@@ -8,18 +8,6 @@ namespace SourceExpander.Generate.Config
         [Test]
         public async Task Conditional()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""remove-conditional"": [
-        ""DEBUG"", ""DEBUG2""
-    ],
-    ""minify-level"": ""full""
-}
-");
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -38,36 +26,47 @@ namespace SourceExpander.Generate.Config
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                            "/foo/bar/SourceExpander.Embedder.Config.json",
+                            """
+                            {
+                                "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                                "embedding-type": "Raw",
+                                "remove-conditional": [
+                                    "DEBUG", "DEBUG2"
+                                ],
+                                "minify-level": "full"
+                            }
+                            """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Debug.Assert(true);
-        T();
-        T4();
-        T8();
-        Console.WriteLine(1);
-    }
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Debug.Assert(true);
+                                    T();
+                                    T4();
+                                    T8();
+                                    Console.WriteLine(1);
+                                }
 
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-    [Conditional(""DEBUG2"")]
-    static void T4() => Console.WriteLine(4);
-    [System.Diagnostics.Conditional(""DEBUG2"")]
-    [Conditional(""Test"")]
-    static void T8() => Console.WriteLine(8);
-}
-"
+                                [System.Diagnostics.Conditional("TEST")]
+                                static void T() => Console.WriteLine(2);
+                                [Conditional("DEBUG2")]
+                                static void T4() => Console.WriteLine(4);
+                                [System.Diagnostics.Conditional("DEBUG2")]
+                                [Conditional("Test")]
+                                static void T8() => Console.WriteLine(8);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -95,13 +94,6 @@ class Program
         [Test]
         public async Task ConditionalProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "Raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-                { "build_property.SourceExpander_Embedder_RemoveConditional", "DEBUG;DEBUG2" },
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -116,7 +108,12 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "Raw" },
+                    { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
+                    { "build_property.SourceExpander_Embedder_RemoveConditional", "DEBUG;DEBUG2" },
+                },
                 TestState =
                 {
                     Sources = {
@@ -173,15 +170,6 @@ class Program
         [Test]
         public async Task ConditionalNone()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", @"
-{
-    ""$schema"": ""https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json"",
-    ""embedding-type"": ""Raw"",
-    ""minify-level"": ""full""
-}
-");
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -200,8 +188,16 @@ class Program
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -246,12 +242,6 @@ class Program
         [Test]
         public async Task ConditionalNoneProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -266,7 +256,11 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
+                },
                 TestState =
                 {
                     Sources = {

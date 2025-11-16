@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Generate
@@ -13,35 +15,37 @@ namespace SourceExpander.Generate
 
         static async Task Impl(bool allowUnsafe, DiagnosticResult[] expectedDiagnostics)
         {
-            var others = new SourceFileCollection{
-                (
-                    "/home/other/C.cs",
-                    "namespace Other{public static class C{public static void P()=>U.P();}}"
-                ),
-                (
-                    "/home/other/U.cs",
-                    "namespace Other{public static class U{public static unsafe void P()=>System.Console.WriteLine();}}"
-                ),
-                (
-                "/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => U.P(); } }\",\"Dependencies\":[\"OtherDependency>U.cs\"],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other { public static class U { public static unsafe void P() => System.Console.WriteLine(); } }\",\"Dependencies\":[],\"FileName\":\"OtherDependency>U.cs\",\"TypeNames\":[\"Other.U\"],\"Usings\":[]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedAllowUnsafe","true")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
-                ),
-            };
             var test = new Test
             {
                 CompilationOptions = new(OutputKind.ConsoleApplication, allowUnsafe: allowUnsafe),
                 SolutionTransforms =
                 {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others,
-                    compilationOptions: new(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)),
+                    (solution, projectId) =>
+                    {
+                        var project = solution.Projects.Single(p => p.Name == "Other");
+                        return solution.WithProjectCompilationOptions(
+                            project.Id, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
+                    }
                 },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P()=>U.P();}}""",
+                                """namespace Other{public static class U{public static unsafe void P()=>System.Console.WriteLine();}}""",
+                                """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => U.P(); } }\",\"Dependencies\":[\"OtherDependency>U.cs\"],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other { public static class U { public static unsafe void P() => System.Console.WriteLine(); } }\",\"Dependencies\":[],\"FileName\":\"OtherDependency>U.cs\",\"TypeNames\":[\"Other.U\"],\"Usings\":[]}]")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedAllowUnsafe","true")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+"""
+                            },
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     Sources = {
                         (
                             "/home/mine/Program.cs",

@@ -8,16 +8,6 @@ namespace SourceExpander.Generate.Config
         [Test]
         public async Task EmbeddingSourceClassNone()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", """
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "embedding-type": "Raw",
-    "embedding-source-class-name": null,
-    "minify-level": "full"
-}
-""");
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -36,8 +26,17 @@ namespace SourceExpander.Generate.Config
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "embedding-source-class-name": null,
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -82,17 +81,7 @@ class Program
         [Test]
         public async Task EmbeddingSourceClass()
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", """
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "embedding-type": "Raw",
-    "embedding-source-class-name": "Container",
-    "minify-level": "full"
-}
-""");
-
-            var embeddedNamespaces = ImmutableArray<string>.Empty;
+                       var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
@@ -110,8 +99,16 @@ class Program
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json", """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "embedding-source-class-name": "Container",
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (

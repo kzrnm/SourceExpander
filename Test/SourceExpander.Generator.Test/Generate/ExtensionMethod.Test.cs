@@ -11,7 +11,7 @@ namespace SourceExpander.Generate
             var others = new SourceFileCollection{
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/L.cs",
@@ -20,9 +20,15 @@ namespace SourceExpander.Generate
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
+                    """)
                 ),
             };
 
@@ -114,7 +120,7 @@ namespace Other.Linq{public static class L{public static int Max(this int v)=>v;
             var others = new SourceFileCollection{
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/L.cs",
@@ -123,9 +129,15 @@ namespace Other.Linq{public static class L{public static int Max(this int v)=>v;
                 (
                 "/home/other/AssemblyInfo.cs",
                 EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]""")
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]
+                    """,
+                    """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
+                    """)
                 ),
             };
 

@@ -8,17 +8,6 @@ namespace SourceExpander.Generate.Config
         [Test]
         public async Task NotExpandJson()
         {
-            InMemorySourceText additionalText = new("/foo/bar/SourceExpander.Embedder.Config.json", """
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "expand-in-library": false,
-    "embedding-type": "Raw",
-    "exclude-attributes": [
-        "System.Diagnostics.DebuggerDisplayAttribute"
-    ],
-    "minify-level": "full"
-}
-""");
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -37,8 +26,20 @@ namespace SourceExpander.Generate.Config
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "expand-in-library": false,
+                            "embedding-type": "Raw",
+                            "exclude-attributes": [
+                                "System.Diagnostics.DebuggerDisplayAttribute"
+                            ],
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -86,14 +87,6 @@ class Program
         [Test]
         public async Task NotExpandProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_ExpandInLibrary", "False" },
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-                { "build_property.SourceExpander_Embedder_ExcludeAttributes", "System.Diagnostics.DebuggerDisplayAttribute;System.Diagnostics.DebuggerDisplayAttribute" },
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -108,7 +101,13 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_ExpandInLibrary", "False" },
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
+                    { "build_property.SourceExpander_Embedder_ExcludeAttributes", "System.Diagnostics.DebuggerDisplayAttribute;System.Diagnostics.DebuggerDisplayAttribute" },
+                },
                 TestState =
                 {
                     Sources = {
@@ -157,17 +156,6 @@ class Program
         [Test]
         public async Task ExpandJson()
         {
-            InMemorySourceText additionalText = new("/foo/bar/SourceExpander.Embedder.Config.json", """
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "expand-in-library": true,
-    "embedding-type": "Raw",
-    "exclude-attributes": [
-        "System.Diagnostics.DebuggerDisplayAttribute"
-    ],
-    "minify-level": "full"
-}
-""");
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -186,8 +174,20 @@ class Program
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        """
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "expand-in-library": true,
+                            "embedding-type": "Raw",
+                            "exclude-attributes": [
+                                "System.Diagnostics.DebuggerDisplayAttribute"
+                            ],
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -246,15 +246,7 @@ class Program
         [Test]
         public async Task ExpandProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_ExpandInLibrary", "true" },
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-                { "build_property.SourceExpander_Embedder_ExcludeAttributes", "System.Diagnostics.DebuggerDisplayAttribute;System.Diagnostics.DebuggerDisplayAttribute" },
-            };
-
-            var embeddedNamespaces = ImmutableArray<string>.Empty;
+                        var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (
@@ -268,7 +260,13 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_ExpandInLibrary", "true" },
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
+                    { "build_property.SourceExpander_Embedder_ExcludeAttributes", "System.Diagnostics.DebuggerDisplayAttribute;System.Diagnostics.DebuggerDisplayAttribute" },
+                },
                 TestState =
                 {
                     Sources = {

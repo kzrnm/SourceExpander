@@ -11,28 +11,28 @@ namespace SourceExpander.Generate.Config
         public static IEnumerable<Func<(InMemorySourceText, (string Obsolete, string Instead)[])>> ObsoleteConfig_Data()
         {
             yield return () => (
-                new("/foo/small/sourceExpander.embedder.config.json", @"{""notmatch"": 0, ""enable-minify"": false}"),
+                new("/foo/small/sourceExpander.embedder.config.json", """{"notmatch": 0, "enable-minify": false}"""),
                 new[]
                 {
                     ("enable-minify", "minify-level"),
                 }
             );
             yield return () => (
-                new("/foo/bar/SourceExpander.Embedder.Config.json", @"{""enable-minify"": true}"),
+                new("/foo/bar/SourceExpander.Embedder.Config.json", """{"enable-minify": true}"""),
                 new[]
                 {
                     ("enable-minify", "minify-level"),
                 }
             );
             yield return () => (
-                new("/foo/bar/SourceExpander.Embedder.Config.json", @"{""embedding-source-class"": {}}"),
+                new("/foo/bar/SourceExpander.Embedder.Config.json", """{"embedding-source-class": {}}"""),
                 new[]
                 {
                     ("embedding-source-class", "embedding-source-class-name"),
                 }
             );
             yield return () => (
-                new("/foo/bar/SourceExpander.Embedder.Config.json", @"{""expanding-symbol"": ""SYMBOL""}"),
+                new("/foo/bar/SourceExpander.Embedder.Config.json", """{"expanding-symbol": "SYMBOL"}"""),
                 new[]
                 {
                     ("expanding-symbol", "expand-in-library"),
@@ -51,7 +51,7 @@ namespace SourceExpander.Generate.Config
                     AdditionalFiles =
                     {
                         additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         ("/home/source/Program.cs", ""),

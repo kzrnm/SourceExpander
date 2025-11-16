@@ -20,16 +20,6 @@ namespace SourceExpander.Generate.Config
         [MethodDataSource(nameof(Include_Data))]
         public async Task Include(string[] data)
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", $$$"""
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "embedding-type": "Raw",
-    "include": [{{{string.Join(",", data.Select(RoslynUtil.ToLiteral))}}}],
-    "minify-level": "full"
-}
-""");
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -48,8 +38,17 @@ namespace SourceExpander.Generate.Config
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        $$$"""
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "include": [{{{string.Join(",", data.Select(RoslynUtil.ToLiteral))}}}],
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -104,13 +103,6 @@ class Program
         [Test]
         public async Task IncludeProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-                { "build_property.SourceExpander_Embedder_Include", "/home/**" },
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -125,7 +117,12 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
+                    { "build_property.SourceExpander_Embedder_Include", "/home/**" },
+                },
                 TestState =
                 {
                     Sources = {
@@ -189,15 +186,6 @@ class Program
         [MethodDataSource(nameof(Exclude_Data))]
         public async Task Exclude(string[] data)
         {
-            var additionalText = new InMemorySourceText(
-                "/foo/bar/SourceExpander.Embedder.Config.json", $$$"""
-{
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "embedding-type": "Raw",
-    "exclude": [{{{string.Join(",", data.Select(RoslynUtil.ToLiteral))}}}],
-    "minify-level": "full"
-}
-""");
 
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
@@ -217,8 +205,17 @@ class Program
                 {
                     AdditionalFiles =
                     {
-                        additionalText,
-                        new InMemorySourceText("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                        (
+                        "/foo/bar/SourceExpander.Embedder.Config.json",
+                        $$$"""
+                        {
+                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                            "embedding-type": "Raw",
+                            "exclude": [{{{string.Join(",", data.Select(RoslynUtil.ToLiteral))}}}],
+                            "minify-level": "full"
+                        }
+                        """),
+                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                     },
                     Sources = {
                         (
@@ -273,13 +270,6 @@ class Program
         [Test]
         public async Task ExcludeProperty()
         {
-            var analyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
-            {
-                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
-                { "build_property.SourceExpander_Embedder_Exclude", "/other/**" }
-            };
-
             var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
@@ -294,7 +284,12 @@ class Program
 
             var test = new Test
             {
-                AnalyzerConfigOptionsProvider = analyzerConfigOptionsProvider,
+                AnalyzerConfigOptionsProvider = new DummyAnalyzerConfigOptionsProvider
+                {
+                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                    { "build_property.SourceExpander_Embedder_MinifyLevel", "full" },
+                    { "build_property.SourceExpander_Embedder_Exclude", "/other/**" }
+                },
                 TestState =
                 {
                     Sources = {

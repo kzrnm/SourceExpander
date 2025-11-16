@@ -37,7 +37,7 @@ namespace SourceExpander.Generate
                             {
                                 (
                                 "/home/other/C.cs",
-                                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                                 ),
                                 (
                                 "/home/other/AssemblyInfo.cs",
