@@ -16,7 +16,7 @@ namespace SourceExpander.Generate
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main()=>Console.WriteLine(0);}"
+                     """class Program{static void Main()=>Console.WriteLine(0);}"""
                  ));
 
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(0);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
@@ -29,12 +29,13 @@ namespace SourceExpander.Generate
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"using System;
-class Program
-{
-    static void Main() => Console.WriteLine(0);
-}
-"
+                            """
+                            using System;
+                            class Program
+                            {
+                                static void Main() => Console.WriteLine(0);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -70,7 +71,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program { static void Main() => Console.WriteLine(0); }"
+                     """class Program { static void Main() => Console.WriteLine(0); }"""
                  ));
 
             string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768("[{\"CodeBody\":\"class Program { static void Main() => Console.WriteLine(0); }\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]");
@@ -83,12 +84,14 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"using System;
-class Program
-{
-    static void Main() => Console.WriteLine(0);
-}
-"
+                            """
+                            using System;
+                            class Program
+                            {
+                                static void Main() => Console.WriteLine(0);
+                            }
+
+                            """
                         ),
                     },
                     GeneratedSources =

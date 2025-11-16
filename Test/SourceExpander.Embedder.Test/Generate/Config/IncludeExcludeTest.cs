@@ -28,7 +28,7 @@ namespace SourceExpander.Generate.Config
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
+                     """class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
@@ -53,29 +53,29 @@ namespace SourceExpander.Generate.Config
                     Sources = {
                         (
                             "/other/Dummy.cs",
-                            @"class Dummy{}"
+                            """class Dummy{}"""
                         ),
                         (
                             "/other/Dummy2.cs",
-                            @"class Dummy2{}"
+                            """class Dummy2{}"""
                         ),
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
 
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-}
-"
+                                [System.Diagnostics.Conditional("TEST")]
+                                static void T() => Console.WriteLine(2);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -128,11 +128,11 @@ class Program
                     Sources = {
                         (
                             "/other/Dummy.cs",
-                            @"class Dummy{}"
+                            """class Dummy{}"""
                         ),
                         (
                             "/other/Dummy2.cs",
-                            @"class Dummy2{}"
+                            """class Dummy2{}"""
                         ),
                         (
                             "/home/source/Program.cs",
@@ -195,7 +195,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);}"
+                     """class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
@@ -220,29 +220,29 @@ class Program
                     Sources = {
                         (
                             "/other/Dummy.cs",
-                            @"class Dummy{}"
+                            """class Dummy{}"""
                         ),
                         (
                             "/other/Dummy2.cs",
-                            @"class Dummy2{}"
+                            """class Dummy2{}"""
                         ),
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
 
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-}
-"
+                                [System.Diagnostics.Conditional("TEST")]
+                                static void T() => Console.WriteLine(2);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -295,11 +295,11 @@ class Program
                     Sources = {
                         (
                             "/other/Dummy.cs",
-                            @"class Dummy{}"
+                            """class Dummy{}"""
                         ),
                         (
                             "/other/Dummy2.cs",
-                            @"class Dummy2{}"
+                            """class Dummy2{}"""
                         ),
                         (
                             "/home/source/Program.cs",

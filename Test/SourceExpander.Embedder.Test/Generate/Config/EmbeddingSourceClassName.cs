@@ -16,7 +16,7 @@ namespace SourceExpander.Generate.Config
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                     """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -41,19 +41,19 @@ namespace SourceExpander.Generate.Config
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Debug.Assert(true);
-        Console.WriteLine(1);
-    }
-}
-"
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Debug.Assert(true);
+                                    Console.WriteLine(1);
+                                }
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -89,7 +89,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                     """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -113,19 +113,19 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Debug.Assert(true);
-        Console.WriteLine(1);
-    }
-}
-"
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Debug.Assert(true);
+                                    Console.WriteLine(1);
+                                }
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =

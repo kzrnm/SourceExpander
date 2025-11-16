@@ -16,7 +16,7 @@ namespace SourceExpander.Generate.Config
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Console.WriteLine(1);}}"
+                     """class Program{static void Main(){Console.WriteLine(1);}}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
@@ -44,22 +44,22 @@ namespace SourceExpander.Generate.Config
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-[DebuggerDisplay(""Name"")]
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
+                            [DebuggerDisplay("Name")]
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
 
-    [SourceExpander.NotEmbeddingSource]
-    static void T() => Console.WriteLine(2);
-}
-"
+                                [SourceExpander.NotEmbeddingSource]
+                                static void T() => Console.WriteLine(2);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -164,7 +164,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Console.WriteLine(1);}}"
+                     """class Program{static void Main(){Console.WriteLine(1);}}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
@@ -192,22 +192,22 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-[DebuggerDisplay(""Name"")]
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
+                            [DebuggerDisplay("Name")]
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
 
-    [SourceExpander.NotEmbeddingSource]
-    static void T() => Console.WriteLine(2);
-}
-"
+                                [SourceExpander.NotEmbeddingSource]
+                                static void T() => Console.WriteLine(2);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =

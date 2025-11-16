@@ -16,7 +16,7 @@ namespace SourceExpander.Generate.Config
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);[Conditional(""DEBUG2"")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(""DEBUG2"")][Conditional(""Test"")]static void T8()=>Console.WriteLine(8);}"
+                     """class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);[Conditional("DEBUG2")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional("DEBUG2")][Conditional("Test")]static void T8()=>Console.WriteLine(8);}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);[Conditional(\\\"DEBUG2\\\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\\\"DEBUG2\\\")][Conditional(\\\"Test\\\")]static void T8()=>Console.WriteLine(8);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -102,7 +102,7 @@ namespace SourceExpander.Generate.Config
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(""TEST"")]static void T()=>Console.WriteLine(2);[Conditional(""DEBUG2"")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(""DEBUG2"")][Conditional(""Test"")]static void T8()=>Console.WriteLine(8);}"
+                     """class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);[Conditional("DEBUG2")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional("DEBUG2")][Conditional("Test")]static void T8()=>Console.WriteLine(8);}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);[Conditional(\\\"DEBUG2\\\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\\\"DEBUG2\\\")][Conditional(\\\"Test\\\")]static void T8()=>Console.WriteLine(8);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -119,30 +119,30 @@ namespace SourceExpander.Generate.Config
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Debug.Assert(true);
-        T();
-        T4();
-        T8();
-        Console.WriteLine(1);
-    }
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Debug.Assert(true);
+                                    T();
+                                    T4();
+                                    T8();
+                                    Console.WriteLine(1);
+                                }
 
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-    [Conditional(""DEBUG2"")]
-    static void T4() => Console.WriteLine(4);
-    [System.Diagnostics.Conditional(""DEBUG2"")]
-    [Conditional(""Test"")]
-    static void T8() => Console.WriteLine(8);
-}
-"
+                                [System.Diagnostics.Conditional("TEST")]
+                                static void T() => Console.WriteLine(2);
+                                [Conditional("DEBUG2")]
+                                static void T4() => Console.WriteLine(4);
+                                [System.Diagnostics.Conditional("DEBUG2")]
+                                [Conditional("Test")]
+                                static void T8() => Console.WriteLine(8);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -178,7 +178,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                     """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -202,19 +202,19 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Debug.Assert(true);
-        Console.WriteLine(1);
-    }
-}
-"
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Debug.Assert(true);
+                                    Console.WriteLine(1);
+                                }
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -250,7 +250,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"
+                     """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
                  ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
 
@@ -266,19 +266,19 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-class Program
-{
-    static void Main()
-    {
-        Debug.Assert(true);
-        Console.WriteLine(1);
-    }
-}
-"
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Debug.Assert(true);
+                                    Console.WriteLine(1);
+                                }
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -6,12 +7,12 @@ namespace SourceExpander.Share
 {
     public class AllTypeNamesTest
     {
-        public struct TypeNameTestInput
+        public readonly struct TypeNameTestInput
         {
             public override string ToString() => Name;
-            public string Name;
-            public SemanticModel Model;
-            public SyntaxTree Tree;
+            public readonly string Name;
+            public readonly SemanticModel Model;
+            public readonly SyntaxTree Tree;
 
             public TypeNameTestInput(string name, string sourceCode)
             {
@@ -26,30 +27,30 @@ namespace SourceExpander.Share
             }
         }
 
-        public static IEnumerable<object[]> GetTypeNameTestData()
+        public static IEnumerable<Func<(TypeNameTestInput input, string[] expected)>> GetTypeNameTestData()
         {
-            yield return new object[] {
-                new TypeNameTestInput("Normal", @"
-using System;
-using System.Linq;
-using static System.Console;
-using Math = System.MathF;
+            yield return () => (
+                new TypeNameTestInput("Normal", """
+                using System;
+                using System.Linq;
+                using static System.Console;
+                using Math = System.MathF;
 
-class MyException : Exception { }
-[System.Serializable]
-class Program
-{
-    IntPtr field;
-    IObserver<DateTime> Property { get; set; }
-    public Action Method(Func<object> func)
-    {
-        var variable = DateTime.Now.TimeOfDay.ToString();
-        variable.Select(c => c - 1).ToList().ToArray();
-        return () => func();
-    }
-}
-"),
-                new string[]{
+                class MyException : Exception { }
+                [System.Serializable]
+                class Program
+                {
+                    IntPtr field;
+                    IObserver<DateTime> Property { get; set; }
+                    public Action Method(Func<object> func)
+                    {
+                        var variable = DateTime.Now.TimeOfDay.ToString();
+                        variable.Select(c => c - 1).ToList().ToArray();
+                        return () => func();
+                    }
+                }
+                """),
+                [
                     "System.Console",
                     "System.MathF",
                     "System.Exception",
@@ -66,8 +67,8 @@ class Program
                     "System.Linq.Enumerable",
                     "Program",
                     "int"
-                },
-            };
+                ]
+            );
         }
 
         [Test]

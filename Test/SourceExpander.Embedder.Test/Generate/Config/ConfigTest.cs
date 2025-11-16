@@ -54,9 +54,9 @@ namespace SourceExpander.Generate.Config
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
+                     """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
                  ));
-            string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768(@"[{""CodeBody"":""[DebuggerDisplay(\""Name\"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\""TEST\"")] static void T() => Console.WriteLine(2); }"",""Dependencies"":[],""FileName"":""TestProject>Program.cs"",""TypeNames"":[""Program""],""Usings"":[""using System;"",""using System.Diagnostics;""]}]");
+            string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768("""[{"CodeBody":"[DebuggerDisplay(\"Name\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\"TEST\")] static void T() => Console.WriteLine(2); }","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""");
             var test = new Test
             {
                 TestState =
@@ -69,22 +69,22 @@ namespace SourceExpander.Generate.Config
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-[DebuggerDisplay(""Name"")]
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
+                            [DebuggerDisplay("Name")]
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
 
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-}
-"
+                                [System.Diagnostics.Conditional("TEST")]
+                                static void T() => Console.WriteLine(2);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -129,7 +129,7 @@ class Program
                      ["Program"],
                      ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                      ImmutableArray<string>.Empty,
-                     @"[DebuggerDisplay(""Name"")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(""TEST"")] static void T() => Console.WriteLine(2); }"
+                     """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
                  ));
             string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768("[{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]");
 
@@ -140,22 +140,22 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
-using System.Diagnostics;
+                            """
+                            using System;
+                            using System.Diagnostics;
 
-[DebuggerDisplay(""Name"")]
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
+                            [DebuggerDisplay("Name")]
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
 
-    [System.Diagnostics.Conditional(""TEST"")]
-    static void T() => Console.WriteLine(2);
-}
-"
+                                [System.Diagnostics.Conditional("TEST")]
+                                static void T() => Console.WriteLine(2);
+                            }
+                            """
                         ),
                     },
                     GeneratedSources =
@@ -209,17 +209,17 @@ class Program
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            @"
-using System;
+                            """
+                            using System;
 
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(1);
-    }
-}
-"
+                            class Program
+                            {
+                                static void Main()
+                                {
+                                    Console.WriteLine(1);
+                                }
+                            }
+                            """
                         ),
                     },
                 }
