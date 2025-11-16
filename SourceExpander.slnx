@@ -8,6 +8,7 @@
     <File Path="3rd-party-license.txt" />
     <File Path="CHANGELOG.md" />
     <File Path="Directory.Build.props" />
+    <File Path="global.json" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/Test/">

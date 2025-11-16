@@ -14,11 +14,11 @@ namespace SourceExpander
             {
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
                 ReferenceAssemblies = new ReferenceAssemblies(
-                        "net8.0",
+                        "net10.0",
                         new PackageIdentity(
                             "Microsoft.NETCore.App.Ref",
                             "8.0.0"),
-                        Path.Combine("ref", "net8.0")).AddPackages(Packages);
+                        Path.Combine("ref", "net10.0")).AddPackages(Packages);
                 foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
                 {
                     TestState.GeneratedSources.Add((typeof(EmbedderGenerator), hintName, sourceText));

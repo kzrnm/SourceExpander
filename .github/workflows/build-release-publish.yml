@@ -25,9 +25,7 @@ jobs:
     with:
       target: SourceExpander.slnx
       dotnet-version: |
-        8.0.x
-        9.0.x
-      # Use 9.0.x for .slnx projects
+        10.0.x
 
   build:
     runs-on: windows-latest
@@ -38,10 +36,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            3.1.x
-            8.0.x
-            9.0.x
-          # Use 9.0.x for .slnx projects
+            10.0.x
       - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
@@ -53,7 +48,7 @@ jobs:
       - name: Build(Release)
         run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} -c Release
       - name: Test
-        run: dotnet test ${{ env.WORKFLOW_BUILD_SLN }} --no-build --logger GitHubActions -c Release
+        run: dotnet test --solution ${{ env.WORKFLOW_BUILD_SLN }} --no-build
       - uses: actions/upload-artifact@v4
         if: ${{ needs.get-version.outputs.is-new == 'true' }}
         with:

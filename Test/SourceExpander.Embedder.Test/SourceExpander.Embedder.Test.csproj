@@ -1,32 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);IDE0022;CA2211</NoWarn>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>../../key.snk</AssemblyOriginatorKeyFile>
-    <RestoreAdditionalProjectSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json ;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+    <UseRoslynLibraries>true</UseRoslynLibraries>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Base32768" Version="2.0.2" />
-    <PackageReference Include="DotNet.Glob" Version="3.1.3" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.3.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.3-beta1.25560.1" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\Verifiers\CSharpSourceGeneratorTest.cs" Link="Verifiers\CSharpSourceGeneratorTest.cs" />
     <Compile Include="..\Verifiers\DummyAnalyzerConfigOptionsProvider.cs" Link="Verifiers\DummyAnalyzerConfigOptionsProvider.cs" />
     <Compile Include="..\Utils\EnvironmentUtil.cs" Link="Utils\EnvironmentUtil.cs" />
     <Compile Include="..\Utils\InMemorySourceText.cs" Link="Utils\InMemorySourceText.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Base32768" Version="2.0.2" />
+    <PackageReference Include="DotNet.Glob" Version="3.1.3" />
   </ItemGroup>
 
   <ItemGroup>

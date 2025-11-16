@@ -16,15 +16,11 @@ jobs:
     with:
       target: SourceExpander.slnx
       dotnet-version: |
-        8.0.x
-        9.0.x
-      # Use 9.0.x for .slnx projects
+        10.0.x
   test:
-    uses: kzrnm/dotnet-actions/.github/workflows/unittest.yml@v2
+    uses: kzrnm/dotnet-actions/.github/workflows/unittest-mtp.yml@v2
     with:
-      target: SourceExpander.slnx
+      solution: SourceExpander.slnx
       dotnet-version: |
-        8.0.x
-        9.0.x
-      # Use 9.0.x for .slnx projects
-      test-logger: GitHubActions
+        10.0.x
+      

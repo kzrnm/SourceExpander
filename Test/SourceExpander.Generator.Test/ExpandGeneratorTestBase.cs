@@ -17,7 +17,7 @@ namespace SourceExpander
             public Test()
             {
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net80.AddPackages(Packages);
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net100.AddPackages(Packages);
             }
         }
         internal static Solution CreateOtherReference(Solution solution,

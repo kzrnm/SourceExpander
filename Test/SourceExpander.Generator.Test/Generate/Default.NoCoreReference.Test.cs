@@ -26,7 +26,7 @@ namespace SourceExpander.Generate
         {
             var test = new Test
             {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net100,
                 TestState =
                 {
                     AdditionalProjects =

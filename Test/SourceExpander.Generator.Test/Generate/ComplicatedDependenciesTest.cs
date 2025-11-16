@@ -10,7 +10,7 @@ namespace SourceExpander.Generate
         {
             var test = new Test
             {
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net80
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net100
                     .AddPackages(Packages.Add(new PackageIdentity("ac-library-csharp", "1.4.4"))),
                 TestState =
                 {
