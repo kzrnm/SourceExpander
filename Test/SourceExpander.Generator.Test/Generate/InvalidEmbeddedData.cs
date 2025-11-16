@@ -9,35 +9,25 @@ namespace SourceExpander.Generate
         [Test]
         public async Task Generate()
         {
-            var others = new SourceFileCollection{
-                (
-                "/home/other/C.cs",
-                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
-                ),
-                (
-                "/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[-]")]
-                    """,
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
-                    """,
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
-                    """)
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                                """
+                                [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[-]")]
+                                [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+                                [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+                                """
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     Sources = {
                         (
                             "/home/mine/Program.cs",

@@ -8,39 +8,26 @@ namespace SourceExpander.Generate
         [Test]
         public async Task Generate()
         {
-            var others = new SourceFileCollection{
-                (
-                "/home/other/C.cs",
-                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
-                ),
-                (
-                "/home/other/L.cs",
-                "namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}"
-                ),
-                (
-                "/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]
-                    """,
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]
-                    """,
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
-                    """)
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                                """namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}""",
+                                """
+                                [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]
+                                [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]
+                                [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
+                                """
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     Sources = {
                         (
                             "/home/mine/Program.cs",
@@ -117,39 +104,26 @@ namespace Other.Linq{public static class L{public static int Max(this int v)=>v;
         [Test]
         public async Task UnusedExtensionMethod()
         {
-            var others = new SourceFileCollection{
-                (
-                "/home/other/C.cs",
-                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
-                ),
-                (
-                "/home/other/L.cs",
-                "namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}"
-                ),
-                (
-                "/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]
-                    """,
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]
-                    """,
-                    """
-                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
-                    """)
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                                """namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}""",
+                                """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Other.Linq{public static class L{public static int Max(this int v)=>v;}}\",\"Dependencies\":[],\"FileName\":\"OtherDependency>L.cs\",\"TypeNames\":[\"Other.Linq.L\"],\"Usings\":[]}]")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other,Other.Linq")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
+"""
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     Sources = {
                         (
                             "/home/mine/Program.cs",
