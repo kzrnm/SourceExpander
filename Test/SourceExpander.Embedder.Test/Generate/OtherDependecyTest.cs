@@ -32,28 +32,24 @@ namespace SourceExpander.Generate
             ]);
             const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
 
-            var others = new SourceFileCollection{
-                (
-                "home/other/C.cs",
-                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}"
-                ),
-                (
-                @"/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedNamespaces"", ""Other"")]",
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]")
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                                """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
+""",
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     AdditionalFiles =
                     {
                         enableMinifyJson,
@@ -61,17 +57,18 @@ namespace SourceExpander.Generate
                     Sources = {
                         (
                             @"/home/mine/C.cs",
-                            @"
+                            """
 namespace Mine{
     public static class C
     {
         public static void P() => System.Console.WriteLine();
     }
-}"
+}
+"""
                         ),
                         (
                             @"/home/mine/Program.cs",
-                            @"
+                            """
 using OC = Other.C;
 
 namespace Mine{
@@ -84,12 +81,12 @@ namespace Mine{
         }
     }
 }
-"
+"""
                         ),
                     },
                     ExpectedDiagnostics =
                     {
-                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 2, 1, 2, 20),
+                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
                     },
                     GeneratedSources =
                     {
@@ -137,29 +134,26 @@ namespace Mine{
             ]);
             const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
 
-            var others = new SourceFileCollection{
-                (
-                "home/other/C.cs",
-                "namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}"
-                ),
-                (
-                @"/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedNamespaces"", ""Other"")]",
-                "[assembly: System.Reflection.AssemblyMetadata(\"SourceExpander.EmbeddedSourceCode.GZipBase32768\"," +
-                "\"㘅桠ҠҠҠ俶䏂⣂㹆䟗謜熬㔀Ⰳ茡毳窰廸揪㇚ᖭ引㱫焸萍瀾㡣暎㘟牟腱棋厝趼㙩闌䡉偩⎙癠㠂恓䦀砦哂叇㡙襏ꜙ㟰鲅ᯝ呡䰆濜㴞缻筷蝂島彀練䮌抸霣ݮ倉蟶㤥矖⢶觉癁荁趟㪺䡶碊赆瓁㥟圅鮀糏䑖䆷璾穗ᓞ䵫镹癠ҧ\")]")
-                ),
-            };
 
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                                """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode.GZipBase32768",
+"㘅桠ҠҠҠ俶䏂⣂㹆䟗謜熬㔀Ⰳ茡毳窰廸揪㇚ᖭ引㱫焸萍瀾㡣暎㘟牟腱棋厝趼㙩闌䡉偩⎙癠㠂恓䦀砦哂叇㡙襏ꜙ㟰鲅ᯝ呡䰆濜㴞缻筷蝂島彀練䮌抸霣ݮ倉蟶㤥矖⢶觉癁荁趟㪺䡶碊赆瓁㥟圅鮀糏䑖䆷璾穗ᓞ䵫镹癠ҧ")]
+""",
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     AdditionalFiles =
                     {
                         enableMinifyJson,
@@ -167,17 +161,18 @@ namespace Mine{
                     Sources = {
                         (
                             @"/home/mine/C.cs",
-                            @"
+                            """
 namespace Mine{
     public static class C
     {
         public static void P() => System.Console.WriteLine();
     }
-}"
+}
+"""
                         ),
                         (
                             @"/home/mine/Program.cs",
-                            @"
+                            """
 using OC = Other.C;
 
 namespace Mine{
@@ -190,12 +185,12 @@ namespace Mine{
         }
     }
 }
-"
+"""
                         ),
                     },
                     ExpectedDiagnostics =
                     {
-                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 2, 1, 2, 20),
+                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
                     },
                     GeneratedSources =
                     {
@@ -234,27 +229,24 @@ namespace Mine{
                 ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
 
-            var others = new SourceFileCollection{
-                (
-                "home/other/C.cs",
-                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}"
-                ),
-                (
-                @"/home/other/AssemblyInfo.cs",
-                "[assembly: System.Reflection.AssemblyMetadata(\"SourceExpander.EmbedderVersion\",\"2147483647.2147483647.2147483647.2147483647\")]"
-                + @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[{\""CodeBody\"":\""namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \"",\""Dependencies\"":[],\""FileName\"":\""OtherDependency>C.cs\"",\""TypeNames\"":[\""Other.C\""],\""Usings\"":[]}]"")]"
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                                """
+                        [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
+                        [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
+                        """
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     AdditionalFiles =
                     {
                         enableMinifyJson,
@@ -262,13 +254,14 @@ namespace Mine{
                     Sources = {
                         (
                             @"/home/mine/C.cs",
-                            @"
+                            """
 namespace Mine{
     public static class C
     {
         public static void P() => System.Console.WriteLine();
     }
-}"
+}
+"""
                         ),
                     },
                     ExpectedDiagnostics =
@@ -312,26 +305,22 @@ namespace Mine{
                 ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
 
-            var others = new SourceFileCollection{
-                (
-                "home/other/C.cs",
-                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}"
-                ),
-                (
-                @"/home/other/AssemblyInfo.cs",
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""[}"")]"
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                                """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[}")]""",
+                                
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     AdditionalFiles =
                     {
                         enableMinifyJson,
@@ -339,13 +328,14 @@ namespace Mine{
                     Sources = {
                         (
                             @"/home/mine/C.cs",
-                            @"
+                            """
 namespace Mine{
     public static class C
     {
         public static void P() => System.Console.WriteLine();
     }
-}"
+}
+"""
                         ),
                     },
                     ExpectedDiagnostics =
@@ -391,26 +381,25 @@ namespace Mine{
                 ));
             const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
 
-            var others = new SourceFileCollection{
-                (
-                "home/other/C.cs",
-                @"namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}"
-                ),
-                (
-                @"/home/other/AssemblyInfo.cs",
-                @"[assembly: System.Reflection.AssemblyMetadata(""SourceExpander.EmbeddedSourceCode"", ""㘅桠ҠҠҠ俕䎶⣂㹊"")]"
-                ),
+            var others = new SourceFileCollection
+            {
             };
 
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                                """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "㘅桠ҠҠҠ俕䎶⣂㹊")]""",
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     AdditionalFiles =
                     {
                         enableMinifyJson,
@@ -418,13 +407,14 @@ namespace Mine{
                     Sources = {
                         (
                             @"/home/mine/C.cs",
-                            @"
+                            """
 namespace Mine{
     public static class C
     {
         public static void P() => System.Console.WriteLine();
     }
-}"
+}
+"""
                         ),
                     },
                     ExpectedDiagnostics =

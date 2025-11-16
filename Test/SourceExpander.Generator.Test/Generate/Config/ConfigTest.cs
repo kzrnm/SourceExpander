@@ -16,11 +16,10 @@ namespace SourceExpander.Generate.Config
     "ignore-file-pattern-regex": 1
 }
 """),
-                new object[]
-                {
+                [
                     "/foo/bar/SourceExpander.Generator.Config.json",
                     "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
-                }
+                ]
             );
             yield return () => (
                 new InMemorySourceText("/foo/bar/sourceExpander.generator.config.json", """
@@ -29,11 +28,10 @@ namespace SourceExpander.Generate.Config
     "ignore-file-pattern-regex": 1
 }
 """),
-                new object[]
-                {
+                [
                     "/foo/bar/sourceExpander.generator.config.json",
                     "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
-                }
+                ]
             );
             yield return () => (
                 new InMemorySourceText("/regexerror/SourceExpander.Generator.Config.json", """
@@ -44,11 +42,10 @@ namespace SourceExpander.Generate.Config
     ]
 }
 """),
-                new object[]
-                {
+                [
                     "/regexerror/SourceExpander.Generator.Config.json",
                     "Invalid pattern '(' at offset 1. Not enough )'s."
-                }
+                ]
             );
         }
 
@@ -56,30 +53,26 @@ namespace SourceExpander.Generate.Config
         [MethodDataSource(nameof(ParseErrorJsons))]
         public async Task ParseErrorTest(InMemorySourceText additionalText, object[] diagnosticsArg)
         {
-            var others = new SourceFileCollection{
-                (
-                "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
-                ),
-                (
-                "/home/other/AssemblyInfo.cs",
-                EnvironmentUtil.JoinByStringBuilder(
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]""",
-                    """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]""")
-                ),
-            };
-
             var test = new Test
             {
-                SolutionTransforms =
-                {
-                    (solution, projectId)
-                    => CreateOtherReference(solution, projectId, others),
-                },
                 TestState =
                 {
+                    AdditionalProjects =
+                    {
+                        ["Other"] =
+                        {
+                            Sources = {
+                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                                """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+"""
+                            }
+                        },
+                    },
+                    AdditionalProjectReferences = { "Other" },
                     AdditionalFiles = { additionalText, },
                     Sources = {
                         (
@@ -180,7 +173,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var others = new SourceFileCollection{
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/AssemblyInfo.cs",
@@ -293,7 +286,7 @@ namespace Other { public static class C { public static void P() => System.Conso
             var others = new SourceFileCollection{
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/AssemblyInfo.cs",
@@ -368,7 +361,7 @@ class Program2
             var others = new SourceFileCollection{
                 (
                 "/home/other/C.cs",
-                "namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"
+                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}"""
                 ),
                 (
                 "/home/other/AssemblyInfo.cs",

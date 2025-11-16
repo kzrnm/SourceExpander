@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Base32768" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>

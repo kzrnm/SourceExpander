@@ -28,16 +28,13 @@ namespace SourceExpander
 
         internal static Solution CreateOtherReference(Solution solution,
             ProjectId projectId,
-            SourceFileCollection documents,
-            CSharpCompilationOptions compilationOptions = null)
+            SourceFileCollection documents)
         {
-            compilationOptions ??= new(OutputKind.DynamicallyLinkedLibrary);
-
             var targetProject = solution.GetProject(projectId);
 
             var project = solution.AddProject("Other", "Other", "C#")
                 .WithMetadataReferences(targetProject.MetadataReferences)
-                .WithCompilationOptions(compilationOptions);
+                .WithCompilationOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             foreach (var (filename, content) in documents)
             {
                 project = project.AddDocument(Path.GetFileNameWithoutExtension(filename), content, filePath: filename).Project;
