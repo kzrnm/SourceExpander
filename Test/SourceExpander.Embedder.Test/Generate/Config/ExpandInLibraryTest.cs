@@ -246,7 +246,7 @@ class Program
         [Test]
         public async Task ExpandProperty()
         {
-                        var embeddedNamespaces = ImmutableArray<string>.Empty;
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (

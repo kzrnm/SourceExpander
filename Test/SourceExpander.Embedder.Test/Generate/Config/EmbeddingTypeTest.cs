@@ -387,7 +387,7 @@ namespace SourceExpander.Generate.Config
         [Test]
         public async Task EmbeddingRawFullMinifyProperty()
         {
-                        var embeddedNamespaces = ImmutableArray<string>.Empty;
+            var embeddedNamespaces = ImmutableArray<string>.Empty;
             var embeddedFiles = ImmutableArray.Create(
                  new SourceFileInfo
                  (

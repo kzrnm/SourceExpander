@@ -310,7 +310,7 @@ namespace Other { public static class C { public static void P() => System.Conso
 
         [Test]
         public async Task Whitelist()
-        {            
+        {
             var test = new Test
             {
                 TestState =

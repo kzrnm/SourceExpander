@@ -316,7 +316,7 @@ namespace Mine{
                             Sources = {
                                 """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
                                 """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[}")]""",
-                                
+
                             }
                         },
                     },

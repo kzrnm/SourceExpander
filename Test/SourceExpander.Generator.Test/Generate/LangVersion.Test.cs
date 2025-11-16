@@ -32,7 +32,7 @@ namespace SourceExpander.Generate
                         {
                             Sources = {
                                 """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
-                                otherAttributes 
+                                otherAttributes
                             }
                         },
                     },
@@ -117,7 +117,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                         {
                             Sources = {
                                 """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
-                                otherAttributes 
+                                otherAttributes
                             }
                         },
                     },
