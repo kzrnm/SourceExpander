@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ac-library-csharp" Version="[3.9.1-atcoder1]" />
+    <PackageReference Include="ac-library-csharp" />
     <ProjectReference Include="..\..\..\Source\Sandbox\SampleLibrary\SampleLibrary.csproj" />
     <ProjectReference Include="..\..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

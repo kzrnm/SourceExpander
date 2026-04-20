@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,16 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Base32768" Version="2.0.2" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Base32768" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
-    <PackageReference Include="System.Formats.Asn1" Version="10.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="System.Formats.Asn1" />
   </ItemGroup>
 
   <ItemGroup>

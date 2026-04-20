@@ -21,16 +21,16 @@
 
   <ItemGroup>
     <Compile Include="../SourceExpander.Share/Util/SourceBuilder.cs" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="IsExternalInit" Version="1.0.3">
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="IsExternalInit">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
   </ItemGroup>
 
   <Target Name="GetDependencyTargetPaths">
