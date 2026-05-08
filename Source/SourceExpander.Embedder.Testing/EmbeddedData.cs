@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Kzrnm.Convert.Base32768;
 
@@ -72,7 +73,6 @@ namespace SourceExpander
             return new EmbeddedData(assembly.FullName, await LoadSourceFiles(metadata).ConfigureAwait(false), metadata);
         }
 
-
         private static ImmutableDictionary<string, string> LoadAssemblyMetadatas(Assembly assembly)
             => assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .ToImmutableDictionary(attr => attr.Key, attr => attr.Value);
@@ -85,20 +85,23 @@ namespace SourceExpander
                 if (keyArray.Length >= 2
                     && keyArray[1] == "EmbeddedSourceCode")
                 {
-                    SourceFileInfo[]? embedded;
+                    ImmutableArray<SourceFileInfo> embedded;
                     if (Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0)
                     {
                         using var ms = new MemoryStream(Base32768.Decode(p.Value));
                         using var gz = new GZipStream(ms, CompressionMode.Decompress);
-                        embedded = await JsonSerializer.DeserializeAsync<SourceFileInfo[]>(gz).ConfigureAwait(false);
+                        embedded = await JsonSerializer
+                            .DeserializeAsync(gz, SourceFileInfoSerializerContext.Default.ImmutableArraySourceFileInfo).ConfigureAwait(false);
                     }
                     else
-                        embedded = JsonSerializer.Deserialize<SourceFileInfo[]>(p.Value);
-                    if (embedded is not null)
-                        return ImmutableArray.Create(embedded);
+                        embedded = JsonSerializer.Deserialize(p.Value, SourceFileInfoSerializerContext.Default.ImmutableArraySourceFileInfo);
+                    if (!embedded.IsDefaultOrEmpty)
+                        return embedded;
                 }
             }
             return ImmutableArray<SourceFileInfo>.Empty;
         }
     }
+    [JsonSerializable(typeof(ImmutableArray<SourceFileInfo>))]
+    internal partial class SourceFileInfoSerializerContext : JsonSerializerContext;
 }
