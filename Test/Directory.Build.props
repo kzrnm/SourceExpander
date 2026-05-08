@@ -14,7 +14,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <PackageReference Include="Microsoft.CodeAnalysis" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" />
-    <PackageReference Include="System.Formats.Asn1" />
   </ItemGroup>
   
   <ItemGroup>
