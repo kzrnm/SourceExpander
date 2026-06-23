@@ -64,20 +64,30 @@ internal class TypeFindAndUnusedUsingRemover : CSharpSyntaxRewriter
 
     public override SyntaxNode? Visit(SyntaxNode? node)
     {
+        return FindTypes(node) ? base.Visit(node) : null;
+    }
+
+
+    /// <summary>
+    /// Visit a node and find type
+    /// </summary>
+    /// <returns>if <see langword="false"/>, ignore <paramref name="node"/></returns>
+    protected virtual bool FindTypes(SyntaxNode? node)
+    {
         if (node == null)
-            return null;
+            return false;
         if (node is MemberDeclarationSyntax memberDeclarationSyntax
             && memberDeclarationSyntax is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax)
         {
             if (!FindDeclaredType(memberDeclarationSyntax))
-                return null;
+                return false;
         }
         var namedTypeSymbol = RoslynUtil.GetTypeNameFromSymbol(SemanticModel.GetSymbolInfo(node, CancellationToken).Symbol);
         if (namedTypeSymbol is not null)
         {
             usedTypesBuilder.Add(namedTypeSymbol);
         }
-        return base.Visit(node);
+        return true;
     }
 
     /// <summary>

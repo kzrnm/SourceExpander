@@ -39,8 +39,8 @@ namespace SourceExpander.Roslyn
         }
         public override SyntaxNode? VisitAttribute(AttributeSyntax node)
         {
-            if (model.GetTypeInfo(node, cancellationToken).Type is { } typeSymbol
-                && config.ExcludeAttributes.Contains(typeSymbol.ToString()))
+            var typeName = model.GetTypeInfo(node, cancellationToken).Type?.ToString();
+            if (typeName is not null && config.ExcludeAttributes.Contains(typeName))
                 return null;
             return base.VisitAttribute(node);
         }
@@ -49,8 +49,12 @@ namespace SourceExpander.Roslyn
         {
             if (node.Target?.Identifier is { } target && (target.IsKind(SyntaxKind.AssemblyKeyword) || target.IsKind(SyntaxKind.ModuleKeyword)))
                 return null;
-            if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Any())
-                return attrs;
+            if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Count > 0)
+            {
+                if (node.Attributes.Count == attrs.Attributes.Count)
+                    return attrs;
+                return SyntaxFactory.AttributeList(SyntaxFactory.SeparatedList(attrs.Attributes));
+            }
             return null;
         }
         public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)

@@ -36,9 +36,9 @@ namespace SourceExpander.Roslyn
             CSharpParseOptions parseOptions,
             CancellationToken cancellationToken = default)
         {
+            var embeddedSyntaxTrees = sources.Select(s => s.ToSyntaxTree(parseOptions, Encoding.UTF8, cancellationToken));
             var embeddedCompilation = CSharpCompilation.Create("NewCompilation",
-                sources.Select(s => s.ToSyntaxTree(parseOptions, Encoding.UTF8, cancellationToken)),
-                references, compilationOptions);
+                embeddedSyntaxTrees, references, compilationOptions);
             return GetCompilationDiagnostic(embeddedCompilation, cancellationToken);
         }
 

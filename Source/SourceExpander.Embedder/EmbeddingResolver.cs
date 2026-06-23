@@ -240,7 +240,7 @@ namespace SourceExpander
             if (!_cacheResolvedFiles.IsDefault)
                 return _cacheResolvedFiles;
             if (!config.Enabled)
-                return _cacheResolvedFiles = ImmutableArray.Create<SourceFileInfo>();
+                return ImmutableArray<SourceFileInfo>.Empty;
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -278,6 +278,13 @@ namespace SourceExpander
             cancellationToken.ThrowIfCancellationRequested();
             var typeFindAndUnusedUsingRemover = new EmbeddingTypeFindAndUnusedUsingRemover()
                 .Visit(tree, compilation, cancellationToken);
+
+            foreach (var d in typeFindAndUnusedUsingRemover.Diagnostics)
+            {
+                reporter.ReportDiagnostic(d);
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             var newTree = typeFindAndUnusedUsingRemover.SyntaxTree ?? throw new Exception($"Syntax tree of {tree.FilePath} is invalid");
             cancellationToken.ThrowIfCancellationRequested();
 
