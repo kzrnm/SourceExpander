@@ -5,7 +5,7 @@
     "properties": {
         "enabled": {
             "type": "boolean",
-            "default": false
+            "default": true
         },
         "include": {
             "type": [
@@ -94,6 +94,21 @@
             "enum": [
                 "WithoutCommonPrefix",
                 "FullPath"
+            ]
+        },
+        "language-version": {
+            "description": "C# version of embedded sources",
+            "default": null,
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "null"
+                }
             ]
         },
         "expand-in-library": {
