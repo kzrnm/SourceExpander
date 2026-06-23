@@ -13,18 +13,15 @@ namespace SourceExpander
             _ => Location.Create(filePath, new(), new()),
         };
 
+        static LocalizableResourceString ResourceString(string name)
+            => new(name, DiagnosticsResources.ResourceManager, typeof(DiagnosticsResources));
+
         public static Diagnostic EXPAND0001_UnknownError(string message)
              => Diagnostic.Create(EXPAND0001_UnknownError_Descriptor, Location.None, message);
         private static readonly DiagnosticDescriptor EXPAND0001_UnknownError_Descriptor = new(
             "EXPAND0001",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0001_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0001_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0001_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0001_Body)),
             "Error",
             DiagnosticSeverity.Warning,
             true);
@@ -32,14 +29,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0002_ExpanderVersion_Descriptor, Location.None, expanderVersion.ToString(), assemblyName, assemblyEmbedderVersion.ToString());
         private static readonly DiagnosticDescriptor EXPAND0002_ExpanderVersion_Descriptor = new(
             "EXPAND0002",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0002_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0002_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0002_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0002_Body)),
             "Usage",
             DiagnosticSeverity.Warning,
             true);
@@ -47,14 +38,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0003_NotFoundEmbedded_Descriptor, Location.None);
         private static readonly DiagnosticDescriptor EXPAND0003_NotFoundEmbedded_Descriptor = new(
             "EXPAND0003",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0003_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0003_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0003_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0003_Title)),
             "Usage",
             DiagnosticSeverity.Info,
             true);
@@ -62,14 +47,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0004_MustBeNewerThanCSharp3_Descriptor, Location.None);
         private static readonly DiagnosticDescriptor EXPAND0004_MustBeNewerThanCSharp3_Descriptor = new(
             "EXPAND0004",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0004_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0004_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0004_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0004_Title)),
             "Usage",
             DiagnosticSeverity.Info,
             true);
@@ -77,14 +56,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0005_NewerCSharpVersion_Descriptor, Location.None, expanderVersion.ToDisplayString(), assemblyName, assemblyEmbedderVersion.ToDisplayString());
         private static readonly DiagnosticDescriptor EXPAND0005_NewerCSharpVersion_Descriptor = new(
             "EXPAND0005",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0005_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0005_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0005_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0005_Body)),
             "Usage",
             DiagnosticSeverity.Warning,
             true);
@@ -93,14 +66,8 @@ namespace SourceExpander
                  AdditionalFileLocation(configFile), configFile ?? "Any of configs", message);
         private static readonly DiagnosticDescriptor EXPAND0007_ParseConfigError_Descriptor = new(
             "EXPAND0007",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0007_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0007_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0007_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0007_Body)),
             "Error",
             DiagnosticSeverity.Error,
             true);
@@ -108,14 +75,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0008_EmbeddedDataError_Descriptor, Location.None, assemblyName, key, value);
         private static readonly DiagnosticDescriptor EXPAND0008_EmbeddedDataError_Descriptor = new(
             "EXPAND0008",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0008_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0008_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0008_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0008_Body)),
             "Error",
             DiagnosticSeverity.Warning,
             true);
@@ -123,14 +84,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0009_MetadataEmbeddingFileNotFound_Descriptor, Location.None, fileName);
         private static readonly DiagnosticDescriptor EXPAND0009_MetadataEmbeddingFileNotFound_Descriptor = new(
             "EXPAND0009",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0009_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0009_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0009_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0009_Body)),
             "Error",
             DiagnosticSeverity.Warning,
             true);
@@ -138,14 +93,8 @@ namespace SourceExpander
              => Diagnostic.Create(EXPAND0010_UnsafeBlock_Descriptor, Location.None, fileName);
         private static readonly DiagnosticDescriptor EXPAND0010_UnsafeBlock_Descriptor = new(
             "EXPAND0010",
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0010_Title),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
-            new LocalizableResourceString(
-                nameof(DiagnosticsResources.EXPAND0010_Body),
-                DiagnosticsResources.ResourceManager,
-                typeof(DiagnosticsResources)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0010_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0010_Body)),
             "Usage",
             DiagnosticSeverity.Warning,
             true);
