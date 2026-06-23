@@ -100,5 +100,15 @@ namespace SourceExpander
             "Config",
             DiagnosticSeverity.Warning,
             true);
+
+        public static Diagnostic EMBED0012_InvalidAttribute(Location location, string attributeName)
+            => Diagnostic.Create(EMBED0012_InvalidAttribute_Descriptor, location, attributeName);
+        private static readonly DiagnosticDescriptor EMBED0012_InvalidAttribute_Descriptor = new(
+            "EMBED0012",
+            ResourceString(nameof(DiagnosticsResources.EMBED0012_Title)),
+            ResourceString(nameof(DiagnosticsResources.EMBED0012_Body)),
+            "Usage",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

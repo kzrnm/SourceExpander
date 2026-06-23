@@ -51,10 +51,10 @@ internal class TypeFindAndUnusedUsingRemover : CSharpSyntaxRewriter
             visiting = false;
         }
         return new(
-            definedTypesBuilder.ToImmutable(),
-            usedTypesBuilder.ToImmutable(),
-            rootUsingsBuilder.ToImmutable(),
-            rewritedCompilationUnit.SyntaxTree);
+            DefinedTypeNames: definedTypesBuilder.ToImmutable(),
+            UsedTypes: usedTypesBuilder.ToImmutable(),
+            RootUsings: rootUsingsBuilder.ToImmutable(),
+            SyntaxTree: rewritedCompilationUnit.SyntaxTree);
     }
 
     protected virtual CompilationUnitSyntax VisitRoot()

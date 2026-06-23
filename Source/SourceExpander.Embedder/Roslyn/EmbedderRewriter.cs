@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-
 namespace SourceExpander.Roslyn;
 
 using static SyntaxFactory;
@@ -14,11 +13,15 @@ using static SyntaxFactory;
 /// </summary>
 class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticReporter reporter, CancellationToken cancellationToken) : CSharpSyntaxRewriter
 {
+    const string System_Diagnostics_ConditionalAttribute = "System.Diagnostics.ConditionalAttribute";
+    const string SourceExpander_NotEmbeddingSourceAttributeName = "SourceExpander.NotEmbeddingSourceAttribute";
+
     private readonly SemanticModel semanticModel = model;
     private readonly EmbedderConfig config = config;
     private readonly IDiagnosticReporter reporter = reporter;
     private readonly CancellationToken cancellationToken = cancellationToken;
 
+    public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia) => ElasticMarker;
 
     public override SyntaxNode? Visit(SyntaxNode? node)
     {
@@ -27,20 +30,50 @@ class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticRe
         return base.Visit(node);
     }
 
-    protected virtual SyntaxNode? VisitMemberDeclaration(MemberDeclarationSyntax node)
-        => HasNotEmbeddingSourceAttribute(node.AttributeLists) ? null : base.Visit(node);
-    public override SyntaxNode? VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
-        => HasNotEmbeddingSourceAttribute(node.AttributeLists) ? null : base.VisitLocalFunctionStatement(node);
     protected bool HasNotEmbeddingSourceAttribute(SyntaxList<AttributeListSyntax> attributeLists)
     {
-        const string SourceExpander_NotEmbeddingSourceAttributeName = "SourceExpander.NotEmbeddingSourceAttribute";
         foreach (var attrSyntax in attributeLists.SelectMany(a => a.Attributes))
             if (semanticModel.GetTypeInfo(attrSyntax).Type?.ToString() is SourceExpander_NotEmbeddingSourceAttributeName)
                 return true;
         return false;
     }
+    protected virtual SyntaxNode? VisitMemberDeclaration(MemberDeclarationSyntax node)
+        => HasNotEmbeddingSourceAttribute(node.AttributeLists) ? null : base.Visit(node);
+    public override SyntaxNode? VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
+        => HasNotEmbeddingSourceAttribute(node.AttributeLists) ? null : base.VisitLocalFunctionStatement(node);
 
-    public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia) => ElasticMarker;
+    #region Attribute
+    public override SyntaxNode? VisitAttribute(AttributeSyntax node)
+    {
+        var typeName = semanticModel.GetTypeInfo(node, cancellationToken).Type?.ToString();
+        if (typeName is not null)
+        {
+            if (typeName is SourceExpander_NotEmbeddingSourceAttributeName)
+            {
+                reporter.ReportDiagnostic(DiagnosticDescriptors.EMBED0012_InvalidAttribute(
+                    node.GetLocation(), SourceExpander_NotEmbeddingSourceAttributeName.Split('.').Last()));
+                return null;
+            }
+
+            if (config.ExcludeAttributes.Contains(typeName))
+                return null;
+        }
+        return base.VisitAttribute(node);
+    }
+
+    public override SyntaxNode? VisitAttributeList(AttributeListSyntax node)
+    {
+        if (node.Target?.Identifier is { } target && (target.IsKind(SyntaxKind.AssemblyKeyword) || target.IsKind(SyntaxKind.ModuleKeyword)))
+            return null;
+        if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Count > 0)
+        {
+            if (node.Attributes.Count == attrs.Attributes.Count)
+                return attrs;
+            return AttributeList(SeparatedList(attrs.Attributes));
+        }
+        return null;
+    }
+    #endregion Attribute
 
     public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)
     {
@@ -58,35 +91,11 @@ class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticRe
         }
     Fin: return base.VisitUsingDirective(node);
     }
-    public override SyntaxNode? VisitAttribute(AttributeSyntax node)
-    {
-        var typeName = semanticModel.GetTypeInfo(node, cancellationToken).Type?.ToString();
-        if (typeName is not null && config.ExcludeAttributes.Contains(typeName))
-            return null;
-        return base.VisitAttribute(node);
-    }
-
-    public override SyntaxNode? VisitAttributeList(AttributeListSyntax node)
-    {
-        if (node.Target?.Identifier is { } target && (target.IsKind(SyntaxKind.AssemblyKeyword) || target.IsKind(SyntaxKind.ModuleKeyword)))
-            return null;
-        if (base.VisitAttributeList(node) is AttributeListSyntax attrs && attrs.Attributes.Count > 0)
-        {
-            if (node.Attributes.Count == attrs.Attributes.Count)
-                return attrs;
-            return AttributeList(SeparatedList(attrs.Attributes));
-        }
-        return null;
-    }
 
     public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)
     {
         bool IsRemovable(ExpressionStatementSyntax node)
         {
-            const string System_Diagnostics_ConditionalAttribute = "System.Diagnostics.ConditionalAttribute";
-
-            cancellationToken.ThrowIfCancellationRequested();
-
             if (!node.Parent.IsKind(SyntaxKind.Block)
                 || node.Expression is not InvocationExpressionSyntax invocation
                 || semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol is not IMethodSymbol symbol)
