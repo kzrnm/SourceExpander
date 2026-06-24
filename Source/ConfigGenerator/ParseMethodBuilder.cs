@@ -12,6 +12,7 @@ internal class ParseMethodBuilder
         NullableT = compilation.GetSpecialType(SpecialType.System_Nullable_T);
         NullableBoolean = NullableT.Construct(compilation.GetSpecialType(SpecialType.System_Boolean));
         NullableString = compilation.GetSpecialType(SpecialType.System_String);
+        NullableObject = compilation.GetSpecialType(SpecialType.System_Object);
         NullableStringArray = compilation.CreateArrayTypeSymbol(NullableString);
     }
     INamedTypeSymbol Symbol { get; }
@@ -20,6 +21,7 @@ internal class ParseMethodBuilder
     INamedTypeSymbol NullableT { get; }
     ITypeSymbol NullableBoolean { get; }
     ITypeSymbol NullableString { get; }
+    ITypeSymbol NullableObject { get; }
     ITypeSymbol NullableStringArray { get; }
 
     public string Build()
@@ -99,7 +101,8 @@ if (analyzerConfigOptions.TryGetValue(header + nameof(data.{{configParam.Name}})
 data.{{configParam.Name}} = !global::System.StringComparer.OrdinalIgnoreCase.Equals(v, "false");
 """);
                 }
-                else if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableString))
+                else if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableString)
+                || SymbolEqualityComparer.Default.Equals(configParam.Type, NullableObject))
                 {
                     sb.AppendLine($$"""
 data.{{configParam.Name}} = v;

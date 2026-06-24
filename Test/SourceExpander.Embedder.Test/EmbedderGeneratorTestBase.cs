@@ -13,13 +13,8 @@ namespace SourceExpander
             public Test()
             {
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
-                ReferenceAssemblies = new ReferenceAssemblies(
-                        "net10.0",
-                        new PackageIdentity(
-                            "Microsoft.NETCore.App.Ref",
-                            "8.0.0"),
-                        Path.Combine("ref", "net10.0")).AddPackages(Packages);
-                foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net100.AddPackages(Packages);
+                foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
                 {
                     TestState.GeneratedSources.Add((typeof(EmbedderGenerator), hintName, sourceText));
                 }
@@ -44,7 +39,7 @@ namespace SourceExpander
         }
 
         internal static ImmutableArray<PackageIdentity> Packages
-            = [new PackageIdentity("SourceExpander.Core", "2.6.0")];
+            = [];
 
         public static string EmbedderVersion => typeof(EmbedderGenerator).Assembly.GetName().Version.ToString();
         public static readonly LanguageVersion EmbeddedLanguageVersionEnum = LanguageVersion.Preview;

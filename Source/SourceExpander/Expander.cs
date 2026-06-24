@@ -87,9 +87,8 @@ namespace SourceExpander
                 throw new ExpanderException(Resources.HasEmbeddedSource);
             }
 
-            var expandedContainerType = callingAssembly.GetType("SourceExpander.Expanded.ExpandedContainer");
-            if (expandedContainerType is null)
-                throw new InvalidOperationException("Needs SourceExpander.Generator");
+            var expandedContainerType = callingAssembly.GetType("SourceExpander.Expanded.ExpandedContainer")
+                ?? throw new InvalidOperationException("Needs SourceExpander.Generator");
             if (expandedContainerType.GetProperty("Files").GetValue(null)
                 is not IReadOnlyDictionary<string, Expanded.SourceCode> dic)
                 throw new InvalidOperationException("SourceExpander.Expanded.ExpandedContainer.Files is invalid");

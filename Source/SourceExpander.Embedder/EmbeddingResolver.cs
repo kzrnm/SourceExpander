@@ -91,7 +91,7 @@ namespace SourceExpander
             result.IsEnabled = true;
             result.EmbeddedAllowUnsafe = compilation.Options.AllowUnsafe;
             result.EmbedderVersion = AssemblyUtil.AssemblyVersion;
-            result.EmbeddedLanguageVersion = parseOptions.LanguageVersion;
+            result.EmbeddedLanguageVersion = config.LanguageVersion ?? parseOptions.LanguageVersion;
             cancellationToken.ThrowIfCancellationRequested();
 
             {
@@ -249,11 +249,15 @@ namespace SourceExpander
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            var newParseOptions = parseOptions;
+            if (config.LanguageVersion is { } langver)
+                newParseOptions = newParseOptions.WithLanguageVersion(langver);
+
             _cacheResolvedFiles = ImmutableArray.Create(infos);
             if (ValidationHelpers.EnumerateEmbeddedSourcesErrors(
-                _cacheResolvedFiles, compilation.Options, compilation.References, parseOptions, cancellationToken).ToArray()
-                is { } diagnostics
-                && diagnostics.Length > 0)
+                _cacheResolvedFiles, compilation.Options, compilation.References,
+                newParseOptions, cancellationToken).ToArray()
+                is { Length: > 0 } diagnostics)
             {
                 foreach (var d in diagnostics)
                 {

@@ -17,7 +17,7 @@ namespace SourceExpander
         {
             context.RegisterPostInitializationOutput(ctx =>
             {
-                foreach (var (hintName, sourceText) in CompileTimeTypeMaker.Sources)
+                foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
                     ctx.AddSource(hintName, sourceText);
             });
 
