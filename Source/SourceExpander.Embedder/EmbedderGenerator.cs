@@ -28,7 +28,18 @@ namespace SourceExpander
                 if (!config.Enabled)
                     return;
 
-                ctx.CancellationToken.ThrowIfCancellationRequested();
+                const string SOURCE_EMBEDDING = nameof(SOURCE_EMBEDDING);
+                parseOptions = parseOptions.WithPreprocessorSymbols(parseOptions.PreprocessorSymbolNames.Concat([SOURCE_EMBEDDING]));
+
+                foreach (var tree in compilation.SyntaxTrees)
+                {
+                    var root = (CSharpSyntaxNode)tree.GetRoot(ctx.CancellationToken);
+                    if (new IfDirectiveWalker().VisitRoot(root))
+                    {
+                        var newTree = CSharpSyntaxTree.ParseText(root.ToFullString(), parseOptions, tree.FilePath, tree.Encoding, ctx.CancellationToken);
+                        compilation = compilation.ReplaceSyntaxTree(tree, newTree);
+                    }
+                }
 
                 var resolver = new EmbeddingResolver(
                     compilation,

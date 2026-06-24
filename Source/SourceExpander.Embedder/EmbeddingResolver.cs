@@ -134,18 +134,15 @@ internal class EmbeddingResolver
         if (updated) return;
         updated = true;
 
-        var newTrees = compilation.SyntaxTrees
-            .TryParallel(ConcurrentBuild, cancellationToken)
-            .Select(Rewrited).ToArray();
-        compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
-
-        SyntaxTree Rewrited(SyntaxTree tree)
+        var c = compilation;
+        foreach (var tree in c.SyntaxTrees.TryParallel(ConcurrentBuild, cancellationToken))
         {
-            cancellationToken.ThrowIfCancellationRequested();
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var newRoot = new EmbedderRewriter(semanticModel, config, reporter, cancellationToken).Visit(tree.GetRoot(cancellationToken))!;
-            return tree.WithRootAndOptions(newRoot, parseOptions);
+            var newTree = tree.WithRootAndOptions(newRoot, parseOptions);
+            c = c.ReplaceSyntaxTree(tree, newTree);
         }
+        compilation = c;
     }
 
     private ImmutableArray<SourceFileInfo> _cacheDependantFiles;

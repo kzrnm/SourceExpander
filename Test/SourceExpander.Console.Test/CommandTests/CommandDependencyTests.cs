@@ -22,26 +22,26 @@ public class CommandDependencyTests
         dic.ShouldContainKeyAndValue(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs"),
             new(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs"),
             [
-            "SampleLibrary>ionFind.cs",
+            "SampleLibrary>nionFind.cs",
             ],
             []));
 
         dic.ShouldContainKeyAndValue(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"),
             new(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"),
-            ["SampleLibrary>safeBlock.cs"],
+            ["SampleLibrary>nsafeBlock.cs"],
             []));
 
         dic.ShouldNotContainKey("ac-library-csharp>Graph/Dsu.cs");
 
         // `Un` is common prefix!
-        dic.ShouldContainKeyAndValue("SampleLibrary>ionFind.cs",
-            new("SampleLibrary>ionFind.cs",
+        dic.ShouldContainKeyAndValue("SampleLibrary>nionFind.cs",
+            new("SampleLibrary>nionFind.cs",
             ["ac-library-csharp>Graph/Dsu.cs"],
             ["SampleLibrary.UnionFind"]));
 
         // `Un` is common prefix!
-        dic.ShouldContainKeyAndValue("SampleLibrary>safeBlock.cs",
-            new("SampleLibrary>safeBlock.cs",
+        dic.ShouldContainKeyAndValue("SampleLibrary>nsafeBlock.cs",
+            new("SampleLibrary>nsafeBlock.cs",
             [],
             ["SampleLibrary.UnsafeBlock"]));
     }
@@ -63,13 +63,13 @@ public class CommandDependencyTests
             [
             "ac-library-csharp>Graph/Dsu.cs",
             "ac-library-csharp>Internal/SimpleList.cs",
-            "SampleLibrary>ionFind.cs",
+            "SampleLibrary>nionFind.cs",
             ],
             []));
 
         dic.ShouldContainKeyAndValue(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"),
             new(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"),
-            ["SampleLibrary>safeBlock.cs"],
+            ["SampleLibrary>nsafeBlock.cs"],
             []));
 
         dic.ShouldContainKeyAndValue("ac-library-csharp>Graph/Dsu.cs",
@@ -78,14 +78,14 @@ public class CommandDependencyTests
             ["AtCoder.Dsu"]));
 
         // `Un` is common prefix!
-        dic.ShouldContainKeyAndValue("SampleLibrary>ionFind.cs",
-            new("SampleLibrary>ionFind.cs",
+        dic.ShouldContainKeyAndValue("SampleLibrary>nionFind.cs",
+            new("SampleLibrary>nionFind.cs",
             ["ac-library-csharp>Graph/Dsu.cs"],
             ["SampleLibrary.UnionFind"]));
 
         // `Un` is common prefix!
-        dic.ShouldContainKeyAndValue("SampleLibrary>safeBlock.cs",
-            new("SampleLibrary>safeBlock.cs",
+        dic.ShouldContainKeyAndValue("SampleLibrary>nsafeBlock.cs",
+            new("SampleLibrary>nsafeBlock.cs",
             [],
             ["SampleLibrary.UnsafeBlock"]));
     }
@@ -107,14 +107,14 @@ public class CommandDependencyTests
             ["AtCoder.Dsu"]));
 
         // `Un` is common prefix!
-        dic.ShouldContainKeyAndValue("SampleLibrary>ionFind.cs",
-            new("SampleLibrary>ionFind.cs",
+        dic.ShouldContainKeyAndValue("SampleLibrary>nionFind.cs",
+            new("SampleLibrary>nionFind.cs",
             ["ac-library-csharp>Graph/Dsu.cs"],
             ["SampleLibrary.UnionFind"]));
 
         // `Un` is common prefix!
-        dic.ShouldContainKeyAndValue("SampleLibrary>safeBlock.cs",
-            new("SampleLibrary>safeBlock.cs",
+        dic.ShouldContainKeyAndValue("SampleLibrary>nsafeBlock.cs",
+            new("SampleLibrary>nsafeBlock.cs",
             [],
             ["SampleLibrary.UnsafeBlock"]));
     }
