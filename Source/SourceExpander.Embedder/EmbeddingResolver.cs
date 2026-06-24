@@ -19,10 +19,6 @@ internal class EmbeddingResolver
     private readonly bool ConcurrentBuild;
     private readonly CancellationToken cancellationToken;
 
-    public EmbeddingResolver(EmbeddingContext context)
-        : this(context.Compilation, context.ParseOptions, context.Reporter, context.Config, context.CancellationToken)
-    { }
-
     public EmbeddingResolver(
         CSharpCompilation compilation,
         CSharpParseOptions parseOptions,

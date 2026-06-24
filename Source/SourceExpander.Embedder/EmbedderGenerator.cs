@@ -29,14 +29,13 @@ namespace SourceExpander
                     return;
 
                 ctx.CancellationToken.ThrowIfCancellationRequested();
-                var embeddingContext = new EmbeddingContext(
+
+                var resolver = new EmbeddingResolver(
                     compilation,
                     parseOptions,
                     ctx,
                     config,
                     ctx.CancellationToken);
-
-                var resolver = new EmbeddingResolver(embeddingContext);
                 var resolvedSources = resolver.ResolveFiles();
 
                 if (resolvedSources.Length == 0)
