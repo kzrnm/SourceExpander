@@ -13,9 +13,9 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    public class EmbedderGeneratorBase
+    public partial class EmbedderGenerator
     {
-        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, ParseOptions parseOptions, EmbedderConfig config, ImmutableArray<Diagnostic> configDiagnostic)
+        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, EmbedderConfig config, ImmutableArray<Diagnostic> configDiagnostic)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace SourceExpander
                 ctx.CancellationToken.ThrowIfCancellationRequested();
                 var embeddingContext = new EmbeddingContext(
                     compilation,
-                    (CSharpParseOptions)parseOptions,
+                    parseOptions,
                     ctx,
                     config,
                     ctx.CancellationToken);
@@ -56,7 +56,7 @@ namespace SourceExpander
             }
             catch (OperationCanceledException)
             {
-                Trace.WriteLine(nameof(EmbedderGeneratorBase) + "." + nameof(Execute) + "is Canceled.");
+                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
             }
             catch (Exception e)
             {
