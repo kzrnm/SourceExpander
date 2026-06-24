@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace SourceExpander
+namespace SourceExpander;
+
+internal static class CollectionExtensions
 {
-    internal static class CollectionExtensions
+    extension<T>(IEnumerable<T> collection)
     {
-        public static IEnumerable<TSource> Do<TSource>(this IEnumerable<TSource> collection, Action<TSource> action)
-        {
-            foreach (var item in collection)
-            {
-                action(item);
-                yield return item;
-            }
-        }
-        public static ParallelQuery<TSource> AsParallel<TSource>(this IEnumerable<TSource> collection, CancellationToken cancellationToken)
-            => collection.AsParallel().WithCancellation(cancellationToken);
+        public IEnumerable<T> Do(Action action)
+            => collection.Select(v => { action(); return v; });
+        public IEnumerable<T> Do(Action<T> action)
+            => collection.Select(v => { action(v); return v; });
+        public IEnumerable<T> TryParallel(bool isConcurrentBuild, CancellationToken cancellationToken)
+            => isConcurrentBuild
+            ? collection.Do(cancellationToken.ThrowIfCancellationRequested)
+            : collection.AsParallel().WithCancellation(cancellationToken);
     }
 }

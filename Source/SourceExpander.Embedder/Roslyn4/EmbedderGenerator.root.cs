@@ -9,7 +9,7 @@ using SourceExpander.Roslyn;
 namespace SourceExpander
 {
     [Generator]
-    public class EmbedderGenerator : EmbedderGeneratorBase, IIncrementalGenerator
+    public partial class EmbedderGenerator : IIncrementalGenerator
     {
         private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
 
@@ -40,7 +40,7 @@ namespace SourceExpander
         private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
         {
             var ((compilation, parseOptions), (config, configDiagnostic)) = source;
-            Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, parseOptions, config, configDiagnostic);
+            Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, (CSharpParseOptions)parseOptions, config, configDiagnostic);
         }
     }
 }

@@ -1,0 +1,10 @@
+{
+  "$schema": "../../schema/embedder.schema.json",
+  "language-version": 4,
+  "minify-level": "full",
+  "exclude": ["**/Resources.*"],
+  "exclude-attributes": [
+    "System.Runtime.CompilerServices.MethodImplAttribute",
+    "System.Runtime.CompilerServices.CallerFilePathAttribute"
+  ]
+}

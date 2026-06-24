@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -58,13 +57,9 @@ namespace SourceExpander
             if (compilationUpdated) return;
             compilationUpdated = true;
 
-            IEnumerable<SyntaxTree> newTrees;
-            if (compilation.Options.ConcurrentBuild)
-                newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
-                    .Select(Rewrited);
-            else
-                newTrees = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                    .Select(Rewrited);
+            var newTrees = compilation.SyntaxTrees
+                .TryParallel(compilation.Options.ConcurrentBuild, cancellationToken)
+                .Select(Rewrited);
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
 
             SyntaxTree Rewrited(SyntaxTree tree)
@@ -85,18 +80,11 @@ namespace SourceExpander
             ImmutableArray<ExpandedResult> Impl()
             {
                 var expander = new CompilationExpander(compilation, container, config);
-                if (compilation.Options.ConcurrentBuild)
-                    return compilation.SyntaxTrees.AsParallel(cancellationToken)
-                        .Where(tree => config.IsMatch(tree.FilePath))
-                        .Select(tree => new ExpandedResult(tree, expander.ExpandCode(tree, cancellationToken)))
-                        .OrderBy(rt => rt.SyntaxTree.FilePath, StringComparer.Ordinal)
-                        .ToImmutableArray();
-                else
-                    return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                        .Where(tree => config.IsMatch(tree.FilePath))
-                        .Select(tree => new ExpandedResult(tree, expander.ExpandCode(tree, cancellationToken)))
-                        .OrderBy(rt => rt.SyntaxTree.FilePath, StringComparer.Ordinal)
-                        .ToImmutableArray();
+                return compilation.SyntaxTrees.TryParallel(compilation.Options.ConcurrentBuild, cancellationToken)
+                    .Where(tree => config.IsMatch(tree.FilePath))
+                    .Select(tree => new ExpandedResult(tree, expander.ExpandCode(tree, cancellationToken)))
+                    .OrderBy(rt => rt.SyntaxTree.FilePath, StringComparer.Ordinal)
+                    .ToImmutableArray();
             }
         }
 
@@ -118,14 +106,9 @@ namespace SourceExpander
                 return new(tree.FilePath, ImmutableArray.CreateRange(deps));
             }
 
-            if (compilation.Options.ConcurrentBuild)
-                return compilation.SyntaxTrees.AsParallel(cancellationToken)
-                    .Select(ResolveDependency)
-                    .ToImmutableArray();
-            else
-                return compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                    .Select(ResolveDependency)
-                    .ToImmutableArray();
+            return compilation.SyntaxTrees.TryParallel(compilation.Options.ConcurrentBuild, cancellationToken)
+                .Select(ResolveDependency)
+                .ToImmutableArray();
         }
 
         /// <summary>
@@ -136,7 +119,8 @@ namespace SourceExpander
         /// <summary>
         /// Expand all source for testing.
         /// </summary>
-        public string ExpandAllForTesting(CancellationToken token) => new CompilationExpander(compilation, container, config).ExpandAllForTesting(token);
+        public string ExpandAllForTesting(CancellationToken token)
+            => new CompilationExpander(compilation, container, config).ExpandAllForTesting(token);
     }
 
     /// <summary>

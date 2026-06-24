@@ -12,10 +12,6 @@
     <File Path="global.json" />
     <File Path="README.md" />
   </Folder>
-  <Folder Name="/Solution Items/schema/">
-    <File Path="schema/embedder.schema.json" />
-    <File Path="schema/expander.schema.json" />
-  </Folder>
   <Folder Name="/Test/">
     <File Path="Test/Directory.Build.props" />
     <Project Path="Test/SourceExpander.Console.Test/SourceExpander.Console.Test.csproj" />
@@ -27,7 +23,6 @@
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Source/ConfigGenerator/ConfigAnalyzer.csproj" />
-    <Project Path="Source/DummySourceExpanderEmbedder/DummySourceExpanderEmbedder.csproj" />
     <Project Path="Source/SourceExpander.Embedder.Roslyn3/SourceExpander.Embedder.Roslyn3.csproj" />
     <Project Path="Source/SourceExpander.Generator.Roslyn3/SourceExpander.Generator.Roslyn3.csproj" />
   </Folder>

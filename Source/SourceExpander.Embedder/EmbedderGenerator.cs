@@ -13,9 +13,9 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander
 {
-    public class EmbedderGeneratorBase
+    public partial class EmbedderGenerator
     {
-        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, ParseOptions parseOptions, EmbedderConfig config, ImmutableArray<Diagnostic> configDiagnostic)
+        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, EmbedderConfig config, ImmutableArray<Diagnostic> configDiagnostic)
         {
             try
             {
@@ -28,15 +28,25 @@ namespace SourceExpander
                 if (!config.Enabled)
                     return;
 
-                ctx.CancellationToken.ThrowIfCancellationRequested();
-                var embeddingContext = new EmbeddingContext(
+                const string SOURCE_EMBEDDING = nameof(SOURCE_EMBEDDING);
+                parseOptions = parseOptions.WithPreprocessorSymbols(parseOptions.PreprocessorSymbolNames.Concat([SOURCE_EMBEDDING]));
+
+                foreach (var tree in compilation.SyntaxTrees)
+                {
+                    var root = (CSharpSyntaxNode)tree.GetRoot(ctx.CancellationToken);
+                    if (new IfDirectiveWalker().VisitRoot(root))
+                    {
+                        var newTree = CSharpSyntaxTree.ParseText(root.ToFullString(), parseOptions, tree.FilePath, tree.Encoding, ctx.CancellationToken);
+                        compilation = compilation.ReplaceSyntaxTree(tree, newTree);
+                    }
+                }
+
+                var resolver = new EmbeddingResolver(
                     compilation,
-                    (CSharpParseOptions)parseOptions,
+                    parseOptions,
                     ctx,
                     config,
                     ctx.CancellationToken);
-
-                var resolver = new EmbeddingResolver(embeddingContext);
                 var resolvedSources = resolver.ResolveFiles();
 
                 if (resolvedSources.Length == 0)
@@ -56,7 +66,7 @@ namespace SourceExpander
             }
             catch (OperationCanceledException)
             {
-                Trace.WriteLine(nameof(EmbedderGeneratorBase) + "." + nameof(Execute) + "is Canceled.");
+                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
             }
             catch (Exception e)
             {

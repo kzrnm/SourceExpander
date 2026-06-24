@@ -19,10 +19,6 @@ internal class EmbeddingResolver
     private readonly bool ConcurrentBuild;
     private readonly CancellationToken cancellationToken;
 
-    public EmbeddingResolver(EmbeddingContext context)
-        : this(context.Compilation, context.ParseOptions, context.Reporter, context.Config, context.CancellationToken)
-    { }
-
     public EmbeddingResolver(
         CSharpCompilation compilation,
         CSharpParseOptions parseOptions,
@@ -138,22 +134,15 @@ internal class EmbeddingResolver
         if (updated) return;
         updated = true;
 
-        SyntaxTree[] newTrees;
-        if (ConcurrentBuild)
-            newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
-                .Select(Rewrited).ToArray();
-        else
-            newTrees = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                .Select(Rewrited).ToArray();
-        compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
-
-        SyntaxTree Rewrited(SyntaxTree tree)
+        var c = compilation;
+        foreach (var tree in c.SyntaxTrees.TryParallel(ConcurrentBuild, cancellationToken))
         {
-            cancellationToken.ThrowIfCancellationRequested();
             var semanticModel = compilation.GetSemanticModel(tree, true);
             var newRoot = new EmbedderRewriter(semanticModel, config, reporter, cancellationToken).Visit(tree.GetRoot(cancellationToken))!;
-            return tree.WithRootAndOptions(newRoot, parseOptions);
+            var newTree = tree.WithRootAndOptions(newRoot, parseOptions);
+            c = c.ReplaceSyntaxTree(tree, newTree);
         }
+        compilation = c;
     }
 
     private ImmutableArray<SourceFileInfo> _cacheDependantFiles;
@@ -197,19 +186,11 @@ internal class EmbeddingResolver
                 UpdateCompilation();
                 cancellationToken.ThrowIfCancellationRequested();
 
-                SourceFileInfoRaw[] rawInfos;
-                if (ConcurrentBuild)
-                    rawInfos = compilation.SyntaxTrees.AsParallel(cancellationToken)
-                        .Select(ParseSource)
-                        .Where(info => info.DefinedTypeNames.Any())
-                        .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
-                        .ToArray();
-                else
-                    rawInfos = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                        .Select(ParseSource)
-                        .Where(info => info.DefinedTypeNames.Any())
-                        .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
-                        .ToArray();
+                var rawInfos = compilation.SyntaxTrees.TryParallel(ConcurrentBuild, cancellationToken)
+                    .Select(ParseSource)
+                    .Where(info => info.DefinedTypeNames.Any())
+                    .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
+                    .ToArray();
 
                 switch (config.EmbeddingFileNameType)
                 {

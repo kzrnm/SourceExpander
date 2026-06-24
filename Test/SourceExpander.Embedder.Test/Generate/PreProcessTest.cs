@@ -18,9 +18,9 @@ namespace SourceExpander.Generate
                      ["Program"],
                      ImmutableArray.Create("using System;"),
                      ImmutableArray<string>.Empty,
-                     "class Program{static void Main()=>Console.WriteLine(1);}"
+                     "class Program{int[]v=new int[]{2,4,6,};static void Main()=>Console.WriteLine(1);}"
                  ));
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+            const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{int[]v=new int[]{2,4,6,};static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
 
             var test = new Test
             {
@@ -40,10 +40,32 @@ namespace SourceExpander.Generate
                     Sources = {
                         (
                             "/home/source/Program.cs",
-                            """
+// lang=C#
+"""
 using System;
 class Program
 {
+    int[] v = new int[]
+    {
+#if SOURCE_EMBEDDINGA
+    1,
+#elif SOURCE_EMBEDDING
+    2,
+#else
+    0,
+#endif
+#if !SOURCE_EMBEDDING
+    3,
+#else
+    4,
+#endif
+#if SOURCE_EMBEDDING && NOT_DEFINED
+    5,
+#endif
+#if NOT_DEFINED || SOURCE_EMBEDDING
+    6,
+#endif
+    };
     static void Main() =>
 #if TRACE
     Console.WriteLine(0);
