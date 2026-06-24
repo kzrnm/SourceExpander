@@ -17,7 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DummySourceExpanderEmbedder\DummySourceExpanderEmbedder.csproj">
+    <AdditionalFiles Include="SourceExpander.Embedder.Config.json" />
+    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>

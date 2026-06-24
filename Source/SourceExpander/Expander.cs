@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,16 +11,25 @@ namespace SourceExpander
     /// <summary>
     /// Expands embedded source codes.
     /// </summary>
-    public static class Expander
+    public
+#if !SOURCE_EMBEDDING
+        static
+#endif
+        class Expander
     {
         /// <summary>
         /// <para>expand library code and comine expanded code and <paramref name="inputFilePath"/>.</para>
         /// <para>write combined code to <paramref name="outputFilePath"/>.</para>
         /// <para>if <paramref name="outputFilePath"/> is null, write the code to Combined.csx in <paramref name="inputFilePath"/>'s directory.</para>
         /// </summary>
+#if SOURCE_EMBEDDING
+        [Conditional("EXP")]
+#else
         [MethodImpl(MethodImplOptions.NoInlining)]
+#endif
         public static void Expand([CallerFilePath] string inputFilePath = null, string outputFilePath = null, bool ignoreAnyError = true)
         {
+#if !SOURCE_EMBEDDING
             try
             {
                 if (inputFilePath is null)
@@ -44,15 +54,29 @@ namespace SourceExpander
                 if (!ignoreAnyError)
                     throw;
             }
+
+#pragma warning disable CS8321
+            [Conditional("DUMMY")]
+            static void Dummy()
+            {
+                Console.WriteLine("FOR `using System.Diagnostics`");
+            }
+#pragma warning restore CS8321
+#endif
         }
 
         /// <summary>
         /// expand library code and comine expanded code and <paramref name="inputFilePath"/>
         /// </summary>
         /// <returns>combined code</returns>
+#if !SOURCE_EMBEDDING
         [MethodImpl(MethodImplOptions.NoInlining)]
+#endif
         public static string ExpandString([CallerFilePath] string inputFilePath = null, bool ignoreAnyError = true)
         {
+#if SOURCE_EMBEDDING
+            return "";
+#else
             try
             {
                 return ExpandString(inputFilePath, Assembly.GetCallingAssembly());
@@ -68,8 +92,10 @@ namespace SourceExpander
                     throw;
                 return "";
             }
+#endif
         }
 
+#if !SOURCE_EMBEDDING
         private class ExpanderException : Exception
         {
             public ExpanderException() { }
@@ -103,5 +129,6 @@ namespace SourceExpander
             }
             throw new FileNotFoundException("input file must be in project.", inputFilePath);
         }
+#endif
     }
 }
