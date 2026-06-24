@@ -138,13 +138,9 @@ internal class EmbeddingResolver
         if (updated) return;
         updated = true;
 
-        SyntaxTree[] newTrees;
-        if (ConcurrentBuild)
-            newTrees = compilation.SyntaxTrees.AsParallel(cancellationToken)
-                .Select(Rewrited).ToArray();
-        else
-            newTrees = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                .Select(Rewrited).ToArray();
+        var newTrees = compilation.SyntaxTrees
+            .TryParallel(ConcurrentBuild, cancellationToken)
+            .Select(Rewrited).ToArray();
         compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(newTrees);
 
         SyntaxTree Rewrited(SyntaxTree tree)
@@ -197,19 +193,11 @@ internal class EmbeddingResolver
                 UpdateCompilation();
                 cancellationToken.ThrowIfCancellationRequested();
 
-                SourceFileInfoRaw[] rawInfos;
-                if (ConcurrentBuild)
-                    rawInfos = compilation.SyntaxTrees.AsParallel(cancellationToken)
-                        .Select(ParseSource)
-                        .Where(info => info.DefinedTypeNames.Any())
-                        .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
-                        .ToArray();
-                else
-                    rawInfos = compilation.SyntaxTrees.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                        .Select(ParseSource)
-                        .Where(info => info.DefinedTypeNames.Any())
-                        .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
-                        .ToArray();
+                var rawInfos = compilation.SyntaxTrees.TryParallel(ConcurrentBuild, cancellationToken)
+                    .Select(ParseSource)
+                    .Where(info => info.DefinedTypeNames.Any())
+                    .Where(info => config.IsMatch(info.SyntaxTree.FilePath))
+                    .ToArray();
 
                 switch (config.EmbeddingFileNameType)
                 {

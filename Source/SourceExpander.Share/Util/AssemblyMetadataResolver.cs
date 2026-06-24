@@ -40,12 +40,10 @@ namespace SourceExpander
 #endif
             }
 
-            if (compilation.Options.ConcurrentBuild)
-                return symbols.AsParallel(cancellationToken)
-                    .Select(Load).ToArray();
-            else
-                return symbols.Do(_ => cancellationToken.ThrowIfCancellationRequested())
-                    .Select(Load).ToArray();
+            return symbols
+                .TryParallel(compilation.Options.ConcurrentBuild, cancellationToken)
+                .Select(Load)
+                .ToArray();
 
             (EmbeddedData Data, string? Name, ImmutableArray<(string Key, string ErrorMessage)>)
                 Load((ISymbol? symbol, string? name) tuple)
