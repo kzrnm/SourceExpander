@@ -29,7 +29,7 @@
     <Compile LinkBase="Share" Include="../SourceExpander.Share/**/IContextWrappter.cs" />
     <Compile LinkBase="Share" Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" />
     <Compile LinkBase="Share" Include="../SourceExpander.Share/**/Util/*.cs" />
-    <Compile LinkBase="Generating" Include="../SourceExpander.Generating.Common/*.cs" />
+    <Compile LinkBase="Generating" Include="../SourceExpander.Generator/Generating/*.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -36,8 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
-    <Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/*.cs" />
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>

@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SourceExpander.Roslyn;
+namespace SourceExpander;
 
 using static SyntaxFactory;
 

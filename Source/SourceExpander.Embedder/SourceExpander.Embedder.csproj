@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
   <PropertyGroup>
@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="$(Roslyn3ProjectPath)" ReferenceOutputAssembly="false" />
-    <Compile Include="../SourceExpander.Share/**/*.cs" LinkBase="Share" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/*.cs" />
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
