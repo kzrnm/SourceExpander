@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
+namespace SourceExpander;
+
 partial struct SourceExpanderCommand
 {
     /// <summary>

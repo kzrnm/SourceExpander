@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 
+namespace SourceExpander;
+
 [SuppressMessage("", "CA1822")]
 internal readonly partial struct SourceExpanderCommand
 {
