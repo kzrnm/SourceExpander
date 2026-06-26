@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -27,10 +26,11 @@ internal readonly partial struct SourceExpanderCommand
     };
 
     private static async Task<(Compilation? Compilation, Project Project)> GetCompilation(string projectPath,
-        IDictionary<string, string>? properties = null,
+        ImmutableDictionary<string, string>? properties = null,
         CancellationToken cancellationToken = default)
     {
-        var workspace = MSBuildWorkspace.Create(properties ?? ImmutableDictionary<string, string>.Empty);
+        properties ??= ImmutableDictionary<string, string>.Empty;
+        var workspace = MSBuildWorkspace.Create(properties.SetItem("ImplicitUsings", "false"));
         var project = await workspace.OpenProjectAsync(projectPath, cancellationToken: cancellationToken);
         return (await project.GetCompilationAsync(cancellationToken), project);
     }
