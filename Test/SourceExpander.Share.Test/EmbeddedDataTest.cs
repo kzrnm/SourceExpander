@@ -1,5 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SourceExpander.Share;
 
@@ -14,7 +16,7 @@ public class EmbeddedDataTest
                 "Empty",
                 [],
                 new Version(1, 0, 0),
-                LanguageVersion.CSharp1,
+                LanguageVersion.CSharp1.ToDisplayString(),
                 false,
                 ImmutableArray<string>.Empty
                 ), TestUtil.EmbeddedDataEqualityComparer);
@@ -30,7 +32,7 @@ public class EmbeddedDataTest
                 "Version",
                 [],
                 new Version(3, 4, 0, 0),
-                LanguageVersion.CSharp1,
+                LanguageVersion.CSharp1.ToDisplayString(),
                 false,
                 ImmutableArray<string>.Empty
                 ), TestUtil.EmbeddedDataEqualityComparer);
@@ -50,7 +52,7 @@ public class EmbeddedDataTest
             "CSharpLanguageVersion",
             [],
             new Version(1, 0, 0),
-            expectedVersion,
+            expectedVersion.ToDisplayString(),
             false,
             ImmutableArray<string>.Empty
         ), TestUtil.EmbeddedDataEqualityComparer);
@@ -87,7 +89,7 @@ public class EmbeddedDataTest
                 )
             ],
             new Version(3, 4, 0, 0),
-            LanguageVersion.CSharp7_3,
+            LanguageVersion.CSharp7_3.ToDisplayString(),
             false,
             ["SampleLibrary"]);
         var (data, errors) = EmbeddedData.Create("RawJson",
@@ -124,7 +126,7 @@ public class EmbeddedDataTest
             new EmbeddedData("RawJson",
             ImmutableArray<SourceFileInfo>.Empty,
             new(3, 4, 0, 0),
-            LanguageVersion.CSharp7_3,
+            LanguageVersion.CSharp7_3.ToDisplayString(),
             false,
             ["SampleLibrary"]), TestUtil.EmbeddedDataEqualityComparer);
 
@@ -140,7 +142,7 @@ public class EmbeddedDataTest
             new EmbeddedData("RawJson",
             ImmutableArray<SourceFileInfo>.Empty,
             new(3, 4, 0, 0),
-            LanguageVersion.CSharp7_3,
+            LanguageVersion.CSharp7_3.ToDisplayString(),
             false,
             ["SampleLibrary"]), TestUtil.EmbeddedDataEqualityComparer);
     }
@@ -160,7 +162,7 @@ public class EmbeddedDataTest
                 )
             ],
             new Version(3, 4, 0, 0),
-            LanguageVersion.CSharp1,
+            LanguageVersion.CSharp1.ToDisplayString(),
             false,
             ["SampleLibrary"]
             );
@@ -180,5 +182,117 @@ public class EmbeddedDataTest
                   );
         await errors.Should().BeEmpty();
         await data.Should().BeEqualTo(expected, TestUtil.EmbeddedDataEqualityComparer);
+    }
+
+    [Test]
+    public async Task ToJson()
+    {
+        var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions()
+        {
+            WriteIndented = false,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        };
+        var jsonSerializerSettings = new JsonSerializerSettings()
+        {
+            Formatting = Formatting.None,
+            StringEscapeHandling = StringEscapeHandling.Default,
+        };
+
+        var data = new EmbeddedData(
+            "RawJson",
+            [
+                new SourceFileInfo(
+                    "_SampleLibrary>Bit.cs",
+                    ["SampleLibrary.Bit"],
+                    ["using System.Runtime.CompilerServices;", "using System.Runtime.Intrinsics.X86;"],
+                    Array.Empty<string>(),
+                    "namespace SampleLibrary { public static class Bit { [MethodImpl(MethodImplOptions.AggressiveInlining)] public static int ExtractLowestSetBit(int n) { if (Bmi1.IsSupported) { return (int)Bmi1.ExtractLowestSetBit((uint)n); } return n & -n; } } } "
+                ),
+                new SourceFileInfo(
+                    "_SampleLibrary>Put.cs",
+                    ["SampleLibrary.Put"],
+                    ["using System.Diagnostics;"],
+                    ["_SampleLibrary>Xorshift.cs"],
+                    "namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } "
+                ),
+                new SourceFileInfo
+                (
+                    "_SampleLibrary>Xorshift.cs",
+                    ["SampleLibrary.Xorshift"],
+                    ["using System;"],
+                    Array.Empty<string>(),
+                    "namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } "
+                )
+            ],
+            new Version(3, 4, 0, 0),
+            LanguageVersion.CSharp7_3.ToDisplayString(),
+            false,
+            ["SampleLibrary"]);
+
+
+        using (Assert.Multiple())
+        {
+            foreach (var json in new[]
+            {
+                JsonConvert.SerializeObject(data, jsonSerializerSettings),
+                System.Text.Json.JsonSerializer.Serialize(data, jsonSerializerOptions),
+            })
+                using (Assert.Multiple())
+                {
+                    await JsonConvert.DeserializeObject<EmbeddedData>(json, jsonSerializerSettings)
+                        .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
+                    await System.Text.Json.JsonSerializer.Deserialize<EmbeddedData>(json, jsonSerializerOptions)
+                        .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
+
+                    var obj = await Assert.That(JsonConvert.DeserializeObject(json, jsonSerializerSettings)).IsTypeOf<JObject>();
+                    await obj.Should().HaveCount(6);
+
+                    await ((IDictionary<string, JToken>)obj).Keys.Should().BeEquivalentTo([
+                        "AssemblyName",
+                        "Sources",
+                        "EmbedderVersion",
+                        "CSharpVersion",
+                        "AllowUnsafe",
+                        "EmbeddedNamespaces",
+                    ]);
+                }
+        }
+
+        data = data with
+        {
+            AllowUnsafe = true,
+            CSharpVersion = "preview",
+            AssemblyName = "Assembly2",
+            EmbedderVersion = new Version(1, 2, 3, 4),
+            EmbeddedNamespaces = ["SampleLibrary", "SampleLibrary.Put"],
+        };
+
+        using (Assert.Multiple())
+        {
+            foreach (var json in new[]
+            {
+                JsonConvert.SerializeObject(data, jsonSerializerSettings),
+                System.Text.Json.JsonSerializer.Serialize(data, jsonSerializerOptions),
+            })
+                using (Assert.Multiple())
+                {
+                    await JsonConvert.DeserializeObject<EmbeddedData>(json, jsonSerializerSettings)
+                        .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
+                    await System.Text.Json.JsonSerializer.Deserialize<EmbeddedData>(json, jsonSerializerOptions)
+                        .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
+
+                    var obj = await Assert.That(JsonConvert.DeserializeObject(json, jsonSerializerSettings)).IsTypeOf<JObject>();
+                    await obj.Should().HaveCount(6);
+
+                    await ((IDictionary<string, JToken>)obj).Keys.Should().BeEquivalentTo([
+                        "AssemblyName",
+                        "Sources",
+                        "EmbedderVersion",
+                        "CSharpVersion",
+                        "AllowUnsafe",
+                        "EmbeddedNamespaces",
+                    ]);
+                }
+        }
     }
 }

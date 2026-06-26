@@ -85,7 +85,7 @@ partial struct SourceExpanderCommand
                     TypeNames: Enumerable.Empty<string>()
                 )));
         }
-        var result = JsonSerializer.Serialize(infos, DefaultSerializerOptions);
+        var result = JsonSerializer.Serialize(infos, JsonUtil.DefaultSerializerOptions);
         Output.WriteLine(result);
     }
 }

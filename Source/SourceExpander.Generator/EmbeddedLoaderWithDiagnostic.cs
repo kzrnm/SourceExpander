@@ -33,7 +33,7 @@ namespace SourceExpander
                     reporter.ReportDiagnostic(
                         DiagnosticDescriptors.EXPAND0008_EmbeddedDataError(display, key, message));
                 }
-                if (embedded.IsEmpty || ignoreAssemblies.Contains(embedded.AssemblyName))
+                if (embedded.Sources.IsEmpty || ignoreAssemblies.Contains(embedded.AssemblyName))
                     continue;
                 if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                 {
@@ -41,11 +41,13 @@ namespace SourceExpander
                         DiagnosticDescriptors.EXPAND0002_ExpanderVersion(
                         AssemblyUtil.AssemblyVersion, embedded.AssemblyName, embedded.EmbedderVersion));
                 }
-                if (embedded.CSharpVersion > parseOptions.LanguageVersion)
+
+                LanguageVersionFacts.TryParse(embedded.CSharpVersion, out var csharpVersion);
+                if (csharpVersion > parseOptions.LanguageVersion)
                 {
                     reporter.ReportDiagnostic(
                         DiagnosticDescriptors.EXPAND0005_NewerCSharpVersion(
-                        parseOptions.LanguageVersion, embedded.AssemblyName, embedded.CSharpVersion));
+                        parseOptions.LanguageVersion, embedded.AssemblyName, csharpVersion));
                 }
                 returnDatas.Add(embedded);
             }

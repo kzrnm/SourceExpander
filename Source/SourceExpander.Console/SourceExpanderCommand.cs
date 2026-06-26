@@ -2,8 +2,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -18,12 +16,6 @@ internal readonly partial struct SourceExpanderCommand
     public TextWriter? Stderr { init; private get; }
     TextWriter Output => Stdout ?? Console.Out;
     TextWriter Error => Stderr ?? Console.Error;
-
-    private static readonly JsonSerializerOptions DefaultSerializerOptions = new()
-    {
-        WriteIndented = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
 
     private static async Task<(Compilation? Compilation, Project Project)> GetCompilation(string projectPath,
         ImmutableDictionary<string, string>? properties = null,

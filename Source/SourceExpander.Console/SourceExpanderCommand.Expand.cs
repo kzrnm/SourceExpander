@@ -103,7 +103,7 @@ partial struct SourceExpanderCommand
         {
             t.SyntaxTree.FilePath,
             t.ExpandedCode,
-        }), DefaultSerializerOptions);
+        }), JsonUtil.DefaultSerializerOptions);
         Output.WriteLine(result);
     }
 }

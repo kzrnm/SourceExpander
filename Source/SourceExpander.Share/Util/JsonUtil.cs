@@ -1,6 +1,5 @@
 ﻿#if NETCOREAPP3_0_OR_GREATER
 #define SYSTEM_TEXT_JSON
-//global using JsonPropertyAttribute = System.Text.Json.Serialization.JsonPropertyNameAttribute;
 #else
 global using JsonPropertyAttribute = Newtonsoft.Json.JsonPropertyAttribute;
 #endif
@@ -20,18 +19,19 @@ internal static class JsonUtil
 {
     public static string ToJson<T>(T infos)
 #if SYSTEM_TEXT_JSON
-        => JsonSerializer.Serialize(infos, DefaultJsonSerializerOptions);
-    private static readonly JsonSerializerOptions DefaultJsonSerializerOptions = new()
+        => JsonSerializer.Serialize(infos, DefaultSerializerOptions);
+    public static readonly JsonSerializerOptions DefaultSerializerOptions = new()
     {
         WriteIndented = false,
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 #else
-        => JsonConvert.SerializeObject(infos, new JsonSerializerSettings
-        {
+        => JsonConvert.SerializeObject(infos, DefaultSerializerSettings);
+    public static readonly JsonSerializerSettings DefaultSerializerSettings = new()
+    {
             Formatting = Formatting.None,
             StringEscapeHandling = StringEscapeHandling.Default,
-        });
+    };
 #endif
 
     public static T? ParseJson<T>(SourceText jsonText) => ParseJson<T>(jsonText.ToString());
@@ -42,7 +42,7 @@ internal static class JsonUtil
 #if SYSTEM_TEXT_JSON
             return JsonSerializer.Deserialize<T>(json);
 #else
-            return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings { });
+            return JsonConvert.DeserializeObject<T>(json, DefaultSerializerSettings);
 #endif
         }
         catch (Exception e)
