@@ -11,22 +11,13 @@ namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]
     [DataContract]
-    internal class SourceFileInfo
+    internal class SourceFileInfo(
+    string? fileName,
+    IEnumerable<string>? typeNames,
+    IEnumerable<string>? usings,
+    IEnumerable<string>? dependencies,
+    string? codeBody)
     {
-        public SourceFileInfo(
-        string? fileName,
-        IEnumerable<string>? typeNames,
-        IEnumerable<string>? usings,
-        IEnumerable<string>? dependencies,
-        string? codeBody)
-        {
-            FileName = fileName ?? "";
-            TypeNames = Sorted(typeNames, UsingComparer.Default);
-            Usings = Sorted(usings, UsingComparer.Default);
-            Dependencies = Sorted(dependencies, UsingComparer.Default);
-            CodeBody = codeBody ?? "";
-        }
-
         private static string[] Sorted(IEnumerable<string>? collection, IComparer<string> comparer)
         {
             if (collection is null)
@@ -39,15 +30,15 @@ namespace SourceExpander
         #region Properties
         // Do not change order for json testing.
         [DataMember]
-        public string CodeBody { get; set; }
+        public string CodeBody { get; set; } = codeBody ?? "";
         [DataMember]
-        public IEnumerable<string> Dependencies { get; set; }
+        public IEnumerable<string> Dependencies { get; set; } = Sorted(dependencies, UsingComparer.Default);
         [DataMember]
-        public string FileName { get; set; }
+        public string FileName { get; set; } = fileName ?? "";
         [DataMember]
-        public IEnumerable<string> TypeNames { get; set; }
+        public IEnumerable<string> TypeNames { get; set; } = Sorted(typeNames, UsingComparer.Default);
         [DataMember]
-        public IEnumerable<string> Usings { get; set; }
+        public IEnumerable<string> Usings { get; set; } = Sorted(usings, UsingComparer.Default);
         #endregion Properties
 
         public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));

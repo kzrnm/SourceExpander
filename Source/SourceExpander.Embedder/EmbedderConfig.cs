@@ -12,12 +12,13 @@ namespace SourceExpander;
 /// <param name="Include">Glob pattern of include files.</param>
 /// <param name="Exclude">Glob pattern of exclude files.</param>
 /// <param name="EmbeddingType">GZipBase32768 or Raw</param>
-/// <param name="ExcludeAttributes">Attribute full name that remove on embedding.</param>
+/// <param name="ExcludeAttributes">Fully qualified name of the attribute used to exclude items from embedding.</param>
 /// <param name="MinifyLevel">Minify level of source code.</param>
-/// <param name="RemoveConditional">Remove method with ConditionalAttribute whose argument is in <see cref="RemoveConditional"/>.</param>
+/// <param name="RemoveConditional">Remove method calls annotated with ConditionalAttribute whose argument is in <see cref="RemoveConditional"/>.</param>
 /// <param name="EmbeddingSourceClassName">For debug. If not null, the generator embed source class with the class name.</param>
 /// <param name="EmbeddingFileNameType">Embedded file name type.</param>
 /// <param name="ObsoleteConfigProperties">Obsolete config property in json.</param>
+/// <param name="LanguageVersion">C# version of embedded sources.</param>
 /// <param name="ExpandInLibrary">if true, source codes will be expanded in the library.</param>
 [GeneratorConfig]
 internal partial record EmbedderConfig(
@@ -95,28 +96,73 @@ internal partial record EmbedderConfig(
         return true;
     }
 }
+
+/// <summary>
+/// Obsolete property. It is retained only to produce warnings and should not be used by users.
+/// </summary>
+/// <param name="Name">Property name</param>
+/// <param name="Instead">Replacement property</param>
 public record ObsoleteConfigProperty(string Name, string Instead)
 {
+    /// <summary>
+    /// Whether to enable minification.
+    /// </summary>
     public static ObsoleteConfigProperty EnableMinify { get; } = new("enable-minify", "minify-level");
+    /// <summary>
+    /// Name of the embedded source class.
+    /// </summary>
     public static ObsoleteConfigProperty EmbeddingSourceClass { get; } = new("embedding-source-class", "embedding-source-class-name");
+    /// <summary>
+    /// Expand in library when the symbol is defined.
+    /// </summary>
     public static ObsoleteConfigProperty ExpandingSymbol { get; } = new("expanding-symbol", "expand-in-library");
 }
 
+/// <summary>
+/// Minification level
+/// </summary>
 public enum MinifyLevel
 {
+    /// <summary>
+    /// Collapse consecutive whitespace characters into a single space.
+    /// </summary>
     Default,
+    /// <summary>
+    /// Do not minify.
+    /// </summary>
     Off,
+    /// <summary>
+    /// Remove as much whitespace as possible.
+    /// </summary>
     Full,
 }
 
+/// <summary>
+/// Embedding format type
+/// </summary>
 public enum EmbeddingType
 {
+    /// <summary>
+    /// Embed the GZip-compressed data as a Base32768-encoded string(default).
+    /// </summary>
     GZipBase32768,
+    /// <summary>
+    /// Embed the JSON string as-is.
+    /// </summary>
     Raw,
 }
 
+/// <summary>
+/// Format of embedded file names.
+/// </summary>
 public enum EmbeddingFileNameType
 {
+    /// <summary>
+    /// Embed the file path after removing the common path prefix(default).
+    /// </summary>
     WithoutCommonPrefix,
+    /// <summary>
+    /// Embed the full file path.
+    /// </summary>
     FullPath,
 }

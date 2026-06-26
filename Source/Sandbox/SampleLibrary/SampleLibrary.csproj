@@ -1,4 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <AdditionalFiles Include="SourceExpander.Embedder.Config.json" />
+  </ItemGroup>
   <ItemGroup>
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Include" />

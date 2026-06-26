@@ -12,6 +12,10 @@
     <File Path="global.json" />
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/Solution Items/schema/">
+    <File Path="schema/embedder.schema.json" />
+    <File Path="schema/expander.schema.json" />
+  </Folder>
   <Folder Name="/Test/">
     <File Path="Test/Directory.Build.props" />
     <Project Path="Test/SourceExpander.Console.Test/SourceExpander.Console.Test.csproj" />

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace SourceExpander
 {
+    [GeneratorConfig]
     public partial record ExpandConfig
     {
         [DataContract]

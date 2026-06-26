@@ -27,7 +27,7 @@ namespace SourceExpander
                 .Collect()
                 .Select((ats, _) => ats.FirstOrDefault())
                 .Combine(context.AnalyzerConfigOptionsProvider)
-                .Select((tup, ct) => ParseAdditionalTextAndAnalyzerOptions(tup.Left, tup.Right, ct));
+                .Select((tup, ct) => ParseAdditionalTextAndAnalyzerOptions(tup.Left, tup.Right.GlobalOptions, ct));
 
 
             var source = context.CompilationProvider
