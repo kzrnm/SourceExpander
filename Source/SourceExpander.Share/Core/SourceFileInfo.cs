@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,7 +9,6 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]
-    [DataContract]
     internal class SourceFileInfo(
     string? fileName,
     IEnumerable<string>? typeNames,
@@ -29,15 +27,10 @@ namespace SourceExpander
 
         #region Properties
         // Do not change order for json testing.
-        [DataMember]
         public string CodeBody { get; set; } = codeBody ?? "";
-        [DataMember]
         public IEnumerable<string> Dependencies { get; set; } = Sorted(dependencies, UsingComparer.Default);
-        [DataMember]
         public string FileName { get; set; } = fileName ?? "";
-        [DataMember]
         public IEnumerable<string> TypeNames { get; set; } = Sorted(typeNames, UsingComparer.Default);
-        [DataMember]
         public IEnumerable<string> Usings { get; set; } = Sorted(usings, UsingComparer.Default);
         #endregion Properties
 

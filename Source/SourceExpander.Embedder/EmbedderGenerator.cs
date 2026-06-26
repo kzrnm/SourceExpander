@@ -169,11 +169,12 @@ namespace SourceExpander
             return SourceText.From(sb.ToString(), Encoding.UTF8);
         }
 
-        internal static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) ParseAdditionalTextAndAnalyzerOptions(AdditionalText? additionalText, AnalyzerConfigOptionsProvider analyzerConfigOptionsProvider, CancellationToken cancellationToken = default)
+        internal static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic)
+            ParseAdditionalTextAndAnalyzerOptions(AdditionalText? additionalText, AnalyzerConfigOptions analyzerConfigOptions, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var isDesignTimeBuild = StringComparer.OrdinalIgnoreCase.Equals(
-                analyzerConfigOptionsProvider.GlobalOptions.GetOrNull("build_property.DesignTimeBuild"),
+                analyzerConfigOptions.GetOrNull("build_property.DesignTimeBuild"),
                 "true");
             if (isDesignTimeBuild)
                 return (new EmbedderConfig(false), ImmutableArray<Diagnostic>.Empty);
@@ -181,7 +182,7 @@ namespace SourceExpander
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                var config = EmbedderConfig.Parse(additionalText?.GetText(cancellationToken)?.ToString(), analyzerConfigOptionsProvider.GlobalOptions);
+                var config = EmbedderConfig.Parse(additionalText?.GetText(cancellationToken)?.ToString(), analyzerConfigOptions);
                 var diagnosticsBuilder = ImmutableArray.CreateBuilder<Diagnostic>();
 
                 if (config.ObsoleteConfigProperties.Any())

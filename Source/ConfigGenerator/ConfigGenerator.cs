@@ -53,13 +53,10 @@ public class ConfigGenerator : IIncrementalGenerator
         {
             dataType = symbol.GetMembers()
                 .OfType<INamedTypeSymbol>()
-                .Where(t =>
-                    t.GetAttributes().Any(a => a.AttributeClass?.ToString() == "System.Runtime.Serialization.DataContractAttribute")
-                    && t.GetMembers()
+                .Single(t => t.GetMembers()
                     .OfType<IMethodSymbol>()
                     .Any(m => m.Name == "ToImmutable"
-                            && SymbolEqualityComparer.Default.Equals(m.ReturnType, symbol)))
-                .Single();
+                            && SymbolEqualityComparer.Default.Equals(m.ReturnType, symbol)));
         }
         catch
         {
@@ -77,10 +74,10 @@ public class ConfigGenerator : IIncrementalGenerator
             {
                 var isObsolete = member.GetAttributes().Any(a => a.AttributeClass?.ToString() == "System.ObsoleteAttribute");
                 var dataMember = member.GetAttributes()
-                    .FirstOrDefault(a => a.AttributeClass?.ToString() == "System.Runtime.Serialization.DataMemberAttribute");
+                    .FirstOrDefault(a => a.AttributeClass?.ToString() == "Newtonsoft.Json.JsonPropertyAttribute");
                 if (dataMember == null)
                     continue;
-                if (dataMember.NamedArguments.FirstOrDefault(kv => kv.Key == "Name").Value.Value is not string jsonName)
+                if (dataMember.ConstructorArguments[0].Value is not string jsonName)
                 {
                     context.ReportDiagnostic(
                         DiagnosticDescriptors.XPA0003_DataMemberAttribute(member.DeclaringSyntaxReferences[0].GetSyntax().GetLocation()));
