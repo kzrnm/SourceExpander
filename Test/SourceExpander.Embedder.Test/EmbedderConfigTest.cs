@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SourceExpander.Embedder.Test;
+﻿namespace SourceExpander.Embedder.Test;
 
 public class EmbedderConfigTest
 {
@@ -76,8 +73,8 @@ public class EmbedderConfigTest
 
     [Test]
     [MethodDataSource(nameof(IncludeExclude_Data))]
-    public void IncludeExclude(string[] include, string[] exclude, string filePath, bool expected)
+    public async Task IncludeExclude(string[] include, string[] exclude, string filePath, bool expected)
     {
-        new EmbedderConfig(include: include, exclude: exclude).IsMatch(filePath).ShouldBe(expected);
+        await new EmbedderConfig(include: include, exclude: exclude).IsMatch(filePath).Should().BeEqualTo(expected);
     }
 }

@@ -18,6 +18,7 @@
     <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
     <SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
     <SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
     <SourceExpander_Embedder_ExpandInLibrary Condition="'$(Configuration)' == 'Debug'">true</SourceExpander_Embedder_ExpandInLibrary>

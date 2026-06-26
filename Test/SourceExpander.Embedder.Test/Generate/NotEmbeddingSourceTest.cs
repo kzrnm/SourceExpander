@@ -1,6 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
@@ -167,10 +165,10 @@ namespace Test.F
             }
         };
         await test.RunAsync(cancellationToken);
-        Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
-        System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
@@ -230,10 +228,10 @@ class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
-        System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
@@ -295,10 +293,10 @@ partial class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
-        System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
@@ -361,10 +359,10 @@ partial class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
-        System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
@@ -435,9 +433,9 @@ class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
-        System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

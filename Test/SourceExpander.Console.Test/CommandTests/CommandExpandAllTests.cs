@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 
 namespace SourceExpander;
 
@@ -9,18 +6,18 @@ namespace SourceExpander;
 public class CommandExpandAllTests
 {
     [Test]
-    public async Task ExpandAll()
+    public async Task ExpandAll(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, cancellationToken: TestContext.Current!.Execution.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, cancellationToken: cancellationToken);
 
         var obj = JsonSerializer.Deserialize<ExpandAllObject[]>(sw.ToString());
-        obj.ShouldNotBeNull();
+        await obj.Should().NotBeNull();
         var dic = obj!.ToDictionary(e => e.FilePath);
 
-        dic.ShouldContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs"));
-        dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs")].ExpandedCode.ReplaceLineEndings().ShouldBe("""
+        await dic.Should().ContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs"));
+        await dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs")].ExpandedCode.ReplaceLineEndings().Should().BeEqualTo("""
 using AtCoder;
 using SampleLibrary;
 using System;
@@ -42,8 +39,8 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
 
 """.ReplaceLineEndings());
 
-        dic.ShouldContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"));
-        dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs")].ExpandedCode.ReplaceLineEndings().ShouldBe("""
+        await dic.Should().ContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"));
+        await dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs")].ExpandedCode.ReplaceLineEndings().Should().BeEqualTo("""
 using SampleLibrary;
 using System;
 namespace SampleApp
@@ -64,18 +61,18 @@ namespace SampleLibrary { public static unsafe class UnsafeBlock { public static
     }
 
     [Test]
-    public async Task ExpandAllWithStaticEmbedding()
+    public async Task ExpandAllWithStaticEmbedding(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
         var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
-        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, staticEmbedding: "/* 🥇 */", cancellationToken: TestContext.Current!.Execution.CancellationToken);
+        await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, staticEmbedding: "/* 🥇 */", cancellationToken: cancellationToken);
 
         var obj = JsonSerializer.Deserialize<ExpandAllObject[]>(sw.ToString());
-        obj.ShouldNotBeNull();
+        await obj.Should().NotBeNull();
         var dic = obj!.ToDictionary(e => e.FilePath);
 
-        dic.ShouldContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs"));
-        dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs")].ExpandedCode.ReplaceLineEndings().ShouldBe("""
+        await dic.Should().ContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs"));
+        await dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs")].ExpandedCode.ReplaceLineEndings().Should().BeEqualTo("""
 using AtCoder;
 using SampleLibrary;
 using System;
@@ -98,8 +95,8 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
 
 """.ReplaceLineEndings());
 
-        dic.ShouldContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"));
-        dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs")].ExpandedCode.ReplaceLineEndings().ShouldBe("""
+        await dic.Should().ContainKey(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs"));
+        await dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program2.cs")].ExpandedCode.ReplaceLineEndings().Should().BeEqualTo("""
 using SampleLibrary;
 using System;
 namespace SampleApp

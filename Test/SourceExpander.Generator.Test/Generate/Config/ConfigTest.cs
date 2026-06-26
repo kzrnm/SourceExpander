@@ -1,40 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Testing;
+﻿using Microsoft.CodeAnalysis.Testing;
 
-namespace SourceExpander.Generate.Config
+namespace SourceExpander.Generate.Config;
+
+public class ConfigTest : ExpandGeneratorTestBase
 {
-    public class ConfigTest : ExpandGeneratorTestBase
+    public static IEnumerable<Func<(InMemorySourceText, object[])>> ParseErrorJsons()
     {
-        public static IEnumerable<Func<(InMemorySourceText, object[])>> ParseErrorJsons()
-        {
-            yield return () => (
-                new("/foo/bar/SourceExpander.Generator.Config.json", """
+        yield return () => (
+            new("/foo/bar/SourceExpander.Generator.Config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
     "ignore-file-pattern-regex": 1
 }
 """),
-                [
-                    "/foo/bar/SourceExpander.Generator.Config.json",
-                    "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
-                ]
-            );
-            yield return () => (
-                new("/foo/bar/sourceExpander.generator.config.json", """
+            [
+                "/foo/bar/SourceExpander.Generator.Config.json",
+                "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
+            ]
+        );
+        yield return () => (
+            new("/foo/bar/sourceExpander.generator.config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
     "ignore-file-pattern-regex": 1
 }
 """),
-                [
-                    "/foo/bar/sourceExpander.generator.config.json",
-                    "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
-                ]
-            );
-            yield return () => (
-                new("/regexerror/SourceExpander.Generator.Config.json", """
+            [
+                "/foo/bar/sourceExpander.generator.config.json",
+                "Error converting value 1 to type 'System.String[]'. Path 'ignore-file-pattern-regex', line 3, position 34."
+            ]
+        );
+        yield return () => (
+            new("/regexerror/SourceExpander.Generator.Config.json", """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
     "ignore-file-pattern-regex": [
@@ -42,277 +39,277 @@ namespace SourceExpander.Generate.Config
     ]
 }
 """),
-                [
-                    "/regexerror/SourceExpander.Generator.Config.json",
-                    "Invalid pattern '(' at offset 1. Not enough )'s."
-                ]
-            );
-        }
+            [
+                "/regexerror/SourceExpander.Generator.Config.json",
+                "Invalid pattern '(' at offset 1. Not enough )'s."
+            ]
+        );
+    }
 
-        [Test]
-        [MethodDataSource(nameof(ParseErrorJsons))]
-        public async Task ParseErrorTest(InMemorySourceText additionalText, object[] diagnosticsArg)
+    [Test]
+    [MethodDataSource(nameof(ParseErrorJsons))]
+    public async Task ParseErrorTest(InMemorySourceText additionalText, object[] diagnosticsArg, CancellationToken cancellationToken)
+    {
+        var test = new Test
         {
-            var test = new Test
+            TestState =
             {
-                TestState =
+                AdditionalProjects =
                 {
-                    AdditionalProjects =
+                    ["Other"] =
                     {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
-                                """
+                        Sources = {
+                            """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                            """
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
 """
-                            }
-                        },
+                        }
                     },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles = { additionalText, },
-                    Sources = {
-                        (
-                            "/home/mine/Program.cs",
-                            """
-using System;
-using Other;
-
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        C.P();
-    }
-}
-"""
-                        ),
-                        (
-                            "/home/mine/Program2.cs",
-                            """
-using System;
-using Other;
-
-class Program2
-{
-    static void M()
-    {
-        C.P();
-    }
-}
-"""
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerError("EXPAND0007")
-                            .WithSpan(additionalText.Path, 1, 1, 1, 1)
-                            .WithArguments(diagnosticsArg),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder(
-                        "// <auto-generated/>",
-                        "#pragma warning disable",
-                         $$$"""[assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{{ExpanderVersion}}}")]"""
-                         )),
-                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
-// <auto-generated/>
-#pragma warning disable
-namespace SourceExpander.Expanded{
-using System.Collections.Generic;
-public static class ExpandedContainer{
-public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
-private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
-{"/home/mine/Program.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program.cs"},{"code",{{{"""
-using Other;
-using System;
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        C.P();
-    }
-}
-#region Expanded by https://github.com/kzrnm/SourceExpander
-namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
-#endregion Expanded by https://github.com/kzrnm/SourceExpander
-""".ReplaceEOL().ToLiteral()}}}},})},
-{"/home/mine/Program2.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program2.cs"},{"code",{{{"""
-using Other;
-class Program2
-{
-    static void M()
-    {
-        C.P();
-    }
-}
-#region Expanded by https://github.com/kzrnm/SourceExpander
-namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
-#endregion Expanded by https://github.com/kzrnm/SourceExpander
-""".ReplaceEOL().ToLiteral()}}}},})},
-};
-}}
-""".ReplaceEOL())
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-        }
-
-
-        [Test]
-        public async Task WithoutConfig()
-        {
-            var test = new Test
-            {
-                TestState =
-                {
-                    AdditionalProjects =
-                    {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
-                                """
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
-"""
-                            }
-                        },
-                    },
-                    AdditionalProjectReferences = { "Other" },
-                    Sources = {
-                        (
-                            "/home/mine/Program.cs",
-                            """
-using System;
-using Other;
-
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        C.P();
-    }
-}
-"""
-                        ),
-                        (
-                            "/home/mine/Program2.cs",
-                            """
-using System;
-using Other;
-
-class Program2
-{
-    static void M()
-    {
-        C.P();
-    }
-}
-"""
-                        ),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
-                        EnvironmentUtil.JoinByStringBuilder(
-                        "// <auto-generated/>",
-                        "#pragma warning disable",
-                         $$$"""[assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{{ExpanderVersion}}}")]"""
-                         )),
-                        (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
-// <auto-generated/>
-#pragma warning disable
-namespace SourceExpander.Expanded{
-using System.Collections.Generic;
-public static class ExpandedContainer{
-public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
-private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
-{"/home/mine/Program.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program.cs"},{"code",{{{"""
-using Other;
-using System;
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(42);
-        C.P();
-    }
-}
-#region Expanded by https://github.com/kzrnm/SourceExpander
-namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
-#endregion Expanded by https://github.com/kzrnm/SourceExpander
-""".ReplaceEOL().ToLiteral()}}}},})},
-{"/home/mine/Program2.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program2.cs"},{"code",{{{"""
-using Other;
-class Program2
-{
-    static void M()
-    {
-        C.P();
-    }
-}
-#region Expanded by https://github.com/kzrnm/SourceExpander
-namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
-#endregion Expanded by https://github.com/kzrnm/SourceExpander
-""".ReplaceEOL().ToLiteral()}}}},})},
-};
-}}
-""".ReplaceEOL())
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-        }
-
-        [Test]
-        public async Task NotEnabled()
-        {
-            var test = new Test
-            {
-                TestState =
-                {
-                    AdditionalProjects =
-                    {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
-                    """
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
-[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
-"""
-                            }
-                        },
-                    },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles = {
-                        (
-                        "/foo/bar/SourceExpander.Generator.Config.json",
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles = { additionalText, },
+                Sources = {
+                    (
+                        "/home/mine/Program.cs",
                         """
+using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"""
+                    ),
+                    (
+                        "/home/mine/Program2.cs",
+                        """
+using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"""
+                    ),
+                },
+                ExpectedDiagnostics =
+                {
+                    DiagnosticResult.CompilerError("EXPAND0007")
+                        .WithSpan(additionalText.Path, 1, 1, 1, 1)
+                        .WithArguments(diagnosticsArg),
+                },
+                GeneratedSources =
+                {
+                    (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                    EnvironmentUtil.JoinByStringBuilder(
+                    "// <auto-generated/>",
+                    "#pragma warning disable",
+                     $$$"""[assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{{ExpanderVersion}}}")]"""
+                     )),
+                    (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
+// <auto-generated/>
+#pragma warning disable
+namespace SourceExpander.Expanded{
+using System.Collections.Generic;
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{"/home/mine/Program.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program.cs"},{"code",{{{"""
+using Other;
+using System;
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+#region Expanded by https://github.com/kzrnm/SourceExpander
+namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL().ToLiteral()}}}},})},
+{"/home/mine/Program2.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program2.cs"},{"code",{{{"""
+using Other;
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+#region Expanded by https://github.com/kzrnm/SourceExpander
+namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL().ToLiteral()}}}},})},
+};
+}}
+""".ReplaceEOL())
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+    }
+
+
+    [Test]
+    public async Task WithoutConfig(CancellationToken cancellationToken)
+    {
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
+                    {
+                        Sources = {
+                            """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                            """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+"""
+                        }
+                    },
+                },
+                AdditionalProjectReferences = { "Other" },
+                Sources = {
+                    (
+                        "/home/mine/Program.cs",
+                        """
+using System;
+using Other;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+"""
+                    ),
+                    (
+                        "/home/mine/Program2.cs",
+                        """
+using System;
+using Other;
+
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+"""
+                    ),
+                },
+                GeneratedSources =
+                {
+                    (typeof(ExpandGenerator), "SourceExpander.Metadata.cs",
+                    EnvironmentUtil.JoinByStringBuilder(
+                    "// <auto-generated/>",
+                    "#pragma warning disable",
+                     $$$"""[assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.ExpanderVersion","{{{ExpanderVersion}}}")]"""
+                     )),
+                    (typeof(ExpandGenerator), "SourceExpander.Expanded.cs", $$$"""
+// <auto-generated/>
+#pragma warning disable
+namespace SourceExpander.Expanded{
+using System.Collections.Generic;
+public static class ExpandedContainer{
+public static IReadOnlyDictionary<string, SourceCode> Files {get{ return _Files; }}
+private static Dictionary<string, SourceCode> _Files = new Dictionary<string, SourceCode>{
+{"/home/mine/Program.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program.cs"},{"code",{{{"""
+using Other;
+using System;
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(42);
+        C.P();
+    }
+}
+#region Expanded by https://github.com/kzrnm/SourceExpander
+namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL().ToLiteral()}}}},})},
+{"/home/mine/Program2.cs",SourceCode.FromDictionary(new Dictionary<string,object>{{"path","/home/mine/Program2.cs"},{"code",{{{"""
+using Other;
+class Program2
+{
+    static void M()
+    {
+        C.P();
+    }
+}
+#region Expanded by https://github.com/kzrnm/SourceExpander
+namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } 
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+""".ReplaceEOL().ToLiteral()}}}},})},
+};
+}}
+""".ReplaceEOL())
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+    }
+
+    [Test]
+    public async Task NotEnabled(CancellationToken cancellationToken)
+    {
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
+                    {
+                        Sources = {
+                            """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                """
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
+[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
+"""
+                        }
+                    },
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles = {
+                    (
+                    "/foo/bar/SourceExpander.Generator.Config.json",
+                    """
 {
     "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/expander.schema.json",
     "enabled": false
 }
 """)
-                    },
-                    Sources = {
-                        (
-                            "/home/mine/Program.cs",
-                            """
+                },
+                Sources = {
+                    (
+                        "/home/mine/Program.cs",
+                        """
 using System;
 using Other;
 
@@ -325,10 +322,10 @@ class Program
     }
 }
 """
-                        ),
-                        (
-                            "/home/mine/Program2.cs",
-                            """
+                    ),
+                    (
+                        "/home/mine/Program2.cs",
+                        """
 using System;
 using Other;
 
@@ -340,47 +337,47 @@ class Program2
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                    },
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-        }
-
-        [Test]
-        public async Task NotEnabledProperty()
-        {
-            var test = new Test
-            {
-                AnalyzerConfigOptions =
-                {
-                    { "build_property.SourceExpander_Generator_Enabled", "false" },
+                    ),
                 },
-                TestState =
+                ExpectedDiagnostics =
                 {
-                    AdditionalProjects =
+                },
+            }
+        };
+        await test.RunAsync(cancellationToken);
+    }
+
+    [Test]
+    public async Task NotEnabledProperty(CancellationToken cancellationToken)
+    {
+        var test = new Test
+        {
+            AnalyzerConfigOptions =
+            {
+                { "build_property.SourceExpander_Generator_Enabled", "false" },
+            },
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
                     {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
-                                """
+                        Sources = {
+                            """namespace Other{public static class C{public static void P()=>System.Console.WriteLine();}}""",
+                            """
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedLanguageVersion","7.2")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","1.1.1.1")]
 """
-                            }
-                        },
+                        }
                     },
-                    AdditionalProjectReferences = { "Other" },
-                    Sources = {
-                        (
-                            "/home/mine/Program.cs",
-                            """
+                },
+                AdditionalProjectReferences = { "Other" },
+                Sources = {
+                    (
+                        "/home/mine/Program.cs",
+                        """
 using System;
 using Other;
 
@@ -393,10 +390,10 @@ class Program
     }
 }
 """
-                        ),
-                        (
-                            "/home/mine/Program2.cs",
-                            """
+                    ),
+                    (
+                        "/home/mine/Program2.cs",
+                        """
 using System;
 using Other;
 
@@ -408,14 +405,13 @@ class Program2
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                    },
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-        }
+                    ),
+                },
+                ExpectedDiagnostics =
+                {
+                },
+            }
+        };
+        await test.RunAsync(cancellationToken);
     }
 }

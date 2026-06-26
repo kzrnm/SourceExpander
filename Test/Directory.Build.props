@@ -4,6 +4,7 @@
     <RestoreEnablePackagePruning>false</RestoreEnablePackagePruning>
     <OutputType>Exe</OutputType>
 
+    <ImplicitUsings>true</ImplicitUsings>
     <RestoreAdditionalProjectSources Condition="$(UseRoslynLibraries) == 'true'">https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json ;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
   </PropertyGroup>
 
@@ -17,8 +18,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Using Include="Shouldly" />
+    <Using Include="TUnit.Assertions.Should" />
+    <Using Include="TUnit.Assertions.Should.Extensions" />
     <PackageReference Include="TUnit" />
-    <PackageReference Include="Shouldly" />
+    <PackageReference Include="TUnit.Assertions.Should" />
   </ItemGroup>
 </Project>

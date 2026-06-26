@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Generate
@@ -7,7 +6,7 @@ namespace SourceExpander.Generate
     public class InvalidEmbeddedData : ExpandGeneratorTestBase
     {
         [Test]
-        public async Task Generate()
+        public async Task Generate(CancellationToken cancellationToken)
         {
             var test = new Test
             {
@@ -114,7 +113,7 @@ class Program2
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
+            await test.RunAsync(cancellationToken);
         }
     }
 }

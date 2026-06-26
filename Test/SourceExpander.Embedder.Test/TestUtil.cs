@@ -1,31 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using TUnit.Assertions.Should.Core;
 
 namespace SourceExpander;
 
 public static class TestUtil
 {
+    internal static IEqualityComparer<SourceFileInfo> SourceFileInfoEqualityComparer
+        = EqualityComparer<SourceFileInfo>.Create(
+            (x, y) => x.FileName == y.FileName
+                && x.CodeBody == y.CodeBody
+                && x.Dependencies.SequenceEqual(y.Dependencies)
+                && x.Usings.SequenceEqual(y.Usings)
+                && x.TypeNames.SequenceEqual(y.TypeNames));
+
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static void ShouldBeEquivalentTo([NotNull] this IEnumerable<SourceFileInfo> actual, IEnumerable<SourceFileInfo> expected)
+    internal static ShouldAssertion<IEnumerable<SourceFileInfo>> BeEquivalentTo(this ShouldCollectionSource<SourceFileInfo> should, IEnumerable<SourceFileInfo> expected)
     {
-        actual.ShouldNotBeNull();
-        actual.Count().ShouldBe(expected.Count());
-
-        foreach (var (a, e) in Enumerable.Zip(actual, expected))
-        {
-            a.ShouldBeEquivalentTo(e);
-
-            a.ShouldSatisfyAllConditions([
-                a => a.FileName.ShouldBe(e.FileName),
-                a => a.CodeBody.ShouldBe(e.CodeBody),
-                a => a.Dependencies.Order().ShouldBe(e.Dependencies.Order()),
-                a => a.TypeNames.Order().ShouldBe(e.TypeNames.Order()),
-                a => a.Usings.Order().ShouldBe(e.Usings.Order()),
-            ]);
-        }
+        return should.BeEquivalentTo(expected, SourceFileInfoEqualityComparer);
     }
 }
