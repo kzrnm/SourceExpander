@@ -11,11 +11,19 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander
-{
-    public class ExpandGeneratorBase
+namespace SourceExpander;
+
+    public partial class ExpandGenerator
     {
-        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, ExpandConfig config, ImmutableArray<Diagnostic> configDiagnostic)
+        private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
+        private const string EMBEDDED_FILE_NAME = "SourceExpander.Embedded.json";
+        internal void Execute(
+            IContextWrappter ctx,
+            CSharpCompilation compilation,
+            CSharpParseOptions parseOptions,
+            //ImmutableArray<EmbeddedData> embeddedData,
+            ExpandConfig config,
+            ImmutableArray<Diagnostic> configDiagnostic)
         {
             try
             {
@@ -158,4 +166,3 @@ namespace SourceExpander
             }
         }
     }
-}

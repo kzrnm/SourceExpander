@@ -7,13 +7,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander
-{
-    [Generator]
-    public class ExpandGenerator : ExpandGeneratorBase, ISourceGenerator
-    {
-        private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
+namespace SourceExpander;
 
+    [Generator]
+    public partial class ExpandGenerator : ISourceGenerator
+    {
         public void Initialize(GeneratorInitializationContext context) { }
         public void Execute(GeneratorExecutionContext context)
         {
@@ -32,7 +30,10 @@ namespace SourceExpander
             var (config, diagnostic) = ParseAdditionalTextAndAnalyzerOptions(
                 context.AdditionalFiles.Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
                 .FirstOrDefault(), context.AnalyzerConfigOptions, context.CancellationToken);
-            Execute(new GeneratorExecutionContextWrapper(context), (CSharpCompilation)context.Compilation, (CSharpParseOptions)context.ParseOptions, config, diagnostic);
+            Execute(
+                new GeneratorExecutionContextWrapper(context),
+                (CSharpCompilation)context.Compilation,
+                (CSharpParseOptions)context.ParseOptions,
+                config, diagnostic);
         }
     }
-}

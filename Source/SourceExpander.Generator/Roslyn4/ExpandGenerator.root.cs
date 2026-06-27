@@ -8,12 +8,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander
-{
+namespace SourceExpander;
+
     [Generator]
-    public class ExpandGenerator : ExpandGeneratorBase, IIncrementalGenerator
+    public partial class ExpandGenerator : IIncrementalGenerator
     {
-        private const string CONFIG_FILE_NAME = "SourceExpander.Generator.Config.json";
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterSourceOutput(context.ParseOptionsProvider, (ctx, opts) =>
@@ -35,13 +34,14 @@ namespace SourceExpander
                 }
             });
 
-            IncrementalValueProvider<(ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
+            var configProvider
                 = context.AdditionalTextsProvider
                 .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
                 .Collect()
                 .Select((ats, _) => ats.FirstOrDefault())
                 .Combine(context.AnalyzerConfigOptionsProvider)
                 .Select((tup, ct) => ParseAdditionalTextAndAnalyzerOptions(tup.Left, tup.Right, ct));
+
 
             var source = context.CompilationProvider
                 .Combine(context.ParseOptionsProvider)
@@ -50,10 +50,13 @@ namespace SourceExpander
             context.RegisterImplementationSourceOutput(source, Execute);
         }
 
-        private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (ExpandConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
+        private void Execute(SourceProductionContext ctx, ((Compilation, ParseOptions), (ExpandConfig, ImmutableArray<Diagnostic>)) source)
         {
             var ((compilation, parseOptions), (config, configDiagnostic)) = source;
-            Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, (CSharpParseOptions)parseOptions, config, configDiagnostic);
+            Execute(
+                new SourceProductionContextWrappter(ctx),
+                (CSharpCompilation)compilation,
+                (CSharpParseOptions)parseOptions,
+                config, configDiagnostic);
         }
     }
-}
