@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Loader;
 using Microsoft.Build.Locator;
+using SourceExpander;
 
 System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;

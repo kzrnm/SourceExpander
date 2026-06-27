@@ -3,230 +3,197 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace SourceExpander
+namespace SourceExpander;
+
+internal record EmbeddedData(
+    string AssemblyName,
+    ImmutableArray<SourceFileInfo> Sources,
+    Version EmbedderVersion,
+    string CSharpVersion,
+    bool AllowUnsafe,
+    ImmutableArray<string> EmbeddedNamespaces)
 {
-    internal class EmbeddedData
+    public static EmbeddedData Empty => new("Empty",
+        ImmutableArray<SourceFileInfo>.Empty, new(1, 0, 0), LanguageVersion.Default.ToDisplayString(), false, ImmutableArray<string>.Empty);
+
+    public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
+        Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
     {
-        public string AssemblyName { get; }
-        public Version EmbedderVersion { get; }
-        public LanguageVersion CSharpVersion { get; }
-        public ImmutableArray<SourceFileInfo> Sources { get; }
-        public bool AllowUnsafe { get; }
-        public ImmutableArray<string> EmbeddedNamespaces { get; }
-        public bool IsEmpty => Sources.Length == 0;
-        internal EmbeddedData(
-            string assemblyName,
-            ImmutableArray<SourceFileInfo> sources,
-            Version embedderVersion,
-            LanguageVersion csharpVersion,
-            bool allowUnsafe,
-            ImmutableArray<string> embeddedNamespaces)
-        {
-            AssemblyName = assemblyName;
-            Sources = sources;
-            EmbedderVersion = embedderVersion;
-            CSharpVersion = csharpVersion;
-            AllowUnsafe = allowUnsafe;
-            EmbeddedNamespaces = embeddedNamespaces;
-        }
-        public static EmbeddedData Empty => new("Empty",
-            ImmutableArray<SourceFileInfo>.Empty,
-            new(1, 0, 0),
-            LanguageVersion.Default,
-            false,
-            ImmutableArray<string>.Empty);
-        public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
-            Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
-        {
-            var errors = ImmutableArray.CreateBuilder<(string Key, string ErrorMessage)>();
-            LanguageVersion csharpVersion = LanguageVersion.CSharp1;
-            Version version = new(1, 0, 0);
-            bool allowUnsafe = false;
-            ImmutableArray<string> embeddedNamespaces = ImmutableArray<string>.Empty;
+        var errors = ImmutableArray.CreateBuilder<(string Key, string ErrorMessage)>();
+        string csharpVersion = LanguageVersion.CSharp1.ToDisplayString();
+        Version version = new(1, 0, 0);
+        bool allowUnsafe = false;
+        ImmutableArray<string> embeddedNamespaces = ImmutableArray<string>.Empty;
 
-            var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();
-            foreach (var pair in assemblyMetadatas)
+        var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();
+        foreach (var pair in assemblyMetadatas)
+        {
+            var key = pair.Key;
+            var value = pair.Value;
+            var keyArray = key.Split('.');
+            if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
+                continue;
+
+            switch (TryGetSourceFileInfos(keyArray, value))
             {
-                var key = pair.Key;
-                var value = pair.Value;
-                var keyArray = key.Split('.');
-                if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
+                case NotMatch<SourceFileInfo[]>:
+                    break;
+                case Success<SourceFileInfo[]> { Value: var sources }:
+                    builder.AddRange(sources);
                     continue;
+                case Error<SourceFileInfo[]> { Message: var message }:
+                    errors.Add((key, message));
+                    continue;
+            }
+            switch (TryGetEmbedderVersion(keyArray, value))
+            {
+                case NotMatch<Version>:
+                    break;
+                case Success<Version> { Value: var attrVersion }:
+                    version = attrVersion;
+                    continue;
+                case Error<Version> { Message: var message }:
+                    errors.Add((key, message));
+                    continue;
+            }
+            switch (TryGetEmbeddedLanguageVersion(keyArray, value))
+            {
+                case NotMatch<string>:
+                    break;
+                case Success<string> { Value: var attrCSharpVersion }:
+                    csharpVersion = attrCSharpVersion;
+                    continue;
+                case Error<string> { Message: var message }:
+                    errors.Add((key, message));
+                    continue;
+            }
+            switch (TryGetEmbeddedAllowUnsafe(keyArray, value))
+            {
+                case NotMatch<bool>:
+                    break;
+                case Success<bool> { Value: var attrAllowUnsafe }:
+                    allowUnsafe = attrAllowUnsafe;
+                    continue;
+                case Error<bool> { Message: var message }:
+                    errors.Add((key, message));
+                    continue;
+            }
+            switch (TryGetEmbeddedNamespaces(keyArray, value))
+            {
+                case NotMatch<ImmutableArray<string>>:
+                    break;
+                case Success<ImmutableArray<string>> { Value: var attrNamespaces }:
+                    embeddedNamespaces = attrNamespaces;
+                    continue;
+                case Error<ImmutableArray<string>> { Message: var message }:
+                    errors.Add((key, message));
+                    continue;
+            }
+        }
+        return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe, embeddedNamespaces), errors.ToImmutable());
+    }
 
-                ParseResult r;
-                switch ((r = TryAddSourceFileInfos(keyArray, value, builder)).Result)
-                {
-                    case ParseResult.Status.NotMatch:
-                        break;
-                    case ParseResult.Status.Success:
-                        continue;
-                    case ParseResult.Status.Error:
-                        errors.Add((key, r.Message));
-                        continue;
-                }
-                switch ((r = TryGetEmbedderVersion(keyArray, value, out var attrVersion)).Result)
-                {
-                    case ParseResult.Status.NotMatch:
-                        break;
-                    case ParseResult.Status.Success:
-                        version = attrVersion!;
-                        continue;
-                    case ParseResult.Status.Error:
-                        errors.Add((key, r.Message));
-                        continue;
-                }
-                switch ((r = TryGetEmbeddedLanguageVersion(keyArray, value, out var attrCSharpVersion)).Result)
-                {
-                    case ParseResult.Status.NotMatch:
-                        break;
-                    case ParseResult.Status.Success:
-                        csharpVersion = attrCSharpVersion;
-                        continue;
-                    case ParseResult.Status.Error:
-                        errors.Add((key, r.Message));
-                        continue;
-                }
-                switch ((r = TryGetEmbeddedAllowUnsafe(keyArray, value, out var attrAllowUnsafe)).Result)
-                {
-                    case ParseResult.Status.NotMatch:
-                        break;
-                    case ParseResult.Status.Success:
-                        allowUnsafe = attrAllowUnsafe;
-                        continue;
-                    case ParseResult.Status.Error:
-                        errors.Add((key, r.Message));
-                        continue;
-                }
-                switch ((r = TryGetEmbeddedNamespaces(keyArray, value, out var attrNamespaces)).Result)
-                {
-                    case ParseResult.Status.NotMatch:
-                        break;
-                    case ParseResult.Status.Success:
-                        embeddedNamespaces = attrNamespaces.ToImmutableArray();
-                        continue;
-                    case ParseResult.Status.Error:
-                        errors.Add((key, r.Message));
-                        continue;
-                }
-            }
-            return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe, embeddedNamespaces), errors.ToImmutable());
-        }
-        private readonly struct ParseResult
-        {
-            private ParseResult(Status result, string message)
-            {
-                Result = result;
-                Message = message;
-            }
+    abstract record ParseResult
+    {
+        public static Success<T> Success<T>(T value) => new(value);
+        public static Error Error(string message) => new(message);
+        public static readonly NotMatch NotMatch = new();
+    }
+    abstract record ParseResult<T> : ParseResult
+    {
+        public static implicit operator ParseResult<T>(Error e) => new Error<T>(e.Message);
+        public static implicit operator ParseResult<T>(NotMatch _) => new NotMatch<T>();
+    }
+    record Success<T>(T Value) : ParseResult<T>;
+    record Error(string Message);
+    record Error<T>(string Message) : ParseResult<T>;
+    record NotMatch;
+    record NotMatch<T> : ParseResult<T>;
 
-            public static readonly ParseResult Success = new(Status.Success, string.Empty);
-            public static readonly ParseResult NotMatch = new(Status.NotMatch, string.Empty);
-            public static ParseResult Error(string message) => new(Status.Error, message);
-            public enum Status
-            {
-                Success,
-                NotMatch,
-                Error,
-            }
-            public Status Result { get; }
-            public string Message { get; }
-        }
-        private static ParseResult TryAddSourceFileInfos(string[] keyArray, string value, ImmutableArray<SourceFileInfo>.Builder builder)
+    private static ParseResult<SourceFileInfo[]> TryGetSourceFileInfos(string[] keyArray, string value)
+    {
+        try
         {
-            try
+            if (keyArray.Length >= 2
+                && keyArray[1] == "EmbeddedSourceCode")
             {
-                if (keyArray.Length >= 2
-                    && keyArray[1] == "EmbeddedSourceCode")
-                {
-                    ImmutableArray<SourceFileInfo> embedded;
-                    if (Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0)
-                        embedded = ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(SourceFileInfoUtil.FromGZipBase32768ToStream(value)));
-                    else
-                        embedded = ImmutableArray.Create(JsonUtil.ParseJson<SourceFileInfo[]>(value));
-                    builder.AddRange(embedded);
-                    return ParseResult.Success;
-                }
-                return ParseResult.NotMatch;
+                var embedded = Array.IndexOf(keyArray, "GZipBase32768", 2) >= 0
+                    ? JsonUtil.ParseJson<SourceFileInfo[]>(SourceFileInfoUtil.FromGZipBase32768ToStream(value))
+                    : JsonUtil.ParseJson<SourceFileInfo[]>(value);
+                if (embedded is { Length: > 0 })
+                    return ParseResult.Success(embedded);
             }
-            catch (Exception e)
-            {
-                return ParseResult.Error(e.Message);
-            }
+            return ParseResult.NotMatch;
         }
-        private static ParseResult TryGetEmbedderVersion(string[] keyArray, string value, out Version? version)
+        catch (Exception e)
         {
-            version = null;
-            try
-            {
-                if (keyArray.Length == 2
-                    && keyArray[1] == "EmbedderVersion"
-                    && Version.TryParse(value, out var embedderVersion))
-                {
-                    version = embedderVersion;
-                    return ParseResult.Success;
-                }
-                return ParseResult.NotMatch;
-            }
-            catch (Exception e)
-            {
-                return ParseResult.Error(e.Message);
-            }
+            return ParseResult.Error(e.Message);
         }
-        private static ParseResult TryGetEmbeddedLanguageVersion(string[] keyArray, string value, out LanguageVersion version)
+    }
+    private static ParseResult<Version> TryGetEmbedderVersion(string[] keyArray, string value)
+    {
+        try
         {
-            version = LanguageVersion.Default;
-            try
+            if (keyArray.Length == 2
+                && keyArray[1] == "EmbedderVersion"
+                && Version.TryParse(value, out var embedderVersion))
             {
-                if (keyArray.Length == 2
-                    && keyArray[1] == "EmbeddedLanguageVersion"
-                    && LanguageVersionFacts.TryParse(value, out var embeddedVersion))
-                {
-                    version = embeddedVersion;
-                    return ParseResult.Success;
-                }
-                return ParseResult.NotMatch;
+                return ParseResult.Success(embedderVersion);
             }
-            catch (Exception e)
-            {
-                return ParseResult.Error(e.Message);
-            }
+            return ParseResult.NotMatch;
         }
-        private static ParseResult TryGetEmbeddedAllowUnsafe(string[] keyArray, string value, out bool allowUnsafe)
+        catch (Exception e)
         {
-            allowUnsafe = false;
-            try
-            {
-                if (keyArray.Length == 2
-                    && keyArray[1] == "EmbeddedAllowUnsafe"
-                    && bool.TryParse(value, out var embeddedAllowUnsafe))
-                {
-                    allowUnsafe = embeddedAllowUnsafe;
-                    return ParseResult.Success;
-                }
-                return ParseResult.NotMatch;
-            }
-            catch (Exception e)
-            {
-                return ParseResult.Error(e.Message);
-            }
+            return ParseResult.Error(e.Message);
         }
-        private static ParseResult TryGetEmbeddedNamespaces(string[] keyArray, string value, out string[] embeddedNamespaces)
+    }
+    private static ParseResult<string> TryGetEmbeddedLanguageVersion(string[] keyArray, string value)
+    {
+        try
         {
-            embeddedNamespaces = Array.Empty<string>();
-            try
+            if (keyArray.Length == 2
+                && keyArray[1] == "EmbeddedLanguageVersion")
             {
-                if (keyArray.Length == 2
-                    && keyArray[1] == "EmbeddedNamespaces")
-                {
-                    embeddedNamespaces = value.Split(',');
-                    return ParseResult.Success;
-                }
-                return ParseResult.NotMatch;
+                return ParseResult.Success(value);
             }
-            catch (Exception e)
+            return ParseResult.NotMatch;
+        }
+        catch (Exception e)
+        {
+            return ParseResult.Error(e.Message);
+        }
+    }
+    private static ParseResult<bool> TryGetEmbeddedAllowUnsafe(string[] keyArray, string value)
+    {
+        try
+        {
+            if (keyArray.Length == 2
+                && keyArray[1] == "EmbeddedAllowUnsafe"
+                && bool.TryParse(value, out var embeddedAllowUnsafe))
             {
-                return ParseResult.Error(e.Message);
+                return ParseResult.Success(embeddedAllowUnsafe);
             }
+            return ParseResult.NotMatch;
+        }
+        catch (Exception e)
+        {
+            return ParseResult.Error(e.Message);
+        }
+    }
+    private static ParseResult<ImmutableArray<string>> TryGetEmbeddedNamespaces(string[] keyArray, string value)
+    {
+        try
+        {
+            if (keyArray.Length == 2
+                && keyArray[1] == "EmbeddedNamespaces")
+            {
+                return ParseResult.Success(ImmutableArray.Create(value.Split(',')));
+            }
+            return ParseResult.NotMatch;
+        }
+        catch (Exception e)
+        {
+            return ParseResult.Error(e.Message);
         }
     }
 }

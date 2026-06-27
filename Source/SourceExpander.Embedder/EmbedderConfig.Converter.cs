@@ -1,48 +1,46 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander;
 
 internal partial record EmbedderConfig
 {
-    [DataContract]
     private class EmbedderConfigData
     {
-        [DataMember(Name = "enabled")]
+        [JsonProperty("enabled")]
         public bool? Enabled { set; get; }
-        [DataMember(Name = "include")]
+        [JsonProperty("include")]
         public string[]? Include { set; get; }
-        [DataMember(Name = "exclude")]
+        [JsonProperty("exclude")]
         public string[]? Exclude { set; get; }
-        [DataMember(Name = "embedding-type")]
+        [JsonProperty("embedding-type")]
         public string? EmbeddingType { set; get; }
-        [DataMember(Name = "exclude-attributes")]
+        [JsonProperty("exclude-attributes")]
         public string[]? ExcludeAttributes { set; get; }
-        [DataMember(Name = "minify-level")]
+        [JsonProperty("minify-level")]
         public string? MinifyLevel { set; get; }
-        [DataMember(Name = "remove-conditional")]
+        [JsonProperty("remove-conditional")]
         public string[]? RemoveConditional { set; get; }
-        [DataMember(Name = "embedding-source-class-name")]
+        [JsonProperty("embedding-source-class-name")]
         public string? EmbeddingSourceClassName { set; get; }
-        [DataMember(Name = "embedding-filename-type")]
+        [JsonProperty("embedding-filename-type")]
         public string? EmbeddingFileNameType { set; get; }
 
-        [DataMember(Name = "language-version")]
+        [JsonProperty("language-version")]
         public object? LanguageVersion { set; get; }
 
-        [DataMember(Name = "expand-in-library")]
+        [JsonProperty("expand-in-library")]
         public bool? ExpandInLibrary { set; get; }
 
         [Obsolete]
-        [DataMember(Name = "expanding-symbol")]
+        [JsonProperty("expanding-symbol")]
         public string? ExpandingSymbol { set; get; }
         [Obsolete]
-        [DataMember(Name = "embedding-source-class")]
+        [JsonProperty("embedding-source-class")]
         public object? EmbeddingSourceClass { set; get; }
         [Obsolete]
-        [DataMember(Name = "enable-minify")]
+        [JsonProperty("enable-minify")]
         public bool? EnableMinify { set; get; }
 
         private EmbeddingType ParsedEmbeddingType

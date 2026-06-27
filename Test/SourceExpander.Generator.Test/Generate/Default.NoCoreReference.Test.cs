@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
@@ -22,7 +21,7 @@ namespace SourceExpander.Generate
     public class DefaultNoCoreReferenceTest : ExpandGeneratorTestBase
     {
         [Test]
-        public async Task Generate()
+        public async Task Generate(CancellationToken cancellationToken)
         {
             var test = new Test
             {
@@ -138,7 +137,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
+            await test.RunAsync(cancellationToken);
         }
     }
 }

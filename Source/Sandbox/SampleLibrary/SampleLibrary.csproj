@@ -1,4 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <AdditionalFiles Include="SourceExpander.Embedder.Config.json" />
+  </ItemGroup>
   <ItemGroup>
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Include" />
@@ -15,6 +18,9 @@
     <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
+    <NoWarn>$(NoWarn);CA1822</NoWarn>
+
     <SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
     <SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
     <SourceExpander_Embedder_ExpandInLibrary Condition="'$(Configuration)' == 'Debug'">true</SourceExpander_Embedder_ExpandInLibrary>
@@ -23,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ac-library-csharp" />
+    <PackageReference Include="ac-library-csharp" VersionOverride="3.9.2" />
     <ProjectReference Include="..\..\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>

@@ -3,8 +3,9 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceExpander.Roslyn;
 
-namespace SourceExpander.Roslyn;
+namespace SourceExpander;
 
 using static SyntaxFactory;
 

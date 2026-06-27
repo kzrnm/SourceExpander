@@ -1,11 +1,9 @@
-﻿using System.Threading.Tasks;
-
-namespace SourceExpander.Generate
+﻿namespace SourceExpander.Generate
 {
     public class DefaultWithCoreReferenceTest : ExpandGeneratorTestBase
     {
         [Test]
-        public async Task Generate()
+        public async Task Generate(CancellationToken cancellationToken)
         {
             var test = new Test
             {
@@ -113,7 +111,7 @@ namespace Other { public static class C { public static void P() => System.Conso
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
+            await test.RunAsync(cancellationToken);
         }
     }
 }

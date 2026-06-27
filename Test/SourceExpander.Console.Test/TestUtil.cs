@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace SourceExpander;
@@ -16,17 +13,20 @@ public static class TestUtil
 
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static void ShouldContainKeyAndValue([NotNull] this IDictionary<string, DependencyResult>? dictionary, string key, DependencyResult val)
+    internal static async Task ShouldContainKeyAndValue([NotNull] this IDictionary<string, DependencyResult>? dictionary, string key, DependencyResult val)
     {
-        dictionary.ShouldNotBeNull();
-        dictionary.ShouldContainKey(key);
-        var actual = dictionary[key];
+        await dictionary.Should().NotBeNull();
+        _ = dictionary!.GetType();
+        await dictionary.Should().ContainKey(key);
+        var dependencyResult = dictionary[key];
 
-        actual.ShouldNotBeNull();
-        actual.ShouldSatisfyAllConditions([
-            r => r.FileName.ShouldBe(val.FileName),
-            r => r.Dependencies.Order().ShouldBe(val.Dependencies.Order()),
-            r => r.TypeNames.Order().ShouldBe(val.TypeNames.Order()),
-        ]);
+        await dependencyResult.Should().NotBeNull();
+
+        using (Assert.Multiple())
+        {
+            await dependencyResult.FileName.Should().BeEqualTo(val.FileName);
+            await dependencyResult.Dependencies.Should().BeEquivalentTo(val.Dependencies);
+            await dependencyResult.TypeNames.Should().BeEquivalentTo(val.TypeNames);
+        }
     }
 }

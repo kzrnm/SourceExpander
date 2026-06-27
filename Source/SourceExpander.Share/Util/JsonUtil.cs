@@ -1,5 +1,7 @@
 ﻿#if NETCOREAPP3_0_OR_GREATER
 #define SYSTEM_TEXT_JSON
+#else
+global using JsonPropertyAttribute = Newtonsoft.Json.JsonPropertyAttribute;
 #endif
 using System;
 using System.IO;
@@ -10,61 +12,63 @@ using System.Text.Json;
 using Newtonsoft.Json;
 #endif
 
-namespace SourceExpander
+
+namespace SourceExpander;
+
+internal static class JsonUtil
 {
-    internal static class JsonUtil
-    {
-        public static string ToJson<T>(T infos)
+    public static string ToJson<T>(T infos)
 #if SYSTEM_TEXT_JSON
-            => JsonSerializer.Serialize(infos, new JsonSerializerOptions
-            {
-                WriteIndented = false,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            });
+        => JsonSerializer.Serialize(infos, DefaultSerializerOptions);
+    public static readonly JsonSerializerOptions DefaultSerializerOptions = new()
+    {
+        WriteIndented = false,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
 #else
-            => JsonConvert.SerializeObject(infos, new JsonSerializerSettings
-            {
-                Formatting = Formatting.None,
-                StringEscapeHandling = StringEscapeHandling.Default,
-            });
+        => JsonConvert.SerializeObject(infos, DefaultSerializerSettings);
+    public static readonly JsonSerializerSettings DefaultSerializerSettings = new()
+    {
+            Formatting = Formatting.None,
+            StringEscapeHandling = StringEscapeHandling.Default,
+    };
 #endif
 
-        public static T? ParseJson<T>(SourceText jsonText) => ParseJson<T>(jsonText.ToString());
-        public static T? ParseJson<T>(string json)
+    public static T? ParseJson<T>(SourceText jsonText) => ParseJson<T>(jsonText.ToString());
+    public static T? ParseJson<T>(string json)
+    {
+        try
         {
-            try
-            {
 #if SYSTEM_TEXT_JSON
-                return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializer.Deserialize<T>(json);
 #else
-                return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings { });
+            return JsonConvert.DeserializeObject<T>(json, DefaultSerializerSettings);
 #endif
-            }
-            catch (Exception e)
-            {
-                throw new ParseJsonException(e);
-            }
         }
-        public static T? ParseJson<T>(Stream jsonStream)
+        catch (Exception e)
         {
-            try
-            {
+            throw new ParseJsonException(e);
+        }
+    }
+    public static T? ParseJson<T>(Stream jsonStream)
+    {
+        try
+        {
 
 #if NET6_0_OR_GREATER
-                return JsonSerializer.Deserialize<T>(jsonStream);
+            return JsonSerializer.Deserialize<T>(jsonStream);
 #elif SYSTEM_TEXT_JSON
-                return JsonSerializer.DeserializeAsync<T>(jsonStream).Result;
+            return JsonSerializer.DeserializeAsync<T>(jsonStream).Result;
 #else
-                var serializer = new JsonSerializer();
-                using var sr = new StreamReader(jsonStream);
-                using var jsonTextReader = new JsonTextReader(sr);
-                return serializer.Deserialize<T>(jsonTextReader);
+            var serializer = new JsonSerializer();
+            using var sr = new StreamReader(jsonStream);
+            using var jsonTextReader = new JsonTextReader(sr);
+            return serializer.Deserialize<T>(jsonTextReader);
 #endif
-            }
-            catch (Exception e)
-            {
-                throw new ParseJsonException(e);
-            }
+        }
+        catch (Exception e)
+        {
+            throw new ParseJsonException(e);
         }
     }
 }

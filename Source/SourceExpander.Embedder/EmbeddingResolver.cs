@@ -160,7 +160,7 @@ internal class EmbeddingResolver
                         reporter.ReportDiagnostic(
                             DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError(display, key, message));
                     }
-                    if (embedded.IsEmpty)
+                    if (embedded.Sources.IsEmpty)
                         continue;
                     if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                     {

@@ -1,63 +1,61 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Threading.Tasks;
+﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace SourceExpander.Generate
-{
-    public class OtherDependencyTest : EmbedderGeneratorTestBase
-    {
-        [Test]
-        public async Task OtherRaw()
-        {
-            var embeddedNamespaces = ImmutableArray.Create("Mine");
-            var embeddedFiles = ImmutableArray.Create([
-                new SourceFileInfo
-                (
-                    "TestProject>C.cs",
-                    ["Mine.C"],
-                    Array.Empty<string>(),
-                    Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-                ),
-                new SourceFileInfo
-                (
-                    "TestProject>Program.cs",
-                    ["Mine.Program"],
-                    ["using OC = Other.C;"],
-                    ["OtherDependency>C.cs", "TestProject>C.cs"],
-                    "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
-                ),
-            ]);
-            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
+namespace SourceExpander.Generate;
 
-            var test = new Test
+public class OtherDependencyTest : EmbedderGeneratorTestBase
+{
+    [Test]
+    public async Task OtherRaw(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray.Create("Mine");
+        var embeddedFiles = ImmutableArray.Create([
+            new SourceFileInfo
+            (
+                "TestProject>C.cs",
+                ["Mine.C"],
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+            ),
+            new SourceFileInfo
+            (
+                "TestProject>Program.cs",
+                ["Mine.Program"],
+                ["using OC = Other.C;"],
+                ["OtherDependency>C.cs", "TestProject>C.cs"],
+                "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
+            ),
+        ]);
+        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
+
+        var test = new Test
+        {
+            TestState =
             {
-                TestState =
+                AdditionalProjects =
                 {
-                    AdditionalProjects =
+                    ["Other"] =
                     {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
-                                """
+                        Sources = {
+                            """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            """
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
 """,
-                            }
-                        },
+                        }
                     },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles =
-                    {
-                        enableMinifyJson,
-                    },
-                    Sources = {
-                        (
-                            @"/home/mine/C.cs",
-                            """
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                },
+                Sources = {
+                    (
+                        @"/home/mine/C.cs",
+                        """
 namespace Mine{
     public static class C
     {
@@ -65,10 +63,10 @@ namespace Mine{
     }
 }
 """
-                        ),
-                        (
-                            @"/home/mine/Program.cs",
-                            """
+                    ),
+                    (
+                        @"/home/mine/Program.cs",
+                        """
 using OC = Other.C;
 
 namespace Mine{
@@ -82,86 +80,86 @@ namespace Mine{
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
-
-        [Test]
-        public async Task OtherGZip()
-        {
-            var embeddedNamespaces = ImmutableArray.Create("Mine");
-            var embeddedFiles = ImmutableArray.Create([
-                new SourceFileInfo
-                (
-                    "TestProject>C.cs",
-                    ["Mine.C"],
-                    Array.Empty<string>(),
-                    Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-                ),
-                new SourceFileInfo
-                (
-                    "TestProject>Program.cs",
-                    ["Mine.Program"],
-                    ["using OC = Other.C;"],
-                    ["OtherDependency>C.cs", "TestProject>C.cs"],
-                    "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
-                ),
-            ]);
-            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
-
-
-            var test = new Test
-            {
-                TestState =
+                    ),
+                },
+                ExpectedDiagnostics =
                 {
-                    AdditionalProjects =
+                    new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
+
+    [Test]
+    public async Task OtherGZip(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray.Create("Mine");
+        var embeddedFiles = ImmutableArray.Create([
+            new SourceFileInfo
+            (
+                "TestProject>C.cs",
+                ["Mine.C"],
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+            ),
+            new SourceFileInfo
+            (
+                "TestProject>Program.cs",
+                ["Mine.Program"],
+                ["using OC = Other.C;"],
+                ["OtherDependency>C.cs", "TestProject>C.cs"],
+                "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
+            ),
+        ]);
+        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
+
+
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
                     {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
-                                """
+                        Sources = {
+                            """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            """
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode.GZipBase32768",
 "㘅桠ҠҠҠ俶䏂⣂㹆䟗謜熬㔀Ⰳ茡毳窰廸揪㇚ᖭ引㱫焸萍瀾㡣暎㘟牟腱棋厝趼㙩闌䡉偩⎙癠㠂恓䦀砦哂叇㡙襏ꜙ㟰鲅ᯝ呡䰆濜㴞缻筷蝂島彀練䮌抸霣ݮ倉蟶㤥矖⢶觉癁荁趟㪺䡶碊赆瓁㥟圅鮀糏䑖䆷璾穗ᓞ䵫镹癠ҧ")]
 """,
-                            }
-                        },
+                        }
                     },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles =
-                    {
-                        enableMinifyJson,
-                    },
-                    Sources = {
-                        (
-                            @"/home/mine/C.cs",
-                            """
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                },
+                Sources = {
+                    (
+                        @"/home/mine/C.cs",
+                        """
 namespace Mine{
     public static class C
     {
@@ -169,10 +167,10 @@ namespace Mine{
     }
 }
 """
-                        ),
-                        (
-                            @"/home/mine/Program.cs",
-                            """
+                    ),
+                    (
+                        @"/home/mine/Program.cs",
+                        """
 using OC = Other.C;
 
 namespace Mine{
@@ -186,75 +184,75 @@ namespace Mine{
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
-
-        [Test]
-        public async Task UsingOlderVersion()
-        {
-            var embeddedNamespaces = ImmutableArray.Create("Mine");
-            var embeddedFiles = ImmutableArray.Create(
-                new SourceFileInfo
-                (
-                    "TestProject>C.cs",
-                    ["Mine.C"],
-                    Array.Empty<string>(),
-                    Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-                ));
-            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
-
-            var test = new Test
-            {
-                TestState =
+                    ),
+                },
+                ExpectedDiagnostics =
                 {
-                    AdditionalProjects =
+                    new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
+
+    [Test]
+    public async Task UsingOlderVersion(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray.Create("Mine");
+        var embeddedFiles = ImmutableArray.Create(
+            new SourceFileInfo
+            (
+                "TestProject>C.cs",
+                ["Mine.C"],
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+            ));
+        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
+
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
                     {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
-                                """
-                        [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
-                        [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
-                        """
-                            }
-                        },
-                    },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles =
-                    {
-                        enableMinifyJson,
-                    },
-                    Sources = {
-                        (
-                            @"/home/mine/C.cs",
+                        Sources = {
+                            """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
                             """
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
+                    [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
+                    """
+                        }
+                    },
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                },
+                Sources = {
+                    (
+                        @"/home/mine/C.cs",
+                        """
 namespace Mine{
     public static class C
     {
@@ -262,73 +260,73 @@ namespace Mine{
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerWarning("EMBED0002").WithArguments(EmbedderVersion, "Other", "2147483647.2147483647.2147483647.2147483647")
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
-
-        [Test]
-        public async Task InvalidRaw()
-        {
-            var embeddedNamespaces = ImmutableArray.Create("Mine");
-            var embeddedFiles = ImmutableArray.Create(
-                new SourceFileInfo
-                (
-                    "TestProject>C.cs",
-                    ["Mine.C"],
-                    Array.Empty<string>(),
-                    Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-                ));
-            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
-
-            var test = new Test
-            {
-                TestState =
+                    ),
+                },
+                ExpectedDiagnostics =
                 {
-                    AdditionalProjects =
-                    {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
-                                """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[}")]""",
+                    DiagnosticResult.CompilerWarning("EMBED0002").WithArguments(EmbedderVersion, "Other", "2147483647.2147483647.2147483647.2147483647")
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
 
-                            }
-                        },
-                    },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles =
+    [Test]
+    public async Task InvalidRaw(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray.Create("Mine");
+        var embeddedFiles = ImmutableArray.Create(
+            new SourceFileInfo
+            (
+                "TestProject>C.cs",
+                ["Mine.C"],
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+            ));
+        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
+
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
                     {
-                        enableMinifyJson,
+                        Sources = {
+                            """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[}")]""",
+
+                        }
                     },
-                    Sources = {
-                        (
-                            @"/home/mine/C.cs",
-                            """
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                },
+                Sources = {
+                    (
+                        @"/home/mine/C.cs",
+                        """
 namespace Mine{
     public static class C
     {
@@ -336,78 +334,78 @@ namespace Mine{
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerWarning("EMBED0006")
-                        .WithArguments("Other", "SourceExpander.EmbeddedSourceCode",
-                        "Unexpected character encountered while parsing value: }. Path '', line 1, position 1.")
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
-
-        [Test]
-        public async Task InvalidGZipBase32768()
-        {
-            var embeddedNamespaces = ImmutableArray.Create("Mine");
-            var embeddedFiles = ImmutableArray.Create(
-                new SourceFileInfo
-                (
-                    "TestProject>C.cs",
-                    ["Mine.C"],
-                    Array.Empty<string>(),
-                    Array.Empty<string>(),
-                    "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-                ));
-            const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
-
-            var others = new SourceFileCollection
-            {
-            };
-
-            var test = new Test
-            {
-                TestState =
+                    ),
+                },
+                ExpectedDiagnostics =
                 {
-                    AdditionalProjects =
+                    DiagnosticResult.CompilerWarning("EMBED0006")
+                    .WithArguments("Other", "SourceExpander.EmbeddedSourceCode",
+                    "Unexpected character encountered while parsing value: }. Path '', line 1, position 1.")
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
+
+    [Test]
+    public async Task InvalidGZipBase32768(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray.Create("Mine");
+        var embeddedFiles = ImmutableArray.Create(
+            new SourceFileInfo
+            (
+                "TestProject>C.cs",
+                ["Mine.C"],
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+            ));
+        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
+
+        var others = new SourceFileCollection
+        {
+        };
+
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
                     {
-                        ["Other"] =
-                        {
-                            Sources = {
-                                """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
-                                """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "㘅桠ҠҠҠ俕䎶⣂㹊")]""",
-                            }
-                        },
+                        Sources = {
+                            """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "㘅桠ҠҠҠ俕䎶⣂㹊")]""",
+                        }
                     },
-                    AdditionalProjectReferences = { "Other" },
-                    AdditionalFiles =
-                    {
-                        enableMinifyJson,
-                    },
-                    Sources = {
-                        (
-                            @"/home/mine/C.cs",
-                            """
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                },
+                Sources = {
+                    (
+                        @"/home/mine/C.cs",
+                        """
 namespace Mine{
     public static class C
     {
@@ -415,34 +413,33 @@ namespace Mine{
     }
 }
 """
-                        ),
-                    },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerWarning("EMBED0006")
-                        .WithArguments("Other", "SourceExpander.EmbeddedSourceCode",
-                        "Unexpected character encountered while parsing value: 㘅. Path '', line 0, position 0."),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
-                    }
+                    ),
+                },
+                ExpectedDiagnostics =
+                {
+                    DiagnosticResult.CompilerWarning("EMBED0006")
+                    .WithArguments("Other", "SourceExpander.EmbeddedSourceCode",
+                    "Unexpected character encountered while parsing value: 㘅. Path '', line 0, position 0."),
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
                 }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

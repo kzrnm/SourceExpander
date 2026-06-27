@@ -20,6 +20,7 @@
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Base32768" />
     <PackageReference Include="DotNet.Glob" />
+    <PackageReference Include="System.Formats.Asn1" />
   </ItemGroup>
 
   <ItemGroup>

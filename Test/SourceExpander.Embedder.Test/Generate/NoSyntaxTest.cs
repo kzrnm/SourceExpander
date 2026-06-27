@@ -1,23 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿namespace SourceExpander.Generate;
 
-namespace SourceExpander.Generate
+public class NoSyntaxTest : EmbedderGeneratorTestBase
 {
-    public class NoSyntaxTest : EmbedderGeneratorTestBase
+    [Test]
+    public async Task Generate(CancellationToken cancellationToken)
     {
-        [Test]
-        public async Task Generate()
+        var test = new Test
         {
-            var test = new Test
+            TestState =
             {
-                TestState =
+                AdditionalFiles =
                 {
-                    AdditionalFiles =
-                    {
-                        enableMinifyJson,
-                    },
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-        }
+                    enableMinifyJson,
+                },
+            }
+        };
+        await test.RunAsync(cancellationToken);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
@@ -8,7 +7,7 @@ namespace SourceExpander.Generate;
 public class LibraryImportTest : EmbedderGeneratorTestBase
 {
     [Test]
-    public async Task Generate()
+    public async Task Generate(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
         var embeddedFiles = ImmutableArray.Create(
@@ -89,10 +88,10 @@ public static partial class UnixConsole
                     }
                 }
         };
-        await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-        Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
-        System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .ShouldBeEquivalentTo(embeddedFiles);
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

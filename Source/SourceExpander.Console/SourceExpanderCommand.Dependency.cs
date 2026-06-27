@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
+namespace SourceExpander;
+
+
 partial struct SourceExpanderCommand
 {
     /// <summary>
@@ -31,12 +34,10 @@ partial struct SourceExpanderCommand
             throw new ArgumentException("File does not exist.", nameof(target));
         var project = targetInfo.Extension == ".csproj" ? targetInfo.FullName : PathUtil.GetProjectPath(target);
 
-        var props = new Dictionary<string, string>
-        {
-            { "SourceExpander_Embedder_EmbeddingType", "Raw" },
-        };
+        var props = ImmutableDictionary.Create<string, string>()
+            .Add("SourceExpander_Embedder_EmbeddingType", "Raw");
         if (fullFilePath)
-            props.Add("SourceExpander_Embedder_EmbeddingFileNameType", "FullPath");
+            props = props.Add("SourceExpander_Embedder_EmbeddingFileNameType", "FullPath");
 
         var (compilation, csProject) = await GetCompilation(project, props, cancellationToken: cancellationToken);
         if (compilation is not CSharpCompilation csCompilation)
@@ -84,7 +85,7 @@ partial struct SourceExpanderCommand
                     TypeNames: Enumerable.Empty<string>()
                 )));
         }
-        var result = JsonSerializer.Serialize(infos, DefaultSerializerOptions);
+        var result = JsonSerializer.Serialize(infos, JsonUtil.DefaultSerializerOptions);
         Output.WriteLine(result);
     }
 }

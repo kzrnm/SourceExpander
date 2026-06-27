@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -20,27 +20,26 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="SourceExpander.Console.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010019f27fe0b62f6a374e67a12dbd713e0b521d251abc73fcb1e3929cc74a99905daae786e8854b1ccd7401ecb850627c58ecf491bebe9a2fef9effbc63e74e1c00e036282d754dd6c8ffd12e8fd07897bf31b551f68d594c2bdd5be8009adc6eb625e10629d36d731246a8a9c353b62c49902024cf1c7fc0f59952325eec2df5a6" />
-    <Using Include="SourceExpander" />
     <Using Include="ConsoleAppFramework" />
 
-    <Compile Include="../SourceExpander.Share/**/Attributes.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Share/**/EmbeddedData.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Share/**/SourceFileInfo.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Share/**/SourceFileContainer.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Share/**/IContextWrappter.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Share/**/Util/*.cs" LinkBase="Share" />
-    <Compile Include="../SourceExpander.Generating.Common/*.cs" LinkBase="Generating" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/Attributes.cs" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/EmbeddedData.cs" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/SourceFileInfo.cs" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/SourceFileContainer.cs" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/IContextWrappter.cs" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/TypeFindAndUnusedUsingRemover.cs" />
+    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/Util/*.cs" />
+    <Compile LinkBase="Generating" Include="../SourceExpander.Generator/Generating/*.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ConsoleAppFramework" />
     <PackageReference Include="Base32768" />
-    <PackageReference Include="ConsoleAppFramework">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="DotNet.Glob" />
+    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="Mono.Cecil" />
   </ItemGroup>
 </Project>

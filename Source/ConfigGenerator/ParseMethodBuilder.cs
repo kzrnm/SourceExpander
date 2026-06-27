@@ -23,7 +23,6 @@ internal class ParseMethodBuilder
     ITypeSymbol NullableString { get; }
     ITypeSymbol NullableObject { get; }
     ITypeSymbol NullableStringArray { get; }
-
     public string Build()
     {
         var sb = new SourceBuilder();
@@ -32,6 +31,7 @@ internal class ParseMethodBuilder
         sb.AppendLine("using System.Linq;");
         sb.AppendLine($"namespace {Symbol.ContainingNamespace.Name};");
         sb.AppendLine($$"""
+#pragma warning disable CS0219,CS0168
 partial record {{Symbol.Name}}
 {
     public static {{Symbol.Name}} Parse(string? sourceText, global::Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptions analyzerConfigOptions)

@@ -1,369 +1,367 @@
 ﻿using System.Collections.Immutable;
-using System.Threading.Tasks;
 
-namespace SourceExpander.Generate.Config
+namespace SourceExpander.Generate.Config;
+
+public class EmbeddingFileNameTypeTest : EmbedderGeneratorTestBase
 {
-    public class EmbeddingFileNameTypeTest : EmbedderGeneratorTestBase
+    [Test]
+    public async Task EmbeddingFileNameTypeWithoutCommonPrefix(CancellationToken cancellationToken)
     {
-        [Test]
-        public async Task EmbeddingFileNameTypeWithoutCommonPrefix()
+        var embeddedNamespaces = ImmutableArray<string>.Empty;
+        var embeddedFiles = ImmutableArray.Create([
+             new SourceFileInfo
+             (
+                 "TestProject>.cs",
+                 ["P"],
+                 ImmutableArray.Create("using System;"),
+                 ImmutableArray<string>.Empty,
+                 """class P { static void T() => Console.WriteLine(2); }"""
+             ),
+             new SourceFileInfo
+             (
+                 "TestProject>rogram.cs",
+                 ["Program"],
+                 ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                 ImmutableArray<string>.Empty,
+                 """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
+             ),
+        ]);
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+        var test = new Test
         {
-            var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create([
-                 new SourceFileInfo
-                 (
-                     "TestProject>.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     """class P { static void T() => Console.WriteLine(2); }"""
-                 ),
-                 new SourceFileInfo
-                 (
-                     "TestProject>rogram.cs",
-                     ["Program"],
-                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray<string>.Empty,
-                     """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
-                 ),
-            ]);
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
-
-            var test = new Test
+            TestState =
             {
-                TestState =
+                AdditionalFiles =
                 {
-                    AdditionalFiles =
+                    (
+                    "/foo/bar/SourceExpander.Embedder.Config.json",
+                    """
                     {
-                        (
-                        "/foo/bar/SourceExpander.Embedder.Config.json",
-                        """
-                        {
-                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-                            "embedding-type": "Raw",
-                            "embedding-filename-type": "withoutCommonPrefix"
-                        }
-                        """),
-                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
-                    },
-                    Sources = {
-                        (
-                            "/home/source/Program.cs",
-                            """
-                            using System;
-                            using System.Diagnostics;
-
-                            [DebuggerDisplay("Name")]
-                            class Program
-                            {
-                                static void Main()
-                                {
-                                    Console.WriteLine(1);
-                                }
-
-                                [System.Diagnostics.Conditional("TEST")]
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                        (
-                            "/home/source/P.cs",
-                            """
-                            using System;
-                            class P
-                            {
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """
-                        ),
+                        "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                        "embedding-type": "Raw",
+                        "embedding-filename-type": "withoutCommonPrefix"
                     }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
-
-        [Test]
-        public async Task EmbeddingFileNameTypeWithoutCommonPrefixProperty()
-        {
-            var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create([
-                 new SourceFileInfo
-                 (
-                     "TestProject>.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     """class P { static void T() => Console.WriteLine(2); }"""
-                 ),
-                 new SourceFileInfo
-                 (
-                     "TestProject>rogram.cs",
-                     ["Program"],
-                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray<string>.Empty,
-                     """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
-                 ),
-            ]);
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
-
-            var test = new Test
-            {
-                AnalyzerConfigOptions =
-                {
-                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                    { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "withoutCommonPrefix" },
+                    """),
+                    ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
                 },
-                TestState =
-                {
-                    Sources = {
-                        (
-                            "/home/source/Program.cs",
-                            """
-                            using System;
-                            using System.Diagnostics;
-
-                            [DebuggerDisplay("Name")]
-                            class Program
-                            {
-                                static void Main()
-                                {
-                                    Console.WriteLine(1);
-                                }
-
-                                [System.Diagnostics.Conditional("TEST")]
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                        (
-                            "/home/source/P.cs",
-                            """
-                            using System;
-                            class P
-                            {
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
+                Sources = {
+                    (
+                        "/home/source/Program.cs",
                         """
-                        ),
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
+                        using System;
+                        using System.Diagnostics;
 
-        [Test]
-        public async Task EmbeddingFileNameTypeFullPath()
-        {
-            var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create([
-                 new SourceFileInfo
-                 (
-                     "/home/source/P.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     """class P { static void T() => Console.WriteLine(2); }"""
-                 ),
-                 new SourceFileInfo
-                 (
-                     "/home/source/Program.cs",
-                     ["Program"],
-                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray<string>.Empty,
-                     """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
-                 ),
-            ]);
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
-
-            var test = new Test
-            {
-                TestState =
-                {
-                    AdditionalFiles =
-                    {
-                        (
-                        "/foo/bar/SourceExpander.Embedder.Config.json",
-                        """
+                        [DebuggerDisplay("Name")]
+                        class Program
                         {
-                            "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-                            "embedding-type": "Raw",
-                            "embedding-filename-type": "fullpath"
+                            static void Main()
+                            {
+                                Console.WriteLine(1);
+                            }
+
+                            [System.Diagnostics.Conditional("TEST")]
+                            static void T() => Console.WriteLine(2);
                         }
-                        """),
-                        ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
-                    },
-                    Sources = {
-                        (
-                            "/home/source/Program.cs",
-                            """
-                            using System;
-                            using System.Diagnostics;
-
-                            [DebuggerDisplay("Name")]
-                            class Program
-                            {
-                                static void Main()
-                                {
-                                    Console.WriteLine(1);
-                                }
-
-                                [System.Diagnostics.Conditional("TEST")]
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                        (
-                            "/home/source/P.cs",
-                            """
-                            using System;
-                            class P
-                            {
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
                         """
-                        ),
-                    }
-                }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
-
-
-        [Test]
-        public async Task EmbeddingFileNameTypeFullPathProperty()
-        {
-            var embeddedNamespaces = ImmutableArray<string>.Empty;
-            var embeddedFiles = ImmutableArray.Create([
-                 new SourceFileInfo
-                 (
-                     "/home/source/P.cs",
-                     ["P"],
-                     ImmutableArray.Create("using System;"),
-                     ImmutableArray<string>.Empty,
-                     """class P { static void T() => Console.WriteLine(2); }"""
-                 ),
-                 new SourceFileInfo
-                 (
-                     "/home/source/Program.cs",
-                     ["Program"],
-                     ImmutableArray.Create("using System;", "using System.Diagnostics;"),
-                     ImmutableArray<string>.Empty,
-                     """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
-                 ),
-            ]);
-            const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
-
-            var test = new Test
-            {
-                AnalyzerConfigOptions =
-                {
-                    { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
-                    { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "fullpath" },
+                    ),
+                    (
+                        "/home/source/P.cs",
+                        """
+                        using System;
+                        class P
+                        {
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
                 },
-                TestState =
+                GeneratedSources =
                 {
-                    Sources = {
-                        (
-                            "/home/source/Program.cs",
-                            """
-                            using System;
-                            using System.Diagnostics;
-
-                            [DebuggerDisplay("Name")]
-                            class Program
-                            {
-                                static void Main()
-                                {
-                                    Console.WriteLine(1);
-                                }
-
-                                [System.Diagnostics.Conditional("TEST")]
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                        (
-                            "/home/source/P.cs",
-                            """
-                            using System;
-                            class P
-                            {
-                                static void T() => Console.WriteLine(2);
-                            }
-                            """
-                        ),
-                    },
-                    GeneratedSources =
-                    {
-                        (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
-                        $"""
-                        // <auto-generated/>
-                        #pragma warning disable
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
-                        [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
-                        
-                        """),
-                    }
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
                 }
-            };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
-            Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-            System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-                .ShouldBeEquivalentTo(embeddedFiles);
-        }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
+
+    [Test]
+    public async Task EmbeddingFileNameTypeWithoutCommonPrefixProperty(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray<string>.Empty;
+        var embeddedFiles = ImmutableArray.Create([
+             new SourceFileInfo
+             (
+                 "TestProject>.cs",
+                 ["P"],
+                 ImmutableArray.Create("using System;"),
+                 ImmutableArray<string>.Empty,
+                 """class P { static void T() => Console.WriteLine(2); }"""
+             ),
+             new SourceFileInfo
+             (
+                 "TestProject>rogram.cs",
+                 ["Program"],
+                 ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                 ImmutableArray<string>.Empty,
+                 """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
+             ),
+        ]);
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"TestProject>rogram.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+        var test = new Test
+        {
+            AnalyzerConfigOptions =
+            {
+                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "withoutCommonPrefix" },
+            },
+            TestState =
+            {
+                Sources = {
+                    (
+                        "/home/source/Program.cs",
+                        """
+                        using System;
+                        using System.Diagnostics;
+
+                        [DebuggerDisplay("Name")]
+                        class Program
+                        {
+                            static void Main()
+                            {
+                                Console.WriteLine(1);
+                            }
+
+                            [System.Diagnostics.Conditional("TEST")]
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
+                    (
+                        "/home/source/P.cs",
+                        """
+                        using System;
+                        class P
+                        {
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
+
+    [Test]
+    public async Task EmbeddingFileNameTypeFullPath(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray<string>.Empty;
+        var embeddedFiles = ImmutableArray.Create([
+             new SourceFileInfo
+             (
+                 "/home/source/P.cs",
+                 ["P"],
+                 ImmutableArray.Create("using System;"),
+                 ImmutableArray<string>.Empty,
+                 """class P { static void T() => Console.WriteLine(2); }"""
+             ),
+             new SourceFileInfo
+             (
+                 "/home/source/Program.cs",
+                 ["Program"],
+                 ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                 ImmutableArray<string>.Empty,
+                 """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
+             ),
+        ]);
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+        var test = new Test
+        {
+            TestState =
+            {
+                AdditionalFiles =
+                {
+                    (
+                    "/foo/bar/SourceExpander.Embedder.Config.json",
+                    """
+                    {
+                        "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+                        "embedding-type": "Raw",
+                        "embedding-filename-type": "fullpath"
+                    }
+                    """),
+                    ("/foo/bar/SourceExpander.Notmatch.json", "notmatch"),
+                },
+                Sources = {
+                    (
+                        "/home/source/Program.cs",
+                        """
+                        using System;
+                        using System.Diagnostics;
+
+                        [DebuggerDisplay("Name")]
+                        class Program
+                        {
+                            static void Main()
+                            {
+                                Console.WriteLine(1);
+                            }
+
+                            [System.Diagnostics.Conditional("TEST")]
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
+                    (
+                        "/home/source/P.cs",
+                        """
+                        using System;
+                        class P
+                        {
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",$"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """
+                    ),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+    }
+
+
+    [Test]
+    public async Task EmbeddingFileNameTypeFullPathProperty(CancellationToken cancellationToken)
+    {
+        var embeddedNamespaces = ImmutableArray<string>.Empty;
+        var embeddedFiles = ImmutableArray.Create([
+             new SourceFileInfo
+             (
+                 "/home/source/P.cs",
+                 ["P"],
+                 ImmutableArray.Create("using System;"),
+                 ImmutableArray<string>.Empty,
+                 """class P { static void T() => Console.WriteLine(2); }"""
+             ),
+             new SourceFileInfo
+             (
+                 "/home/source/Program.cs",
+                 ["Program"],
+                 ImmutableArray.Create("using System;", "using System.Diagnostics;"),
+                 ImmutableArray<string>.Empty,
+                 """[DebuggerDisplay("Name")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional("TEST")] static void T() => Console.WriteLine(2); }"""
+             ),
+        ]);
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class P { static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/P.cs\",\"TypeNames\":[\"P\"],\"Usings\":[\"using System;\"]},{\"CodeBody\":\"[DebuggerDisplay(\\\"Name\\\")] class Program { static void Main() { Console.WriteLine(1); }  [System.Diagnostics.Conditional(\\\"TEST\\\")] static void T() => Console.WriteLine(2); }\",\"Dependencies\":[],\"FileName\":\"/home/source/Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+
+        var test = new Test
+        {
+            AnalyzerConfigOptions =
+            {
+                { "build_property.SourceExpander_Embedder_EmbeddingType", "raw" },
+                { "build_property.SourceExpander_Embedder_EmbeddingFileNameType", "fullpath" },
+            },
+            TestState =
+            {
+                Sources = {
+                    (
+                        "/home/source/Program.cs",
+                        """
+                        using System;
+                        using System.Diagnostics;
+
+                        [DebuggerDisplay("Name")]
+                        class Program
+                        {
+                            static void Main()
+                            {
+                                Console.WriteLine(1);
+                            }
+
+                            [System.Diagnostics.Conditional("TEST")]
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
+                    (
+                        "/home/source/P.cs",
+                        """
+                        using System;
+                        class P
+                        {
+                            static void T() => Console.WriteLine(2);
+                        }
+                        """
+                    ),
+                },
+                GeneratedSources =
+                {
+                    (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs",
+                    $"""
+                    // <auto-generated/>
+                    #pragma warning disable
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbedderVersion","{EmbedderVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion","{EmbeddedLanguageVersion}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces","{string.Join(",", embeddedNamespaces)}")]
+                    [assembly: global::System.Reflection.AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode",{embeddedSourceCode.ToLiteral()})]
+                    
+                    """),
+                }
+            }
+        };
+        await test.RunAsync(cancellationToken);
+        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
+        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
+            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

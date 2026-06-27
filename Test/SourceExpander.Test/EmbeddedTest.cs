@@ -1,24 +1,25 @@
-﻿using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 
-namespace SourceExpander.Test
+namespace SourceExpander.Test;
+
+public class EmbeddedTest
 {
-    public class EmbeddedTest
+    [Test]
+    public async Task Embedded()
     {
-        [Test]
-        public async Task Embedded()
+        var embedded = await EmbeddedData.LoadFromAssembly(typeof(Expander));
+        await embedded.EmbeddedLanguageVersion.Should().BeEqualTo(LanguageVersion.CSharp4.ToDisplayString());
+        var s = await Assert.That(embedded.SourceFiles).HasSingleItem();
+        using (Assert.Multiple())
         {
-            var embedded = await EmbeddedData.LoadFromAssembly(typeof(Expander));
-            embedded.EmbeddedLanguageVersion.ShouldBe(LanguageVersion.CSharp4.ToDisplayString());
-            embedded.SourceFiles.ShouldHaveSingleItem()
-                .ShouldBeEquivalentTo(new SourceFileInfo(
-                    "SourceExpander>Expander.cs",
-                    ["SourceExpander.Expander"],
-                    ["using System.Diagnostics;"],
-                    [],
-                    "namespace SourceExpander{public class Expander{[Conditional(\"EXP\")]" +
-                    "public static void Expand(string inputFilePath=null,string outputFilePath=null,bool ignoreAnyError=true){}" +
-                    "public static string ExpandString(string inputFilePath=null,bool ignoreAnyError=true){return \"\";}}}"));
+            await s.FileName.Should().BeEqualTo("SourceExpander>Expander.cs");
+            await s.TypeNames.Should().BeEquivalentTo(["SourceExpander.Expander"]);
+            await s.Usings.Should().BeEquivalentTo(["using System.Diagnostics;"]);
+            await s.Dependencies.Should().BeEmpty();
+            await s.CodeBody.Should().BeEqualTo(
+                "namespace SourceExpander{public class Expander{[Conditional(\"EXP\")]" +
+                "public static void Expand(string inputFilePath=null,string outputFilePath=null,bool ignoreAnyError=true){}" +
+                "public static string ExpandString(string inputFilePath=null,bool ignoreAnyError=true){return \"\";}}}");
         }
     }
 }

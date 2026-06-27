@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Testing;
+﻿using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Generate
 {
     public class ComplicatedDependenciesTest : ExpandGeneratorTestBase
     {
         [Test]
-        public async Task Generate()
+        public async Task Generate(CancellationToken cancellationToken)
         {
             var test = new Test
             {
@@ -116,7 +115,7 @@ namespace AtCoder{public interface IAdditionOperator<T>{T Add(T x,T y);T Subtrac
                     }
                 }
             };
-            await test.RunAsync(TestContext.Current!.Execution.CancellationToken);
+            await test.RunAsync(cancellationToken);
         }
     }
 }

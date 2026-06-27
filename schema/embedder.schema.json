@@ -70,11 +70,11 @@
             ]
         },
         "remove-conditional": {
-            "description": "Remove method Conditional(\"{Value}\")",
+            "description": "Remove method calls annotated with Conditional(\"{Value}\")",
             "type": "array",
             "default": [],
             "items": {
-                "description": "Remove method Conditional(\"{Value}\")",
+                "description": "Remove method calls annotated with Conditional(\"{Value}\")",
                 "type": "string"
             }
         },
@@ -90,7 +90,7 @@
         "embedding-filename-type": {
             "description": "Embedded file name type",
             "type": "string",
-            "default": "RelativeFromProject",
+            "default": "WithoutCommonPrefix",
             "enum": [
                 "WithoutCommonPrefix",
                 "FullPath"
@@ -117,10 +117,10 @@
             "default": false
         },
         "exclude-attributes": {
-            "description": "Attribute full name that remove on embedding.",
+            "description": "Fully qualified name of the attribute used to exclude items from embedding.",
             "type": "array",
             "items": {
-                "description": "Attribute full name that remove on embedding.",
+                "description": "Fully qualified name of the attribute used to exclude items from embedding.",
                 "type": "string"
             }
         }

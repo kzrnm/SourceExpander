@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
+namespace SourceExpander;
+
 partial struct SourceExpanderCommand
 {
     /// <summary>
@@ -101,7 +103,7 @@ partial struct SourceExpanderCommand
         {
             t.SyntaxTree.FilePath,
             t.ExpandedCode,
-        }), DefaultSerializerOptions);
+        }), JsonUtil.DefaultSerializerOptions);
         Output.WriteLine(result);
     }
 }

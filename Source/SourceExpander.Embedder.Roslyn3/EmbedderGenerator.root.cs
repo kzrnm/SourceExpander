@@ -22,9 +22,10 @@ namespace SourceExpander
         }
         public void Execute(GeneratorExecutionContext context)
         {
+            var configFile = context.AdditionalFiles
+                .FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
             var (config, diagnostic) = ParseAdditionalTextAndAnalyzerOptions(
-                context.AdditionalFiles.Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
-                .FirstOrDefault(), context.AnalyzerConfigOptions, context.CancellationToken);
+                configFile, context.AnalyzerConfigOptions.GlobalOptions, context.CancellationToken);
             Execute(new GeneratorExecutionContextWrapper(context), (CSharpCompilation)context.Compilation, (CSharpParseOptions)context.ParseOptions, config, diagnostic);
         }
     }

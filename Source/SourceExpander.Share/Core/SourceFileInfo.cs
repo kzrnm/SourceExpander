@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,23 +9,13 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace SourceExpander
 {
     [DebuggerDisplay("{" + nameof(FileName) + "}")]
-    [DataContract]
-    internal class SourceFileInfo
+    internal class SourceFileInfo(
+    string? fileName,
+    IEnumerable<string>? typeNames,
+    IEnumerable<string>? usings,
+    IEnumerable<string>? dependencies,
+    string? codeBody)
     {
-        public SourceFileInfo(
-        string? fileName,
-        IEnumerable<string>? typeNames,
-        IEnumerable<string>? usings,
-        IEnumerable<string>? dependencies,
-        string? codeBody)
-        {
-            FileName = fileName ?? "";
-            TypeNames = Sorted(typeNames, UsingComparer.Default);
-            Usings = Sorted(usings, UsingComparer.Default);
-            Dependencies = Sorted(dependencies, UsingComparer.Default);
-            CodeBody = codeBody ?? "";
-        }
-
         private static string[] Sorted(IEnumerable<string>? collection, IComparer<string> comparer)
         {
             if (collection is null)
@@ -38,16 +27,11 @@ namespace SourceExpander
 
         #region Properties
         // Do not change order for json testing.
-        [DataMember]
-        public string CodeBody { get; set; }
-        [DataMember]
-        public IEnumerable<string> Dependencies { get; set; }
-        [DataMember]
-        public string FileName { get; set; }
-        [DataMember]
-        public IEnumerable<string> TypeNames { get; set; }
-        [DataMember]
-        public IEnumerable<string> Usings { get; set; }
+        public string CodeBody { get; set; } = codeBody ?? "";
+        public IEnumerable<string> Dependencies { get; set; } = Sorted(dependencies, UsingComparer.Default);
+        public string FileName { get; set; } = fileName ?? "";
+        public IEnumerable<string> TypeNames { get; set; } = Sorted(typeNames, UsingComparer.Default);
+        public IEnumerable<string> Usings { get; set; } = Sorted(usings, UsingComparer.Default);
         #endregion Properties
 
         public string Restore() => string.Join("\n", (Usings ?? Array.Empty<string>()).Append(CodeBody));

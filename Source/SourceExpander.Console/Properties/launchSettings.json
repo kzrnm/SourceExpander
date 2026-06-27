@@ -30,6 +30,11 @@
       "commandLineArgs": "library-list ../Sandbox/SampleLibrary/SampleLibrary.csproj",
       "workingDirectory": "$(ProjectDir)"
     },
+    "Embedded": {
+      "commandName": "Project",
+      "commandLineArgs": "embedded ../Sandbox/SampleLibrary/bin/Debug/net10.0/SampleLibrary.dll --output ../Sandbox/SampleLibrary/bin/Debug/net10.0/SampleLibrary2.dll",
+      "workingDirectory": "$(ProjectDir)"
+    },
     "no args": {
       "commandName": "Project",
       "workingDirectory": "$(ProjectDir)"
