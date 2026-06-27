@@ -124,8 +124,8 @@ public class ConfigGenerator : IIncrementalGenerator
             }
         }
 
-        context.AddSource($"{attributeSyntaxContext.TargetSymbol}.Convert.Parse.g.cs",
-            new ParseMethodBuilder(
+        context.AddSource($"{attributeSyntaxContext.TargetSymbol}.Convert.Parser.g.cs",
+            new ParserBuilder(
                 compilation,
                 (INamedTypeSymbol)attributeSyntaxContext.TargetSymbol,
                 configParams).Build());
