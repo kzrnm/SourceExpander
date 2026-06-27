@@ -1,8 +1,6 @@
 ﻿using System.Collections.Immutable;
-using System.Text.Json;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace SourceExpander.Share;
 

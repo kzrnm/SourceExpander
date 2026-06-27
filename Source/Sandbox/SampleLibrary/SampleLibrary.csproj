@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ac-library-csharp" />
+    <PackageReference Include="ac-library-csharp" VersionOverride="3.9.2" />
     <ProjectReference Include="..\..\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>

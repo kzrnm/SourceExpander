@@ -33,14 +33,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ConsoleAppFramework" />
     <PackageReference Include="Base32768" />
-    <PackageReference Include="ConsoleAppFramework">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="DotNet.Glob" />
     <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="Mono.Cecil" />
   </ItemGroup>
 </Project>
