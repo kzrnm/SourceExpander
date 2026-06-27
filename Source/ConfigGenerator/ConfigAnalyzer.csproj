@@ -20,7 +20,6 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <Compile Include="../SourceExpander.Share/Util/SourceBuilder.cs" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="IsExternalInit">
       <PrivateAssets>all</PrivateAssets>

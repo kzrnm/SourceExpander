@@ -17,7 +17,7 @@ class SourceBuilder
             return _cacheIndentSpaces[Level];
         }
     }
-    List<string> _cacheIndentSpaces = [
+    static readonly List<string> _cacheIndentSpaces = [
         "",
         "    ",
         "        ",

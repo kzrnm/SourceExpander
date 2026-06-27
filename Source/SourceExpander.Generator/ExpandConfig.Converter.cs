@@ -10,23 +10,23 @@ public partial record ExpandConfig
     private class ExpandConfigData
     {
         [JsonProperty("enabled")]
-        public bool? Enabled { set; get; }
+        public bool? Enabled;
         [JsonProperty("match-file-pattern")]
-        public string[]? MatchFilePattern { set; get; }
+        public string[]? MatchFilePattern;
         [JsonProperty("metadata-expanding-file")]
-        public string? MetadataExpandingFile { set; get; }
+        public string? MetadataExpandingFile;
         [JsonProperty("ignore-file-pattern-regex")]
-        public string[]? IgnoreFilePatternRegex { set; get; }
+        public string[]? IgnoreFilePatternRegex;
         [JsonProperty("ignore-assemblies")]
-        public string[]? IgnoreAssemblies { set; get; }
+        public string[]? IgnoreAssemblies;
         [JsonProperty("static-embedding-text")]
-        public string? StaticEmbeddingText { set; get; }
+        public string? StaticEmbeddingText;
         [JsonProperty("expanding-all")]
-        public bool? ExpandingAll { set; get; }
+        public bool? ExpandingAll;
         [JsonProperty("expanding-by-group")]
-        public bool? ExpandingByGroup { set; get; }
+        public bool? ExpandingByGroup;
         [JsonProperty("expanding-position")]
-        public string? ExpandingPosition { set; get; }
+        public string? ExpandingPosition;
         private ExpandingPosition ParsedExpandingPosition
             => Enum.TryParse(ExpandingPosition, true, out ExpandingPosition r) ? r : SourceExpander.ExpandingPosition.EndOfFile;
 

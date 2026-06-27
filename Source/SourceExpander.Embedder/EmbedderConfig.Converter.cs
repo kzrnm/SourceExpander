@@ -9,39 +9,39 @@ internal partial record EmbedderConfig
     private class EmbedderConfigData
     {
         [JsonProperty("enabled")]
-        public bool? Enabled { set; get; }
+        public bool? Enabled;
         [JsonProperty("include")]
-        public string[]? Include { set; get; }
+        public string[]? Include;
         [JsonProperty("exclude")]
-        public string[]? Exclude { set; get; }
+        public string[]? Exclude;
         [JsonProperty("embedding-type")]
-        public string? EmbeddingType { set; get; }
+        public string? EmbeddingType;
         [JsonProperty("exclude-attributes")]
-        public string[]? ExcludeAttributes { set; get; }
+        public string[]? ExcludeAttributes;
         [JsonProperty("minify-level")]
-        public string? MinifyLevel { set; get; }
+        public string? MinifyLevel;
         [JsonProperty("remove-conditional")]
-        public string[]? RemoveConditional { set; get; }
+        public string[]? RemoveConditional;
         [JsonProperty("embedding-source-class-name")]
-        public string? EmbeddingSourceClassName { set; get; }
+        public string? EmbeddingSourceClassName;
         [JsonProperty("embedding-filename-type")]
-        public string? EmbeddingFileNameType { set; get; }
+        public string? EmbeddingFileNameType;
 
         [JsonProperty("language-version")]
-        public object? LanguageVersion { set; get; }
+        public object? LanguageVersion;
 
         [JsonProperty("expand-in-library")]
-        public bool? ExpandInLibrary { set; get; }
+        public bool? ExpandInLibrary;
 
         [Obsolete]
         [JsonProperty("expanding-symbol")]
-        public string? ExpandingSymbol { set; get; }
+        public string? ExpandingSymbol;
         [Obsolete]
         [JsonProperty("embedding-source-class")]
-        public object? EmbeddingSourceClass { set; get; }
+        public object? EmbeddingSourceClass;
         [Obsolete]
         [JsonProperty("enable-minify")]
-        public bool? EnableMinify { set; get; }
+        public bool? EnableMinify;
 
         private EmbeddingType ParsedEmbeddingType
             => Enum.TryParse(EmbeddingType, true, out EmbeddingType r) ? r : SourceExpander.EmbeddingType.GZipBase32768;

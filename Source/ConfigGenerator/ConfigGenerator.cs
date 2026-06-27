@@ -70,7 +70,7 @@ public class ConfigGenerator : IIncrementalGenerator
         ConfigParams GetParams(INamedTypeSymbol dataType)
         {
             var builder = ImmutableArray.CreateBuilder<ConfigParam>();
-            foreach (var member in dataType.GetMembers().OfType<IPropertySymbol>())
+            foreach (var member in dataType.GetMembers().OfType<IFieldSymbol>())
             {
                 var isObsolete = member.GetAttributes().Any(a => a.AttributeClass?.ToString() == "System.ObsoleteAttribute");
                 var dataMember = member.GetAttributes()
@@ -84,11 +84,13 @@ public class ConfigGenerator : IIncrementalGenerator
                     continue;
                 }
 
+                var declaringSyntax = member.DeclaringSyntaxReferences.Single().GetSyntax(cancellationToken: context.CancellationToken);
+
                 builder.Add(new(
                     member.Name,
                     jsonName,
                     member.Type,
-                    (PropertyDeclarationSyntax)member.DeclaringSyntaxReferences[0].GetSyntax(cancellationToken: context.CancellationToken),
+                    (VariableDeclaratorSyntax)declaringSyntax,
                     isObsolete));
             }
             builder.Sort((a, b) => a.IsObsolete.CompareTo(b.IsObsolete));

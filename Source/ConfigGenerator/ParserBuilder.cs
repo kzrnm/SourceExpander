@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander;
@@ -16,6 +15,7 @@ internal class ParserBuilder
         NullableObject = compilation.GetSpecialType(SpecialType.System_Object);
         NullableStringArray = compilation.CreateArrayTypeSymbol(NullableString);
     }
+
     INamedTypeSymbol Symbol { get; }
     ConfigParams ConfigParams { get; }
 
@@ -35,93 +35,117 @@ internal class ParserBuilder
 #pragma warning disable CS0219,CS0168
 partial record {{Symbol.Name}}
 {
-    internal record Parser(
-        string? SourceText
 """);
+        sb.AppendLine("""
+    internal record Builder(
+        global::Microsoft.CodeAnalysis.AdditionalText? SourceText
+""");
+        using (sb.Indent(2))
+            foreach (var configParam in ConfigParams)
+                sb.AppendLine($", string? {configParam.Name}");
         sb.AppendLine($$"""
     )
     {
-        
-    }
-    public static {{Symbol.Name}} Parse(string? sourceText, global::Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptions analyzerConfigOptions)
-    {
-        try
+        static void SetObject(ref object? field, string? value)
         {
-"""
-);
-        using (sb.Indent(3))
+            if(value is not null)
+                field = value;
+        }
+        static void SetObject(ref string? field, string? value)
+        {
+            if(value is not null)
+                field = value;
+        }
+        static void SetBool(ref bool field, string? value)
+        {
+            if(value is not null)
+                field = !global::System.StringComparer.OrdinalIgnoreCase.Equals(value, "false");
+        }
+        static void SetBool(ref bool? field, string? value)
+        {
+            if(value is not null)
+                field = !global::System.StringComparer.OrdinalIgnoreCase.Equals(value, "false");
+        }
+        static void SetStringArray(ref string[]? field, string? value)
+        {
+            if(value is not null)
+                field = value.Split(';').Select(t => t.Trim()).Where(t => t is {Length: not 0}).ToArray();
+        }
+        public {{Symbol.Name}} Build(global::System.Threading.CancellationToken cancellationToken)
+        {
+            try
+            {
+""");
+        using (sb.Indent(4))
         {
             sb.AppendLine($$"""
-{{ConfigParams.Type.Name}} data = sourceText switch
+{{ConfigParams.Type.Name}} data = SourceText?.GetText(cancellationToken)?.ToString() switch
 {
     null => new(),
-    _ => global::SourceExpander.JsonUtil.ParseJson<{{ConfigParams.Type.Name}}>(sourceText) ?? new(),
+    var source => global::SourceExpander.JsonUtil.ParseJson<{{ConfigParams.Type.Name}}>(source) ?? new(),
 };
 """);
+            sb.AppendLineRaw("#pragma warning disable CS0612");
+            foreach (var configParam in ConfigParams)
+            {
+                if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableBoolean))
+                {
+                    sb.AppendLine($$"""SetBool(ref data.{{configParam.Name}}, {{configParam.Name}});""");
+                }
+                else if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableString)
+                || SymbolEqualityComparer.Default.Equals(configParam.Type, NullableObject))
+                {
+                    sb.AppendLine($$"""SetObject(ref data.{{configParam.Name}}, {{configParam.Name}});""");
+                }
+                else if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableStringArray))
+                {
+                    sb.AppendLine($$"""SetStringArray(ref data.{{configParam.Name}}, {{configParam.Name}});""");
+                }
+                else if (!configParam.IsObsolete)
+                {
+                    throw new System.NotImplementedException("Update ConfigAnalyzer");
+                }
+            }
+            sb.AppendLineRaw("#pragma warning restore CS0612");
+            sb.AppendLine();
+            sb.AppendLine("return data.ToImmutable();");
+        }
+        sb.AppendLine("""
+            }
+            catch (global::System.Exception e)
+            {
+                throw new global::SourceExpander.ParseJsonException(e);
+            }
+        }
+    }
+    internal static Builder LoadBuilder(global::Microsoft.CodeAnalysis.AdditionalText? sourceText, global::Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptions analyzerConfigOptions)
+    {
+""");
+        using (sb.Indent(2))
+        {
             sb.AppendLine($"const string buildPropHeader = {SyntaxFactory.Literal("build_property.")};");
             sb.AppendLine($"const string header = buildPropHeader + {SyntaxFactory.Literal(Symbol.ContainingAssembly.Name.ToString().Replace('.', '_') + "_")};");
 
             sb.AppendLine();
-            sb.AppendLine($"string? v;");
-            sb.AppendLine("// Parse properties");
-
-            bool isFirstObsolete = true;
+            sb.AppendLine("// properties form analyzerConfigOptions");
+            sb.AppendLineRaw("#pragma warning disable CS0612");
 
             foreach (var configParam in ConfigParams)
             {
-                if (configParam.IsObsolete && isFirstObsolete)
-                {
-                    isFirstObsolete = false;
-                    sb.AppendLineRaw("#pragma warning disable CS0612");
-                }
-
                 sb.AppendLine($$"""
-if (analyzerConfigOptions.TryGetValue(header + nameof(data.{{configParam.Name}}), out v) && !string.IsNullOrWhiteSpace(v))
+if (analyzerConfigOptions.TryGetValue(header + nameof({{ConfigParams.Type.Name}}.{{configParam.Name}}), out string? {{configParam.Name}}))
 {
+    {{configParam.Name}} = {{configParam.Name}}.Trim();
+}
 """);
-                using (sb.Indent())
-                {
-                    if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableBoolean))
-                    {
-                        sb.AppendLine($$"""
-data.{{configParam.Name}} = !global::System.StringComparer.OrdinalIgnoreCase.Equals(v, "false");
-""");
-                    }
-                    else if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableString)
-                    || SymbolEqualityComparer.Default.Equals(configParam.Type, NullableObject))
-                    {
-                        sb.AppendLine($$"""
-data.{{configParam.Name}} = v;
-""");
-                    }
-                    else if (SymbolEqualityComparer.Default.Equals(configParam.Type, NullableStringArray))
-                    {
-                        sb.AppendLine($$"""
-data.{{configParam.Name}} = v.Split(';').Select(t => t.Trim()).ToArray();
-""");
-                    }
-                    else if (!configParam.IsObsolete)
-                    {
-                        throw new System.NotImplementedException();
-                    }
-                }
-                sb.AppendLine("}");
             }
-            if (!isFirstObsolete)
-            {
-                sb.AppendLineRaw("#pragma warning restore CS0612");
-            }
-
-            sb.AppendLine();
-            sb.AppendLine("return data.ToImmutable();");
+            sb.AppendLineRaw("#pragma warning restore CS0612");
+            sb.AppendLine("return new Builder(SourceText: sourceText");
+            foreach (var configParam in ConfigParams)
+                sb.AppendLine($", {configParam.Name}: {configParam.Name}");
         }
-        sb.AppendLine(
-"""
-        }
-        catch (global::System.Exception e)
-        {
-            throw new global::SourceExpander.ParseJsonException(e);
-        }
+        sb.AppendLine($$"""
+        );
     }
 }
 """);
