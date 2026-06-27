@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text.Json;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -239,22 +240,60 @@ public class EmbeddedDataTest
             })
                 using (Assert.Multiple())
                 {
+                    await json.Should().BeEqualTo(
+                        """
+                        {
+                            "AssemblyName": "RawJson",
+                            "Sources": [
+                                {
+                                    "CodeBody": "namespace SampleLibrary { public static class Bit { [MethodImpl(MethodImplOptions.AggressiveInlining)] public static int ExtractLowestSetBit(int n) { if (Bmi1.IsSupported) { return (int)Bmi1.ExtractLowestSetBit((uint)n); } return n & -n; } } } ",
+                                    "Dependencies": [],
+                                    "FileName": "_SampleLibrary>Bit.cs",
+                                    "TypeNames": [
+                                        "SampleLibrary.Bit"
+                                    ],
+                                    "Usings": [
+                                        "using System.Runtime.CompilerServices;",
+                                        "using System.Runtime.Intrinsics.X86;"
+                                    ]
+                                },
+                                {
+                                    "CodeBody": "namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } ",
+                                    "Dependencies": [
+                                        "_SampleLibrary>Xorshift.cs"
+                                    ],
+                                    "FileName": "_SampleLibrary>Put.cs",
+                                    "TypeNames": [
+                                        "SampleLibrary.Put"
+                                    ],
+                                    "Usings": [
+                                        "using System.Diagnostics;"
+                                    ]
+                                },
+                                {
+                                    "CodeBody": "namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } ",
+                                    "Dependencies": [],
+                                    "FileName": "_SampleLibrary>Xorshift.cs",
+                                    "TypeNames": [
+                                        "SampleLibrary.Xorshift"
+                                    ],
+                                    "Usings": [
+                                        "using System;"
+                                    ]
+                                }
+                            ],
+                            "EmbedderVersion": "3.4.0.0",
+                            "CSharpVersion": "7.3",
+                            "AllowUnsafe": false,
+                            "EmbeddedNamespaces": [
+                                "SampleLibrary"
+                            ]
+                        }
+                        """, TestUtil.JsonEqualityComparer);
                     await JsonConvert.DeserializeObject<EmbeddedData>(json, jsonSerializerSettings)
                         .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
                     await System.Text.Json.JsonSerializer.Deserialize<EmbeddedData>(json, jsonSerializerOptions)
                         .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
-
-                    var obj = await Assert.That(JsonConvert.DeserializeObject(json, jsonSerializerSettings)).IsTypeOf<JObject>();
-                    await obj.Should().HaveCount(6);
-
-                    await ((IDictionary<string, JToken>)obj).Keys.Should().BeEquivalentTo([
-                        "AssemblyName",
-                        "Sources",
-                        "EmbedderVersion",
-                        "CSharpVersion",
-                        "AllowUnsafe",
-                        "EmbeddedNamespaces",
-                    ]);
                 }
         }
 
@@ -276,22 +315,62 @@ public class EmbeddedDataTest
             })
                 using (Assert.Multiple())
                 {
+                    await json.Should().BeEqualTo(
+                        """
+                        {
+                            "AssemblyName": "Assembly2",
+                            "Sources": [
+                                {
+                                    "CodeBody": "namespace SampleLibrary { public static class Bit { [MethodImpl(MethodImplOptions.AggressiveInlining)] public static int ExtractLowestSetBit(int n) { if (Bmi1.IsSupported) { return (int)Bmi1.ExtractLowestSetBit((uint)n); } return n & -n; } } } ",
+                                    "Dependencies": [],
+                                    "FileName": "_SampleLibrary>Bit.cs",
+                                    "TypeNames": [
+                                        "SampleLibrary.Bit"
+                                    ],
+                                    "Usings": [
+                                        "using System.Runtime.CompilerServices;",
+                                        "using System.Runtime.Intrinsics.X86;"
+                                    ]
+                                },
+                                {
+                                    "CodeBody": "namespace SampleLibrary { public static class Put { private static readonly Xorshift rnd = new Xorshift(); public static void WriteRandom() => Trace.WriteLine(rnd.Next()); } } ",
+                                    "Dependencies": [
+                                        "_SampleLibrary>Xorshift.cs"
+                                    ],
+                                    "FileName": "_SampleLibrary>Put.cs",
+                                    "TypeNames": [
+                                        "SampleLibrary.Put"
+                                    ],
+                                    "Usings": [
+                                        "using System.Diagnostics;"
+                                    ]
+                                },
+                                {
+                                    "CodeBody": "namespace SampleLibrary { public class Xorshift : Random { private uint x = 123456789; private uint y = 362436069; private uint z = 521288629; private uint w; private static readonly Random rnd = new Random(); public Xorshift() : this(rnd.Next()) { } public Xorshift(int seed) { w = (uint)seed; } protected override double Sample() => InternalSample() * (1.0 / uint.MaxValue); private uint InternalSample() { uint t = x ^ (x << 11); x = y; y = z; z = w; return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)); } } } ",
+                                    "Dependencies": [],
+                                    "FileName": "_SampleLibrary>Xorshift.cs",
+                                    "TypeNames": [
+                                        "SampleLibrary.Xorshift"
+                                    ],
+                                    "Usings": [
+                                        "using System;"
+                                    ]
+                                }
+                            ],
+                            "EmbedderVersion": "1.2.3.4",
+                            "CSharpVersion": "preview",
+                            "AllowUnsafe": true,
+                            "EmbeddedNamespaces": [
+                                "SampleLibrary",
+                                "SampleLibrary.Put"
+                            ]
+                        }
+                        """, TestUtil.JsonEqualityComparer);
+
                     await JsonConvert.DeserializeObject<EmbeddedData>(json, jsonSerializerSettings)
                         .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
                     await System.Text.Json.JsonSerializer.Deserialize<EmbeddedData>(json, jsonSerializerOptions)
                         .Should().BeEqualTo(data, TestUtil.EmbeddedDataEqualityComparer);
-
-                    var obj = await Assert.That(JsonConvert.DeserializeObject(json, jsonSerializerSettings)).IsTypeOf<JObject>();
-                    await obj.Should().HaveCount(6);
-
-                    await ((IDictionary<string, JToken>)obj).Keys.Should().BeEquivalentTo([
-                        "AssemblyName",
-                        "Sources",
-                        "EmbedderVersion",
-                        "CSharpVersion",
-                        "AllowUnsafe",
-                        "EmbeddedNamespaces",
-                    ]);
                 }
         }
     }

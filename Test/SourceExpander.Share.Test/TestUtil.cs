@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text.Json;
+using Microsoft.CodeAnalysis;
 
 namespace SourceExpander.Share;
 
@@ -14,6 +15,10 @@ static class TestUtil
             yield return MetadataReference.CreateFromFile(file);
         }
     }
+
+    public static IEqualityComparer<string> JsonEqualityComparer
+        = EqualityComparer<string>.Create(
+            (x, y) => JsonElement.DeepEquals(JsonElement.Parse(x), JsonElement.Parse(y)));
 
     public static IEqualityComparer<EmbeddedData> EmbeddedDataEqualityComparer
         = EqualityComparer<EmbeddedData>.Create(
