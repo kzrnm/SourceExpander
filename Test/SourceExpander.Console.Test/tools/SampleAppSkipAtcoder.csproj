@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="..\..\..\Source\Sandbox\SampleApp\SourceExpander.Embedded.json" />
     <PackageReference Include="ac-library-csharp" VersionOverride="3.9.2-atcoder1" />
     <ProjectReference Include="..\..\..\Source\Sandbox\SampleLibrary\SampleLibrary.csproj" />
     <ProjectReference Include="..\..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj">

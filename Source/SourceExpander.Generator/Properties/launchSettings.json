@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SourceExpander.Generator": {
+    "SampleApp": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "..\\Sandbox\\SampleApp\\SampleApp.csproj"
     }

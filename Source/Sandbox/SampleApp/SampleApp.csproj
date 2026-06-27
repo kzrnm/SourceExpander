@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="SourceExpander.Embedded.json" />
     <ProjectReference Include="..\SampleLibrary\SampleLibrary.csproj" />
     <ProjectReference Include="..\..\SourceExpander.Generator\SourceExpander.Generator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
