@@ -1,4 +1,7 @@
 <Project>
+  <PropertyGroup>
+    <SourceExpander_Generator>true</SourceExpander_Generator>
+  </PropertyGroup>
 	<ItemGroup>
 		<CompilerVisibleProperty Include="SourceExpander_Generator_Enabled" />
 		<CompilerVisibleProperty Include="SourceExpander_Generator_MatchFilePattern" />
