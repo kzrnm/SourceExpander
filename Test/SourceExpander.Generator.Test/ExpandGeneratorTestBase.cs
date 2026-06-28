@@ -12,16 +12,20 @@ namespace SourceExpander
         {
             public Test()
             {
+                AnalyzerConfigOptions.Add(
+                    typeof(ExpandConfig.Builder).GetProperties()
+                        .Where(p => p.Name is not "SourceText")
+                        .Select(p => KeyValuePair.Create($"build_property.SourceExpander_Embedder_{p.Name}", "")));
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net100.AddPackages(Packages);
             }
         }
         internal static Solution CreateOtherReference(Solution solution,
-    ProjectId projectId,
-    SourceFileCollection documents,
-    string otherName = "Other",
-    string otherAssemblyName = "Other",
-    CSharpCompilationOptions compilationOptions = null)
+            ProjectId projectId,
+            SourceFileCollection documents,
+            string otherName = "Other",
+            string otherAssemblyName = "Other",
+            CSharpCompilationOptions compilationOptions = null)
         {
             compilationOptions ??= new(OutputKind.DynamicallyLinkedLibrary);
 

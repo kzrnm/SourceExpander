@@ -1,14 +1,15 @@
 {
-    "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
-    "enable-minify": true,
-    "exclude-attributes": [
-        "System.Diagnostics.DebuggerBrowsableAttribute",
-        "System.Diagnostics.DebuggerDisplayAttribute",
-        "System.Diagnostics.DebuggerHiddenAttribute",
-        "System.Diagnostics.DebuggerNonUserCodeAttribute",
-        "System.Diagnostics.DebuggerStepperBoundaryAttribute",
-        "System.Diagnostics.DebuggerStepThroughAttribute",
-        "System.Diagnostics.DebuggerTypeProxyAttribute",
-        "System.Diagnostics.DebuggerVisualizerAttribute"
-    ]
+  "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
+  "minify-level": "default",
+  "embedding-source-class-name": "hoge",
+  "exclude-attributes": [
+    "System.Diagnostics.DebuggerBrowsableAttribute",
+    "System.Diagnostics.DebuggerDisplayAttribute",
+    "System.Diagnostics.DebuggerHiddenAttribute",
+    "System.Diagnostics.DebuggerNonUserCodeAttribute",
+    "System.Diagnostics.DebuggerStepperBoundaryAttribute",
+    "System.Diagnostics.DebuggerStepThroughAttribute",
+    "System.Diagnostics.DebuggerTypeProxyAttribute",
+    "System.Diagnostics.DebuggerVisualizerAttribute"
+  ]
 }

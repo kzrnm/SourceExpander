@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="SampleProject/SampleProject.csproj" />
+  <Project Path="SampleProject2/SampleProject2.csproj" />
+  <Project Path="_SampleLibrary/_SampleLibrary.csproj" />
+  <Project Path="_SampleLibrary2/_SampleLibrary2.csproj" />
+</Solution>

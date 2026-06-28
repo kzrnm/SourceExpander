@@ -1,7 +1,6 @@
 <Project>
 
   <PropertyGroup>
-    <UseLocalReference>false</UseLocalReference>
+    <SourceExpanderVersion>9.0.0-beta2</SourceExpanderVersion>
   </PropertyGroup>
-
 </Project>

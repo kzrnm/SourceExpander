@@ -37,11 +37,11 @@ namespace SourceExpander
 
     public class DummyAnalyzerConfigOptions : AnalyzerConfigOptions, IEnumerable<KeyValuePair<string, string>>
     {
-        public void Add(string key, string value) => dict.Add(key, value);
+        public void Add(string key, string value) => dict[key] = value;
         public void Add(IEnumerable<KeyValuePair<string, string>> other)
         {
             foreach (var (k, v) in other)
-                dict.Add(k, v);
+                dict[k] = v;
         }
 
         public bool IsEmpty => dict.Count == 0;
