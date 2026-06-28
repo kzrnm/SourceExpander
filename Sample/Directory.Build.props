@@ -1,6 +1,6 @@
 <Project>
 
   <PropertyGroup>
-    <SourceExpanderVersion>9.0.0-beta2</SourceExpanderVersion>
+    <SourceExpanderVersion>9.0.0</SourceExpanderVersion>
   </PropertyGroup>
 </Project>
