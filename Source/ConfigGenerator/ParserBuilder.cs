@@ -123,8 +123,9 @@ partial record {{Symbol.Name}}
 """);
         using (sb.Indent(2))
         {
+            var assemblyName = Symbol.ContainingAssembly.Name.ToString().Replace(".Roslyn3", "").Replace('.', '_');
             sb.AppendLine($"const string buildPropHeader = {SyntaxFactory.Literal("build_property.")};");
-            sb.AppendLine($"const string header = buildPropHeader + {SyntaxFactory.Literal(Symbol.ContainingAssembly.Name.ToString().Replace('.', '_') + "_")};");
+            sb.AppendLine($"const string header = buildPropHeader + {SyntaxFactory.Literal(assemblyName + "_")};");
 
             sb.AppendLine();
             sb.AppendLine("// properties form analyzerConfigOptions");
