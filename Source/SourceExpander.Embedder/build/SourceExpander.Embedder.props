@@ -1,4 +1,7 @@
 <Project>
+  <PropertyGroup>
+    <SourceExpander_Embedder>true</SourceExpander_Embedder>
+  </PropertyGroup>
   <ItemGroup>
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Include" />
