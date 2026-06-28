@@ -26,4 +26,25 @@ internal readonly partial struct SourceExpanderCommand
         var project = await workspace.OpenProjectAsync(projectPath, cancellationToken: cancellationToken);
         return (await project.GetCompilationAsync(cancellationToken), project);
     }
+
+    private static async Task<ImmutableArray<EmbeddedData>> GetAdditionalEmbeddedData(Project project, CancellationToken cancellationToken)
+    {
+        const string EMBEDDED_FILE_NAME = "SourceExpander.Embedded.json";
+
+        var builder = ImmutableArray.CreateBuilder<EmbeddedData>();
+        foreach (var doc in project.AdditionalDocuments)
+            if (doc.FilePath?.EndsWith(EMBEDDED_FILE_NAME, StringComparison.OrdinalIgnoreCase) is true)
+            {
+                try
+                {
+                    var obj = JsonUtil.ParseJson<EmbeddedData>(await doc.GetTextAsync(cancellationToken));
+                    if (obj is not null)
+                        builder.Add(obj);
+                }
+                catch (ParseJsonException)
+                {
+                }
+            }
+        return builder.ToImmutable();
+    }
 }

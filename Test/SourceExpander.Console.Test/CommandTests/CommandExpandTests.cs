@@ -42,7 +42,7 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
     public async Task ExpandAnotherProject(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
         await new SourceExpanderCommand { Stdout = sw }.Expand(target, project: project, cancellationToken: cancellationToken);
         await sw.ToString().ReplaceLineEndings().Should().BeEqualTo("""
@@ -63,6 +63,7 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFind(int n) : base(n) { Foo(); }  void Foo() => Bar(); public bool Try(out string? text) { if (this.Size(0) == 1) { text = "Single"; return true; }  text = null; return false; }  partial void Bar(); } }
+namespace AtCoder{}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
@@ -108,7 +109,7 @@ namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFin
     public async Task ExpandToFile(CancellationToken cancellationToken)
     {
         var output = Path.Combine(Path.GetTempPath(), "SourceExpander.Console.Test.ExpandToFile.csx");
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         var target = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program.cs");
         await new SourceExpanderCommand().Expand(target, output: output, project: project, cancellationToken: cancellationToken);
         await (await File.ReadAllTextAsync(output, cancellationToken)).ReplaceLineEndings().Should().BeEqualTo("""
@@ -129,6 +130,7 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFind(int n) : base(n) { Foo(); }  void Foo() => Bar(); public bool Try(out string? text) { if (this.Size(0) == 1) { text = "Single"; return true; }  text = null; return false; }  partial void Bar(); } }
+namespace AtCoder{}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());

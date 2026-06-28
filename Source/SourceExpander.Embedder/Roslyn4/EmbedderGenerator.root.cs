@@ -1,46 +1,44 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander
+namespace SourceExpander;
+
+[Generator]
+public partial class EmbedderGenerator : IIncrementalGenerator
 {
-    [Generator]
-    public partial class EmbedderGenerator : IIncrementalGenerator
+    private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
-
-        public void Initialize(IncrementalGeneratorInitializationContext context)
+        context.RegisterPostInitializationOutput(ctx =>
         {
-            context.RegisterPostInitializationOutput(ctx =>
-            {
-                foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
-                    ctx.AddSource(hintName, sourceText);
-            });
+            foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
+                ctx.AddSource(hintName, sourceText);
+        });
 
-            IncrementalValueProvider<(EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic)> configProvider
-                = context.AdditionalTextsProvider
-                .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
-                .Collect()
-                .Select((ats, _) => ats.FirstOrDefault())
-                .Combine(context.AnalyzerConfigOptionsProvider)
-                .Select((tup, ct) => ParseAdditionalTextAndAnalyzerOptions(tup.Left, tup.Right.GlobalOptions, ct));
+        var configProvider
+            = context.AdditionalTextsProvider
+            .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+            .Collect()
+            .Select((ats, _) => ats.FirstOrDefault())
+            .Combine(context.AnalyzerConfigOptionsProvider.Select((s, _) => s.GlobalOptions))
+            .Select((tup, ct) => (tup.Right, EmbedderConfig.LoadBuilder(tup.Left, tup.Right)));
 
+        var source = context.CompilationProvider
+            .Combine(context.ParseOptionsProvider)
+            .Combine(configProvider);
 
-            var source = context.CompilationProvider
-                .Combine(context.ParseOptionsProvider)
-                .Combine(configProvider);
+        context.RegisterImplementationSourceOutput(source, Execute);
+    }
 
-            context.RegisterImplementationSourceOutput(source, Execute);
-        }
-
-        private void Execute(SourceProductionContext ctx, ((Compilation Left, ParseOptions Right) Left, (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic) Right) source)
-        {
-            var ((compilation, parseOptions), (config, configDiagnostic)) = source;
-            Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, (CSharpParseOptions)parseOptions, config, configDiagnostic);
-        }
+    private void Execute(SourceProductionContext ctx, ((Compilation, ParseOptions), (AnalyzerConfigOptions, EmbedderConfig.Builder)) source)
+    {
+        var ((compilation, parseOptions), (analyzerConfigOptions, configBuilder)) = source;
+        Execute(new SourceProductionContextWrappter(ctx), (CSharpCompilation)compilation, (CSharpParseOptions)parseOptions, analyzerConfigOptions, configBuilder);
     }
 }

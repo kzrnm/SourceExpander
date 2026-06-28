@@ -13,4 +13,4 @@ internal record ConfigParams(ITypeSymbol Type, ImmutableArray<ConfigParam> Param
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<ConfigParam>)Params).GetEnumerator();
 }
 
-internal record ConfigParam(string Name, string JsonName, ITypeSymbol Type, PropertyDeclarationSyntax Syntax, bool IsObsolete);
+internal record ConfigParam(string Name, string JsonName, ITypeSymbol Type, VariableDeclaratorSyntax Syntax, bool IsObsolete);

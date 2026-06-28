@@ -7,11 +7,12 @@ public class CommandLibraryListTests
     public async Task LibraryListSampleAppSkipAtcoder(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: cancellationToken);
 
         await sw.ToString().ReplaceLineEndings().Should().BeEqualTo(
 $"""
+ac-library-csharp-override,1.0.0
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
 
 """.ReplaceLineEndings());
@@ -26,6 +27,7 @@ SampleLibrary,{AssemblyUtil.AssemblyVersion}
 
         await sw.ToString().ReplaceLineEndings().Should().BeEqualTo(
 $"""
+ac-library-csharp-override,1.0.0
 ac-library-csharp,7.0.0.100
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
 

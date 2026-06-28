@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\..\Source\Sandbox\SampleApp\*.cs" />
+    <Compile Include="..\SampleApp\*.cs" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_Enabled" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_MatchFilePattern" />
     <CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
@@ -19,9 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="..\SampleApp\SourceExpander.Embedded.json" />
     <PackageReference Include="ac-library-csharp" VersionOverride="3.9.2-atcoder1" />
-    <ProjectReference Include="..\..\..\Source\Sandbox\SampleLibrary\SampleLibrary.csproj" />
-    <ProjectReference Include="..\..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj">
+    <ProjectReference Include="..\SampleLibrary\SampleLibrary.csproj" />
+    <ProjectReference Include="..\..\SourceExpander.Generator\SourceExpander.Generator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>

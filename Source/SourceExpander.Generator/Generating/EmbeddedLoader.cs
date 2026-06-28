@@ -21,12 +21,13 @@ namespace SourceExpander
         /// <summary>
         /// constructor
         /// </summary>
-        public EmbeddedLoader(
+        internal EmbeddedLoader(
             CSharpCompilation compilation,
             CSharpParseOptions parseOptions,
+            ImmutableArray<EmbeddedData> embeddeds,
             ExpandConfig config,
             CancellationToken cancellationToken = default)
-            : this(compilation, parseOptions, config, ResolveEmbeddedData(compilation, cancellationToken), cancellationToken)
+            : this(compilation, parseOptions, config, ResolveEmbeddedData(compilation, embeddeds, cancellationToken), cancellationToken)
         {
         }
 
@@ -44,10 +45,10 @@ namespace SourceExpander
             this.container = container;
         }
 
-        private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, CancellationToken cancellationToken)
+        private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, ImmutableArray<EmbeddedData> embeddeds, CancellationToken cancellationToken)
         {
             var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken);
-            return new SourceFileContainer(embeddedDatas.Select(t => t.Data));
+            return new SourceFileContainer(embeddedDatas.Select(t => t.Data).Concat(embeddeds));
         }
 
 

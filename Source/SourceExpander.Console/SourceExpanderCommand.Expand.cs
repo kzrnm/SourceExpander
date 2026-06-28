@@ -38,12 +38,15 @@ partial struct SourceExpanderCommand
         if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
             throw new InvalidOperationException("Failed to get parseOptions");
 
+        var embedded = await GetAdditionalEmbeddedData(csProject, cancellationToken);
+
         var config = new ExpandConfig(
             matchFilePatterns: [new FileInfo(expand).FullName],
             staticEmbeddingText: staticEmbedding);
 
         var (_, code) = new EmbeddedLoader(csCompilation,
             parseOptions,
+            embedded,
             config,
             cancellationToken)
             .ExpandedCodes()
@@ -91,10 +94,13 @@ partial struct SourceExpanderCommand
         if (csProject.ParseOptions is not CSharpParseOptions parseOptions)
             throw new InvalidOperationException("Failed to get parseOptions");
 
+        var embedded = await GetAdditionalEmbeddedData(csProject, cancellationToken);
+
         var config = new ExpandConfig(staticEmbeddingText: staticEmbedding);
 
         var expanded = new EmbeddedLoader(csCompilation,
             parseOptions,
+            embedded,
             config,
             cancellationToken)
             .ExpandedCodes();

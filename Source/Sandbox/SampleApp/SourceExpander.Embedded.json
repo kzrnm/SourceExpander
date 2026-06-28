@@ -1,0 +1,20 @@
+{
+    "AssemblyName": "ac-library-csharp-override",
+    "Sources": [
+        {
+            "CodeBody": "namespace AtCoder { struct IntOperator{public int Add(int a, int b) => a + b; }}",
+            "Dependencies": [],
+            "FileName": "Acl>IntOperator.cs",
+            "TypeNames": [
+                "AtCoder.IntOperator"
+            ],
+            "Usings": []
+        }
+    ],
+    "EmbedderVersion": "1.0.0",
+    "CSharpVersion": "8",
+    "AllowUnsafe": false,
+    "EmbeddedNamespaces": [
+        "AtCoder"
+    ]
+}

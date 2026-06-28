@@ -5,28 +5,31 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander
-{
-    [Generator]
-    public partial class EmbedderGenerator : ISourceGenerator
-    {
-        private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
+namespace SourceExpander;
 
-        public void Initialize(GeneratorInitializationContext context)
+[Generator]
+public partial class EmbedderGenerator : ISourceGenerator
+{
+    private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
+
+    public void Initialize(GeneratorInitializationContext context)
+    {
+        context.RegisterForPostInitialization(ctx =>
         {
-            context.RegisterForPostInitialization(ctx =>
-            {
-                foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
-                    ctx.AddSource(hintName, sourceText);
-            });
-        }
-        public void Execute(GeneratorExecutionContext context)
-        {
-            var configFile = context.AdditionalFiles
-                .FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
-            var (config, diagnostic) = ParseAdditionalTextAndAnalyzerOptions(
-                configFile, context.AnalyzerConfigOptions.GlobalOptions, context.CancellationToken);
-            Execute(new GeneratorExecutionContextWrapper(context), (CSharpCompilation)context.Compilation, (CSharpParseOptions)context.ParseOptions, config, diagnostic);
-        }
+            foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
+                ctx.AddSource(hintName, sourceText);
+        });
+    }
+    public void Execute(GeneratorExecutionContext context)
+    {
+        var configFile = context.AdditionalFiles
+            .FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
+        var configBuilder = EmbedderConfig.LoadBuilder(configFile, context.AnalyzerConfigOptions.GlobalOptions);
+        Execute(
+            new GeneratorExecutionContextWrapper(context),
+            (CSharpCompilation)context.Compilation,
+            (CSharpParseOptions)context.ParseOptions,
+            context.AnalyzerConfigOptions.GlobalOptions,
+            configBuilder);
     }
 }

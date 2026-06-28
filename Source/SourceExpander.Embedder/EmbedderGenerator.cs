@@ -4,201 +4,196 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using SourceExpander.Roslyn;
 
-namespace SourceExpander
+namespace SourceExpander;
+
+public partial class EmbedderGenerator
 {
-    public partial class EmbedderGenerator
+    internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, AnalyzerConfigOptions analyzerConfigOptions, EmbedderConfig.Builder configBuilder)
     {
-        internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, EmbedderConfig config, ImmutableArray<Diagnostic> configDiagnostic)
+        try
         {
-            try
+            var config = ParseConfigWithDiagnostic(ctx, configBuilder, analyzerConfigOptions);
+
+            if (!compilation.SyntaxTrees.Any()) return;
+            if (!config.Enabled)
+                return;
+
+            const string SOURCE_EMBEDDING = nameof(SOURCE_EMBEDDING);
+            parseOptions = parseOptions.WithPreprocessorSymbols(parseOptions.PreprocessorSymbolNames.Concat([SOURCE_EMBEDDING]));
+
+            foreach (var tree in compilation.SyntaxTrees)
             {
-                foreach (var diag in configDiagnostic)
+                var root = (CSharpSyntaxNode)tree.GetRoot(ctx.CancellationToken);
+                if (new IfDirectiveWalker().VisitRoot(root))
                 {
-                    ctx.ReportDiagnostic(diag);
+                    var newTree = CSharpSyntaxTree.ParseText(root.ToFullString(), parseOptions, tree.FilePath, tree.Encoding, ctx.CancellationToken);
+                    compilation = compilation.ReplaceSyntaxTree(tree, newTree);
                 }
+            }
 
-                if (!compilation.SyntaxTrees.Any()) return;
-                if (!config.Enabled)
-                    return;
+            var resolver = new EmbeddingResolver(
+                compilation,
+                parseOptions,
+                ctx,
+                config,
+                ctx.CancellationToken);
+            var resolvedSources = resolver.ResolveFiles();
 
-                const string SOURCE_EMBEDDING = nameof(SOURCE_EMBEDDING);
-                parseOptions = parseOptions.WithPreprocessorSymbols(parseOptions.PreprocessorSymbolNames.Concat([SOURCE_EMBEDDING]));
+            if (resolvedSources.Length == 0)
+                return;
 
-                foreach (var tree in compilation.SyntaxTrees)
-                {
-                    var root = (CSharpSyntaxNode)tree.GetRoot(ctx.CancellationToken);
-                    if (new IfDirectiveWalker().VisitRoot(root))
-                    {
-                        var newTree = CSharpSyntaxTree.ParseText(root.ToFullString(), parseOptions, tree.FilePath, tree.Encoding, ctx.CancellationToken);
-                        compilation = compilation.ReplaceSyntaxTree(tree, newTree);
-                    }
-                }
+            ctx.AddSource(
+                "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
 
-                var resolver = new EmbeddingResolver(
-                    compilation,
-                    parseOptions,
-                    ctx,
-                    config,
-                    ctx.CancellationToken);
-                var resolvedSources = resolver.ResolveFiles();
-
-                if (resolvedSources.Length == 0)
-                    return;
-
+            if (config.EmbeddingSourceClassName != null)
                 ctx.AddSource(
-                    "EmbeddedSourceCode.Metadata.cs", CreateMetadataSource(resolver.EnumerateAssemblyMetadata()));
+                    "EmbeddingSourceClass.cs",
+                    CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClassName));
 
-                if (config.EmbeddingSourceClassName != null)
-                    ctx.AddSource(
-                        "EmbeddingSourceClass.cs",
-                        CreateEmbbedingSourceClass(resolvedSources, config.EmbeddingSourceClassName));
+            if (config.ExpandInLibrary)
+                ctx.AddSource("ExpandInLibrary.cs", ExpandInLibrary(resolvedSources));
 
-                if (config.ExpandInLibrary)
-                    ctx.AddSource("ExpandInLibrary.cs", ExpandInLibrary(resolvedSources));
-
-            }
-            catch (OperationCanceledException)
-            {
-                Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.ToString());
-                ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
-            }
         }
-
-        static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
+        catch (OperationCanceledException)
         {
-            StringBuilder sb = new();
-            sb.AppendLine("// <auto-generated/>");
-            sb.AppendLine("#pragma warning disable");
-            foreach (var (key, value) in metadatas)
-            {
-                sb.Append("[assembly: global::System.Reflection.AssemblyMetadataAttribute(")
-                  .Append(key.ToLiteral()).Append(",")
-                  .Append(value.ToLiteral())
-                  .AppendLine(")]");
-            }
-            return SourceText.From(sb.ToString(), Encoding.UTF8);
+            Trace.WriteLine(nameof(EmbedderGenerator) + "." + nameof(Execute) + "is Canceled.");
         }
-
-        static SourceText CreateEmbbedingSourceClass(
-            ImmutableArray<SourceFileInfo> sources,
-            string className)
+        catch (Exception e)
         {
-            StringBuilder sb = new();
-            sb.AppendLine("// <auto-generated/>");
-            sb.AppendLine("#pragma warning disable");
-
-            sb.AppendLine("namespace SourceExpander.Embedded{");
-            sb.AppendLine("using System;");
-            sb.AppendLine("using System.Collections.Generic;");
-            sb.AppendLine("public class " + className + "{");
-            sb.AppendLine("public class SourceFileInfo{");
-            sb.AppendLine("  public string FileName{get;set;}");
-            sb.AppendLine("  public string[] TypeNames{get;set;}");
-            sb.AppendLine("  public string[] Usings{get;set;}");
-            sb.AppendLine("  public string[] Dependencies{get;set;}");
-            sb.AppendLine("  public string CodeBody{get;set;}");
-            sb.AppendLine("}");
-            sb.AppendLine("  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{");
-            foreach (var source in sources)
-            {
-                sb.AppendLine("    new SourceFileInfo{");
-                if (source.FileName is { } fileName)
-                    sb.Append("      FileName = ").Append(fileName.ToLiteral()).AppendLine(",");
-                if (source.CodeBody is { } body)
-                    sb.Append("      CodeBody = ").Append(body.ToLiteral()).AppendLine(",");
-                if (source.TypeNames is { } typeNames)
-                {
-                    sb.AppendLine("      TypeNames = new string[]{");
-                    foreach (var ty in typeNames.Select(s => s.ToLiteral()))
-                        sb.Append("        ").Append(ty).AppendLine(",");
-                    sb.AppendLine("      },");
-                }
-                if (source.Usings is { } usings)
-                {
-                    sb.AppendLine("      Usings = new string[]{");
-                    foreach (var u in usings.OrderBy(s => s).Select(s => s.ToLiteral()))
-                        sb.Append("        ").Append(u).AppendLine(",");
-                    sb.AppendLine("      },");
-                }
-                if (source.Dependencies is { } deps)
-                {
-                    sb.AppendLine("      Dependencies = new string[]{");
-                    foreach (var d in deps.Select(s => s.ToLiteral()))
-                        sb.Append("        ").Append(d).AppendLine(",");
-                    sb.AppendLine("      },");
-                }
-                sb.AppendLine("    },");
-            }
-            sb.AppendLine("  };");
-            sb.AppendLine("}");
-            sb.AppendLine("}");
-            return SourceText.From(sb.ToString(), Encoding.UTF8);
+            Trace.WriteLine(e.ToString());
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.EMBED0001_UnknownError(e.Message));
         }
+    }
 
-        static SourceText ExpandInLibrary(ImmutableArray<SourceFileInfo> sources)
+    static SourceText CreateMetadataSource(IEnumerable<(string Key, string Value)> metadatas)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("// <auto-generated/>");
+        sb.AppendLine("#pragma warning disable");
+        foreach (var (key, value) in metadatas)
         {
-            StringBuilder sb = new();
-            StringBuilder inner = new();
-            var usings = new HashSet<string>();
-
-            sb.AppendLine("// <auto-generated/>");
-            sb.AppendLine("#pragma warning disable");
-            sb.AppendLine("namespace SourceExpander.Embedded.Expand{");
-            foreach (var s in sources)
-            {
-                usings.UnionWith(s.Usings);
-                inner.AppendLine(s.CodeBody);
-            }
-            foreach (var s in usings)
-                sb.AppendLine(s);
-            sb.AppendLine(inner.ToString());
-            sb.AppendLine("}");
-
-            return SourceText.From(sb.ToString(), Encoding.UTF8);
+            sb.Append("[assembly: global::System.Reflection.AssemblyMetadataAttribute(")
+              .Append(key.ToLiteral()).Append(",")
+              .Append(value.ToLiteral())
+              .AppendLine(")]");
         }
+        return SourceText.From(sb.ToString(), Encoding.UTF8);
+    }
 
-        internal static (EmbedderConfig Config, ImmutableArray<Diagnostic> Diagnostic)
-            ParseAdditionalTextAndAnalyzerOptions(AdditionalText? additionalText, AnalyzerConfigOptions analyzerConfigOptions, CancellationToken cancellationToken = default)
+    static SourceText CreateEmbbedingSourceClass(
+        ImmutableArray<SourceFileInfo> sources,
+        string className)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("// <auto-generated/>");
+        sb.AppendLine("#pragma warning disable");
+
+        sb.AppendLine("namespace SourceExpander.Embedded{");
+        sb.AppendLine("using System;");
+        sb.AppendLine("using System.Collections.Generic;");
+        sb.AppendLine("public class " + className + "{");
+        sb.AppendLine("public class SourceFileInfo{");
+        sb.AppendLine("  public string FileName{get;set;}");
+        sb.AppendLine("  public string[] TypeNames{get;set;}");
+        sb.AppendLine("  public string[] Usings{get;set;}");
+        sb.AppendLine("  public string[] Dependencies{get;set;}");
+        sb.AppendLine("  public string CodeBody{get;set;}");
+        sb.AppendLine("}");
+        sb.AppendLine("  public static readonly IReadOnlyList<SourceFileInfo> Files = new SourceFileInfo[]{");
+        foreach (var source in sources)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var isDesignTimeBuild = StringComparer.OrdinalIgnoreCase.Equals(
-                analyzerConfigOptions.GetOrNull("build_property.DesignTimeBuild"),
-                "true");
-            if (isDesignTimeBuild)
-                return (new EmbedderConfig(false), ImmutableArray<Diagnostic>.Empty);
-
-            cancellationToken.ThrowIfCancellationRequested();
-            try
+            sb.AppendLine("    new SourceFileInfo{");
+            if (source.FileName is { } fileName)
+                sb.Append("      FileName = ").Append(fileName.ToLiteral()).AppendLine(",");
+            if (source.CodeBody is { } body)
+                sb.Append("      CodeBody = ").Append(body.ToLiteral()).AppendLine(",");
+            if (source.TypeNames is { } typeNames)
             {
-                var config = EmbedderConfig.Parse(additionalText?.GetText(cancellationToken)?.ToString(), analyzerConfigOptions);
-                var diagnosticsBuilder = ImmutableArray.CreateBuilder<Diagnostic>();
+                sb.AppendLine("      TypeNames = new string[]{");
+                foreach (var ty in typeNames.Select(s => s.ToLiteral()))
+                    sb.Append("        ").Append(ty).AppendLine(",");
+                sb.AppendLine("      },");
+            }
+            if (source.Usings is { } usings)
+            {
+                sb.AppendLine("      Usings = new string[]{");
+                foreach (var u in usings.OrderBy(s => s).Select(s => s.ToLiteral()))
+                    sb.Append("        ").Append(u).AppendLine(",");
+                sb.AppendLine("      },");
+            }
+            if (source.Dependencies is { } deps)
+            {
+                sb.AppendLine("      Dependencies = new string[]{");
+                foreach (var d in deps.Select(s => s.ToLiteral()))
+                    sb.Append("        ").Append(d).AppendLine(",");
+                sb.AppendLine("      },");
+            }
+            sb.AppendLine("    },");
+        }
+        sb.AppendLine("  };");
+        sb.AppendLine("}");
+        sb.AppendLine("}");
+        return SourceText.From(sb.ToString(), Encoding.UTF8);
+    }
 
-                if (config.ObsoleteConfigProperties.Any())
+    static SourceText ExpandInLibrary(ImmutableArray<SourceFileInfo> sources)
+    {
+        StringBuilder sb = new();
+        StringBuilder inner = new();
+        var usings = new HashSet<string>();
+
+        sb.AppendLine("// <auto-generated/>");
+        sb.AppendLine("#pragma warning disable");
+        sb.AppendLine("namespace SourceExpander.Embedded.Expand{");
+        foreach (var s in sources)
+        {
+            usings.UnionWith(s.Usings);
+            inner.AppendLine(s.CodeBody);
+        }
+        foreach (var s in usings)
+            sb.AppendLine(s);
+        sb.AppendLine(inner.ToString());
+        sb.AppendLine("}");
+
+        return SourceText.From(sb.ToString(), Encoding.UTF8);
+    }
+
+    internal static EmbedderConfig
+        ParseConfigWithDiagnostic(IContextWrappter ctx, EmbedderConfig.Builder builder, AnalyzerConfigOptions analyzerConfigOptions)
+    {
+        ctx.CancellationToken.ThrowIfCancellationRequested();
+        var isDesignTimeBuild = StringComparer.OrdinalIgnoreCase.Equals(
+            analyzerConfigOptions.GetOrNull("build_property.DesignTimeBuild"),
+            "true");
+        if (isDesignTimeBuild)
+            return new EmbedderConfig(false);
+
+        ctx.CancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            var config = builder.Build(ctx.CancellationToken);
+
+            if (config.ObsoleteConfigProperties.Any())
+            {
+                foreach (var p in config.ObsoleteConfigProperties)
                 {
-                    foreach (var p in config.ObsoleteConfigProperties)
-                    {
-                        diagnosticsBuilder.Add(
-                            DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(additionalText?.Path, p.Name, p.Instead));
-                    }
+                    ctx.ReportDiagnostic(
+                        DiagnosticDescriptors.EMBED0011_ObsoleteConfigProperty(builder.SourceText?.Path, p.Name, p.Instead));
                 }
-                return (config, diagnosticsBuilder.ToImmutable());
             }
-            catch (ParseJsonException e)
-            {
-                return (new EmbedderConfig(), ImmutableArray.Create(DiagnosticDescriptors.EMBED0003_ParseConfigError(additionalText?.Path, e.Message)));
-            }
+            return config;
+        }
+        catch (ParseJsonException e)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.EMBED0003_ParseConfigError(builder.SourceText?.Path, e.Message));
+            return new EmbedderConfig();
         }
     }
 }
