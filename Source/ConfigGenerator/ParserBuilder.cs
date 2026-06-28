@@ -48,27 +48,27 @@ partial record {{Symbol.Name}}
     {
         static void SetObject(ref object? field, string? value)
         {
-            if(value is not null)
+            if(!string.IsNullOrWhiteSpace(value))
                 field = value;
         }
         static void SetObject(ref string? field, string? value)
         {
-            if(value is not null)
+            if(!string.IsNullOrWhiteSpace(value))
                 field = value;
         }
         static void SetBool(ref bool field, string? value)
         {
-            if(value is not null)
+            if(!string.IsNullOrWhiteSpace(value))
                 field = !global::System.StringComparer.OrdinalIgnoreCase.Equals(value, "false");
         }
         static void SetBool(ref bool? field, string? value)
         {
-            if(value is not null)
+            if(!string.IsNullOrWhiteSpace(value))
                 field = !global::System.StringComparer.OrdinalIgnoreCase.Equals(value, "false");
         }
         static void SetStringArray(ref string[]? field, string? value)
         {
-            if(value is not null)
+            if(!string.IsNullOrWhiteSpace(value))
                 field = value.Split(';').Select(t => t.Trim()).Where(t => t is {Length: not 0}).ToArray();
         }
         public {{Symbol.Name}} Build(global::System.Threading.CancellationToken cancellationToken)
