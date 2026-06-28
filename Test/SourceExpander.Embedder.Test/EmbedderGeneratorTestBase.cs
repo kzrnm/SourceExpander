@@ -11,6 +11,10 @@ namespace SourceExpander
         {
             public Test()
             {
+                AnalyzerConfigOptions.Add(
+                    typeof(EmbedderConfig.Builder).GetProperties()
+                        .Where(p => p.Name is not "SourceText")
+                        .Select(p => KeyValuePair.Create($"build_property.SourceExpander_Embedder_{p.Name}", "")));
                 ParseOptions = ParseOptions.WithLanguageVersion(EmbeddedLanguageVersionEnum);
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net100.AddPackages(Packages);
                 foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
