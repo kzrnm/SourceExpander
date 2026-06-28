@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.0.0] - 2026-06-28
+## Added
+- SourceExpander.Embedder: Add LanguageVersion to Embedder.Config
+- SourceExpander.Embedder: Warn if NotEmbeddingSourceAttribute is attached to property's accessor
+- SourceExpander.Embedder: Define SOURCE_EMBEDDING when embedding
+- SourceExpander.Console: Add embedded subcommand
+- SourceExpander.Embedder, SourceExpander.Generator: Add build properties `SourceExpander_Generator`, `SourceExpander_Embedder` and `SourceExpander`
+- Embedding other than Assembly attribute via SourceExpander.Embedded.json
+### Changed
+- Update libraries
+
 ## [8.3.0] - 2026-05-09
 ### Changed
 - SourceExpander.Embedder.Testing: Add JsonSerializerContext to JsonSerializer.Deserialize

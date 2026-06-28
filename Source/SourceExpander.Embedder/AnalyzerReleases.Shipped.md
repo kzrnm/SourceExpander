@@ -1,5 +1,12 @@
 ﻿; Shipped analyzer releases
 ; https://github.com/dotnet/roslyn-analyzers/blob/master/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+
+## Release 9.0.0
+### New Rules
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+EMBED0012 | Usage | Warning | The attribute cannot be used here
+
 ## Release 6.0.0
 
 ### Removed Rules
