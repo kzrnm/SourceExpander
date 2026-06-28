@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>SampleLibrary</RootNamespace>
-    <LangVersion>2</LangVersion>
+    <LangVersion>3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SourceExpander.Embedder">
+    <PackageReference Include="SourceExpander.Embedder" Version="$(SourceExpanderVersion)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -8,11 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\_SampleLibrary\_SampleLibrary.csproj" />
-	<ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj">
-		<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-		<OutputItemType>Analyzer</OutputItemType>
-	</ProjectReference>
-	<AdditionalFiles Include="SourceExpander.Embedder.Config.json" />
+    <PackageReference Include="SourceExpander.Embedder" Version="$(SourceExpanderVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
