@@ -84,7 +84,8 @@
             "default": "gzipBase32768",
             "enum": [
                 "raw",
-                "gzipBase32768"
+                "gzipBase32768",
+                "SingleMetadataJson"
             ]
         },
         "embedding-filename-type": {

@@ -11,7 +11,7 @@ namespace SourceExpander;
 /// <param name="Enabled">if true, embedder is enabled.</param>
 /// <param name="Include">Glob pattern of include files.</param>
 /// <param name="Exclude">Glob pattern of exclude files.</param>
-/// <param name="EmbeddingType">GZipBase32768 or Raw</param>
+/// <param name="EmbeddingType">Embedding format type.</param>
 /// <param name="ExcludeAttributes">Fully qualified name of the attribute used to exclude items from embedding.</param>
 /// <param name="MinifyLevel">Minify level of source code.</param>
 /// <param name="RemoveConditional">Remove method calls annotated with ConditionalAttribute whose argument is in <see cref="RemoveConditional"/>.</param>
@@ -150,6 +150,10 @@ public enum EmbeddingType
     /// Embed the JSON string as-is.
     /// </summary>
     Raw,
+    /// <summary>
+    /// Embed all metadata—including the source code—as a single JSON document.
+    /// </summary>
+    SingleMetadataJson,
 }
 
 /// <summary>
