@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander;
@@ -69,7 +70,7 @@ partial record {{Symbol.Name}}
         static void SetStringArray(ref string[]? field, string? value)
         {
             if(!string.IsNullOrWhiteSpace(value))
-                field = value.Split(';').Select(t => t.Trim()).Where(t => t is {Length: not 0}).ToArray();
+                field = value!.Split(';').Select(t => t.Trim()).Where(t => t is {Length: not 0}).ToArray();
         }
         public {{Symbol.Name}} Build(global::System.Threading.CancellationToken cancellationToken)
         {
