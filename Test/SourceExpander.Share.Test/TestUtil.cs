@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using Microsoft.CodeAnalysis;
 
 namespace SourceExpander.Share;
@@ -16,6 +17,14 @@ static class TestUtil
         }
     }
 
+    static bool EqualImmutableArray<T>(ImmutableArray<T> x, ImmutableArray<T> y, IEqualityComparer<T> equalityComparer = null)
+        => (x, y) switch
+        {
+            ({ IsDefault: true }, { IsDefault: var other }) => other,
+            ({ IsDefault: false }, { IsDefault: true }) => false,
+            ({ IsDefault: false }, { IsDefault: false }) => x.SequenceEqual(y, equalityComparer),
+        };
+
     public static IEqualityComparer<string> JsonEqualityComparer
         = EqualityComparer<string>.Create(
             (x, y) => JsonElement.DeepEquals(JsonElement.Parse(x), JsonElement.Parse(y)));
@@ -26,8 +35,8 @@ static class TestUtil
                 && x.EmbedderVersion == y.EmbedderVersion
                 && x.AllowUnsafe == y.AllowUnsafe
                 && x.CSharpVersion == y.CSharpVersion
-                && x.EmbeddedNamespaces.SequenceEqual(y.EmbeddedNamespaces)
-                && x.Sources.SequenceEqual(y.Sources, SourceFileInfoEqualityComparer));
+                && EqualImmutableArray(x.EmbeddedNamespaces, y.EmbeddedNamespaces)
+                && EqualImmutableArray(x.Sources, y.Sources, SourceFileInfoEqualityComparer));
     public static IEqualityComparer<SourceFileInfo> SourceFileInfoEqualityComparer
         = EqualityComparer<SourceFileInfo>.Create(
             (x, y) => x.FileName == y.FileName

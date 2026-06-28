@@ -47,7 +47,7 @@ namespace SourceExpander
                 if (symbol is null)
                     return (EmbeddedData.Empty, name, ImmutableArray<(string, string)>.Empty);
 
-                var (embedded, errors) = EmbeddedData.Create(
+                var (embedded, errors) = EmbeddedData.LoadFromMetadata(
                     symbol.Name,
                     symbol.GetAttributes()
                     .Select(GetAttributeSourceCode)

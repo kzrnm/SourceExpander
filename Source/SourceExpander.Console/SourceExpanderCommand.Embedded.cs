@@ -39,7 +39,7 @@ partial struct SourceExpanderCommand
         {
             assembly.CustomAttributes.RemoveAt(assembly.CustomAttributes.Count - 1);
         }
-        var (embeddedData, _) = EmbeddedData.Create(assembly.Name.Name, metadata);
+        var (embeddedData, _) = EmbeddedData.LoadFromMetadata(assembly.Name.Name, metadata);
 
         if (output is { Length: not 0 })
         {
