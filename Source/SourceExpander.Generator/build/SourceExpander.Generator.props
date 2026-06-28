@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <SourceExpander>true</SourceExpander>
     <SourceExpander_Generator>true</SourceExpander_Generator>
   </PropertyGroup>
 	<ItemGroup>
