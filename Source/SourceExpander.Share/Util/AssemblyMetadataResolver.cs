@@ -7,18 +7,13 @@ using Microsoft.CodeAnalysis;
 
 namespace SourceExpander
 {
-    internal class AssemblyMetadataResolver
+    internal class AssemblyMetadataResolver(Compilation compilation)
     {
-        private readonly Compilation compilation;
         private INamedTypeSymbol? _System_Reflection_AssemblyMetadataAttribute;
         private INamedTypeSymbol System_Reflection_AssemblyMetadataAttribute
             => _System_Reflection_AssemblyMetadataAttribute
             ??= compilation.GetTypeByMetadataName("System.Reflection.AssemblyMetadataAttribute")
             ?? throw new Exception("System.Reflection.AssemblyMetadataAttribute is not found");
-        public AssemblyMetadataResolver(Compilation compilation)
-        {
-            this.compilation = compilation;
-        }
 
         public ImmutableDictionary<string, string> GetAssemblyMetadata(ISymbol symbol)
             => ImmutableDictionary.CreateRange(

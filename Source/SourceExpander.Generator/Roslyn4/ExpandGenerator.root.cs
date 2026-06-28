@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,10 @@ public partial class ExpandGenerator : IIncrementalGenerator
             }
         });
 
+        var embeddedDataJsonsProvider = context.AdditionalTextsProvider
+            .Where(a => a.Path.EndsWith(EMBEDDED_FILE_NAME, StringComparison.OrdinalIgnoreCase))
+            .Collect();
+
         var configProvider
             = context.AdditionalTextsProvider
             .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
@@ -44,18 +49,21 @@ public partial class ExpandGenerator : IIncrementalGenerator
 
         var source = context.CompilationProvider
             .Combine(context.ParseOptionsProvider)
+            .Combine(embeddedDataJsonsProvider)
             .Combine(configProvider);
 
         context.RegisterImplementationSourceOutput(source, Execute);
     }
 
-    private void Execute(SourceProductionContext ctx, ((Compilation, ParseOptions), (AnalyzerConfigOptions, ExpandConfig.Builder)) source)
+    private void Execute(SourceProductionContext ctx, (((Compilation, ParseOptions), ImmutableArray<AdditionalText>), (AnalyzerConfigOptions, ExpandConfig.Builder)) source)
     {
-        var ((compilation, parseOptions), (analyzerConfigOptions, configBuilder)) = source;
+        var (((compilation, parseOptions), emmbeddedDataJsons), (analyzerConfigOptions, configBuilder)) = source;
         Execute(
             new SourceProductionContextWrappter(ctx),
             (CSharpCompilation)compilation,
             (CSharpParseOptions)parseOptions,
-            analyzerConfigOptions, configBuilder);
+            analyzerConfigOptions,
+            emmbeddedDataJsons,
+            configBuilder);
     }
 }

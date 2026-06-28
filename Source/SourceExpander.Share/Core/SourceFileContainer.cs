@@ -23,7 +23,8 @@ namespace SourceExpander
             {
                 foreach (var sf in embedded.Sources)
                 {
-                    if (sf.FileName == null) throw new ArgumentException($"({nameof(sf.FileName)} is null");
+                    if (sf.FileName == null)
+                        throw new ArgumentException($"{nameof(sf.FileName)} is null");
                     if (_sourceFiles.ContainsKey(sf.FileName))
                         throw new ArgumentException($"duplicate {nameof(sf.FileName)}: {sf.FileName}");
                     _sourceFiles.Add(sf.FileName, sf);
@@ -68,20 +69,21 @@ namespace SourceExpander
         /// </summary>
         /// <returns></returns>
         public IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<INamedTypeSymbol> typeNames, CancellationToken cancellationToken = default)
-            => ResolveDependency(
-                typeNames.SelectMany(type => _sourceFilesByTypeName.TryGetValue(type.ToDisplayString(), out var list) ? list : Enumerable.Empty<SourceFileInfo>()),
-                cancellationToken);
-        private IEnumerable<SourceFileInfo> ResolveDependency(IEnumerable<SourceFileInfo> origs, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var result = new Dictionary<string, SourceFileInfo>();
             var fileNameQueue = new Queue<string>();
 
             cancellationToken.ThrowIfCancellationRequested();
-            foreach (var s in origs)
+            foreach (var type in typeNames)
             {
-                if (s.FileName == null) throw new ArgumentException($"({nameof(s.FileName)} is null");
-                result[s.FileName] = s;
+                if (_sourceFilesByTypeName.TryGetValue(type.ToDisplayString(), out var list))
+                    foreach (var s in list)
+                    {
+                        if (s.FileName == null)
+                            throw new ArgumentException($"({nameof(s.FileName)} is null");
+                        result[s.FileName] = s;
+                    }
             }
             foreach (var d in result.Values.SelectMany(s => s.Dependencies))
                 if (!result.ContainsKey(d))

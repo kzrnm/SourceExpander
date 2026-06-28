@@ -26,10 +26,16 @@ partial struct SourceExpanderCommand
         if (!targetInfo.Exists)
             throw new ArgumentException("File does not exist.", nameof(target));
         var project = targetInfo.Extension == ".csproj" ? targetInfo.FullName : PathUtil.GetProjectPath(target);
-        var (compilation, _) = await GetCompilation(project, cancellationToken: cancellationToken);
+        var (compilation, csProject) = await GetCompilation(project, cancellationToken: cancellationToken);
 
         if (compilation == null)
             throw new InvalidOperationException("Failed to get compilation");
+
+        var embedded = await GetAdditionalEmbeddedData(csProject, cancellationToken);
+        foreach (var e in embedded)
+        {
+            Output.WriteLine($"{e.AssemblyName},{e.EmbedderVersion}");
+        }
 
         var metadataResolver = new AssemblyMetadataResolver(compilation);
         foreach (var symbol in compilation.References

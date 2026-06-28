@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ public partial class ExpandGenerator
         CSharpCompilation compilation,
         CSharpParseOptions parseOptions,
         AnalyzerConfigOptions analyzerConfigOptions,
-        //ImmutableArray<EmbeddedData> embeddedData,
+        ImmutableArray<AdditionalText> embeddedDataJsons,
         ExpandConfig.Builder configBuilder)
     {
         try
@@ -32,8 +33,28 @@ public partial class ExpandGenerator
             if (parseOptions is { LanguageVersion: <= LanguageVersion.CSharp3 })
                 return;
 
+            var embeddedDataBuilder = ImmutableArray.CreateBuilder<EmbeddedData>();
+            foreach (var additionalText in embeddedDataJsons)
+                if (additionalText.GetText(ctx.CancellationToken) is { } sourceText)
+                {
+                    try
+                    {
+                        var obj = JsonUtil.ParseJson<EmbeddedData>(sourceText);
+                        if (obj is not null)
+                            embeddedDataBuilder.Add(obj);
+                    }
+                    catch (ParseJsonException)
+                    {
+                        ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0011_InvalidEmbeddedData(additionalText.Path));
+                    }
+                }
+
             ctx.CancellationToken.ThrowIfCancellationRequested();
-            var loader = new EmbeddedLoaderWithDiagnostic(compilation, parseOptions, ctx, config, ctx.CancellationToken);
+            var loader = new EmbeddedLoaderWithDiagnostic(
+                compilation,
+                parseOptions,
+                embeddedDataBuilder.ToImmutable(),
+                ctx, config, ctx.CancellationToken);
             if (loader.IsEmbeddedEmpty)
                 ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());
 

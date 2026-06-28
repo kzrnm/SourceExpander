@@ -63,6 +63,7 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFind(int n) : base(n) { Foo(); }  void Foo() => Bar(); public bool Try(out string? text) { if (this.Size(0) == 1) { text = "Single"; return true; }  text = null; return false; }  partial void Bar(); } }
+namespace AtCoder{}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
@@ -129,6 +130,7 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFind(int n) : base(n) { Foo(); }  void Foo() => Bar(); public bool Try(out string? text) { if (this.Size(0) == 1) { text = "Single"; return true; }  text = null; return false; }  partial void Bar(); } }
+namespace AtCoder{}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());

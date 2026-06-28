@@ -12,6 +12,7 @@ public class CommandLibraryListTests
 
         await sw.ToString().ReplaceLineEndings().Should().BeEqualTo(
 $"""
+ac-library-csharp-override,1.0.0
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
 
 """.ReplaceLineEndings());
@@ -26,6 +27,7 @@ SampleLibrary,{AssemblyUtil.AssemblyVersion}
 
         await sw.ToString().ReplaceLineEndings().Should().BeEqualTo(
 $"""
+ac-library-csharp-override,1.0.0
 ac-library-csharp,7.0.0.100
 SampleLibrary,{AssemblyUtil.AssemblyVersion}
 

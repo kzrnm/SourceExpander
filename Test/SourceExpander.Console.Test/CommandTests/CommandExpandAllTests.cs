@@ -35,6 +35,7 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFind(int n) : base(n) { Foo(); }  void Foo() => Bar(); public bool Try(out string? text) { if (this.Size(0) == 1) { text = "Single"; return true; }  text = null; return false; }  partial void Bar(); } }
+namespace AtCoder{}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
@@ -55,6 +56,27 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 namespace SampleLibrary { public static unsafe class UnsafeBlock { public static ulong Convert(double d) { double* p = &d; return *(ulong*)p; } } }
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+
+""".ReplaceLineEndings());
+
+        await dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program3.cs")].ExpandedCode.ReplaceLineEndings().Should().BeEqualTo("""
+using AtCoder;
+using System;
+namespace SampleApp.Acl
+{
+    class Program3
+    {
+        static void Main()
+        {
+#pragma warning disable CS0618
+            Console.WriteLine(new IntOperator().Add(2, 1));
+#pragma warning restore CS0618
+        }
+    }
+}
+#region Expanded by https://github.com/kzrnm/SourceExpander
+namespace AtCoder { struct IntOperator{public int Add(int a, int b) => a + b; }}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
@@ -91,6 +113,7 @@ namespace SampleApp
 #region Expanded by https://github.com/kzrnm/SourceExpander
 /* 🥇 */
 namespace SampleLibrary { public partial class UnionFind : Dsu { public UnionFind(int n) : base(n) { Foo(); }  void Foo() => Bar(); public bool Try(out string? text) { if (this.Size(0) == 1) { text = "Single"; return true; }  text = null; return false; }  partial void Bar(); } }
+namespace AtCoder{}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
@@ -112,6 +135,28 @@ namespace SampleApp
 #region Expanded by https://github.com/kzrnm/SourceExpander
 /* 🥇 */
 namespace SampleLibrary { public static unsafe class UnsafeBlock { public static ulong Convert(double d) { double* p = &d; return *(ulong*)p; } } }
+#endregion Expanded by https://github.com/kzrnm/SourceExpander
+
+""".ReplaceLineEndings());
+
+        await dic[Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program3.cs")].ExpandedCode.ReplaceLineEndings().Should().BeEqualTo("""
+using AtCoder;
+using System;
+namespace SampleApp.Acl
+{
+    class Program3
+    {
+        static void Main()
+        {
+#pragma warning disable CS0618
+            Console.WriteLine(new IntOperator().Add(2, 1));
+#pragma warning restore CS0618
+        }
+    }
+}
+#region Expanded by https://github.com/kzrnm/SourceExpander
+/* 🥇 */
+namespace AtCoder { struct IntOperator{public int Add(int a, int b) => a + b; }}
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,9 @@ public partial class ExpandGenerator : ISourceGenerator
                SourceText.From(EmbeddingCore.SourceCodeClassCode, new UTF8Encoding(false)));
         }
 
+        var embeddedDataJsons = context.AdditionalFiles
+            .Where(a => a.Path.EndsWith(EMBEDDED_FILE_NAME, StringComparison.OrdinalIgnoreCase))
+            .ToImmutableArray();
 
         var configFile = context.AdditionalFiles
             .FirstOrDefault(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0);
@@ -37,6 +41,7 @@ public partial class ExpandGenerator : ISourceGenerator
             (CSharpCompilation)context.Compilation,
             (CSharpParseOptions)context.ParseOptions,
             context.AnalyzerConfigOptions.GlobalOptions,
+            embeddedDataJsons,
             configBuilder);
     }
 }

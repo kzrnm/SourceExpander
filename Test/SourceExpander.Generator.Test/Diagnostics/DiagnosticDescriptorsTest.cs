@@ -57,6 +57,7 @@ public abstract class DiagnosticDescriptorsTestBase
             .GetMessage(FormatProvider)
             .Should().BeEqualTo(FormatProvider.Name switch
             {
+                "ja-JP" => "C# 3 以上である必要があります",
                 _ => "Need C# 3 or later",
             });
     }
@@ -78,6 +79,7 @@ public abstract class DiagnosticDescriptorsTestBase
             .GetMessage(FormatProvider)
             .Should().BeEqualTo(FormatProvider.Name switch
             {
+                "ja-JP" => "設定ファイルのエラー: Path: /home/source/SourceExpander.Generator.Config.json, Message: any error",
                 _ => "Error config file: Path: /home/source/SourceExpander.Generator.Config.json, Message: any error",
             });
     }
@@ -88,6 +90,7 @@ public abstract class DiagnosticDescriptorsTestBase
             .GetMessage(FormatProvider)
             .Should().BeEqualTo(FormatProvider.Name switch
             {
+                "ja-JP" => "埋め込みデータが不正: Anotherlib, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.",
                 _ => "Invalid embedded data: Anotherlib, Key: SourceExpander.EmbeddedSourceCode, Message: There was an error deserializing the object of type SourceExpander.SourceFileInfo[]. Encountered unexpected character '}'.",
             });
     }
@@ -98,6 +101,7 @@ public abstract class DiagnosticDescriptorsTestBase
             .GetMessage(FormatProvider)
             .Should().BeEqualTo(FormatProvider.Name switch
             {
+                "ja-JP" => "MetadataEmbeddingFile が見つかりません: name: Program.cs",
                 _ => "MetadataEmbeddingFile is not found: name: Program.cs",
             });
     }
@@ -108,7 +112,19 @@ public abstract class DiagnosticDescriptorsTestBase
             .GetMessage(FormatProvider)
             .Should().BeEqualTo(FormatProvider.Name switch
             {
+                "ja-JP" => "展開後のコードに unsafe ブロックがあります: /home/mine/P.cs",
                 _ => "Expanded code has unsafe block: /home/mine/P.cs",
+            });
+    }
+    [Test]
+    public async Task EXPAND0011()
+    {
+        await DiagnosticDescriptors.EXPAND0011_InvalidEmbeddedData("/home/mine/SourceExpander.Embedded.json")
+            .GetMessage(FormatProvider)
+            .Should().BeEqualTo(FormatProvider.Name switch
+            {
+                "ja-JP" => "SourceExpander.Embedded.json が不正です: '/home/mine/SourceExpander.Embedded.json'",
+                _ => "SourceExpander.Embedded.json is invalid: '/home/mine/SourceExpander.Embedded.json'",
             });
     }
 }

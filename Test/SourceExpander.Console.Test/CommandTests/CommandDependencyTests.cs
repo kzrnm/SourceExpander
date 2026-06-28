@@ -28,6 +28,11 @@ public class CommandDependencyTests
             ["SampleLibrary>nsafeBlock.cs"],
             []));
 
+        await dic.ShouldContainKeyAndValue(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program3.cs"),
+            new(Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleApp", "Program3.cs"),
+            ["Acl>IntOperator.cs"],
+            []));
+
         await dic.Should().NotContainKey("ac-library-csharp>Graph/Dsu.cs");
 
         // `Un` is common prefix!

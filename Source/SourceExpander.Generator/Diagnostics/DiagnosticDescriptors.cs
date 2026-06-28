@@ -98,5 +98,14 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
+        public static Diagnostic EXPAND0011_InvalidEmbeddedData(string fileName)
+             => Diagnostic.Create(EXPAND0011_InvalidEmbeddedData_Descriptor, Location.None, fileName);
+        private static readonly DiagnosticDescriptor EXPAND0011_InvalidEmbeddedData_Descriptor = new(
+            "EXPAND0011",
+            ResourceString(nameof(DiagnosticsResources.EXPAND0011_Title)),
+            ResourceString(nameof(DiagnosticsResources.EXPAND0011_Body)),
+            "Error",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

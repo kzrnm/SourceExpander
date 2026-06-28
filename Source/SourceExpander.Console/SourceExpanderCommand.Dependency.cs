@@ -71,11 +71,15 @@ partial struct SourceExpanderCommand
                 Dependencies: t.Dependencies,
                 TypeNames: t.TypeNames
             ));
+
+        var embedded = await GetAdditionalEmbeddedData(csProject, cancellationToken);
+
         if (metadatas.FirstOrDefault(t => t.Name == compilation.AssemblyName) is not { Data.Sources.Length: > 0 })
         {
             infos = infos.Concat(
                 new EmbeddedLoader(csCompilation,
                 parseOptions,
+                embedded,
                 new ExpandConfig(),
                 cancellationToken)
                 .Dependencies()
