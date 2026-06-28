@@ -1,0 +1,16 @@
+{
+  "AssemblyName": "_SampleLibraryOverride",
+  "Sources": [
+    {
+      "CodeBody": "namespace Dummy{}",
+      "Dependencies": [],
+      "FileName": "_SampleLibrary>Other>Metadata.cs",
+      "TypeNames": [ "SampleLibrary.Put2" ],
+      "Usings": [ "using System.Reflection;" ]
+    }
+  ],
+  "EmbedderVersion": "9.0.0.3",
+  "CSharpVersion": "3",
+  "AllowUnsafe": false,
+  "EmbeddedNamespaces": [ "SampleLibrary" ]
+}

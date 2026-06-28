@@ -1,7 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/kzrnm/SourceExpander/master/schema/embedder.schema.json",
   "minify-level": "default",
-  "embedding-source-class-name": "hoge",
   "exclude-attributes": [
     "System.Diagnostics.DebuggerBrowsableAttribute",
     "System.Diagnostics.DebuggerDisplayAttribute",
