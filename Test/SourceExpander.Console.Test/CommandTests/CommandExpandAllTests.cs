@@ -9,7 +9,7 @@ public class CommandExpandAllTests
     public async Task ExpandAll(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, cancellationToken: cancellationToken);
 
         var obj = JsonSerializer.Deserialize<ExpandAllObject[]>(sw.ToString());
@@ -86,7 +86,7 @@ namespace AtCoder { struct IntOperator{public int Add(int a, int b) => a + b; }}
     public async Task ExpandAllWithStaticEmbedding(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         await new SourceExpanderCommand { Stdout = sw }.ExpandAll(project, staticEmbedding: "/* 🥇 */", cancellationToken: cancellationToken);
 
         var obj = JsonSerializer.Deserialize<ExpandAllObject[]>(sw.ToString());

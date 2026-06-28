@@ -7,7 +7,7 @@ public class CommandLibraryListTests
     public async Task LibraryListSampleAppSkipAtcoder(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         await new SourceExpanderCommand { Stdout = sw }.LibraryList(project, cancellationToken: cancellationToken);
 
         await sw.ToString().ReplaceLineEndings().Should().BeEqualTo(

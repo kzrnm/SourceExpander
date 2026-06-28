@@ -18,7 +18,5 @@
   <ItemGroup>
     <Compile Remove="tools/**" />
     <None Remove="tools/**" />
-    <None Include="tools/*.csproj" />
-    <None Include="tools/Directory.Build.props" />
   </ItemGroup>
 </Project>

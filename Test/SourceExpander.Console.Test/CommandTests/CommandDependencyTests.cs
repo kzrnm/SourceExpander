@@ -9,7 +9,7 @@ public class CommandDependencyTests
     public async Task DependencySampleAppSkipAtcoder(CancellationToken cancellationToken)
     {
         using var sw = new StringWriter();
-        var project = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleAppSkipAtcoder.csproj");
+        var project = Path.Combine(TestUtil.SourceDirectory, "Sandbox", "SampleAppSkipAtcoder", "SampleAppSkipAtcoder.csproj");
         await new SourceExpanderCommand { Stdout = sw }.Dependency(project, cancellationToken: cancellationToken);
 
         var obj = JsonSerializer.Deserialize<DependencyResult[]>(sw.ToString());
