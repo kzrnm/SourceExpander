@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../SourceExpander.Generator/build/SourceExpander.Generator.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,16 +7,6 @@
     <SourceExpander_Generator_ExpandingPosition>AfterUsings</SourceExpander_Generator_ExpandingPosition>
     <SourceExpander_Generator_ExpandingAll>false</SourceExpander_Generator_ExpandingAll>
   </PropertyGroup>
-
-  <ItemGroup>
-    <CompilerVisibleProperty Include="SourceExpander_Generator_Enabled" />
-    <CompilerVisibleProperty Include="SourceExpander_Generator_MatchFilePattern" />
-    <CompilerVisibleProperty Include="SourceExpander_Generator_MetadataExpandingFile" />
-    <CompilerVisibleProperty Include="SourceExpander_Generator_IgnoreFilePatternRegex" />
-    <CompilerVisibleProperty Include="SourceExpander_Generator_StaticEmbeddingText" />
-    <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingAll" />
-    <CompilerVisibleProperty Include="SourceExpander_Generator_ExpandingPosition" />
-  </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="SourceExpander.Embedded.json" />
@@ -30,4 +21,5 @@
     <StartupObject>SampleApp.Program</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <Import Project="../../SourceExpander.Generator/build/SourceExpander.Generator.targets" />
 </Project>

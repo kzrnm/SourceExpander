@@ -32,7 +32,7 @@
     },
     "Embedded": {
       "commandName": "Project",
-      "commandLineArgs": "embedded ../Sandbox/SampleLibrary/bin/Debug/net10.0/SampleLibrary.dll --output ../Sandbox/SampleLibrary/bin/Debug/net10.0/SampleLibrary2.dll",
+      "commandLineArgs": "embedded ../Sandbox/SampleLibrary/bin/Debug/net10.0/SampleLibrary.dll",
       "workingDirectory": "$(ProjectDir)"
     },
     "no args": {
