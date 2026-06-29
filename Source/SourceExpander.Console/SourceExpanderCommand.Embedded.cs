@@ -13,12 +13,11 @@ partial struct SourceExpanderCommand
     /// Show the embedded data.
     /// </summary>
     /// <param name="target">Target DLL file.</param>
-    /// <param name="output">Output path for the DLL with the SourceExpander metadata removed.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
     [Command("embedded")]
-    public async Task Embedded([Argument] string target, string? output = null)
+    public async Task Embedded([Argument] string target)
     {
         using var assembly = AssemblyDefinition.ReadAssembly(target);
         var metadata = new List<KeyValuePair<string, string>>();
@@ -40,13 +39,6 @@ partial struct SourceExpanderCommand
             assembly.CustomAttributes.RemoveAt(assembly.CustomAttributes.Count - 1);
         }
         var (embeddedData, _) = EmbeddedData.LoadFromMetadata(assembly.Name.Name, metadata);
-
-        if (output is { Length: not 0 })
-        {
-            if (Path.GetDirectoryName(output) is string dir)
-                Directory.CreateDirectory(dir);
-            assembly.Write(output);
-        }
 
         Output.WriteLine(JsonUtil.ToJson(embeddedData));
     }

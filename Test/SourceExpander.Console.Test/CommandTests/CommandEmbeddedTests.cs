@@ -7,13 +7,11 @@ public class CommandEmbeddedTests
 {
 
     [Test]
-    [Arguments(null)]
-    [Arguments("./SampleLibraryRemovedMetadata.dll")]
-    public async Task Embedded(string? output)
+    public async Task Embedded()
     {
         using var sw = new StringWriter();
         var dllFile = Path.Combine(TestUtil.TestProjectDirectory, "tools", "SampleLibrary.dll");
-        await new SourceExpanderCommand { Stdout = sw }.Embedded(dllFile, output: output);
+        await new SourceExpanderCommand { Stdout = sw }.Embedded(dllFile);
 
         await JsonElement.DeepEquals(JsonElement.Parse(sw.ToString()), JsonElement.Parse(
         """
@@ -48,23 +46,5 @@ public class CommandEmbeddedTests
             ]
         }
         """)).Should().BeTrue();
-
-        if (output is not null)
-        {
-            sw.GetStringBuilder().Clear();
-            await Path.Exists(output).Should().BeTrue();
-            await new SourceExpanderCommand { Stdout = sw }.Embedded(output);
-            await JsonElement.DeepEquals(JsonElement.Parse(sw.ToString()), JsonElement.Parse(
-            """
-            {
-                "AssemblyName": "SampleLibrary",
-                "EmbedderVersion": "1.0.0",
-                "CSharpVersion": "1",
-                "AllowUnsafe": false,
-                "EmbeddedNamespaces": [],
-                "Sources": []
-            }
-            """)).Should().BeTrue();
-        }
     }
 }
