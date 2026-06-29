@@ -31,8 +31,12 @@ public class EmbedderGeneratorTestBase : GeneratorTestBase<EmbedderGenerator>
             metadata.AddRange(
                 AssemblyMetadataAttribute("SourceExpander.EmbedderVersion", p.EmbedderVersion ?? EmbedderVersion),
                 AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion", p.EmbeddedLanguageVersion ?? EmbeddedLanguageVersion),
-                AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces", string.Join(",", p.EmbeddedNamespaces ?? [])),
-                AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode", p.EmbeddedSourceCode));
+                AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces", p.EmbeddedNamespaces ?? ""));
+
+            if (p.EmbeddedSourceCode is not null)
+                metadata.Add(AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode", p.EmbeddedSourceCode));
+            if (p.EmbeddedSourceCodeGZip is not null)
+                metadata.Add(AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode.GZipBase32768", SourceFileInfoUtil.ToGZipBase32768(p.EmbeddedSourceCodeGZip)));
 
             TestState.GeneratedSources.Add(
                 (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", EnvironmentUtil.JoinByStringBuilder(metadata))
@@ -43,11 +47,12 @@ public class EmbedderGeneratorTestBase : GeneratorTestBase<EmbedderGenerator>
     }
 
     public record TestParams(
-        bool AllowUnsafe = false,
         string EmbedderVersion = null,
         string EmbeddedLanguageVersion = null,
-        IEnumerable<string> EmbeddedNamespaces = null,
-        [property: StringSyntax("json")][param: StringSyntax("json")] string EmbeddedSourceCode = null);
+        string EmbeddedNamespaces = null,
+        [property: StringSyntax("json")][param: StringSyntax("json")] string EmbeddedSourceCode = null,
+        string EmbeddedSourceCodeGZip = null,
+        bool AllowUnsafe = false);
 
     public static string EmbedderVersion => typeof(EmbedderGenerator).Assembly.GetName().Version.ToString();
     public static string EmbeddedLanguageVersion => "preview";
