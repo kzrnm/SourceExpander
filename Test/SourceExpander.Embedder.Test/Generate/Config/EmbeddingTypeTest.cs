@@ -1,7 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Reflection;
-using System.Text;
-using Microsoft.CodeAnalysis;
 
 namespace SourceExpander.Generate.Config;
 
