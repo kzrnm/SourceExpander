@@ -8,7 +8,8 @@ public class DefaultTest : EmbedderGeneratorTestBase
     public async Task MinifyRaw(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main()=>Console.WriteLine(0);}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -16,9 +17,8 @@ public class DefaultTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main()=>Console.WriteLine(0);}"""
-             ));
-
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(0);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             ),
+        ]);
 
         var test = new Test
         {
@@ -53,17 +53,14 @@ public class DefaultTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task Generate(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768("[{\"CodeBody\":\"class Program { static void Main() => Console.WriteLine(0); }\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]");
+        await SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode).Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -71,9 +68,8 @@ public class DefaultTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;"),
                  ImmutableArray<string>.Empty,
                  """class Program { static void Main() => Console.WriteLine(0); }"""
-             ));
-
-        string embeddedSourceCode = SourceFileInfoUtil.ToGZipBase32768("[{\"CodeBody\":\"class Program { static void Main() => Console.WriteLine(0); }\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]");
+             ),
+        ]);
 
         var test = new Test
         {
@@ -110,11 +106,5 @@ public class DefaultTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(
-            SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(
-            SourceFileInfoUtil.FromGZipBase32768(embeddedSourceCode))
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

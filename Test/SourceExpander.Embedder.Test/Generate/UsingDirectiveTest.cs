@@ -10,7 +10,8 @@ public class UsingDirectiveTest : EmbedderGeneratorTestBase
     public async Task Generate(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using List = System.Collections.Generic.List<int>;\",\"using System;\",\"using static System.Math;\"]}]";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -18,9 +19,8 @@ public class UsingDirectiveTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using List = System.Collections.Generic.List<int>;", "using System;", "using static System.Math;"),
                  ImmutableArray<string>.Empty,
                  "class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}"
-             ));
-
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(0);static List L(int x,int y)=>new List(Min(x,y));}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using List = System.Collections.Generic.List<int>;\",\"using System;\",\"using static System.Math;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -64,9 +64,5 @@ class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

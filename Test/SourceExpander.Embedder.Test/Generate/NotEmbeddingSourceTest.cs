@@ -10,7 +10,8 @@ public class NotEmbeddingSourceTest : EmbedderGeneratorTestBase
     public async Task Generate(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray.Create("Test,Test.F,Test.I");
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Test.F{public enum NumType{Zero,Pos,Neg,}}","Dependencies":[],"FileName":"TestProject>F/NumType.cs","TypeNames":["Test.F.NumType"],"Usings":[]},{"CodeBody":"namespace Test.I{public record IntRecord(int n);[System.Diagnostics.DebuggerDisplay(\"TEST\")]class D<T>:IComparer<T>{public int Compare(T x,T y)=>throw new NotImplementedException();[System.Diagnostics.Conditional(\"TEST\")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}void OuterMethod(){}}}","Dependencies":["TestProject>Put.cs"],"FileName":"TestProject>I/D.cs","TypeNames":["Test.I.D<T>","Test.I.IntRecord"],"Usings":["using System;","using System.Collections.Generic;","using System.Diagnostics;"]},{"CodeBody":"namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}","Dependencies":[],"FileName":"TestProject>Put.cs","TypeNames":["Test.Put","Test.Put.Nested"],"Usings":["using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
                new SourceFileInfo
                (
                    "TestProject>F/NumType.cs",
@@ -37,9 +38,9 @@ public class NotEmbeddingSourceTest : EmbedderGeneratorTestBase
                    ImmutableArray<string>.Empty,
                    // lang=C#
                    "namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}"
-               ));
+               )
+        ]);
 
-        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Test.F{public enum NumType{Zero,Pos,Neg,}}\",\"Dependencies\":[],\"FileName\":\"TestProject>F/NumType.cs\",\"TypeNames\":[\"Test.F.NumType\"],\"Usings\":[]},{\"CodeBody\":\"namespace Test.I{public record IntRecord(int n);[System.Diagnostics.DebuggerDisplay(\\\"TEST\\\")]class D<T>:IComparer<T>{public int Compare(T x,T y)=>throw new NotImplementedException();[System.Diagnostics.Conditional(\\\"TEST\\\")]public static void WriteType(){Console.Write(typeof(T).FullName);Trace.Write(typeof(T).FullName);Put.Nested.Write(typeof(T).FullName);}void OuterMethod(){}}}\",\"Dependencies\":[\"TestProject>Put.cs\"],\"FileName\":\"TestProject>I/D.cs\",\"TypeNames\":[\"Test.I.D<T>\",\"Test.I.IntRecord\"],\"Usings\":[\"using System;\",\"using System.Collections.Generic;\",\"using System.Diagnostics;\"]},{\"CodeBody\":\"namespace Test{static class Put{public class Nested{public static void Write(string v){Debug.WriteLine(v);}}}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Put.cs\",\"TypeNames\":[\"Test.Put\",\"Test.Put.Nested\"],\"Usings\":[\"using System.Diagnostics;\"]}]";
         var test = new Test
         {
             TestState =
@@ -165,17 +166,14 @@ namespace Test.F
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task PropertyAccessor(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{public int Value{get;set;}}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":[]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -185,8 +183,8 @@ namespace Test.F
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  "class Program{public int Value{get;set;}}"
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{public int Value{get;set;}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -228,17 +226,14 @@ class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task PartialClass(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"partial class Program{static void Main()=>Console.WriteLine(1);}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -248,8 +243,8 @@ class Program
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  "partial class Program{static void Main()=>Console.WriteLine(1);}"
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"partial class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -293,17 +288,14 @@ partial class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task PartialMethod(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"partial class Program{static void Main()=>Console.WriteLine(1);}partial class Program{public partial void PartialMethod(){}}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -313,8 +305,8 @@ partial class Program
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  "partial class Program{static void Main()=>Console.WriteLine(1);}partial class Program{public partial void PartialMethod(){}}"
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"partial class Program{static void Main()=>Console.WriteLine(1);}partial class Program{public partial void PartialMethod(){}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -359,10 +351,6 @@ partial class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
@@ -382,7 +370,8 @@ partial class Program
     public async Task Generic(string impl, CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main()=>Console.WriteLine(1);}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -392,8 +381,8 @@ partial class Program
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  "class Program{static void Main()=>Console.WriteLine(1);}"
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -433,9 +422,5 @@ class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

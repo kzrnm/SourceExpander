@@ -10,7 +10,8 @@ public class LibraryImportTest : EmbedderGeneratorTestBase
     public async Task Generate(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = "[{\"CodeBody\":\"public static partial class UnixConsole{public static int Write(ReadOnlySpan<byte>buffer){if(_init){SystemNative_InitializeTerminalAndSignalHandling();_init=false;}return SystemNative_Write(OUT,buffer,buffer.Length);}public static int Read(Span<byte>buffer)=>SystemNative_Read(IN,buffer,buffer.Length);static bool _init=true;const string libNative=\\\"libSystem.Native\\\";static readonly SafeFileHandle IN=new(0,false);static readonly SafeFileHandle OUT=new(1,false);[LibraryImport(libNative)]private static partial int SystemNative_Read(SafeHandle fd,Span<byte>buffer,int count);[LibraryImport(libNative)]private static partial int SystemNative_Write(SafeHandle fd,ReadOnlySpan<byte>buffer,int count);[LibraryImport(libNative)]private static partial int SystemNative_InitializeTerminalAndSignalHandling();}\",\"Dependencies\":[],\"FileName\":\"TestProject>UnixConsole.cs\",\"TypeNames\":[\"UnixConsole\"],\"Usings\":[\"using Microsoft.Win32.SafeHandles;\",\"using System;\",\"using System.Runtime.InteropServices;\"]}]";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>UnixConsole.cs",
@@ -21,10 +22,8 @@ public class LibraryImportTest : EmbedderGeneratorTestBase
                      "using System.Runtime.InteropServices;"),
                  ImmutableArray<string>.Empty,
                  """public static partial class UnixConsole{public static int Write(ReadOnlySpan<byte>buffer){if(_init){SystemNative_InitializeTerminalAndSignalHandling();_init=false;}return SystemNative_Write(OUT,buffer,buffer.Length);}public static int Read(Span<byte>buffer)=>SystemNative_Read(IN,buffer,buffer.Length);static bool _init=true;const string libNative="libSystem.Native";static readonly SafeFileHandle IN=new(0,false);static readonly SafeFileHandle OUT=new(1,false);[LibraryImport(libNative)]private static partial int SystemNative_Read(SafeHandle fd,Span<byte>buffer,int count);[LibraryImport(libNative)]private static partial int SystemNative_Write(SafeHandle fd,ReadOnlySpan<byte>buffer,int count);[LibraryImport(libNative)]private static partial int SystemNative_InitializeTerminalAndSignalHandling();}"""
-             ));
-
-        const string embeddedSourceCode = "[{\"CodeBody\":\"public static partial class UnixConsole{public static int Write(ReadOnlySpan<byte>buffer){if(_init){SystemNative_InitializeTerminalAndSignalHandling();_init=false;}return SystemNative_Write(OUT,buffer,buffer.Length);}public static int Read(Span<byte>buffer)=>SystemNative_Read(IN,buffer,buffer.Length);static bool _init=true;const string libNative=\\\"libSystem.Native\\\";static readonly SafeFileHandle IN=new(0,false);static readonly SafeFileHandle OUT=new(1,false);[LibraryImport(libNative)]private static partial int SystemNative_Read(SafeHandle fd,Span<byte>buffer,int count);[LibraryImport(libNative)]private static partial int SystemNative_Write(SafeHandle fd,ReadOnlySpan<byte>buffer,int count);[LibraryImport(libNative)]private static partial int SystemNative_InitializeTerminalAndSignalHandling();}\",\"Dependencies\":[],\"FileName\":\"TestProject>UnixConsole.cs\",\"TypeNames\":[\"UnixConsole\"],\"Usings\":[\"using Microsoft.Win32.SafeHandles;\",\"using System;\",\"using System.Runtime.InteropServices;\"]}]";
-
+             )
+        ]);
         var test = new Test
         {
             CompilationOptions = new(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true),
@@ -89,9 +88,5 @@ public static partial class UnixConsole
                 }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }
