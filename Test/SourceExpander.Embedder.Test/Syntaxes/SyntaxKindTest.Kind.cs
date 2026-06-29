@@ -3,7 +3,7 @@
 namespace SourceExpander.Embedder.Syntaxes;
 
 [InheritsTests]
-public class ClassFieldTest : EmbedderGeneratorTestBaseWithValue
+public class ClassFieldTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -22,7 +22,7 @@ class Def
 }
 
 [InheritsTests]
-public class StructFieldTest : EmbedderGeneratorTestBaseWithValue
+public class StructFieldTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -40,7 +40,7 @@ struct Def
 }
 
 [InheritsTests]
-public class RecordFieldTest : EmbedderGeneratorTestBaseWithValue
+public class RecordFieldTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -59,7 +59,7 @@ record Def(string Foo)
 }
 
 [InheritsTests]
-public class InterfaceTest : EmbedderGeneratorTestBaseWithValue
+public class InterfaceTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -74,7 +74,7 @@ public interface IDef { }
 }
 
 [InheritsTests]
-public class DelegateTest : EmbedderGeneratorTestBaseWithValue
+public class DelegateTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -90,7 +90,7 @@ public delegate void Def2(uint n);
 }
 
 [InheritsTests]
-public class EnumTest : EmbedderGeneratorTestBaseWithValue
+public class EnumTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -108,7 +108,7 @@ enum Def
 }
 
 [InheritsTests]
-public class NamespaceTest : EmbedderGeneratorTestBaseWithValue
+public class NamespaceTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 namespace Foo
@@ -130,7 +130,7 @@ namespace Foo
 }
 
 [InheritsTests]
-public class FileScopedNamespaceTest : EmbedderGeneratorTestBaseWithValue
+public class FileScopedNamespaceTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 namespace Foo;
@@ -151,7 +151,7 @@ class Def
 }
 
 [InheritsTests]
-public class PropertyTest : EmbedderGeneratorTestBaseWithValue
+public class PropertyTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -180,7 +180,7 @@ class Def
 }
 
 [InheritsTests]
-public class EventTest : EmbedderGeneratorTestBaseWithValue
+public class EventTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -210,7 +210,7 @@ class Def
 }
 
 [InheritsTests]
-public class ConstructorTest : EmbedderGeneratorTestBaseWithValue
+public class ConstructorTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -237,7 +237,7 @@ public class Def : Par
 }
 
 [InheritsTests]
-public class ConversionTest : EmbedderGeneratorTestBaseWithValue
+public class ConversionTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -256,7 +256,7 @@ public class Def
 }
 
 [InheritsTests]
-public class MethodTest : EmbedderGeneratorTestBaseWithValue
+public class MethodTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -297,7 +297,7 @@ internal static class Ext
 }
 
 [InheritsTests]
-public class IndexerTest : EmbedderGeneratorTestBaseWithValue
+public class IndexerTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -320,7 +320,7 @@ public partial class Def
 }
 
 [InheritsTests]
-public class AttributesTest : EmbedderGeneratorTestBaseWithValue
+public class AttributesTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System.Diagnostics;
@@ -348,7 +348,7 @@ public class Def
 }
 
 [InheritsTests]
-public class ArrayTest : EmbedderGeneratorTestBaseWithValue
+public class ArrayTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -374,7 +374,7 @@ public static class Def
 }
 
 [InheritsTests]
-public class AnonymousTypeTest : EmbedderGeneratorTestBaseWithValue
+public class AnonymousTypeTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -396,7 +396,7 @@ public class Def
 }
 
 [InheritsTests]
-public class AnonymousMethodTest : EmbedderGeneratorTestBaseWithValue
+public class AnonymousMethodTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System.Linq;
@@ -417,7 +417,7 @@ public class Def
 }
 
 [InheritsTests]
-public class LambdaTest : EmbedderGeneratorTestBaseWithValue
+public class LambdaTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System.Linq;
@@ -440,7 +440,7 @@ public class Def
 }
 
 [InheritsTests]
-public class AsyncAwaitTest : EmbedderGeneratorTestBaseWithValue
+public class AsyncAwaitTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -462,7 +462,7 @@ public class Def
 }
 
 [InheritsTests]
-public class PatternsTest : EmbedderGeneratorTestBaseWithValue
+public class PatternsTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -491,7 +491,7 @@ public class Def
 }
 
 [InheritsTests]
-public class UnaryExpressionTest : EmbedderGeneratorTestBaseWithValue
+public class UnaryExpressionTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -515,7 +515,7 @@ public class Def
 }
 
 [InheritsTests]
-public class BinaryExpressionTest : EmbedderGeneratorTestBaseWithValue
+public class BinaryExpressionTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -558,7 +558,7 @@ public class Def
 }
 
 [InheritsTests]
-public class ConditionalTest : EmbedderGeneratorTestBaseWithValue
+public class ConditionalTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -580,7 +580,7 @@ public class Def
 }
 
 [InheritsTests]
-public class TryCatchFinallyTest : EmbedderGeneratorTestBaseWithValue
+public class TryCatchFinallyTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -618,7 +618,7 @@ public class Def
 }
 
 [InheritsTests]
-public class CheckedUncheckedTest : EmbedderGeneratorTestBaseWithValue
+public class CheckedUncheckedTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -649,7 +649,7 @@ public class Def
 }
 
 [InheritsTests]
-public class DefaultTest : EmbedderGeneratorTestBaseWithValue
+public class DefaultTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -673,7 +673,7 @@ public class Def
 }
 
 [InheritsTests]
-public class DocumentationCommentTest : EmbedderGeneratorTestBaseWithValue
+public class DocumentationCommentTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -700,7 +700,7 @@ public class Def
 }
 
 [InheritsTests]
-public class ProcessorTest : EmbedderGeneratorTestBaseWithValue
+public class ProcessorTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 #define EXPAND
@@ -746,7 +746,7 @@ public class Def
 }
 
 [InheritsTests]
-public class PointerTest : EmbedderGeneratorTestBaseWithValue
+public class PointerTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -785,7 +785,7 @@ public class Def
 }
 
 [InheritsTests]
-public class ForTest : EmbedderGeneratorTestBaseWithValue
+public class ForTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -813,7 +813,7 @@ public class Def
 }
 
 [InheritsTests]
-public class ForEachTest : EmbedderGeneratorTestBaseWithValue
+public class ForEachTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -841,7 +841,7 @@ public class Def
 }
 
 [InheritsTests]
-public class WhileTest : EmbedderGeneratorTestBaseWithValue
+public class WhileTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -873,7 +873,7 @@ public class Def
 }
 
 [InheritsTests]
-public class SwitchTest : EmbedderGeneratorTestBaseWithValue
+public class SwitchTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -908,7 +908,7 @@ public class Def
 }
 
 [InheritsTests]
-public class FunctionPointersTest : EmbedderGeneratorTestBaseWithValue
+public class FunctionPointersTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -932,7 +932,7 @@ public class Def
 }
 
 [InheritsTests]
-public class GotoTest : EmbedderGeneratorTestBaseWithValue
+public class GotoTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -956,7 +956,7 @@ public class Def
 }
 
 [InheritsTests]
-public class GenericsTest : EmbedderGeneratorTestBaseWithValue
+public class GenericsTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -984,7 +984,7 @@ public class Def<T, Q> where T : ICloneable
 }
 
 [InheritsTests]
-public class StringTest : EmbedderGeneratorTestBaseWithValue
+public class StringTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1008,7 +1008,7 @@ public class Def
 }
 
 [InheritsTests]
-public class RangeTest : EmbedderGeneratorTestBaseWithValue
+public class RangeTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1034,7 +1034,7 @@ public class Def
 }
 
 [InheritsTests]
-public class TupleTest : EmbedderGeneratorTestBaseWithValue
+public class TupleTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1058,7 +1058,7 @@ public class Def
 }
 
 [InheritsTests]
-public class UsingTest : EmbedderGeneratorTestBaseWithValue
+public class UsingTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System.IO;
@@ -1086,7 +1086,7 @@ public class Def
 }
 
 [InheritsTests]
-public class IfTest : EmbedderGeneratorTestBaseWithValue
+public class IfTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1125,7 +1125,7 @@ public class Def
 }
 
 [InheritsTests]
-public class LINQTest : EmbedderGeneratorTestBaseWithValue
+public class LINQTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System.Linq;
@@ -1147,7 +1147,7 @@ public class Def
 }
 
 [InheritsTests]
-public class IncrementTest : EmbedderGeneratorTestBaseWithValue
+public class IncrementTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1172,7 +1172,7 @@ public class Def
 }
 
 [InheritsTests]
-public class DecrementTest : EmbedderGeneratorTestBaseWithValue
+public class DecrementTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1197,7 +1197,7 @@ public class Def
 }
 
 [InheritsTests]
-public class GenericLambdaTest : EmbedderGeneratorTestBaseWithValue
+public class GenericLambdaTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 using System;
@@ -1215,7 +1215,7 @@ public class Def
 }
 
 [InheritsTests]
-public class NullableTest : EmbedderGeneratorTestBaseWithValue
+public class NullableTest : SyntaxKindTestBase
 {
     public override string Syntax => """
 #nullable enable

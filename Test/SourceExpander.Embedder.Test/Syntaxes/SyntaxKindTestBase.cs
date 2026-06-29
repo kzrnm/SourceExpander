@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander.Embedder.Syntaxes;
 
-public abstract class SyntaxKindTest : EmbedderGeneratorTestBase
+public abstract class SyntaxKindTestBase : EmbedderGeneratorTestBase
 {
     public abstract string Syntax { get; }
     public abstract IEnumerable<string> ExpectedTypeNames { get; }
@@ -11,7 +11,7 @@ public abstract class SyntaxKindTest : EmbedderGeneratorTestBase
     public abstract IEnumerable<string> ExpectedDependencies { get; }
     public abstract string ExpectedCodeBody { get; }
     public abstract string ExpectedMinifyCodeBody { get; }
-
+    public abstract IEnumerable<string> ExpectedNamespaces { get; }
     public InMemorySourceText Source => new("/foo/path.cs", Syntax);
     internal SourceFileInfo Expected => new(
                 "TestProject>path.cs",
@@ -59,6 +59,7 @@ public abstract class SyntaxKindTest : EmbedderGeneratorTestBase
                     "[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                     $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                     $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                    $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", ExpectedNamespaces)}\")]",
                     $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{ExpectedJson.ToLiteral()})]")
                     ),
                 },
@@ -105,6 +106,7 @@ public abstract class SyntaxKindTest : EmbedderGeneratorTestBase
                     "[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedAllowUnsafe\",\"true\")]",
                     $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbedderVersion\",\"{EmbedderVersion}\")]",
                     $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedLanguageVersion\",\"{EmbeddedLanguageVersion}\")]",
+                    $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedNamespaces\",\"{string.Join(",", ExpectedNamespaces)}\")]",
                     $"[assembly: global::System.Reflection.AssemblyMetadataAttribute(\"SourceExpander.EmbeddedSourceCode\",{ExpectedMinifyJson.ToLiteral()})]")
                     ),
                 },
