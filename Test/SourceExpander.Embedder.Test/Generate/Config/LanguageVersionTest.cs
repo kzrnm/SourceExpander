@@ -31,7 +31,8 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
     public async Task Json(string inputLiteral, string embeddedLanguageVersion, CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -41,8 +42,8 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  """class Program{static void Main(){Console.WriteLine(1);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -94,10 +95,6 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
@@ -105,7 +102,8 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
     public async Task Property(string inputLiteral, string embeddedLanguageVersion, CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -115,8 +113,8 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  """class Program{static void Main(){Console.WriteLine(1);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -172,10 +170,6 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
 
@@ -185,7 +179,8 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
     public async Task Error(bool hasError, CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void M(int[]a){Console.WriteLine(a[..]);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -195,9 +190,8 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
                  ImmutableArray<string>.Empty,
                  // lang=C#
                  """class Program{static void M(int[]a){Console.WriteLine(a[..]);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void M(int[]a){Console.WriteLine(a[..]);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
-
+             )
+        ]);
         var langVersion = hasError ? "7.3" : "8.0";
 
         var test = new Test
@@ -257,9 +251,5 @@ public class LanguageVersionTest : EmbedderGeneratorTestBase
             test.TestState.ExpectedDiagnostics.Add(DiagnosticResult.CompilerWarning("EMBED0004"));
 
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

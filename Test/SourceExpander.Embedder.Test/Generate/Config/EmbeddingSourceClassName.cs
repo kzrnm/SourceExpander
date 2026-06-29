@@ -8,7 +8,8 @@ public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
     public async Task EmbeddingSourceClassNone(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -16,8 +17,8 @@ public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -71,17 +72,14 @@ public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task EmbeddingSourceClass(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -89,8 +87,8 @@ public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -176,9 +174,5 @@ public class EmbeddingSourceClassNameTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

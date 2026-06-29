@@ -10,7 +10,9 @@ public class PreProcessTest : EmbedderGeneratorTestBase
     public async Task Generate(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{int[]v=new int[]{2,4,6,};static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -18,15 +20,13 @@ public class PreProcessTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;"),
                  ImmutableArray<string>.Empty,
                  "class Program{int[]v=new int[]{2,4,6,};static void Main()=>Console.WriteLine(1);}"
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{int[]v=new int[]{2,4,6,};static void Main()=>Console.WriteLine(1);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\"]}]";
+             ),
+        ]);
 
         var test = new Test
         {
             ParseOptions = new CSharpParseOptions(
-                EmbeddedLanguageVersionEnum,
-
-
+                LanguageVersion.Preview,
                 kind: SourceCodeKind.Regular,
                 documentationMode: DocumentationMode.Parse,
                 preprocessorSymbols: new[] { "Trace", "TEST" }),
@@ -97,9 +97,5 @@ class Program
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

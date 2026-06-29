@@ -8,7 +8,8 @@ public class ConditionalTest : EmbedderGeneratorTestBase
     public async Task Conditional(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\"TEST\")]static void T()=>Console.WriteLine(2);[Conditional(\"DEBUG2\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\"DEBUG2\")][Conditional(\"Test\")]static void T8()=>Console.WriteLine(8);}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -16,8 +17,8 @@ public class ConditionalTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);[Conditional("DEBUG2")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional("DEBUG2")][Conditional("Test")]static void T8()=>Console.WriteLine(8);}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);[Conditional(\\\"DEBUG2\\\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\\\"DEBUG2\\\")][Conditional(\\\"Test\\\")]static void T8()=>Console.WriteLine(8);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -84,17 +85,14 @@ public class ConditionalTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task ConditionalProperty(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\"TEST\")]static void T()=>Console.WriteLine(2);[Conditional(\"DEBUG2\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\"DEBUG2\")][Conditional(\"Test\")]static void T8()=>Console.WriteLine(8);}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -102,8 +100,8 @@ public class ConditionalTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional("TEST")]static void T()=>Console.WriteLine(2);[Conditional("DEBUG2")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional("DEBUG2")][Conditional("Test")]static void T8()=>Console.WriteLine(8);}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){T();Console.WriteLine(1);}[System.Diagnostics.Conditional(\\\"TEST\\\")]static void T()=>Console.WriteLine(2);[Conditional(\\\"DEBUG2\\\")]static void T4()=>Console.WriteLine(4);[System.Diagnostics.Conditional(\\\"DEBUG2\\\")][Conditional(\\\"Test\\\")]static void T8()=>Console.WriteLine(8);}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -160,17 +158,14 @@ public class ConditionalTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task ConditionalNone(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -178,8 +173,8 @@ public class ConditionalTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -232,17 +227,14 @@ public class ConditionalTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task ConditionalNoneProperty(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray<string>.Empty;
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using System;","using System.Diagnostics;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
              new SourceFileInfo
              (
                  "TestProject>Program.cs",
@@ -250,8 +242,8 @@ public class ConditionalTest : EmbedderGeneratorTestBase
                  ImmutableArray.Create("using System;", "using System.Diagnostics;"),
                  ImmutableArray<string>.Empty,
                  """class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}"""
-             ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"class Program{static void Main(){Debug.Assert(true);Console.WriteLine(1);}}\",\"Dependencies\":[],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Program\"],\"Usings\":[\"using System;\",\"using System.Diagnostics;\"]}]";
+             )
+        ]);
 
         var test = new Test
         {
@@ -296,9 +288,5 @@ public class ConditionalTest : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }

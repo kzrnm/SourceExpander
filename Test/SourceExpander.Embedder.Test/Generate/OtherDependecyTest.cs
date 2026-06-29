@@ -10,7 +10,8 @@ public class OtherDependencyTest : EmbedderGeneratorTestBase
     public async Task OtherRaw(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray.Create("Mine");
-        var embeddedFiles = ImmutableArray.Create([
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}","Dependencies":[],"FileName":"TestProject>C.cs","TypeNames":["Mine.C"],"Usings":[]},{"CodeBody":"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}","Dependencies":["OtherDependency>C.cs","TestProject>C.cs"],"FileName":"TestProject>Program.cs","TypeNames":["Mine.Program"],"Usings":["using OC = Other.C;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
             new SourceFileInfo
             (
                 "TestProject>C.cs",
@@ -28,7 +29,6 @@ public class OtherDependencyTest : EmbedderGeneratorTestBase
                 "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
             ),
         ]);
-        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
 
         var test = new Test
         {
@@ -102,17 +102,14 @@ namespace Mine{
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task OtherGZip(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray.Create("Mine");
-        var embeddedFiles = ImmutableArray.Create([
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}","Dependencies":[],"FileName":"TestProject>C.cs","TypeNames":["Mine.C"],"Usings":[]},{"CodeBody":"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}","Dependencies":["OtherDependency>C.cs","TestProject>C.cs"],"FileName":"TestProject>Program.cs","TypeNames":["Mine.Program"],"Usings":["using OC = Other.C;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
             new SourceFileInfo
             (
                 "TestProject>C.cs",
@@ -130,8 +127,6 @@ namespace Mine{
                 "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
             ),
         ]);
-        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]},{\"CodeBody\":\"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}\",\"Dependencies\":[\"OtherDependency>C.cs\",\"TestProject>C.cs\"],\"FileName\":\"TestProject>Program.cs\",\"TypeNames\":[\"Mine.Program\"],\"Usings\":[\"using OC = Other.C;\"]}]";
-
 
         var test = new Test
         {
@@ -206,17 +201,14 @@ namespace Mine{
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task UsingOlderVersion(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray.Create("Mine");
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}","Dependencies":[],"FileName":"TestProject>C.cs","TypeNames":["Mine.C"],"Usings":[]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
             new SourceFileInfo
             (
                 "TestProject>C.cs",
@@ -224,8 +216,8 @@ namespace Mine{
                 Array.Empty<string>(),
                 Array.Empty<string>(),
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-            ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
+            )
+        ]);
 
         var test = new Test
         {
@@ -282,17 +274,14 @@ namespace Mine{
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task InvalidRaw(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray.Create("Mine");
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}","Dependencies":[],"FileName":"TestProject>C.cs","TypeNames":["Mine.C"],"Usings":[]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
             new SourceFileInfo
             (
                 "TestProject>C.cs",
@@ -300,8 +289,8 @@ namespace Mine{
                 Array.Empty<string>(),
                 Array.Empty<string>(),
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-            ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
+            )
+        ]);
 
         var test = new Test
         {
@@ -358,17 +347,14 @@ namespace Mine{
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 
     [Test]
     public async Task InvalidGZipBase32768(CancellationToken cancellationToken)
     {
         var embeddedNamespaces = ImmutableArray.Create("Mine");
-        var embeddedFiles = ImmutableArray.Create(
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}","Dependencies":[],"FileName":"TestProject>C.cs","TypeNames":["Mine.C"],"Usings":[]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
             new SourceFileInfo
             (
                 "TestProject>C.cs",
@@ -376,12 +362,8 @@ namespace Mine{
                 Array.Empty<string>(),
                 Array.Empty<string>(),
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
-            ));
-        const string embeddedSourceCode = "[{\"CodeBody\":\"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}\",\"Dependencies\":[],\"FileName\":\"TestProject>C.cs\",\"TypeNames\":[\"Mine.C\"],\"Usings\":[]}]";
-
-        var others = new SourceFileCollection
-        {
-        };
+            )
+        ]);
 
         var test = new Test
         {
@@ -437,9 +419,5 @@ namespace Mine{
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(embeddedSourceCode)
-            .Should().BeEquivalentTo(embeddedFiles);
     }
 }
