@@ -1,19 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <AdditionalFiles Include="SourceExpander.Embedder.Config.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_Include" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_Exclude" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_MinifyLevel" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingType" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_ExcludeAttributes" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_RemoveConditional" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingFileNameType" />
-    <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandInLibrary" />
-  </ItemGroup>
-
+  <Import Project="../../SourceExpander.Embedder/build/SourceExpander.Embedder.props" />
   <PropertyGroup>
     <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -42,5 +28,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+  <Import Project="../../SourceExpander.Embedder/build/SourceExpander.Embedder.targets" />
 </Project>

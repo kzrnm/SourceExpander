@@ -19,6 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SourceExpander.Embedder\SourceExpander.Embedder.csproj" />
+    <ProjectReference Include="..\..\Source\SourceExpander.Generator\SourceExpander.Generator.csproj" />
   </ItemGroup>
 </Project>

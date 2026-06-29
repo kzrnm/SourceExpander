@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
-using Mono.Cecil;
 
 namespace SourceExpander;
 
@@ -13,59 +14,53 @@ partial struct SourceExpanderCommand
     /// Show the embedded data.
     /// </summary>
     /// <param name="target">Target DLL file.</param>
-    /// <param name="output">Output path for the DLL with the SourceExpander metadata removed.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
     [Command("embedded")]
-    public async Task Embedded([Argument] string target, string? output = null)
+    public async Task Embedded([Argument] string target)
     {
-        using var assembly = AssemblyDefinition.ReadAssembly(target);
-        var metadata = new List<KeyValuePair<string, string>>();
-        int to = 0;
-        for (int i = 0; i < assembly.CustomAttributes.Count; i++)
-        {
-            var a = assembly.CustomAttributes[i];
-            if (TryParseSourceExpanderMetadata(a, out var pair))
-            {
-                metadata.Add(pair);
-            }
-            else
-            {
-                assembly.CustomAttributes[to++] = a;
-            }
-        }
-        while (assembly.CustomAttributes.Count >= to)
-        {
-            assembly.CustomAttributes.RemoveAt(assembly.CustomAttributes.Count - 1);
-        }
-        var (embeddedData, _) = EmbeddedData.Create(assembly.Name.Name, metadata);
-
-        if (output is { Length: not 0 })
-        {
-            if (Path.GetDirectoryName(output) is string dir)
-                Directory.CreateDirectory(dir);
-            assembly.Write(output);
-        }
-
-        Output.WriteLine(JsonUtil.ToJson(embeddedData));
+        var data = ReadEmbeddedData(target);
+        Output.WriteLine(JsonUtil.ToJson(data));
     }
 
-    static bool TryParseSourceExpanderMetadata(CustomAttribute attribute, out KeyValuePair<string, string> result)
+
+    static EmbeddedData ReadEmbeddedData(string target)
     {
-        if (attribute is not { AttributeType.FullName: "System.Reflection.AssemblyMetadataAttribute", ConstructorArguments.Count: 2 })
-            goto Failure;
+        using var stream = File.OpenRead(target);
+        using var peReader = new PEReader(stream);
 
-        var keyArg = attribute.ConstructorArguments[0].Value;
-        var valArg = attribute.ConstructorArguments[1].Value;
+        var metadataReader = peReader.GetMetadataReader();
+        string assemblyName = metadataReader.GetString(metadataReader.GetAssemblyDefinition().Name);
+        return EmbeddedData.LoadFromMetadata(assemblyName, EnumerateSourceExpanderMetadata(metadataReader)).Data;
+    }
 
-        if (keyArg is string key && key.StartsWith("SourceExpander.") && valArg is string val)
+    static List<KeyValuePair<string, string>> EnumerateSourceExpanderMetadata(MetadataReader metadataReader)
+    {
+        var metadata = new List<KeyValuePair<string, string>>();
+        foreach (var attrHandle in metadataReader.GetAssemblyDefinition().GetCustomAttributes())
         {
-            result = KeyValuePair.Create(key, val);
-            return true;
+            var attribute = metadataReader.GetCustomAttribute(attrHandle);
+
+            // 属性のコンストラクタ（型情報）を取得
+            if (attribute.Constructor.Kind == HandleKind.MemberReference)
+            {
+                var memberRef = metadataReader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
+                var typeRef = metadataReader.GetTypeReference((TypeReferenceHandle)memberRef.Parent);
+
+                if (metadataReader.GetString(typeRef.Name) is "AssemblyMetadataAttribute")
+                {
+                    var blob = metadataReader.GetBlobReader(attribute.Value);
+                    if (blob.ReadUInt16() == 1
+                        && blob.ReadSerializedString() is string key
+                        && key.StartsWith("SourceExpander.")
+                        && blob.ReadSerializedString() is string value)
+                    {
+                        metadata.Add(KeyValuePair.Create(key, value));
+                    }
+                }
+            }
         }
-    Failure:
-        result = default;
-        return false;
+        return metadata;
     }
 }

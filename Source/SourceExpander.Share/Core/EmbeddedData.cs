@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceExpander;
 
-internal record EmbeddedData(
+internal partial record EmbeddedData(
     string AssemblyName,
     ImmutableArray<SourceFileInfo> Sources,
     Version EmbedderVersion,
@@ -13,17 +13,39 @@ internal record EmbeddedData(
     bool AllowUnsafe,
     ImmutableArray<string> EmbeddedNamespaces)
 {
-    public static EmbeddedData Empty => new("Empty",
-        ImmutableArray<SourceFileInfo>.Empty, new(1, 0, 0), LanguageVersion.Default.ToDisplayString(), false, ImmutableArray<string>.Empty);
+    public static EmbeddedData Empty => new("Empty", ImmutableArray<SourceFileInfo>.Empty, new(1, 0, 0), LanguageVersion.CSharp1.ToDisplayString(), false, ImmutableArray<string>.Empty);
+
+    public static EmbeddedData? ParseJson(string json, string deafultAssemblyName)
+        => JsonUtil.ParseJson<EmbeddedData>(json)?.Normalize(deafultAssemblyName);
+
+#nullable disable
+    /// <summary>
+    /// Repair the object immediately after parsing the JSON, since it may not be valid at that point.
+    /// </summary>
+    /// <returns></returns>
+    public EmbeddedData Normalize(string assemblyName)
+    {
+        var empty = Empty;
+        return new(
+            Sources: Sources.IsDefault ? empty.Sources : Sources,
+            EmbeddedNamespaces: EmbeddedNamespaces.IsDefault ? empty.EmbeddedNamespaces : EmbeddedNamespaces,
+            AllowUnsafe: AllowUnsafe,
+            EmbedderVersion: EmbedderVersion ?? empty.EmbedderVersion,
+            CSharpVersion: CSharpVersion ?? empty.CSharpVersion,
+            AssemblyName: AssemblyName ?? assemblyName);
+    }
+#nullable restore
 
     public static (EmbeddedData Data, ImmutableArray<(string Key, string ErrorMessage)> Errors)
-        Create(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
+        LoadFromMetadata(string assemblyName, IEnumerable<KeyValuePair<string, string>> assemblyMetadatas)
     {
         var errors = ImmutableArray.CreateBuilder<(string Key, string ErrorMessage)>();
         string csharpVersion = LanguageVersion.CSharp1.ToDisplayString();
         Version version = new(1, 0, 0);
         bool allowUnsafe = false;
         ImmutableArray<string> embeddedNamespaces = ImmutableArray<string>.Empty;
+
+        EmbeddedData? embeddedDataByJson = null;
 
         var builder = ImmutableArray.CreateBuilder<SourceFileInfo>();
         foreach (var pair in assemblyMetadatas)
@@ -34,6 +56,17 @@ internal record EmbeddedData(
             if (keyArray.Length < 2 || keyArray[0] != "SourceExpander")
                 continue;
 
+            switch (TryGetEmbeddedDataJson(keyArray, value, assemblyName))
+            {
+                case NotMatch<EmbeddedData>:
+                    break;
+                case Success<EmbeddedData> { Value: var data }:
+                    embeddedDataByJson = data;
+                    continue;
+                case Error<EmbeddedData> { Message: var message }:
+                    errors.Add((key, message));
+                    continue;
+            }
             switch (TryGetSourceFileInfos(keyArray, value))
             {
                 case NotMatch<SourceFileInfo[]>:
@@ -90,7 +123,7 @@ internal record EmbeddedData(
                     continue;
             }
         }
-        return (new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe, embeddedNamespaces), errors.ToImmutable());
+        return (embeddedDataByJson ?? new EmbeddedData(assemblyName, builder.ToImmutable(), version, csharpVersion, allowUnsafe, embeddedNamespaces), errors.ToImmutable());
     }
 
     abstract record ParseResult
@@ -110,6 +143,23 @@ internal record EmbeddedData(
     record NotMatch;
     record NotMatch<T> : ParseResult<T>;
 
+    private static ParseResult<EmbeddedData> TryGetEmbeddedDataJson(string[] keyArray, string value, string assemblyName)
+    {
+        try
+        {
+            if (keyArray.Length == 2 && keyArray[1] == "EmbeddedDataJson")
+            {
+                var embedded = ParseJson(value, assemblyName);
+                if (embedded is not null)
+                    return ParseResult.Success(embedded);
+            }
+            return ParseResult.NotMatch;
+        }
+        catch (Exception e)
+        {
+            return ParseResult.Error(e.Message);
+        }
+    }
     private static ParseResult<SourceFileInfo[]> TryGetSourceFileInfos(string[] keyArray, string value)
     {
         try

@@ -43,28 +43,33 @@ internal class EmbeddingResolver
     private struct EmbeddingAssemblyMetadata
     {
         public bool IsEnabled;
-        public bool EmbeddedAllowUnsafe;
-        public Version EmbedderVersion;
-        public LanguageVersion EmbeddedLanguageVersion;
-        public string[] EmbeddedNamespaces;
-        public (string Raw, string GZipBase32768) EmbeddedSourceCode;
-
+        public EmbeddingType EmbeddingType;
+        public EmbeddedData EmbeddedData;
         public readonly IEnumerable<(string Key, string Value)> EnumerateMetadatas()
         {
             if (!IsEnabled) yield break;
 
-            if (EmbeddedAllowUnsafe)
+            var data = EmbeddedData;
+
+            if (EmbeddingType is EmbeddingType.SingleMetadataJson)
+            {
+                yield return ("SourceExpander.EmbeddedDataJson", JsonUtil.ToJson(data));
+                yield break;
+            }
+
+            if (data.AllowUnsafe)
                 yield return ("SourceExpander.EmbeddedAllowUnsafe", "true");
 
-            yield return ("SourceExpander.EmbedderVersion", EmbedderVersion.ToString());
-            yield return ("SourceExpander.EmbeddedLanguageVersion", EmbeddedLanguageVersion.ToDisplayString());
+            yield return ("SourceExpander.EmbedderVersion", data.EmbedderVersion.ToString());
+            yield return ("SourceExpander.EmbeddedLanguageVersion", data.CSharpVersion);
 
-            yield return ("SourceExpander.EmbeddedNamespaces", string.Join(",", EmbeddedNamespaces));
+            yield return ("SourceExpander.EmbeddedNamespaces", string.Join(",", data.EmbeddedNamespaces));
 
-            yield return EmbeddedSourceCode switch
+            var sourceJson = JsonUtil.ToJson(data.Sources);
+            yield return EmbeddingType switch
             {
-                (_, string gz) => ("SourceExpander.EmbeddedSourceCode.GZipBase32768", gz),
-                (string raw, _) => ("SourceExpander.EmbeddedSourceCode", raw),
+                EmbeddingType.GZipBase32768 => ("SourceExpander.EmbeddedSourceCode.GZipBase32768", SourceFileInfoUtil.ToGZipBase32768(sourceJson)),
+                EmbeddingType.Raw => ("SourceExpander.EmbeddedSourceCode", sourceJson),
                 _ => throw new InvalidDataException(),
             };
         }
@@ -79,52 +84,52 @@ internal class EmbeddingResolver
             return result;
         var infos = ResolveFiles();
         cancellationToken.ThrowIfCancellationRequested();
-        if (infos.Length == 0)
-            return result;
-        var json = JsonUtil.ToJson(infos);
+
+        if (infos.Length is 0)
+            return new EmbeddingAssemblyMetadata
+            {
+                IsEnabled = true,
+                EmbeddedData = EmbeddedData.Empty with { AssemblyName = compilation.AssemblyName ?? Guid.NewGuid().ToString() },
+            };
+
         cancellationToken.ThrowIfCancellationRequested();
 
         result.IsEnabled = true;
-        result.EmbeddedAllowUnsafe = compilation.Options.AllowUnsafe;
-        result.EmbedderVersion = AssemblyUtil.AssemblyVersion;
-        result.EmbeddedLanguageVersion = config.LanguageVersion ?? parseOptions.LanguageVersion;
         cancellationToken.ThrowIfCancellationRequested();
 
-        {
-            var typeNames = infos.SelectMany(s => s.TypeNames).ToImmutableHashSet();
-            var hs = new HashSet<string>();
-            foreach (var namespaceName in ParseNamespaceName(typeNames))
-                if (!typeNames.Contains(namespaceName))
-                    hs.Add(namespaceName);
-            cancellationToken.ThrowIfCancellationRequested();
+        var typeNames = infos.SelectMany(s => s.TypeNames).Distinct();
+        var namespaceSet = new HashSet<string>();
 
-            var array = hs.ToArray();
-            Array.Sort(array, StringComparer.Ordinal);
-            result.EmbeddedNamespaces = array;
-        }
-        cancellationToken.ThrowIfCancellationRequested();
-
-        static IEnumerable<string> ParseNamespaceName(IEnumerable<string> typeNames)
+        foreach (var typeName in typeNames)
         {
-            foreach (var typeName in typeNames)
+            var length = typeName.LastIndexOf('.');
+            if (length > 0)
             {
-                var length = typeName.LastIndexOf('.');
-                if (length > 0)
-                    yield return typeName.Substring(0, length);
+                var maybeNamespaceName = typeName.Substring(0, length);
+
+                // For nested types, `maybeNamespaceName` is not a namespace.
+                if (!typeNames.Contains(maybeNamespaceName))
+                    namespaceSet.Add(maybeNamespaceName);
             }
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
-        switch (config.EmbeddingType)
+        var namespaces = namespaceSet.ToArray();
+        Array.Sort(namespaces, StringComparer.Ordinal);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        return new EmbeddingAssemblyMetadata
         {
-            case EmbeddingType.Raw:
-                result.EmbeddedSourceCode.Raw = json;
-                break;
-            default:
-                result.EmbeddedSourceCode.GZipBase32768 = SourceFileInfoUtil.ToGZipBase32768(json);
-                break;
-        }
-
-        return result;
+            IsEnabled = true,
+            EmbeddingType = config.EmbeddingType,
+            EmbeddedData = new EmbeddedData(
+                EmbeddedNamespaces: ImmutableArray.Create(namespaces),
+                CSharpVersion: (config.LanguageVersion ?? parseOptions.LanguageVersion).ToDisplayString(),
+                AllowUnsafe: compilation.Options.AllowUnsafe,
+                EmbedderVersion: AssemblyUtil.AssemblyVersion,
+                Sources: infos,
+                AssemblyName: compilation.AssemblyName ?? Guid.NewGuid().ToString()),
+        }; ;
     }
 
     private bool updated = false;
