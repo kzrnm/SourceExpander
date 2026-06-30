@@ -1,43 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using System.Threading.Tasks;
 
 namespace SourceExpander;
 
-
-partial struct SourceExpanderCommand
+internal class SourceExpanderMetadata
 {
-    /// <summary>
-    /// Show the embedded data.
-    /// </summary>
-    /// <param name="target">Target DLL file.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="InvalidOperationException"></exception>
-    [Command("embedded")]
-    public async Task Embedded([Argument] string target)
+    private SourceExpanderMetadata(string assemblyName, ImmutableArray<KeyValuePair<string, string>> attributesData)
     {
-        var data = ReadEmbeddedData(target);
-        Output.WriteLine(JsonUtil.ToJson(data));
+        AssemblyName = assemblyName;
+        Attributes = attributesData;
     }
-
-
-    static EmbeddedData ReadEmbeddedData(string target)
+    public string AssemblyName { get; }
+    public ImmutableArray<KeyValuePair<string, string>> Attributes { get; }
+    public static SourceExpanderMetadata Load(string assemblyPath)
     {
-        using var stream = File.OpenRead(target);
+        using var stream = File.OpenRead(assemblyPath);
         using var peReader = new PEReader(stream);
 
         var metadataReader = peReader.GetMetadataReader();
         string assemblyName = metadataReader.GetString(metadataReader.GetAssemblyDefinition().Name);
-        return EmbeddedData.LoadFromMetadata(assemblyName, EnumerateSourceExpanderMetadata(metadataReader)).Data;
+        return new(assemblyName, EnumerateSourceExpanderMetadata(metadataReader));
     }
 
-    static List<KeyValuePair<string, string>> EnumerateSourceExpanderMetadata(MetadataReader metadataReader)
+    static ImmutableArray<KeyValuePair<string, string>> EnumerateSourceExpanderMetadata(MetadataReader metadataReader)
     {
-        var metadata = new List<KeyValuePair<string, string>>();
+        var metadata = ImmutableArray.CreateBuilder<KeyValuePair<string, string>>();
         foreach (var attrHandle in metadataReader.GetAssemblyDefinition().GetCustomAttributes())
         {
             var attribute = metadataReader.GetCustomAttribute(attrHandle);
@@ -56,11 +46,11 @@ partial struct SourceExpanderCommand
                         && key.StartsWith("SourceExpander.")
                         && blob.ReadSerializedString() is string value)
                     {
-                        metadata.Add(KeyValuePair.Create(key, value));
+                        metadata.Add(new KeyValuePair<string, string>(key, value));
                     }
                 }
             }
         }
-        return metadata;
+        return metadata.ToImmutable();
     }
 }
