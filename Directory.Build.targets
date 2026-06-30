@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <None Condition="Exists('$(ThirdPartyLicensePath)')" Include="$(ThirdPartyLicensePath)" Pack="true" PackagePath="" Visible="false" />
+    <None Condition="Exists('$(ReadmePath)')" Include="$(ReadmePath)" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,102 @@
+<Project>
+  <Target Name="SourceExpanderDefinePackProperties" BeforeTargets="BeforeBuild" Condition="'$(SourceExpander_PackJson_Disabled)' != 'true'">
+    <PropertyGroup>
+      <_SourceExpander_PackageIdTag>$(PackageId.Replace('.', '_'))</_SourceExpander_PackageIdTag>
+      <_SourceExpander_PackageSourceTag>$(PackageId)_Source</_SourceExpander_PackageSourceTag>
+      <SourceExpander_Embedder_EmbeddingType>SingleMetadataJson</SourceExpander_Embedder_EmbeddingType>
+      <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);SourceExpanderPackage</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+  </Target>
+  <Target Name="SourceExpanderEmbeddingBuild"
+          BeforeTargets="BeforeBuild"
+          DependsOnTargets="SourceExpanderDefinePackProperties"
+          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true'And '$(_SourceExpander_RunEmbeddingJson)'!='true'">
+    <MSBuild Projects="$(MSBuildProjectFile)"
+             Targets="SourceExpanderWriteEmbeddedDataJson"
+             Properties="TargetFramework=$(TargetFramework);_SourceExpander_RunEmbeddingJson=true;IncludeBuildOutput=false">
+      <Output TaskParameter="TargetOutputs" ItemName="_ReadEmbeddedDataResult" />
+    </MSBuild>
+    <PropertyGroup>
+      <SourceExpander_JsonPath>%(_ReadEmbeddedDataResult.JsonPath)</SourceExpander_JsonPath>
+      <SourceExpander_JsonName>%(_ReadEmbeddedDataResult.JsonName)</SourceExpander_JsonName>
+      <SourceExpander_Embedder_Enabled>false</SourceExpander_Embedder_Enabled>
+    </PropertyGroup>
+  </Target>
+  <Target Name="SourceExpanderWriteEmbeddedDataJson"
+          DependsOnTargets="SourceExpanderDefinePackProperties;Build"
+          Returns="@(EmbeddedJsonOutputItem)"
+          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true' And '$(_SourceExpander_RunEmbeddingJson)' == 'true'">
+    <Message Importance="high" Text="[$(TargetFramework)] Writing embedded JSON data..." />
+    <ReadEmbeddedData AssemblyPath="$(TargetPath)">
+      <Output TaskParameter="OutputPath" PropertyName="JsonPath" />
+      <Output TaskParameter="OutputName" PropertyName="JsonName" />
+    </ReadEmbeddedData>
+    <ItemGroup>
+      <EmbeddedJsonOutputItem Include="$(JsonPath)">
+        <TargetFramework>$(TargetFramework)</TargetFramework>
+        <JsonPath>$(JsonPath)</JsonPath>
+        <JsonName>$(JsonName)</JsonName>
+      </EmbeddedJsonOutputItem>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="SourceExpanderDefineProps"
+          AfterTargets="SourceExpanderEmbeddingBuild" DependsOnTargets="SourceExpanderDefinePackProperties"
+          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true' And '$(SourceExpander_PackJsonProps_Disabled)' != 'true'">
+    <PropertyGroup>
+      <PackPropsPath Condition="'$(PackPropsPath)'==''">$(TargetDir)$(PackageId).props</PackPropsPath>
+      <PackPropsBody>
+        <![CDATA[
+<Project>
+  <PropertyGroup>
+    <$(_SourceExpander_PackageSourceTag)>%24(MSBuildThisFileDirectory)$(SourceExpander_JsonName)</$(_SourceExpander_PackageSourceTag)>
+    <$(_SourceExpander_PackageSourceTag)_Visible>false</$(_SourceExpander_PackageSourceTag)_Visible>
+  </PropertyGroup>
+</Project>
+      ]]>
+      </PackPropsBody>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PackPropsPath)" Lines="$(PackPropsBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+  <Target Name="SourceExpanderDefineTargets"
+          AfterTargets="SourceExpanderEmbeddingBuild" DependsOnTargets="SourceExpanderDefinePackProperties"
+          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true' And '$(SourceExpander_PackJsonTargets_Disabled)' != 'true'">
+    <PropertyGroup>
+      <PackTargetsPath Condition="'$(PackTargetsPath)'==''">$(TargetDir)$(PackageId).targets</PackTargetsPath>
+      <PackTargetsBody>
+        <![CDATA[
+<Project>
+  <ItemGroup Condition="'%24(SourceExpander_Generator)'=='true' And Exists('%24($(_SourceExpander_PackageSourceTag))')">
+    <AdditionalFiles LinkBase="Properties/SourceExpander.Embedded"
+      Include="%24($(_SourceExpander_PackageSourceTag))"
+      Visible="%24($(_SourceExpander_PackageSourceTag)_Visible)" />
+  </ItemGroup>
+</Project>
+      ]]>
+      </PackTargetsBody>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PackTargetsPath)" Lines="$(PackTargetsBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <Target Name="SourceExpanderPackage"
+          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true'">
+    <Error Condition="!Exists('$(SourceExpander_JsonPath)')" Text="Embedded data json '$(SourceExpander_JsonPath)' is not found" />
+
+    <ItemGroup>
+      <TfmSpecificPackageFile
+        Condition="Exists('$(PackPropsPath)')"
+        Include="$(PackPropsPath)"
+        PackagePath="buildTransitive/$(TargetFramework)"
+        IncludeInPackage="true" CopyToOutputDirectory="Never" />
+      <TfmSpecificPackageFile
+        Condition="Exists('$(PackTargetsPath)')"
+        Include="$(PackTargetsPath)"
+        PackagePath="buildTransitive/$(TargetFramework)"
+        IncludeInPackage="true" CopyToOutputDirectory="Never" />
+      <TfmSpecificPackageFile
+        Include="$(SourceExpander_JsonPath)"
+        PackagePath="buildTransitive/$(TargetFramework)"
+        IncludeInPackage="true" CopyToOutputDirectory="Never" />
+    </ItemGroup>
+  </Target>
+</Project>

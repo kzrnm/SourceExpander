@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SourceExpander</RootNamespace>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+    <NoWarn>$(NoWarn);NU5100</NoWarn>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <ThirdPartyLicensePath></ThirdPartyLicensePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build/**" Pack="true" PackagePath="build" />
+    <None Remove="tasks/**" />
+    <Compile Include="../SourceExpander.Console/SourceExpanderMetadata.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" PrivateAssets="all" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.Metadata" PrivateAssets="all" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="CopyOutputToTasks" AfterTargets="Build" Condition="$(UpdateLocalPackDll) == 'true'">
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFolder="tasks/$(TargetFramework)/"
+          ContinueOnError="true"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

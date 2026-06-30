@@ -8,8 +8,8 @@
     <PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <Version>9.0.1</Version>
-    <AssemblyVersion>9.0.1.100</AssemblyVersion>
+    <Version>9.0.2-alpha7</Version>
+    <AssemblyVersion>9.0.2.7</AssemblyVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
@@ -17,8 +17,6 @@
     <LangVersion>latest</LangVersion>
 
     <NoWarn>$(NoWarn);CA2249;IDE0130</NoWarn>
-
-    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
@@ -28,12 +26,11 @@
     <RootNamespace>SourceExpander</RootNamespace>
     <DefineConstants Condition="'$(IsRoslyn3)'!='true'">$(DefineConstants)USE_ROSLYN4</DefineConstants>
     <NoWarn>$(NoWarn);NU1507</NoWarn>
-  </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)3rd-party-license.txt" Pack="true" PackagePath="" Visible="false" />
-    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="false" />
-  </ItemGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <ReadmePath>$(MSBuildThisFileDirectory)README.md</ReadmePath>
+    <ThirdPartyLicensePath>$(MSBuildThisFileDirectory)3rd-party-license.txt</ThirdPartyLicensePath>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

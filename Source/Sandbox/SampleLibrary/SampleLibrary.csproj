@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../SourceExpander.Embedder/build/SourceExpander.Embedder.props" />
+  <Import Project="../../SourceExpander.Embedder.PackJson/build/SourceExpander.Embedder.PackJson.props" />
   <PropertyGroup>
     <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -7,6 +8,9 @@
     <ImplicitUsings>false</ImplicitUsings>
     <NoWarn>$(NoWarn);CA1822</NoWarn>
 
+    <SourceExpander_PackJson_Disabled>true</SourceExpander_PackJson_Disabled>
+    <SourceExpander_PackJsonProps_Disabled>false</SourceExpander_PackJsonProps_Disabled>
+    <SourceExpander_PackJsonTargets_Disabled>false</SourceExpander_PackJsonTargets_Disabled>
     <SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
     <SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
     <SourceExpander_Embedder_ExpandInLibrary Condition="'$(Configuration)' == 'Debug'">true</SourceExpander_Embedder_ExpandInLibrary>
@@ -28,5 +32,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+  <Import Project="../../SourceExpander.Embedder.PackJson/build/SourceExpander.Embedder.PackJson.targets" />
   <Import Project="../../SourceExpander.Embedder/build/SourceExpander.Embedder.targets" />
 </Project>

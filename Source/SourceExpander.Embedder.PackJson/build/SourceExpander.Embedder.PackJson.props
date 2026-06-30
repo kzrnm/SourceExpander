@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <_ReadEmbeddedDataAssembly>$(MSBuildThisFileDirectory)../tasks/netstandard2.0/$(MSBuildThisFileName).dll</_ReadEmbeddedDataAssembly>
+    <SourceExpander_PackJson_Disabled></SourceExpander_PackJson_Disabled>
+    <SourceExpander_PackJsonProps_Disabled></SourceExpander_PackJsonProps_Disabled>
+    <SourceExpander_PackJsonTargets_Disabled></SourceExpander_PackJsonTargets_Disabled>
+    <PackPropsPath></PackPropsPath>
+    <PackTargetsPath></PackTargetsPath>
+  </PropertyGroup>
+
+  <UsingTask TaskName="SourceExpander.ReadEmbeddedData" AssemblyFile="$(_ReadEmbeddedDataAssembly)"/>
+</Project>

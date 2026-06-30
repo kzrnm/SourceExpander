@@ -55,7 +55,7 @@ namespace SampleApp
     }
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
-namespace SampleLibrary { public static unsafe class UnsafeBlock { public static ulong Convert(double d) { double* p = &d; return *(ulong*)p; } } }
+namespace SampleLibrary { public static unsafe class UnsafeBlock { public static ulong Convert(double d) { double* p = &d; System.Console.WriteLine(System.Runtime.CompilerServices.Unsafe.BitCast<char, short>('a')); return *(ulong*)p; } } }
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
@@ -134,7 +134,7 @@ namespace SampleApp
 }
 #region Expanded by https://github.com/kzrnm/SourceExpander
 /* 🥇 */
-namespace SampleLibrary { public static unsafe class UnsafeBlock { public static ulong Convert(double d) { double* p = &d; return *(ulong*)p; } } }
+namespace SampleLibrary { public static unsafe class UnsafeBlock { public static ulong Convert(double d) { double* p = &d; System.Console.WriteLine(System.Runtime.CompilerServices.Unsafe.BitCast<char, short>('a')); return *(ulong*)p; } } }
 #endregion Expanded by https://github.com/kzrnm/SourceExpander
 
 """.ReplaceLineEndings());
