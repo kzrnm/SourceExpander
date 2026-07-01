@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConfigGenerator\ConfigAnalyzer.csproj">
+    <ProjectReference Include="../Tools/ConfigGenerator/ConfigGenerator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
