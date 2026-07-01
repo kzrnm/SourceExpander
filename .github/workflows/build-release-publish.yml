@@ -28,7 +28,7 @@ jobs:
         10.0.x
 
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: [get-version]
     steps:
       - uses: actions/checkout@v7
