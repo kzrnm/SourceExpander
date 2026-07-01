@@ -20,7 +20,7 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <DevelopmentDependency>true</DevelopmentDependency>
 
-    <Roslyn3ProjectPath>../SourceExpander.Generator.Roslyn3/SourceExpander.Generator.Roslyn3.csproj</Roslyn3ProjectPath>
+    <Roslyn3ProjectPath>../Tools/SourceExpander.Generator.Roslyn3/SourceExpander.Generator.Roslyn3.csproj</Roslyn3ProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
