@@ -3,10 +3,10 @@
     <RootNamespace>SourceExpander</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
 
+    <IncludeSymbols>false</IncludeSymbols>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <NoWarn>$(NoWarn);NU5100</NoWarn>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <DevelopmentDependency>true</DevelopmentDependency>
     <ThirdPartyLicensePath></ThirdPartyLicensePath>
   </PropertyGroup>
@@ -21,16 +21,14 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Collections.Immutable" VersionOverride="8.0.0" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="System.Reflection.Metadata" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" PrivateAssets="None" />
   </ItemGroup>
 
   <Target Name="CopyOutputToTasks" AfterTargets="Build" Condition="$(UpdateLocalPackDll) == 'true'">
-    <Copy SourceFiles="$(TargetPath)"
-          DestinationFolder="tasks/$(TargetFramework)/"
-          ContinueOnError="true"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="tasks/$(TargetFramework)/" ContinueOnError="true" SkipUnchangedFiles="true" />
   </Target>
 </Project>
