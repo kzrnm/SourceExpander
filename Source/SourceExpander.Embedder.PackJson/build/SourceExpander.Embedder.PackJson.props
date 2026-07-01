@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <_ReadEmbeddedDataAssembly>$(MSBuildThisFileDirectory)../tasks/netstandard2.0/$(MSBuildThisFileName).dll</_ReadEmbeddedDataAssembly>
-    <SourceExpander_PackJson_Disabled></SourceExpander_PackJson_Disabled>
-    <SourceExpander_PackJsonProps_Disabled></SourceExpander_PackJsonProps_Disabled>
-    <SourceExpander_PackJsonTargets_Disabled></SourceExpander_PackJsonTargets_Disabled>
+    <SourceExpander_PackJson_Enabled>true</SourceExpander_PackJson_Enabled>
+    <SourceExpander_PackJsonProps_Enabled>true</SourceExpander_PackJsonProps_Enabled>
+    <SourceExpander_PackJsonTargets_Enabled>true</SourceExpander_PackJsonTargets_Enabled>
     <PackPropsPath></PackPropsPath>
     <PackTargetsPath></PackTargetsPath>
   </PropertyGroup>

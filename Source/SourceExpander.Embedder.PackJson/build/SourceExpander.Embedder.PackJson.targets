@@ -1,5 +1,5 @@
 <Project>
-  <Target Name="SourceExpanderDefinePackProperties" BeforeTargets="BeforeBuild" Condition="'$(SourceExpander_PackJson_Disabled)' != 'true'">
+  <Target Name="SourceExpanderDefinePackProperties" BeforeTargets="BeforeBuild" Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
     <PropertyGroup>
       <_SourceExpander_PackageIdTag>$(PackageId.Replace('.', '_'))</_SourceExpander_PackageIdTag>
       <_SourceExpander_PackageSourceTag>$(PackageId)_Source</_SourceExpander_PackageSourceTag>
@@ -10,7 +10,7 @@
   <Target Name="SourceExpanderEmbeddingBuild"
           BeforeTargets="BeforeBuild"
           DependsOnTargets="SourceExpanderDefinePackProperties"
-          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true'And '$(_SourceExpander_RunEmbeddingJson)'!='true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'And '$(_SourceExpander_RunEmbeddingJson)'!='true'">
     <MSBuild Projects="$(MSBuildProjectFile)"
              Targets="SourceExpanderWriteEmbeddedDataJson"
              Properties="TargetFramework=$(TargetFramework);_SourceExpander_RunEmbeddingJson=true;IncludeBuildOutput=false">
@@ -25,7 +25,7 @@
   <Target Name="SourceExpanderWriteEmbeddedDataJson"
           DependsOnTargets="SourceExpanderDefinePackProperties;Build"
           Returns="@(EmbeddedJsonOutputItem)"
-          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true' And '$(_SourceExpander_RunEmbeddingJson)' == 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(_SourceExpander_RunEmbeddingJson)' == 'true'">
     <Message Importance="high" Text="[$(TargetFramework)] Writing embedded JSON data..." />
     <ReadEmbeddedData AssemblyPath="$(TargetPath)">
       <Output TaskParameter="OutputPath" PropertyName="JsonPath" />
@@ -42,7 +42,7 @@
 
   <Target Name="SourceExpanderDefineProps"
           AfterTargets="SourceExpanderEmbeddingBuild" DependsOnTargets="SourceExpanderDefinePackProperties"
-          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true' And '$(SourceExpander_PackJsonProps_Disabled)' != 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(SourceExpander_PackJsonProps_Enabled)' == 'true'">
     <PropertyGroup>
       <PackPropsPath Condition="'$(PackPropsPath)'==''">$(TargetDir)$(PackageId).props</PackPropsPath>
       <PackPropsBody>
@@ -60,7 +60,7 @@
   </Target>
   <Target Name="SourceExpanderDefineTargets"
           AfterTargets="SourceExpanderEmbeddingBuild" DependsOnTargets="SourceExpanderDefinePackProperties"
-          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true' And '$(SourceExpander_PackJsonTargets_Disabled)' != 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(SourceExpander_PackJsonTargets_Enabled)' == 'true'">
     <PropertyGroup>
       <PackTargetsPath Condition="'$(PackTargetsPath)'==''">$(TargetDir)$(PackageId).targets</PackTargetsPath>
       <PackTargetsBody>
@@ -79,7 +79,7 @@
   </Target>
 
   <Target Name="SourceExpanderPackage"
-          Condition="'$(SourceExpander_PackJson_Disabled)' != 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
     <Error Condition="!Exists('$(SourceExpander_JsonPath)')" Text="Embedded data json '$(SourceExpander_JsonPath)' is not found" />
 
     <ItemGroup>

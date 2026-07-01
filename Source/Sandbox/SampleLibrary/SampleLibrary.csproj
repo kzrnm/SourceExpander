@@ -8,9 +8,9 @@
     <ImplicitUsings>false</ImplicitUsings>
     <NoWarn>$(NoWarn);CA1822</NoWarn>
 
-    <SourceExpander_PackJson_Disabled>true</SourceExpander_PackJson_Disabled>
-    <SourceExpander_PackJsonProps_Disabled>false</SourceExpander_PackJsonProps_Disabled>
-    <SourceExpander_PackJsonTargets_Disabled>false</SourceExpander_PackJsonTargets_Disabled>
+    <SourceExpander_PackJson_Enabled>false</SourceExpander_PackJson_Enabled>
+    <SourceExpander_PackJsonProps_Enabled>false</SourceExpander_PackJsonProps_Enabled>
+    <SourceExpander_PackJsonTargets_Enabled>false</SourceExpander_PackJsonTargets_Enabled>
     <SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
     <SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
     <SourceExpander_Embedder_ExpandInLibrary Condition="'$(Configuration)' == 'Debug'">true</SourceExpander_Embedder_ExpandInLibrary>
