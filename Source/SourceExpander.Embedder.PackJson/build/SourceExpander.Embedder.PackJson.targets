@@ -2,7 +2,7 @@
   <Target Name="SourceExpanderDefinePackProperties" BeforeTargets="BeforeBuild" Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
     <PropertyGroup>
       <_SourceExpander_PackageIdTag>$(PackageId.Replace('.', '_'))</_SourceExpander_PackageIdTag>
-      <_SourceExpander_PackageSourceTag>$(PackageId)_Source</_SourceExpander_PackageSourceTag>
+      <_SourceExpander_PackageSourceTag>$(_SourceExpander_PackageIdTag)_Source</_SourceExpander_PackageSourceTag>
       <SourceExpander_Embedder_EmbeddingType>SingleMetadataJson</SourceExpander_Embedder_EmbeddingType>
       <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);SourceExpanderPackage</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>
