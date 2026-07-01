@@ -1,4 +1,4 @@
 {
-  "$schema": "../../schema/embedder.schema.json",
+  "$schema": "../../../schema/embedder.schema.json",
   "minify-level": "default"
 }

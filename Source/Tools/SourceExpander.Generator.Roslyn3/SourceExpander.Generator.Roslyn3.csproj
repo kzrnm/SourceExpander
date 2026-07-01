@@ -1,6 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -14,37 +12,30 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <DevelopmentDependency>true</DevelopmentDependency>
 
-    <Roslyn4ProjectPath>../SourceExpander.Embedder</Roslyn4ProjectPath>
+    <Roslyn4ProjectPath>../../SourceExpander.Generator</Roslyn4ProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile LinkBase="Orig" Include="$(Roslyn4ProjectPath)/**/*.cs" Exclude="$(Roslyn4ProjectPath)/obj/**/*.cs;$(Roslyn4ProjectPath)/Roslyn4/**/*.cs" />
-    <Compile LinkBase="Share" Include="../SourceExpander.Share/**/*.cs" Exclude="../SourceExpander.Share/**/Roslyn4/**/*.cs"/>
-    <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
-    <AdditionalFiles Include="$(Roslyn4ProjectPath)/AnalyzerReleases.*.md" />
+    <Compile LinkBase="Share" Include="../../SourceExpander.Share/**/*.cs" Exclude="../../SourceExpander.Share/**/Roslyn4/**/*.cs" />
+    <AdditionalFiles Include="$(Roslyn4ProjectPath)/AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="$(Roslyn4ProjectPath)/AnalyzerReleases.Unshipped.md" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConfigGenerator\ConfigAnalyzer.csproj">
+    <ProjectReference Include="../ConfigGenerator/ConfigGenerator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
   </ItemGroup>
 
-  <ItemDefinitionGroup>
-    <PackageReference>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemDefinitionGroup>
-
   <ItemGroup>
-    <PackageReference Include="DotNet.Glob" GeneratePathProperty="true" />
-    <PackageReference Include="Newtonsoft.Json" GeneratePathProperty="true" />
-    <PackageReference Include="Base32768" GeneratePathProperty="true" />
     <PackageReference Include="IsExternalInit">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" VersionOverride="3.11.0" />
+    <PackageReference Include="Newtonsoft.Json" GeneratePathProperty="true" />
+    <PackageReference Include="Base32768" GeneratePathProperty="true" />
   </ItemGroup>
 </Project>
