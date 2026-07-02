@@ -51,6 +51,7 @@ internal class EmbeddingResolver
 
             var data = EmbeddedData;
 
+            yield return ("SourceExpander.EmbedderVersion", data.EmbedderVersion.ToString());
             if (EmbeddingType is EmbeddingType.SingleMetadataJson)
             {
                 yield return ("SourceExpander.EmbeddedDataJson", JsonUtil.ToJson(data));
@@ -60,7 +61,6 @@ internal class EmbeddingResolver
             if (data.AllowUnsafe)
                 yield return ("SourceExpander.EmbeddedAllowUnsafe", "true");
 
-            yield return ("SourceExpander.EmbedderVersion", data.EmbedderVersion.ToString());
             yield return ("SourceExpander.EmbeddedLanguageVersion", data.CSharpVersion);
 
             yield return ("SourceExpander.EmbeddedNamespaces", string.Join(",", data.EmbeddedNamespaces));
