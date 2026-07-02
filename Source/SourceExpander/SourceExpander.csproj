@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceExpander.Core\SourceExpander.Core.csproj" />
-    <ProjectReference Include="..\SourceExpander.Generator\SourceExpander.Generator.csproj" PrivateAssets="None" />
+    <ProjectReference Include="..\SourceExpander.Generator\SourceExpander.Generator.csproj" PrivateAssets="None" Private="false" />
   </ItemGroup>
 
   <ItemGroup>

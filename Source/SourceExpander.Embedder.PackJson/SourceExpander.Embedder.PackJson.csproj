@@ -6,7 +6,7 @@
     <IncludeSymbols>false</IncludeSymbols>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
-    <NoWarn>$(NoWarn);NU5100</NoWarn>
+    <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
     <DevelopmentDependency>true</DevelopmentDependency>
     <ThirdPartyLicensePath></ThirdPartyLicensePath>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <PackageReference Include="System.Reflection.Metadata" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" PrivateAssets="None" />
+    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" PrivateAssets="None" Private="false" />
   </ItemGroup>
 
   <Target Name="CopyOutputToTasks" AfterTargets="Build" Condition="$(UpdateLocalPackDll) == 'true'">
