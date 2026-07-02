@@ -21,6 +21,9 @@
       <SourceExpander_JsonName>%(_ReadEmbeddedDataResult.JsonName)</SourceExpander_JsonName>
       <SourceExpander_Embedder_Enabled>false</SourceExpander_Embedder_Enabled>
     </PropertyGroup>
+    <ItemGroup>
+      <AssemblyMetadata Include="SourceExpander.EmbedderVersion" Value="%(_ReadEmbeddedDataResult.EmbedderVersion)" />
+    </ItemGroup>
   </Target>
   <Target Name="SourceExpanderWriteEmbeddedDataJson"
           DependsOnTargets="SourceExpanderDefinePackProperties;Build"
@@ -30,12 +33,14 @@
     <ReadEmbeddedData AssemblyPath="$(TargetPath)">
       <Output TaskParameter="OutputPath" PropertyName="JsonPath" />
       <Output TaskParameter="OutputName" PropertyName="JsonName" />
+      <Output TaskParameter="EmbedderVersion" PropertyName="EmbedderVersion" />
     </ReadEmbeddedData>
     <ItemGroup>
-      <EmbeddedJsonOutputItem Include="$(JsonPath)">
+      <EmbeddedJsonOutputItem>
         <TargetFramework>$(TargetFramework)</TargetFramework>
         <JsonPath>$(JsonPath)</JsonPath>
         <JsonName>$(JsonName)</JsonName>
+        <EmbedderVersion>$(EmbedderVersion)</EmbedderVersion>
       </EmbeddedJsonOutputItem>
     </ItemGroup>
   </Target>
