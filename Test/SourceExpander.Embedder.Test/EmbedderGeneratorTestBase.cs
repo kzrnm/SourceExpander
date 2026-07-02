@@ -26,23 +26,26 @@ public class EmbedderGeneratorTestBase : GeneratorTestBase<EmbedderGenerator>
                 "#pragma warning disable",
             ];
 
-            if (p.AllowUnsafe)
-                metadata.Add(AssemblyMetadataAttribute("SourceExpander.EmbeddedAllowUnsafe", "true"));
-            metadata.AddRange(
-                AssemblyMetadataAttribute("SourceExpander.EmbedderVersion", p.EmbedderVersion ?? EmbedderVersion),
-                AssemblyMetadataAttribute("SourceExpander.EmbeddedLanguageVersion", p.EmbeddedLanguageVersion ?? EmbeddedLanguageVersion),
-                AssemblyMetadataAttribute("SourceExpander.EmbeddedNamespaces", p.EmbeddedNamespaces ?? ""));
-
-            if (p.EmbeddedSourceCode is not null)
-                metadata.Add(AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode", p.EmbeddedSourceCode));
-            if (p.EmbeddedSourceCodeGZip is not null)
-                metadata.Add(AssemblyMetadataAttribute("SourceExpander.EmbeddedSourceCode.GZipBase32768", SourceFileInfoUtil.ToGZipBase32768(p.EmbeddedSourceCodeGZip)));
+            foreach (var (k, v) in EnumerateMetadata(p))
+                metadata.Add(AssemblyMetadataAttribute(k, v));
 
             TestState.GeneratedSources.Add(
                 (typeof(EmbedderGenerator), "EmbeddedSourceCode.Metadata.cs", EnvironmentUtil.JoinByStringBuilder(metadata))
             );
-            static string AssemblyMetadataAttribute(string key, string value)
-                => $"[assembly: global::System.Reflection.AssemblyMetadataAttribute({key.ToLiteral()},{value.ToLiteral()})]";
+
+            static IEnumerable<KeyValuePair<string, string>> EnumerateMetadata(TestParams p)
+            {
+                yield return new("SourceExpander.EmbedderVersion", p.EmbedderVersion ?? EmbedderVersion);
+                if (p.AllowUnsafe)
+                    yield return new("SourceExpander.EmbeddedAllowUnsafe", "true");
+                yield return new("SourceExpander.EmbeddedLanguageVersion", p.EmbeddedLanguageVersion ?? EmbeddedLanguageVersion);
+                yield return new("SourceExpander.EmbeddedNamespaces", p.EmbeddedNamespaces ?? "");
+
+                if (p.EmbeddedSourceCode is not null)
+                    yield return new("SourceExpander.EmbeddedSourceCode", p.EmbeddedSourceCode);
+                if (p.EmbeddedSourceCodeGZip is not null)
+                    yield return new("SourceExpander.EmbeddedSourceCode.GZipBase32768", SourceFileInfoUtil.ToGZipBase32768(p.EmbeddedSourceCodeGZip));
+            }
         }
     }
 
@@ -56,6 +59,9 @@ public class EmbedderGeneratorTestBase : GeneratorTestBase<EmbedderGenerator>
 
     public static string EmbedderVersion => typeof(EmbedderGenerator).Assembly.GetName().Version.ToString();
     public static string EmbeddedLanguageVersion => "preview";
+
+    public static string AssemblyMetadataAttribute(string key, string value)
+        => $"[assembly: global::System.Reflection.AssemblyMetadataAttribute({key.ToLiteral()},{value.ToLiteral()})]";
 
     public static InMemorySourceText enableMinifyJson = new(
         "/foo/bar/SourceExpander.Embedder.Config.json", """

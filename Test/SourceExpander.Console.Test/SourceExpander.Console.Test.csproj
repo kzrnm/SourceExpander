@@ -13,6 +13,13 @@
     <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" />
     <ProjectReference Include="..\..\Source\SourceExpander.Console\SourceExpander.Console.csproj" />
+
+    <ProjectReference Include="..\..\Source\Sandbox\SampleAppSkipAtcoder\SampleAppSkipAtcoder.csproj"
+                      SetConfiguration="Debug"
+                      ReferenceOutputAssembly="false" Private="false" ExcludeAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\..\Source\Sandbox\SampleApp\SampleApp.csproj"
+                      SetConfiguration="Debug"
+                      ReferenceOutputAssembly="false" Private="false" ExcludeAssets="all" SkipGetTargetFrameworkProperties="true"/>
   </ItemGroup>
 
   <ItemGroup>
