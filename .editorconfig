@@ -1,10 +1,8 @@
-# Rules in this file were initially inferred by Visual Studio IntelliCode from the Z:\source\repos\SourceExpander codebase based on best match to current usage at 2020/09/24
-# You can modify the rules from these initially generated values to suit your own policies
-# You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+[*]
+indent_style = space
 
 [*.{csproj,props,targets,config,nuspec}]
 indent_size = 2
-indent_style = space
 
 # Code files
 [*.{csproj}]

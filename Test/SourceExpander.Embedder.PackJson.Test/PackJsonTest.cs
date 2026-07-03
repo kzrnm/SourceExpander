@@ -1,52 +1,9 @@
-﻿using System.Diagnostics;
-using System.IO.Compression;
-using System.Text;
+﻿using System.Text;
 
 namespace SourceExpander;
 
 public class PackJsonTest
 {
-    [Before(Class)]
-    public static async Task BuildProject(CancellationToken cancellationToken)
-    {
-        if (Directory.Exists(TestUtil.PackageDirectory))
-        {
-            foreach (var pkg in Directory.EnumerateFiles(TestUtil.PackageDirectory, "SampleLibrary.*.nupkg"))
-                File.Delete(pkg);
-
-            foreach (var pkg in Directory.EnumerateDirectories(TestUtil.PackageDirectory, "SampleLibrary"))
-                Directory.Delete(pkg, true);
-
-            File.Delete(Path.Combine(TestUtil.PackageDirectory, "SampleLibrary.1.0.0.nupkg"));
-        }
-        var processStartInfo = new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            ArgumentList =
-            {
-                "pack",
-                "SampleLibrary.csproj",
-                "-c", "Release",
-                "-o", TestUtil.PackageDirectory,
-                "-p:PackageTesting=true",
-            },
-            StandardOutputEncoding = System.Text.Encoding.UTF8,
-            StandardErrorEncoding = System.Text.Encoding.UTF8,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            WorkingDirectory = TestUtil.SampleLibraryProjectDirectory,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            EnvironmentVariables = { ["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1", ["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "1" },
-        };
-
-        using var process = Process.Start(processStartInfo);
-        await process.WaitForExitAsync(cancellationToken);
-
-        var nupkgFile = Directory.EnumerateFiles(TestUtil.PackageDirectory, "SampleLibrary.*.nupkg").Single();
-        await ZipFile.ExtractToDirectoryAsync(nupkgFile, Path.Combine(TestUtil.PackageDirectory, "SampleLibrary"), true, cancellationToken);
-    }
-
     static readonly string ExtractedPackageDirectory = Path.Combine(TestUtil.PackageDirectory, "SampleLibrary");
 
     static FileInfo FileInfo(params ReadOnlySpan<string> paths) => new(Path.Combine(paths));

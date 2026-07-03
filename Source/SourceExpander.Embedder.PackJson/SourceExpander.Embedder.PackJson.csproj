@@ -28,7 +28,8 @@
     <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" PrivateAssets="None" Private="false" />
   </ItemGroup>
 
-  <Target Name="CopyOutputToTasks" AfterTargets="Build" Condition="$(UpdateLocalPackDll) == 'true'">
+  <Target Name="CopyOutputToTasks" AfterTargets="Build"
+          Condition="$(UpdateLocalPackDll) == 'true' Or ('$(GITHUB_ACTIONS)' == 'true' And $(Configuration) == 'Release')">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="tasks/$(TargetFramework)/" ContinueOnError="true" SkipUnchangedFiles="true" />
   </Target>
 </Project>
