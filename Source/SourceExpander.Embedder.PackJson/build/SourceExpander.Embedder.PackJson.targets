@@ -36,7 +36,7 @@
       <Output TaskParameter="EmbedderVersion" PropertyName="EmbedderVersion" />
     </ReadEmbeddedData>
     <ItemGroup>
-      <EmbeddedJsonOutputItem>
+      <EmbeddedJsonOutputItem Include="JsonPath">
         <TargetFramework>$(TargetFramework)</TargetFramework>
         <JsonPath>$(JsonPath)</JsonPath>
         <JsonName>$(JsonName)</JsonName>

@@ -2,15 +2,16 @@
   <Import Project="../../SourceExpander.Embedder/build/SourceExpander.Embedder.props" />
   <Import Project="../../SourceExpander.Embedder.PackJson/build/SourceExpander.Embedder.PackJson.props" />
   <PropertyGroup>
-    <TargetFrameworks>net10.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(PackageTesting)'!='true'">net10.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(PackageTesting)'=='true'">net10.0;netstandard2.1;net9.0;net8.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <ImplicitUsings>false</ImplicitUsings>
     <NoWarn>$(NoWarn);CA1822</NoWarn>
 
-    <SourceExpander_PackJson_Enabled>false</SourceExpander_PackJson_Enabled>
-    <SourceExpander_PackJsonProps_Enabled>false</SourceExpander_PackJsonProps_Enabled>
-    <SourceExpander_PackJsonTargets_Enabled>false</SourceExpander_PackJsonTargets_Enabled>
+    <SourceExpander_PackJson_Enabled Condition="'$(PackageTesting)'!='true' Or '$(TargetFramework)' == 'net8.0'">false</SourceExpander_PackJson_Enabled>
+    <SourceExpander_PackJsonProps_Enabled Condition="'$(TargetFramework)' == 'net9.0'">false</SourceExpander_PackJsonProps_Enabled>
+    <SourceExpander_PackJsonTargets_Enabled Condition="'$(TargetFramework)' == 'netstandard2.1'">false</SourceExpander_PackJsonTargets_Enabled>
     <SourceExpander_Embedder_Enabled>True</SourceExpander_Embedder_Enabled>
     <SourceExpander_Embedder_EmbeddingType>raw</SourceExpander_Embedder_EmbeddingType>
     <SourceExpander_Embedder_ExpandInLibrary Condition="'$(Configuration)' == 'Debug'">true</SourceExpander_Embedder_ExpandInLibrary>
