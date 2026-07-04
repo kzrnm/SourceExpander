@@ -8,11 +8,15 @@
     <PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <Version>9.0.2-beta3</Version>
-    <AssemblyVersion>9.0.2.13</AssemblyVersion>
+    <VersionPrefix>9.0.2</VersionPrefix>
+    <VersionSuffix>beta4</VersionSuffix>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
+
+    <VersionSuffixNumber Condition="'$(VersionSuffix)' != ''">$(VersionSuffix.Replace('alpha', '1').Replace('beta', '2'))</VersionSuffixNumber>
+    <VersionSuffixNumber Condition="'$(VersionSuffix)' == ''">100</VersionSuffixNumber>
+    <AssemblyVersion>$(VersionPrefix).$(VersionSuffixNumber)</AssemblyVersion>
 
     <LangVersion>latest</LangVersion>
 

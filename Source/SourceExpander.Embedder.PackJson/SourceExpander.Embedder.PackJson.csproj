@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <Target Name="CopyOutputToTasks" AfterTargets="Build"
-          Condition="$(UpdateLocalPackDll) == 'true' Or ('$(GITHUB_ACTIONS)' == 'true' And $(Configuration) == 'Release')">
+          Condition="$(UpdateLocalPackDll) == 'true' Or '$(GITHUB_ACTIONS)' == 'true'">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="tasks/$(TargetFramework)/" ContinueOnError="true" SkipUnchangedFiles="true" />
   </Target>
 </Project>

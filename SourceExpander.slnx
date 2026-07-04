@@ -2,8 +2,12 @@
   <Folder Name="/Sandbox/">
     <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
     <Project Path="Source/Sandbox/SampleAppSkipAtcoder/SampleAppSkipAtcoder.csproj" />
-    <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj" />
-    <Project Path="Source/Sandbox/SampleLibraryJsonPack/SampleLibraryJsonPack.csproj" />
+    <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj">
+      <BuildDependency Project="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" />
+    </Project>
+    <Project Path="Source/Sandbox/SampleLibraryJsonPack/SampleLibraryJsonPack.csproj">
+      <BuildDependency Project="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" />
+    </Project>
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
