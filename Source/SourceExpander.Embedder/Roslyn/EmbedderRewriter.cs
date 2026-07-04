@@ -52,7 +52,7 @@ class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticRe
             if (typeName is SourceExpander_NotEmbeddingSourceAttributeName)
             {
                 reporter.ReportDiagnostic(DiagnosticDescriptors.EMBED0012_InvalidAttribute(
-                    node.GetLocation(), SourceExpander_NotEmbeddingSourceAttributeName.Split('.').Last()));
+                    ActualLocation(node), SourceExpander_NotEmbeddingSourceAttributeName.Split('.').Last()));
                 return null;
             }
 
@@ -82,12 +82,11 @@ class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticRe
         {
             Diagnostic diagnostic;
             if (node.StaticKeyword.IsKind(SyntaxKind.StaticKeyword))
-                diagnostic = DiagnosticDescriptors.EMBED0009_UsingStaticDirective(node.GetLocation());
+                diagnostic = DiagnosticDescriptors.EMBED0009_UsingStaticDirective(ActualLocation(node));
             else if (node.Alias != null)
-                diagnostic = DiagnosticDescriptors.EMBED0010_UsingAliasDirective(node.GetLocation());
+                diagnostic = DiagnosticDescriptors.EMBED0010_UsingAliasDirective(ActualLocation(node));
             else
                 goto Fin;
-
             reporter.ReportDiagnostic(diagnostic);
         }
     Fin: return base.VisitUsingDirective(node);
@@ -114,5 +113,11 @@ class EmbedderRewriter(SemanticModel model, EmbedderConfig config, IDiagnosticRe
             return config.RemoveConditional.Overlaps(conditions);
         }
         return IsRemovable(node) ? null : base.VisitExpressionStatement(node);
+    }
+
+    static Location ActualLocation(SyntaxNode node)
+    {
+        var loc = node.GetLocation();
+        return Location.Create(node.SyntaxTree.FilePath, loc.SourceSpan, loc.GetLineSpan().Span);
     }
 }

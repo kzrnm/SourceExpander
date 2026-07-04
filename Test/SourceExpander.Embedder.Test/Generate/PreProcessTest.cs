@@ -1,6 +1,6 @@
-﻿using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Testing;
 
 namespace SourceExpander.Generate;
 
@@ -16,8 +16,8 @@ public class PreProcessTest : EmbedderGeneratorTestBase
              (
                  "TestProject>Program.cs",
                  ["Program"],
-                 ImmutableArray.Create("using System;"),
-                 ImmutableArray<string>.Empty,
+                 ["using System;"],
+                 [],
                  "class Program{int[]v=new int[]{2,4,6,};static void Main()=>Console.WriteLine(1);}"
              ),
         ]);
@@ -31,7 +31,7 @@ public class PreProcessTest : EmbedderGeneratorTestBase
                 LanguageVersion.Preview,
                 kind: SourceCodeKind.Regular,
                 documentationMode: DocumentationMode.Parse,
-                preprocessorSymbols: new[] { "Trace", "TEST" }),
+                preprocessorSymbols: ["Trace", "TEST"]),
             TestState =
             {
                 AdditionalFiles =
@@ -79,6 +79,80 @@ class Program
 #endif
 );
 #endif
+}
+"""
+                    ),
+                },
+            }
+        };
+        await test.RunAsync(cancellationToken);
+    }
+
+    [Test]
+    public async Task WithError(CancellationToken cancellationToken)
+    {
+        const string embeddedSourceCode = """[{"CodeBody":"class Program{[M(256)]static void Do()=>WriteLine(0);}","Dependencies":[],"FileName":"TestProject>Program.cs","TypeNames":["Program"],"Usings":["using M = System.Runtime.CompilerServices.MethodImplAttribute;","using static System.Console;"]}]""";
+
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
+             new SourceFileInfo
+             (
+                 "TestProject>Program.cs",
+                 ["Program"],
+                 ["using M = System.Runtime.CompilerServices.MethodImplAttribute;","using static System.Console;"],
+                 [],
+                 "class Program{[M(256)]static void Do()=>WriteLine(0);}"
+             ),
+        ]);
+
+        var test = new Test(new()
+        {
+            EmbeddedSourceCode = embeddedSourceCode,
+        })
+        {
+            ParseOptions = new CSharpParseOptions(
+                LanguageVersion.Preview,
+                kind: SourceCodeKind.Regular,
+                documentationMode: DocumentationMode.Parse
+            ),
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult("EMBED0009", DiagnosticSeverity.Info).WithSpan("/home/source/Program.cs", 3, 1, 3, 29),
+                new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/source/Program.cs", 4, 1, 4, 63),
+            },
+            TestState =
+            {
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                },
+                Sources = {
+                    (
+                        "/home/source/Program.cs",
+// lang=C#
+"""
+using System;
+#if SOURCE_EMBEDDING
+using static System.Console;
+using M = System.Runtime.CompilerServices.MethodImplAttribute;
+#endif
+class Program
+{
+#if SOURCE_EMBEDDING
+    [M(256)]
+#endif
+    static void Do() =>
+#if !SOURCE_EMBEDDING
+    Console.
+#endif
+    WriteLine(0);
+
+    [SourceExpander.NotEmbeddingSource]
+    static void NotEmbedding() => Console.WriteLine(0);
+
+#if SOURCE_EMBEDDING
+    [SourceExpander.NotEmbeddingSource]
+#endif
+    static void NotEmbedding2() => Console.WriteLine(0);
 }
 """
                     ),
