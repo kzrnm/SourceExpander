@@ -4,7 +4,7 @@ namespace SourceExpander;
 
 public class PackJsonTest
 {
-    static readonly string ExtractedPackageDirectory = Path.Combine(TestUtil.PackageDirectory, "SampleLibrary");
+    static readonly string ExtractedPackageDirectory = Path.Combine(TestUtil.PackageDirectory, "SampleLibraryJsonPack");
 
     static FileInfo FileInfo(params ReadOnlySpan<string> paths) => new(Path.Combine(paths));
     static DirectoryInfo DirectoryInfo(params ReadOnlySpan<string> paths) => new(Path.Combine(paths));
@@ -30,7 +30,7 @@ public class PackJsonTest
     [MethodDataSource(nameof(TargetFrameworksWithEmbeddedJson))]
     public async Task MetadataDllWithEmbeddedJson(Target target)
     {
-        var file = FileInfo(ExtractedPackageDirectory, "lib", target.TargetFramework, "SampleLibrary.dll");
+        var file = FileInfo(ExtractedPackageDirectory, "lib", target.TargetFramework, "SampleLibraryJsonPack.dll");
         await Assert.That(file).Exists();
 
         var metadata = TestUtil.GetSourceExpanderMetadata(file);
@@ -43,7 +43,7 @@ public class PackJsonTest
     [MethodDataSource(nameof(TargetFrameworksWithoutEmbeddedJson))]
     public async Task BuildDirWithoutEmbeddedJson(Target target)
     {
-        var file = FileInfo(ExtractedPackageDirectory, "lib", target.TargetFramework, "SampleLibrary.dll");
+        var file = FileInfo(ExtractedPackageDirectory, "lib", target.TargetFramework, "SampleLibraryJsonPack.dll");
         await Assert.That(file).Exists();
 
         var metadata = TestUtil.GetSourceExpanderMetadata(file);
@@ -62,10 +62,10 @@ public class PackJsonTest
     {
         var directory = DirectoryInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework);
         await Assert.That(directory).Exists();
-        var jsonFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibrary_SourceExpander.Embedded.json");
+        var jsonFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack_SourceExpander.Embedded.json");
         await Assert.That(jsonFile).Exists();
 
-        var propsFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibrary.props");
+        var propsFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack.props");
         if (target.HasProps)
         {
             await Assert.That(propsFile).Exists();
@@ -73,8 +73,8 @@ public class PackJsonTest
                 """
                 <Project>
                   <PropertyGroup>
-                    <SampleLibrary_Source>$(MSBuildThisFileDirectory)SampleLibrary_SourceExpander.Embedded.json</SampleLibrary_Source>
-                    <SampleLibrary_Source_Visible>false</SampleLibrary_Source_Visible>
+                    <SampleLibraryJsonPack_Source>$(MSBuildThisFileDirectory)SampleLibraryJsonPack_SourceExpander.Embedded.json</SampleLibraryJsonPack_Source>
+                    <SampleLibraryJsonPack_Source_Visible>false</SampleLibraryJsonPack_Source_Visible>
                   </PropertyGroup>
                 </Project>
                 
@@ -85,17 +85,17 @@ public class PackJsonTest
             await Assert.That(propsFile).DoesNotExist();
         }
 
-        var targetsFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibrary.targets");
+        var targetsFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack.targets");
         if (target.HasTargets)
         {
             await Assert.That(targetsFile).Exists();
             await Assert.That(File.ReadAllText(targetsFile.FullName, new UTF8Encoding(false))).IsEqualTo(
                 """
                 <Project>
-                  <ItemGroup Condition="'$(SourceExpander_Generator)'=='true' And Exists('$(SampleLibrary_Source)')">
+                  <ItemGroup Condition="'$(SourceExpander_Generator)'=='true' And Exists('$(SampleLibraryJsonPack_Source)')">
                     <AdditionalFiles LinkBase="Properties/SourceExpander.Embedded"
-                      Include="$(SampleLibrary_Source)"
-                      Visible="$(SampleLibrary_Source_Visible)" />
+                      Include="$(SampleLibraryJsonPack_Source)"
+                      Visible="$(SampleLibraryJsonPack_Source_Visible)" />
                   </ItemGroup>
                 </Project>
                 

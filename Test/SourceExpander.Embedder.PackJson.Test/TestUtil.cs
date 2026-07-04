@@ -14,10 +14,10 @@ static class TestUtil
     {
         if (Directory.Exists(PackageDirectory))
         {
-            foreach (var pkg in Directory.EnumerateFiles(PackageDirectory, "SampleLibrary.*.nupkg"))
+            foreach (var pkg in Directory.EnumerateFiles(PackageDirectory, "SampleLibraryJsonPack.*.nupkg"))
                 File.Delete(pkg);
 
-            foreach (var pkg in Directory.EnumerateDirectories(PackageDirectory, "SampleLibrary"))
+            foreach (var pkg in Directory.EnumerateDirectories(PackageDirectory, "SampleLibraryJsonPack"))
                 Directory.Delete(pkg, true);
         }
         var processStartInfo = new ProcessStartInfo
@@ -26,10 +26,9 @@ static class TestUtil
             ArgumentList =
             {
                 "pack",
-                "SampleLibrary.csproj",
+                "SampleLibraryJsonPack.csproj",
                 "-c", "Release",
                 "-o", PackageDirectory,
-                "-p:PackageTesting=true",
             },
             StandardOutputEncoding = System.Text.Encoding.UTF8,
             StandardErrorEncoding = System.Text.Encoding.UTF8,
@@ -50,16 +49,16 @@ static class TestUtil
         logger.LogInformation("---stdout---\n" + process.StandardOutput.ReadToEnd());
         logger.LogInformation("---stderr---\n" + process.StandardError.ReadToEnd());
 
-        var nupkgFile = Directory.EnumerateFiles(PackageDirectory, "SampleLibrary.*.nupkg").Single();
-        await ZipFile.ExtractToDirectoryAsync(nupkgFile, Path.Combine(PackageDirectory, "SampleLibrary"), true, cancellationToken);
+        var nupkgFile = Directory.EnumerateFiles(PackageDirectory, "SampleLibraryJsonPack.*.nupkg").Single();
+        await ZipFile.ExtractToDirectoryAsync(nupkgFile, Path.Combine(PackageDirectory, "SampleLibraryJsonPack"), true, cancellationToken);
     }
 
     static string ThisFileDir([CallerFilePath] string path = "") => Path.GetDirectoryName(path)!;
     public static string TestProjectDirectory = ThisFileDir();
     public static string PackageDirectory = Path.Combine(Path.GetDirectoryName(typeof(TestUtil).Assembly.Location), "publish");
     public static string SandboxDirectory = Path.GetFullPath(Path.Combine(TestProjectDirectory, "..", "..", "Source", "Sandbox"));
-    public static string SampleLibraryProjectDirectory = Path.Combine(SandboxDirectory, "SampleLibrary");
-    public static string SampleLibraryProject = Path.Combine(SampleLibraryProjectDirectory, "SampleLibrary.csproj");
+    public static string SampleLibraryProjectDirectory = Path.Combine(SandboxDirectory, "SampleLibraryJsonPack");
+    public static string SampleLibraryProject = Path.Combine(SampleLibraryProjectDirectory, "SampleLibraryJsonPack.csproj");
 
     public static Dictionary<string, string> GetSourceExpanderMetadata(FileInfo file)
     {
