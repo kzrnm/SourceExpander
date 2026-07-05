@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -7,7 +8,7 @@ using TUnit.Core.Logging;
 
 namespace SourceExpander;
 
-static class TestUtil
+abstract class TestUtil
 {
     [Before(Assembly)]
     public static async Task BuildProject(CancellationToken cancellationToken)
@@ -20,45 +21,57 @@ static class TestUtil
             foreach (var pkg in Directory.EnumerateDirectories(PackageDirectory, "SampleLibraryJsonPack"))
                 Directory.Delete(pkg, true);
         }
-        var processStartInfo = new ProcessStartInfo
+
+        foreach (var dir in ExtractedPackageDirectories)
         {
-            FileName = "dotnet",
-            ArgumentList =
+            var processStartInfo = new ProcessStartInfo
             {
-                "pack",
-                "SampleLibraryJsonPack.csproj",
-                "-c", "Release",
-                "-o", PackageDirectory,
-            },
-            StandardOutputEncoding = System.Text.Encoding.UTF8,
-            StandardErrorEncoding = System.Text.Encoding.UTF8,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            WorkingDirectory = SampleLibraryProjectDirectory,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            EnvironmentVariables = { ["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1", ["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "1" },
-        };
+                FileName = "dotnet",
+                ArgumentList =
+                {
+                    "pack",
+                    "SampleLibraryJsonPack.csproj",
+                    "-c", "Release",
+                    "-o", PackageDirectory,
+                },
+                StandardOutputEncoding = System.Text.Encoding.UTF8,
+                StandardErrorEncoding = System.Text.Encoding.UTF8,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                WorkingDirectory = SampleLibraryProjectDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                EnvironmentVariables = { ["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1", ["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "1" },
+            };
 
-        using var process = Process.Start(processStartInfo);
-        await process.WaitForExitAsync(cancellationToken);
+            if (dir.EndsWith("PackNotBuild"))
+                processStartInfo.ArgumentList.Add("--no-build");
 
-        var logger = TestContext.Current!.GetDefaultLogger();
+            using var process = Process.Start(processStartInfo);
+            await process.WaitForExitAsync(cancellationToken);
 
-        logger.LogInformation($"Process exited with code {process.ExitCode}");
-        logger.LogInformation("---stdout---\n" + process.StandardOutput.ReadToEnd());
-        logger.LogInformation("---stderr---\n" + process.StandardError.ReadToEnd());
+            var logger = TestContext.Current!.GetDefaultLogger();
 
-        var nupkgFile = Directory.EnumerateFiles(PackageDirectory, "SampleLibraryJsonPack.*.nupkg").Single();
-        await ZipFile.ExtractToDirectoryAsync(nupkgFile, Path.Combine(PackageDirectory, "SampleLibraryJsonPack"), true, cancellationToken);
+            logger.LogInformation($"Process exited with code {process.ExitCode}");
+            logger.LogInformation("---stdout---\n" + process.StandardOutput.ReadToEnd());
+            logger.LogInformation("---stderr---\n" + process.StandardError.ReadToEnd());
+
+            var nupkgFile = Directory.EnumerateFiles(PackageDirectory, "SampleLibraryJsonPack.*.nupkg").Single();
+            await ZipFile.ExtractToDirectoryAsync(nupkgFile, dir, true, cancellationToken);
+            File.Delete(nupkgFile);
+        }
     }
 
     static string ThisFileDir([CallerFilePath] string path = "") => Path.GetDirectoryName(path)!;
-    public static string TestProjectDirectory = ThisFileDir();
-    public static string PackageDirectory = Path.Combine(Path.GetDirectoryName(typeof(TestUtil).Assembly.Location), "publish");
-    public static string SandboxDirectory = Path.GetFullPath(Path.Combine(TestProjectDirectory, "..", "..", "Source", "Sandbox"));
-    public static string SampleLibraryProjectDirectory = Path.Combine(SandboxDirectory, "SampleLibraryJsonPack");
-    public static string SampleLibraryProject = Path.Combine(SampleLibraryProjectDirectory, "SampleLibraryJsonPack.csproj");
+    static readonly string TestProjectDirectory = ThisFileDir();
+    static readonly string PackageDirectory = Path.Combine(Path.GetDirectoryName(typeof(TestUtil).Assembly.Location), "publish");
+    static readonly string SandboxDirectory = Path.GetFullPath(Path.Combine(TestProjectDirectory, "..", "..", "Source", "Sandbox"));
+    static readonly string SampleLibraryProjectDirectory = Path.Combine(SandboxDirectory, "SampleLibraryJsonPack");
+    public static readonly string SampleLibraryProject = Path.Combine(SampleLibraryProjectDirectory, "SampleLibraryJsonPack.csproj");
+    public static readonly ImmutableArray<string> ExtractedPackageDirectories = [
+        Path.Combine(PackageDirectory, "PackAfterBuild"),
+        Path.Combine(PackageDirectory, "PackNotBuild"),
+    ];
 
     public static Dictionary<string, string> GetSourceExpanderMetadata(FileInfo file)
     {

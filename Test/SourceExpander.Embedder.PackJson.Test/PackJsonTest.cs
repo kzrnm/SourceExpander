@@ -2,10 +2,10 @@
 
 namespace SourceExpander;
 
+using static TestUtil;
+
 public class PackJsonTest
 {
-    static readonly string ExtractedPackageDirectory = Path.Combine(TestUtil.PackageDirectory, "SampleLibraryJsonPack");
-
     static FileInfo FileInfo(params ReadOnlySpan<string> paths) => new(Path.Combine(paths));
     static DirectoryInfo DirectoryInfo(params ReadOnlySpan<string> paths) => new(Path.Combine(paths));
 
@@ -25,28 +25,33 @@ public class PackJsonTest
     {
         yield return new("net8.0");
     }
+    public static IEnumerable<string> ExtractedPackageDirectories() => TestUtil.ExtractedPackageDirectories;
 
     [Test]
-    [MethodDataSource(nameof(TargetFrameworksWithEmbeddedJson))]
-    public async Task MetadataDllWithEmbeddedJson(Target target)
+    [MatrixDataSource]
+    public async Task MetadataDllWithEmbeddedJson(
+        [MatrixMethod<PackJsonTest>(nameof(ExtractedPackageDirectories))] string root,
+        [MatrixMethod<PackJsonTest>(nameof(TargetFrameworksWithEmbeddedJson))] Target target)
     {
-        var file = FileInfo(ExtractedPackageDirectory, "lib", target.TargetFramework, "SampleLibraryJsonPack.dll");
+        var file = FileInfo(root, "lib", target.TargetFramework, "SampleLibraryJsonPack.dll");
         await Assert.That(file).Exists();
 
-        var metadata = TestUtil.GetSourceExpanderMetadata(file);
+        var metadata = GetSourceExpanderMetadata(file);
 
         await Assert.That(metadata).Count().IsEqualTo(1)
             .And.ContainsKeyWithValue("SourceExpander.EmbedderVersion", EmbedderVersion);
     }
 
     [Test]
-    [MethodDataSource(nameof(TargetFrameworksWithoutEmbeddedJson))]
-    public async Task BuildDirWithoutEmbeddedJson(Target target)
+    [MatrixDataSource]
+    public async Task BuildDirWithoutEmbeddedJson(
+        [MatrixMethod<PackJsonTest>(nameof(ExtractedPackageDirectories))] string root,
+        [MatrixMethod<PackJsonTest>(nameof(TargetFrameworksWithoutEmbeddedJson))] Target target)
     {
-        var file = FileInfo(ExtractedPackageDirectory, "lib", target.TargetFramework, "SampleLibraryJsonPack.dll");
+        var file = FileInfo(root, "lib", target.TargetFramework, "SampleLibraryJsonPack.dll");
         await Assert.That(file).Exists();
 
-        var metadata = TestUtil.GetSourceExpanderMetadata(file);
+        var metadata = GetSourceExpanderMetadata(file);
 
         await Assert.That(metadata).Count().IsEqualTo(5)
             .And.ContainsKeyWithValue("SourceExpander.EmbedderVersion", EmbedderVersion)
@@ -57,15 +62,17 @@ public class PackJsonTest
     }
 
     [Test]
-    [MethodDataSource(nameof(TargetFrameworksWithEmbeddedJson))]
-    public async Task BuildDirWithEmbeddedJson(Target target)
+    [MatrixDataSource]
+    public async Task BuildDirWithEmbeddedJson(
+        [MatrixMethod<PackJsonTest>(nameof(ExtractedPackageDirectories))] string root,
+        [MatrixMethod<PackJsonTest>(nameof(TargetFrameworksWithEmbeddedJson))] Target target)
     {
-        var directory = DirectoryInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework);
+        var directory = DirectoryInfo(root, "buildTransitive", target.TargetFramework);
         await Assert.That(directory).Exists();
-        var jsonFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack_SourceExpander.Embedded.json");
+        var jsonFile = FileInfo(root, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack_SourceExpander.Embedded.json");
         await Assert.That(jsonFile).Exists();
 
-        var propsFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack.props");
+        var propsFile = FileInfo(root, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack.props");
         if (target.HasProps)
         {
             await Assert.That(propsFile).Exists();
@@ -85,7 +92,7 @@ public class PackJsonTest
             await Assert.That(propsFile).DoesNotExist();
         }
 
-        var targetsFile = FileInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack.targets");
+        var targetsFile = FileInfo(root, "buildTransitive", target.TargetFramework, "SampleLibraryJsonPack.targets");
         if (target.HasTargets)
         {
             await Assert.That(targetsFile).Exists();
@@ -108,10 +115,12 @@ public class PackJsonTest
     }
 
     [Test]
-    [MethodDataSource(nameof(TargetFrameworksWithoutEmbeddedJson))]
-    public async Task MetadataDllWithoutEmbeddedJson(Target target)
+    [MatrixDataSource]
+    public async Task MetadataDllWithoutEmbeddedJson(
+        [MatrixMethod<PackJsonTest>(nameof(ExtractedPackageDirectories))] string root,
+        [MatrixMethod<PackJsonTest>(nameof(TargetFrameworksWithoutEmbeddedJson))] Target target)
     {
-        var directory = DirectoryInfo(ExtractedPackageDirectory, "buildTransitive", target.TargetFramework);
+        var directory = DirectoryInfo(root, "buildTransitive", target.TargetFramework);
         await Assert.That(directory).DoesNotExist();
     }
 }
