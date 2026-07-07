@@ -5,6 +5,23 @@
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);IDE0022</NoWarn>
     <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+    <SampleLibraryJsonPack>$(MSBuildThisFileDirectory)../../Source/Sandbox/SampleLibraryJsonPack/SampleLibraryJsonPack.csproj</SampleLibraryJsonPack>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="$(SampleLibraryJsonPack)">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Target Name="PackSampleLibrary" AfterTargets="Build">
+    <RemoveDir Directories="$(TargetDir)/SampleLibraryJsonPack" Condition="Exists('$(TargetDir)/SampleLibraryJsonPack')" />
+    <MSBuild Projects="$(SampleLibraryJsonPack)"
+             Targets="Pack"
+             Properties="NoBuild=true;Configuration=$(Configuration);PackageOutputPath=$(TargetDir)" />
+    <ItemGroup>
+      <GeneratedPackages Include="$(TargetDir)SampleLibraryJsonPack*.nupkg" />
+    </ItemGroup>
+    <Unzip SourceFiles="@(GeneratedPackages)" DestinationFolder="$(TargetDir)/SampleLibraryJsonPack/" />
+  </Target>
 </Project>
