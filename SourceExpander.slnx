@@ -2,12 +2,8 @@
   <Folder Name="/Sandbox/">
     <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
     <Project Path="Source/Sandbox/SampleAppSkipAtcoder/SampleAppSkipAtcoder.csproj" />
-    <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj">
-      <BuildDependency Project="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" />
-    </Project>
-    <Project Path="Source/Sandbox/SampleLibraryJsonPack/SampleLibraryJsonPack.csproj">
-      <BuildDependency Project="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" />
-    </Project>
+    <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj" />
+    <Project Path="Source/Sandbox/SampleLibraryJsonPack/SampleLibraryJsonPack.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
@@ -26,7 +22,7 @@
   <Folder Name="/Test/">
     <File Path="Test/Directory.Build.props" />
     <Project Path="Test/SourceExpander.Console.Test/SourceExpander.Console.Test.csproj" />
-    <Project Path="Test/SourceExpander.Embedder.PackJson.Test/SourceExpander.Embedder.PackJson.Test.csproj" Id="1a3da11d-d21e-4d98-9058-bfaa19a2c1ac" />
+    <Project Path="Test/SourceExpander.Embedder.PackJson.Test/SourceExpander.Embedder.PackJson.Test.csproj" />
     <Project Path="Test/SourceExpander.Embedder.Test/SourceExpander.Embedder.Test.csproj" />
     <Project Path="Test/SourceExpander.Embedder.Testing.Test/SourceExpander.Embedder.Testing.Test.csproj" />
     <Project Path="Test/SourceExpander.Generator.Test/SourceExpander.Generator.Test.csproj" />
@@ -40,7 +36,7 @@
   </Folder>
   <Project Path="Source/SourceExpander.Console/SourceExpander.Console.csproj" />
   <Project Path="Source/SourceExpander.Core/SourceExpander.Core.csproj" />
-  <Project Path="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" Id="2f15ad2d-478f-48f7-b60a-1e1cc3ea1a01" />
+  <Project Path="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" />
   <Project Path="Source/SourceExpander.Embedder.Testing/SourceExpander.Embedder.Testing.csproj" />
   <Project Path="Source/SourceExpander.Embedder/SourceExpander.Embedder.csproj" />
   <Project Path="Source/SourceExpander.Generator/SourceExpander.Generator.csproj" />
