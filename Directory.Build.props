@@ -26,9 +26,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-    <IsRoslyn3 Condition="$(MSBuildProjectName.EndsWith('.Roslyn3'))">true</IsRoslyn3>
     <RootNamespace>SourceExpander</RootNamespace>
-    <DefineConstants Condition="'$(IsRoslyn3)'!='true'">$(DefineConstants)USE_ROSLYN4</DefineConstants>
     <NoWarn>$(NoWarn);NU1507</NoWarn>
 
     <PackageReadmeFile>README.md</PackageReadmeFile>

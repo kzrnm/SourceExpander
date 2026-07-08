@@ -108,21 +108,19 @@ public class ConfigGenerator : IIncrementalGenerator
         if (attributeSyntaxContext.SemanticModel.Compilation is not { } compilation)
             return;
         var assemblyName = $"{attributeSyntaxContext.SemanticModel.Compilation?.AssemblyName?.Replace(".", "_")}";
-        if (!assemblyName.EndsWith("Roslyn3"))
+
+        foreach (var configParam in configParams)
         {
-            foreach (var configParam in configParams)
+            var propertyName = $"{assemblyName}_{configParam.Name}";
+            if (!configParam.IsObsolete && !compilerVisibleProperties.Contains(propertyName))
             {
-                var propertyName = $"{assemblyName}_{configParam.Name}";
-                if (!configParam.IsObsolete && !compilerVisibleProperties.Contains(propertyName))
-                {
-                    context.ReportDiagnostic(
-                        DiagnosticDescriptors.XPA0001_NeedsProperty(propertyName, configParam.Syntax.Identifier.GetLocation()));
-                }
-                if (configParam.Type.NullableAnnotation is not NullableAnnotation.Annotated)
-                {
-                    context.ReportDiagnostic(
-                        DiagnosticDescriptors.XPA0004_MustBeNullable(propertyName, configParam.Syntax.Identifier.GetLocation()));
-                }
+                context.ReportDiagnostic(
+                    DiagnosticDescriptors.XPA0001_NeedsProperty(propertyName, configParam.Syntax.Identifier.GetLocation()));
+            }
+            if (configParam.Type.NullableAnnotation is not NullableAnnotation.Annotated)
+            {
+                context.ReportDiagnostic(
+                    DiagnosticDescriptors.XPA0004_MustBeNullable(propertyName, configParam.Syntax.Identifier.GetLocation()));
             }
         }
 
