@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -12,8 +13,43 @@ using SourceExpander.Roslyn;
 
 namespace SourceExpander;
 
-public partial class EmbedderGenerator
+[Generator]
+public class EmbedderGenerator : IIncrementalGenerator
 {
+    private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterPostInitializationOutput(ctx =>
+        {
+            foreach (var (hintName, sourceText) in Constants.CompileTimeSources)
+                ctx.AddSource(hintName, sourceText);
+        });
+
+        var configProvider
+            = context.AdditionalTextsProvider
+            .Where(a => StringComparer.OrdinalIgnoreCase.Compare(Path.GetFileName(a.Path), CONFIG_FILE_NAME) == 0)
+            .Collect()
+            .Select((ats, _) => ats.FirstOrDefault())
+            .Combine(context.AnalyzerConfigOptionsProvider.Select((s, _) => s.GlobalOptions))
+            .Select((tup, ct) => (tup.Right, EmbedderConfig.LoadBuilder(tup.Left, tup.Right)));
+
+        var source = context.CompilationProvider
+            .Combine(context.ParseOptionsProvider)
+            .Combine(configProvider);
+
+        context.RegisterImplementationSourceOutput(source, (ctx, source) =>
+        {
+            var ((compilation, parseOptions), (analyzerConfigOptions, configBuilder)) = source;
+            Execute(
+                new SourceProductionContextWrappter(ctx),
+                (CSharpCompilation)compilation,
+                (CSharpParseOptions)parseOptions,
+                analyzerConfigOptions,
+                configBuilder);
+        });
+    }
+
     internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, AnalyzerConfigOptions analyzerConfigOptions, EmbedderConfig.Builder configBuilder)
     {
         try

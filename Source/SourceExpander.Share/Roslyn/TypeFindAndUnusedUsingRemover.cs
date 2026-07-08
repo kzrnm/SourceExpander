@@ -108,13 +108,11 @@ internal class TypeFindAndUnusedUsingRemover : CSharpSyntaxRewriter
         return false;
     }
 
-#if USE_ROSLYN4
     public override SyntaxNode? VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
     {
         node = (FileScopedNamespaceDeclarationSyntax)base.VisitFileScopedNamespaceDeclaration(node)!;
         return SyntaxFactory.NamespaceDeclaration(node.AttributeLists, node.Modifiers, node.Name, node.Externs, node.Usings, node.Members);
     }
-#endif
 
     public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node)
     {

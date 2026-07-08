@@ -3,7 +3,6 @@
     <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
     <Project Path="Source/Sandbox/SampleAppSkipAtcoder/SampleAppSkipAtcoder.csproj" />
     <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj" />
-    <Project Path="Source/Sandbox/SampleLibraryJsonPack/SampleLibraryJsonPack.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
@@ -31,8 +30,6 @@
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Source/Tools/ConfigGenerator/ConfigGenerator.csproj" />
-    <Project Path="Source/Tools/SourceExpander.Embedder.Roslyn3/SourceExpander.Embedder.Roslyn3.csproj" />
-    <Project Path="Source/Tools/SourceExpander.Generator.Roslyn3/SourceExpander.Generator.Roslyn3.csproj" />
   </Folder>
   <Project Path="Source/SourceExpander.Console/SourceExpander.Console.csproj" />
   <Project Path="Source/SourceExpander.Core/SourceExpander.Core.csproj" />
