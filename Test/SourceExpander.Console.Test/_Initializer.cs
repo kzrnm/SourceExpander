@@ -7,8 +7,8 @@ public static class Initializer
 {
     public const string CommandTests = "CommandTests";
 
-    [Before(Assembly)]
-    public static async Task Setup(CancellationToken cancellationToken)
+    [Before(TestSession)]
+    public static void Setup()
     {
         InitializeMSBuildLocator();
     }
