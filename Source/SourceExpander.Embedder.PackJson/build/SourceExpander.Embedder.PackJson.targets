@@ -2,7 +2,7 @@
   <!-- Write json and props/targets after build -->
   <Target Name="SourceExpanderWriteJson"
           AfterTargets="AfterBuild"
-          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(_SourceExpander_Rebuilding)' != 'true'">
     <Message Importance="high" Text="SourceExpander: write embedded data json of '$(AssemblyName)' [$(TargetFramework)]" />
     <MakeDir Directories="$(TargetDir)SourceExpander.build" ContinueOnError="true" />
 
@@ -13,11 +13,11 @@
     </PropertyGroup>
 
     <ReadEmbeddedData AssemblyPath="$(TargetPath)" OutputPath="$(TargetDir)SourceExpander.build/$(SourceExpander_JsonName)" />
-</Target>
+  </Target>
 
   <Target Name="SourceExpanderDefineProps"
           AfterTargets="SourceExpanderWriteJson"
-          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(SourceExpander_PackJsonProps_Enabled)' == 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(_SourceExpander_Rebuilding)' != 'true' And '$(SourceExpander_PackJsonProps_Enabled)' == 'true'">
     <Message Importance="high" Text="SourceExpander: Add '$(PackageId).props' [$(TargetFramework)]" />
     <PropertyGroup>
       <PackPropsPath Condition="'$(PackPropsPath)'==''">$(TargetDir)SourceExpander.build/$(PackageId).props</PackPropsPath>
@@ -36,7 +36,7 @@
   </Target>
   <Target Name="SourceExpanderDefineTargets"
           AfterTargets="SourceExpanderWriteJson"
-          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(SourceExpander_PackJsonTargets_Enabled)' == 'true'">
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(_SourceExpander_Rebuilding)' != 'true' And '$(SourceExpander_PackJsonTargets_Enabled)' == 'true'">
     <Message Importance="high" Text="SourceExpander: Add '$(PackageId).targets' [$(TargetFramework)]" />
     <PropertyGroup>
       <PackTargetsPath Condition="'$(PackTargetsPath)'==''">$(TargetDir)SourceExpander.build/$(PackageId).targets</PackTargetsPath>
@@ -56,7 +56,7 @@
   </Target>
 
   <!-- Add package files -->
-  <Target Name="SourceExpanderPackage" Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
+  <Target Name="SourceExpanderPackMetadata" Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
     <Message Importance="high" Text="SourceExpander: Add package files of '$(AssemblyName)' [$(TargetFramework)]" />
     <ItemGroup>
       <TfmSpecificPackageFile
@@ -64,6 +64,14 @@
         PackagePath="buildTransitive/$(TargetFramework)"
         IncludeInPackage="true" CopyToOutputDirectory="Never" />
     </ItemGroup>
+  </Target>
+  <Target Name="SourceExpanderSkipRebuild"
+          BeforeTargets="BeforeBuild"
+          Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(_SourceExpander_Rebuilding)' == 'true'">
+    <Message Importance="high" Text="Rebuild without metadata [$(TargetFramework)]" />
+    <PropertyGroup>
+      <SourceExpander_Embedder_Enabled>false</SourceExpander_Embedder_Enabled>
+    </PropertyGroup>
   </Target>
 
   <!-- Rebuild dll without metadata before pack -->
@@ -73,27 +81,24 @@
     <Message Importance="high" Text="SourceExpander: Rebuild '$(AssemblyName)' without metadata" />
     <MSBuild Projects="$(MSBuildProjectFullPath)"
              Targets="Build"
-             Properties="NoBuild=false;GeneratePackageOnBuild=false;SourceExpander_Embedder_Enabled=false;_SourceExpander_Rebuilding=true" />
+             Properties="NoBuild=false;GeneratePackageOnBuild=false;_SourceExpander_Rebuilding=true" />
   </Target>
   <Target Name="SourceExpanderRebuildWithoutMetadata"
           AfterTargets="ResolveAssemblyReferences"
           Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(_SourceExpander_Rebuilding)' == 'true'">
     <ItemGroup>
-      <!-- SourceExpander.Embedder.dll を特定 -->
       <SourceExpanderAnalyzer Include="@(Analyzer)"
                               Condition="'%(Analyzer.Filename)' == 'SourceExpander.Embedder'" />
     </ItemGroup>
-    <!-- GetAssemblyIdentity を実行 -->
     <GetAssemblyIdentity AssemblyFiles="@(SourceExpanderAnalyzer)">
       <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
     </GetAssemblyIdentity>
 
-    <!-- Version をプロパティに格納 -->
     <PropertyGroup>
       <SourceExpanderVersion>%(SourceExpanderIdentity.Version)</SourceExpanderVersion>
     </PropertyGroup>
 
-    <Message Text="SourceExpander.Embedder バージョン: $(SourceExpanderVersion)" Importance="High" />
+    <Message Text="SourceExpander.Embedder Version: $(SourceExpanderVersion)" Importance="High" />
 
     <ItemGroup Condition="'$(SourceExpanderVersion)' != ''">
         <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">

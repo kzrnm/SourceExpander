@@ -21,7 +21,6 @@
   <Folder Name="/Test/">
     <File Path="Test/Directory.Build.props" />
     <Project Path="Test/SourceExpander.Console.Test/SourceExpander.Console.Test.csproj" />
-    <Project Path="Test/SourceExpander.Embedder.PackJson.Test/SourceExpander.Embedder.PackJson.Test.csproj" />
     <Project Path="Test/SourceExpander.Embedder.Test/SourceExpander.Embedder.Test.csproj" />
     <Project Path="Test/SourceExpander.Embedder.Testing.Test/SourceExpander.Embedder.Testing.Test.csproj" />
     <Project Path="Test/SourceExpander.Generator.Test/SourceExpander.Generator.Test.csproj" />

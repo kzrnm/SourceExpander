@@ -49,6 +49,9 @@ jobs:
         run: dotnet build ${{ env.WORKFLOW_BUILD_SLN }} -c Release
       - name: Test
         run: dotnet test --solution ${{ env.WORKFLOW_BUILD_SLN }} --no-build
+      - name: Test JsonPack
+        shell: pwsh
+        run: Invoke-Pester Test/SourceExpander.Embedder.PackJson.Tests.ps1 -CI
       - uses: actions/upload-artifact@v7
         if: ${{ needs.get-version.outputs.is-new == 'true' }}
         with:

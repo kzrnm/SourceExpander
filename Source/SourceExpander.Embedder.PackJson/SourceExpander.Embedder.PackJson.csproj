@@ -25,7 +25,9 @@
     <PackageReference Include="System.Reflection.Metadata" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" PrivateAssets="None" Private="false" />
+    <ProjectReference
+        Condition="$(UpdateLocalPackDll) != 'true'"
+        Include="..\SourceExpander.Embedder\SourceExpander.Embedder.csproj" PrivateAssets="None" Private="false" />
   </ItemGroup>
 
   <Target Name="CopyOutputToTasks" AfterTargets="Build"
