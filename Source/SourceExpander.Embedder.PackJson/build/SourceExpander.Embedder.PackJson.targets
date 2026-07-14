@@ -1,4 +1,8 @@
 <Project>
+  <Target Name="SourceExpanderNoGeneratePackageOnBuild"
+          BeforeTargets="BeforeBuild">
+    <Error Condition="'$(SourceExpander_PackJson_Enabled)' == 'true' And '$(GeneratePackageOnBuild)' == 'true'" Code="SourceEmbeddingPackJson0001" Text="'GeneratePackageOnBuild' must be false" />
+  </Target>
   <!-- Write json and props/targets after build -->
   <Target Name="SourceExpanderWriteJson"
           AfterTargets="AfterBuild"

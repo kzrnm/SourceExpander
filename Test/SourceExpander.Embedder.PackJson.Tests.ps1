@@ -1,11 +1,6 @@
 BeforeAll {
     $script:SourceDirectory = Get-Item (Join-Path $PSScriptRoot ".." "Source")
-    if ($env:GITHUB_ACTIONS -ieq 'true') {
-        $script:PackageDirectory = New-Item -ItemType Directory (Join-Path $env:RUNNER_TEMP "SourceExpander.Embedder.PackJson.Test") -Force
-    }
-    else {
-        $script:PackageDirectory = New-Item -ItemType Directory ("$PSScriptRoot/obj/SourceExpander.Embedder.PackJson.Test") -Force
-    }
+    $script:PackageDirectory = New-Item -ItemType Directory ("$PSScriptRoot/obj/SourceExpander.Embedder.PackJson.Test") -Force
 
     Write-Host "Build projects in '$PackageDirectory'"
 
@@ -267,5 +262,54 @@ _Visible>
                 }
             }
         }
+    }
+}
+
+Describe 'GeneratePackageOnBuild' {
+    BeforeAll {
+        $Name = 'GeneratePackageOnBuild'
+        $projectDir = New-Item -ItemType Directory (Join-Path $PackageDirectory $Name) -Force
+        $projectFile = (Join-Path $projectDir ($Name + ".csproj"))
+        "
+class P
+{
+public static int Num =>0;
+}
+" > "$projectDir/Prog.cs"
+
+        @"
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="$SourceDirectory/SourceExpander.Embedder.PackJson/build/SourceExpander.Embedder.PackJson.props" />
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SourceExpander.Embedder" Version="9.0.2-beta4">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <Import Project="$SourceDirectory/SourceExpander.Embedder.PackJson/build/SourceExpander.Embedder.PackJson.targets" />
+</Project>
+"@ > $projectFile
+    }
+
+    It 'Build failure' {
+        $psi = [System.Diagnostics.ProcessStartInfo]@{
+            RedirectStandardOutput = $true;
+            StandardOutputEncoding = [System.Text.UTF8Encoding]::new($false);
+            FileName               = "dotnet";
+            Arguments              = "build $projectFile";
+        }
+        $Psi.EnvironmentVariables['DOTNET_CLI_UI_LANGUAGE'] = 'en'
+        $proc = [System.Diagnostics.Process]::Start($psi)
+        $proc.WaitForExit(10000)
+        $output = $proc.StandardOutput.ReadToEnd()
+        $proc.ExitCode | Should -Not -Be 0
+        $output | Should -Match 'SourceEmbeddingPackJson0001'
+        $output | Should -Match "'GeneratePackageOnBuild' must be false"
     }
 }
