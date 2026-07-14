@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
     <VersionPrefix>9.0.2</VersionPrefix>
-    <VersionSuffix>beta6</VersionSuffix>
+    <VersionSuffix>beta7</VersionSuffix>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
