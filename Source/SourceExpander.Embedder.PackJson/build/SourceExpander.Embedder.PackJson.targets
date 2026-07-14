@@ -80,7 +80,6 @@
 
   <!-- Rebuild dll without metadata before pack -->
   <Target Name="SourceExpanderRebuildJsonPackage"
-          BeforeTargets="GenerateNuspec"
           Condition="'$(SourceExpander_PackJson_Enabled)' == 'true'">
     <Message Importance="high" Text="SourceExpander: Rebuild '$(AssemblyName)' without metadata" />
     <MSBuild Projects="$(MSBuildProjectFullPath)"

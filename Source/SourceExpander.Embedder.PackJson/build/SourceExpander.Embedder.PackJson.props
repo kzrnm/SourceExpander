@@ -9,7 +9,7 @@
 
     <SourceExpander_Embedder_EmbeddingType>SingleMetadataJson</SourceExpander_Embedder_EmbeddingType>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);SourceExpanderPackMetadata</TargetsForTfmSpecificContentInPackage>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);SourceExpanderRebuildJsonPackage</GenerateNuspecDependsOn>
   </PropertyGroup>
-
   <UsingTask TaskName="SourceExpander.ReadEmbeddedData" AssemblyFile="$(_ReadEmbeddedDataAssembly)"/>
 </Project>
