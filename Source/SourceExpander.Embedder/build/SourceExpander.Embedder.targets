@@ -1,9 +1,61 @@
 <Project>
+  <PropertyGroup>
+    <SourceExpanderEmbedderConfigFile Condition=" '$(SourceExpanderEmbedderConfigFile)' == ''">$(ProjectDir)SourceExpander.Embedder.Config.json</SourceExpanderEmbedderConfigFile>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists($(SourceExpanderEmbedderConfigFile))">
+    <AdditionalFiles Include="$(SourceExpanderEmbedderConfigFile)" />
+  </ItemGroup>
 
-	<PropertyGroup>
-		<SourceExpanderEmbedderConfigFile Condition=" '$(SourceExpanderEmbedderConfigFile)' == ''">$(ProjectDir)SourceExpander.Embedder.Config.json</SourceExpanderEmbedderConfigFile>
-	</PropertyGroup>
-	<ItemGroup Condition="Exists($(SourceExpanderEmbedderConfigFile))">
-		<AdditionalFiles Include="$(SourceExpanderEmbedderConfigFile)" />
-	</ItemGroup>
+  <!-- Write json and props/targets after build -->
+  <PropertyGroup Condition="'$(SourceExpander_Embedder_PackJson)' == 'true'">
+    <SourceExpander_Embedder_EmbeddingType>SingleMetadataJson</SourceExpander_Embedder_EmbeddingType>
+  </PropertyGroup>
+  <Target Name="SourceExpanderWriteJson"
+          AfterTargets="AfterBuild"
+          Condition="'$(SourceExpander_Embedder_PackJson)' == 'true' And '$(SourceExpander_Embedder_Enabled)' != 'false'">
+    <Message Importance="high" Text="SourceExpander: Force SourceExpander_Embedder_EmbeddingType=SingleMetadataJson for pack json" />
+    <Message Importance="high" Text="SourceExpander: write embedded data json of '$(AssemblyName)' [$(TargetFramework)]" />
+    <MakeDir Directories="$(TargetDir)SourceExpander.build" ContinueOnError="true" />
+
+    <PropertyGroup>
+      <_SourceExpander_PackageIdTag>$(PackageId.Replace('.', '_'))</_SourceExpander_PackageIdTag>
+      <_SourceExpander_PackageSourceTag>$(_SourceExpander_PackageIdTag)_Source</_SourceExpander_PackageSourceTag>
+      <SourceExpander_JsonName>$(TargetName)_SourceExpander.Embedded.json</SourceExpander_JsonName>
+    </PropertyGroup>
+
+    <ReadEmbeddedData AssemblyPath="$(TargetPath)" OutputPath="$(TargetDir)SourceExpander.build/$(SourceExpander_JsonName)" />
+
+    <Message Importance="high" Text="SourceExpander: Add '$(PackageId).props' [$(TargetFramework)]" />
+    <PropertyGroup>
+      <PackPropsPath Condition="'$(PackPropsPath)'==''">$(TargetDir)SourceExpander.build/$(PackageId).props</PackPropsPath>
+      <PackPropsBody>
+        <![CDATA[
+<Project>
+  <PropertyGroup>
+    <$(_SourceExpander_PackageSourceTag)>%24(MSBuildThisFileDirectory)$(SourceExpander_JsonName)</$(_SourceExpander_PackageSourceTag)>
+    <$(_SourceExpander_PackageSourceTag)_Visible>false</$(_SourceExpander_PackageSourceTag)_Visible>
+  </PropertyGroup>
+</Project>
+      ]]>
+      </PackPropsBody>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PackPropsPath)" Lines="$(PackPropsBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+
+    <Message Importance="high" Text="SourceExpander: Add '$(PackageId).targets' [$(TargetFramework)]" />
+    <PropertyGroup>
+      <PackTargetsPath Condition="'$(PackTargetsPath)'==''">$(TargetDir)SourceExpander.build/$(PackageId).targets</PackTargetsPath>
+      <PackTargetsBody>
+        <![CDATA[
+<Project>
+  <ItemGroup Condition="'%24(SourceExpander_Generator)'=='true' And Exists('%24($(_SourceExpander_PackageSourceTag))')">
+    <AdditionalFiles LinkBase="Properties/SourceExpander.Embedded"
+      Include="%24($(_SourceExpander_PackageSourceTag))"
+      Visible="%24($(_SourceExpander_PackageSourceTag)_Visible)" />
+  </ItemGroup>
+</Project>
+      ]]>
+      </PackTargetsBody>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PackTargetsPath)" Lines="$(PackTargetsBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
 </Project>
