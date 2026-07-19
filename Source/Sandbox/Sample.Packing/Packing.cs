@@ -1,9 +1,10 @@
-﻿
-class P
+﻿namespace Sample
 {
-    public static int Num =>
+    class P
+    {
+        public static int Num =>
 #if NET10_0
-        10
+            10
 #elif NET9_0
         9
 #elif NET8_0
@@ -19,5 +20,6 @@ class P
 #elif NETSTANDARD2_0
         0
 #endif
-        ;
+            ;
+    }
 }

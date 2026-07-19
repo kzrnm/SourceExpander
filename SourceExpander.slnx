@@ -1,9 +1,9 @@
 <Solution>
   <Folder Name="/Sandbox/">
+    <Project Path="Source/Sandbox/Sample.Packing/Sample.Packing.csproj" />
     <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
     <Project Path="Source/Sandbox/SampleAppSkipAtcoder/SampleAppSkipAtcoder.csproj" />
     <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj" />
-    <Project Path="Source/Sandbox/Sample.Packing/Sample.Packing.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

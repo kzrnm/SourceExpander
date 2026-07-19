@@ -33,6 +33,7 @@ public abstract class SyntaxKindTestBase : EmbedderGeneratorTestBase
     public async Task Generate(CancellationToken cancellationToken)
     {
         await ExpectedJson.Should().BeEquivalentToJsonSources([Expected]);
+
         var test = new Test(new()
         {
             AllowUnsafe = true,
@@ -60,12 +61,6 @@ public abstract class SyntaxKindTestBase : EmbedderGeneratorTestBase
             }
         };
         await test.RunAsync(cancellationToken);
-        await Newtonsoft.Json.JsonConvert.DeserializeObject<SourceFileInfo[]>(ExpectedJson)
-            .Should()
-            .BeEquivalentTo([Expected], TestUtil.SourceFileInfoEqualityComparer);
-        await System.Text.Json.JsonSerializer.Deserialize<SourceFileInfo[]>(ExpectedJson)
-            .Should()
-            .BeEquivalentTo([Expected], TestUtil.SourceFileInfoEqualityComparer);
     }
 
     [Test]
