@@ -8,8 +8,8 @@
     <PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <VersionPrefix>9.0.2</VersionPrefix>
-    <VersionSuffix>beta8</VersionSuffix>
+    <VersionPrefix>9.1.0</VersionPrefix>
+    <VersionSuffix>alpha1</VersionSuffix>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\Packages\$(Configuration)\</PackageOutputPath>
