@@ -47,6 +47,7 @@ public class PackJsonTest
                       <PropertyGroup>
                         <Sample_Packing_Source>$(MSBuildThisFileDirectory)Sample.Packing_SourceExpander.Embedded.json</Sample_Packing_Source>
                         <Sample_Packing_Source_Visible>false</Sample_Packing_Source_Visible>
+                        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackSourceJson</TargetsForTfmSpecificContentInPackage>
                       </PropertyGroup>
                     </Project>
 
@@ -60,6 +61,11 @@ public class PackJsonTest
                           Visible="$(Sample_Packing_Source_Visible)" />
                       </ItemGroup>
 
+                      <Target Name="PackSourceJson">
+                        <ItemGroup Condition="'$(DisablePackSourceJson)' != 'true'">
+                          <TfmSpecificPackageFile Include="$(TargetDir)/SourceExpander.build/*.*" PackagePath="buildTransitive/$(TargetFramework)" />
+                        </ItemGroup>
+                      </Target>
                       <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'$(DisableCheckSourceExpanderVersion)' != 'true'">
                         <GetAssemblyIdentity AssemblyFiles="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'SourceExpander.Generator'">
                           <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />

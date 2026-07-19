@@ -34,6 +34,7 @@
   <PropertyGroup>
     <$(_SourceExpander_PackageSourceTag)>%24(MSBuildThisFileDirectory)$(SourceExpander_JsonName)</$(_SourceExpander_PackageSourceTag)>
     <$(_SourceExpander_PackageSourceTag)_Visible>false</$(_SourceExpander_PackageSourceTag)_Visible>
+    <TargetsForTfmSpecificContentInPackage>%24(TargetsForTfmSpecificContentInPackage)%3BPackSourceJson</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 </Project>
       ]]>
@@ -53,6 +54,11 @@
       Visible="%24($(_SourceExpander_PackageSourceTag)_Visible)" />
   </ItemGroup>
 
+  <Target Name="PackSourceJson">
+    <ItemGroup Condition="'%24(DisablePackSourceJson)' != 'true'">
+      <TfmSpecificPackageFile Include="%24(TargetDir)/SourceExpander.build/*.*" PackagePath="buildTransitive/%24(TargetFramework)" />
+    </ItemGroup>
+  </Target>
   <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'%24(DisableCheckSourceExpanderVersion)' != 'true'">
     <GetAssemblyIdentity AssemblyFiles="%40(Analyzer)" Condition="'%25(Analyzer.Filename)' == 'SourceExpander.Generator'">
       <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
