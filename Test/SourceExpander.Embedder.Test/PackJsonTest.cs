@@ -60,7 +60,7 @@ public class PackJsonTest
                           Visible="$(Sample_Packing_Source_Visible)" />
                       </ItemGroup>
 
-                      <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'$(DisableCheckSourceExpanderVersion)' != 'true'">
+                      <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'$(SourceExpander_Generator)'=='true' And '$(DisableCheckSourceExpanderVersion)' != 'true'">
                         <GetAssemblyIdentity AssemblyFiles="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'SourceExpander.Generator'">
                           <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
                         </GetAssemblyIdentity>

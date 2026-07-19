@@ -58,7 +58,7 @@
       Visible="%24($(_SourceExpander_PackageSourceTag)_Visible)" />
   </ItemGroup>
 
-  <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'%24(DisableCheckSourceExpanderVersion)' != 'true'">
+  <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'%24(SourceExpander_Generator)'=='true' And '%24(DisableCheckSourceExpanderVersion)' != 'true'">
     <GetAssemblyIdentity AssemblyFiles="%40(Analyzer)" Condition="'%25(Analyzer.Filename)' == 'SourceExpander.Generator'">
       <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
     </GetAssemblyIdentity>

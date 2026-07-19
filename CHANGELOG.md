@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.1.1] - 2026-07-20
+## Added
+- [SourceExpander.Embedder] Add '$(SourceExpander_Generator)'=='true' to packed .targets
+
 ## [9.1.0] - 2026-07-20
 ## Added
 - [SourceExpander.Embedder] Add SourceExpander_Embedder_PackJson, SourceExpander_Embedder_VersionOnly
