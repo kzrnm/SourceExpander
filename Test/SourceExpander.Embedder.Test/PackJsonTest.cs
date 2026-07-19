@@ -60,7 +60,7 @@ public class PackJsonTest
                           Visible="$(Sample_Packing_Source_Visible)" />
                       </ItemGroup>
 
-                      <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile">
+                      <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'$(DisableCheckSourceExpanderVersion)' != 'true'">
                         <GetAssemblyIdentity AssemblyFiles="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'SourceExpander.Generator'">
                           <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
                         </GetAssemblyIdentity>
@@ -69,7 +69,7 @@ public class PackJsonTest
                           <SourceExpanderVersion>%(SourceExpanderIdentity.Version)</SourceExpanderVersion>
                         </PropertyGroup>
 
-                        <Error Condition="$([MSBuild]::VersionLessThan('$(SourceExpanderVersion)', '9.1.0'))" Text="SourceExpander.Generator version $(SourceExpanderVersion) is too old. Version 9.1.0 or newer is required." />
+                        <Error Condition="'$(SourceExpanderVersion)' != '' And $([MSBuild]::VersionLessThan('$(SourceExpanderVersion)', '9.1.0'))" Text="SourceExpander.Generator version $(SourceExpanderVersion) is too old. Version 9.1.0 or newer is required." />
                       </Target>
                     </Project>
 

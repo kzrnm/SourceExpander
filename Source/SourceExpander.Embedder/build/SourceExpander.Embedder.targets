@@ -53,7 +53,7 @@
       Visible="%24($(_SourceExpander_PackageSourceTag)_Visible)" />
   </ItemGroup>
 
-  <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile">
+  <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'%24(DisableCheckSourceExpanderVersion)' != 'true'">
     <GetAssemblyIdentity AssemblyFiles="%40(Analyzer)" Condition="'%25(Analyzer.Filename)' == 'SourceExpander.Generator'">
       <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
     </GetAssemblyIdentity>
@@ -62,7 +62,7 @@
       <SourceExpanderVersion>%25(SourceExpanderIdentity.Version)</SourceExpanderVersion>
     </PropertyGroup>
 
-    <Error Condition="%24([MSBuild]::VersionLessThan('%24(SourceExpanderVersion)', '9.1.0'))" Text="SourceExpander.Generator version %24(SourceExpanderVersion) is too old. Version 9.1.0 or newer is required." />
+    <Error Condition="'%24(SourceExpanderVersion)' != '' And %24([MSBuild]::VersionLessThan('%24(SourceExpanderVersion)', '9.1.0'))" Text="SourceExpander.Generator version %24(SourceExpanderVersion) is too old. Version 9.1.0 or newer is required." />
   </Target>
 </Project>
       ]]>
