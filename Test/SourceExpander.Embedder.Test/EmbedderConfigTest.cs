@@ -1,4 +1,4 @@
-﻿namespace SourceExpander.Embedder.Test;
+﻿namespace SourceExpander.Embedder;
 
 public class EmbedderConfigTest
 {

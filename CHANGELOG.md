@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ## Added
-- Add SourceExpander.Embedder.PackJson
+- [SourceExpander.Embedder] 
 ## Removed
 - Drop support for Roslyn3
 

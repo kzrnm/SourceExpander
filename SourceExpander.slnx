@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Sandbox/">
+    <Project Path="Source/Sandbox/Sample.Packing/Sample.Packing.csproj" />
     <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
     <Project Path="Source/Sandbox/SampleAppSkipAtcoder/SampleAppSkipAtcoder.csproj" />
     <Project Path="Source/Sandbox/SampleLibrary/SampleLibrary.csproj" />
@@ -29,10 +30,10 @@
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Source/Tools/ConfigGenerator/ConfigGenerator.csproj" />
+    <Project Path="Source/Tools/SourceExpander.Tasks/SourceExpander.Tasks.csproj" />
   </Folder>
   <Project Path="Source/SourceExpander.Console/SourceExpander.Console.csproj" />
   <Project Path="Source/SourceExpander.Core/SourceExpander.Core.csproj" />
-  <Project Path="Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj" />
   <Project Path="Source/SourceExpander.Embedder.Testing/SourceExpander.Embedder.Testing.csproj" />
   <Project Path="Source/SourceExpander.Embedder/SourceExpander.Embedder.csproj" />
   <Project Path="Source/SourceExpander.Generator/SourceExpander.Generator.csproj" />

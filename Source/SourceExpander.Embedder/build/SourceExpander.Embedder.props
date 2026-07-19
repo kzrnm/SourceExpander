@@ -2,6 +2,8 @@
   <PropertyGroup>
     <SourceExpander>true</SourceExpander>
     <SourceExpander_Embedder>true</SourceExpander_Embedder>
+    <SourceExpander_Embedder_PackJson>false</SourceExpander_Embedder_PackJson>
+    <_ReadEmbeddedDataAssembly>$(MSBuildThisFileDirectory)../tasks/netstandard2.0/SourceExpander.Tasks.dll</_ReadEmbeddedDataAssembly>
   </PropertyGroup>
   <ItemGroup>
     <CompilerVisibleProperty Include="SourceExpander_Embedder_Enabled" />
@@ -16,5 +18,8 @@
     <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandInLibrary" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_LanguageVersion" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingSourceClassName" />
+
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_VersionOnly" />
   </ItemGroup>
+  <UsingTask TaskName="SourceExpander.ReadEmbeddedData" AssemblyFile="$(_ReadEmbeddedDataAssembly)"/>
 </Project>

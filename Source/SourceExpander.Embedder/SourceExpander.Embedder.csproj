@@ -5,7 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <NoWarn>$(NoWarn);1701;1702;IDE0056;IDE0057</NoWarn>
+    <NoWarn>$(NoWarn);1701;1702;IDE0056;IDE0057;NU5100</NoWarn>
 
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <PackageId>SourceExpander.Embedder</PackageId>
@@ -21,6 +21,8 @@
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <DevelopmentDependency>true</DevelopmentDependency>
+
+    <TasksProjectPath>../Tools/SourceExpander.Tasks/SourceExpander.Tasks.csproj</TasksProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="$(TasksProjectPath)" OutputItemType="None" ReferenceOutputAssembly="false" />
     <ProjectReference Include="../Tools/ConfigGenerator/ConfigGenerator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
@@ -52,6 +55,7 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
+    <None Remove="tasks/**/*" />
     <None Remove="build\SourceExpander.Embedder.props" />
     <AdditionalFiles Include="build\SourceExpander.Embedder.props" />
   </ItemGroup>
@@ -99,6 +103,22 @@
       <TfmSpecificPackageFile Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
       <TfmSpecificPackageFile Include="$(PkgBase32768)\lib\netstandard2.0\*.dll" PackagePath="analyzers\dotnet\cs" />
       <TfmSpecificPackageFile Include="$(PkgDotNet_Glob)\lib\netstandard1.1\*.dll" PackagePath="analyzers\dotnet\cs" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CopyTasksAssembly" AfterTargets="Build"
+          Condition="$(UpdateLocalPackDll) == 'true' Or '$(GITHUB_ACTIONS)' == 'true'">
+    <MSBuild Projects="$(TasksProjectPath)" Targets="GetTargetPath">
+      <Output ItemName="TasksAssembly" TaskParameter="TargetOutputs" />
+    </MSBuild>
+    <Copy SourceFiles="%(TasksAssembly.Identity)" DestinationFolder="tasks/netstandard2.0" ContinueOnError="true" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="AddTasksAssembly" BeforeTargets="_GetPackageFiles">
+    <MSBuild Projects="$(TasksProjectPath)" Targets="GetTargetPath">
+      <Output ItemName="TasksAssembly" TaskParameter="TargetOutputs" />
+    </MSBuild>
+    <ItemGroup>
+      <None Include="%(TasksAssembly.Identity)" Pack="true" PackagePath="tasks/netstandard2.0" Visible="false" />
     </ItemGroup>
   </Target>
 </Project>
