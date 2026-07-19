@@ -18,6 +18,8 @@
     <CompilerVisibleProperty Include="SourceExpander_Embedder_ExpandInLibrary" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_LanguageVersion" />
     <CompilerVisibleProperty Include="SourceExpander_Embedder_EmbeddingSourceClassName" />
+
+    <CompilerVisibleProperty Include="SourceExpander_Embedder_VersionOnly" />
   </ItemGroup>
   <UsingTask TaskName="SourceExpander.ReadEmbeddedData" AssemblyFile="$(_ReadEmbeddedDataAssembly)"/>
 </Project>

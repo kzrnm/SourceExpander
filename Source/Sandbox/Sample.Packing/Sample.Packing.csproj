@@ -7,6 +7,7 @@
     <SourceExpander_Embedder_PackJson Condition="'$(TargetFramework)' != 'netstandard2.0'">true</SourceExpander_Embedder_PackJson>
     <SourceExpander_Embedder_Enabled Condition="'$(TargetFramework)' == 'netstandard2.1'">false</SourceExpander_Embedder_Enabled>
     <OutputPath>$(MSBuildProjectDirectory)/bin</OutputPath>
+    <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>

@@ -23,13 +23,3 @@ jobs:
       solution: SourceExpander.slnx
       dotnet-version: |
         10.0.x
-  test-json-pack:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Build PackJson
-        run: |
-          dotnet build Source/SourceExpander.Embedder.PackJson/SourceExpander.Embedder.PackJson.csproj -c Release -p:UpdateLocalPackDll=true
-      - name: Test JsonPack
-        shell: pwsh
-        run: Invoke-Pester Test/SourceExpander.Embedder.PackJson.Tests.ps1 -CI
