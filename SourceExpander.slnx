@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/Sandbox/">
+    <File Path="Source/Sandbox/Directory.Build.props" />
+    <File Path="Source/Sandbox/Directory.Packages.props" />
     <Project Path="Source/Sandbox/Sample.Packing/Sample.Packing.csproj" />
     <Project Path="Source/Sandbox/SampleApp/SampleApp.csproj" />
     <Project Path="Source/Sandbox/SampleAppSkipAtcoder/SampleAppSkipAtcoder.csproj" />

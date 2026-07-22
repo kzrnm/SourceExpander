@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -31,23 +32,31 @@ partial struct SourceExpanderCommand
         if (compilation == null)
             throw new InvalidOperationException("Failed to get compilation");
 
+        var libs = new HashSet<(string Name, Version EmbedderVersion)>();
+
         var embedded = await GetAdditionalEmbeddedData(csProject, cancellationToken);
         foreach (var e in embedded)
         {
-            Output.WriteLine($"{e.AssemblyName},{e.EmbedderVersion}");
+            libs.Add((e.AssemblyName, e.EmbedderVersion));
         }
 
         var metadataResolver = new AssemblyMetadataResolver(compilation);
         foreach (var symbol in compilation.References
             .Select(compilation.GetAssemblyOrModuleSymbol)
             .Prepend(compilation.Assembly)
-            .OfType<ISymbol>())
+            .OfType<ISymbol>()
+            .Distinct(SymbolEqualityComparer.Default))
         {
             var dict = metadataResolver.GetAssemblyMetadata(symbol);
             if (dict.TryGetValue("SourceExpander.EmbedderVersion", out var version))
             {
-                Output.WriteLine($"{symbol.Name},{version}");
+                libs.Add((symbol.Name, Version.Parse(version)));
             }
+        }
+
+        foreach (var (name, version) in libs.Order())
+        {
+            Output.WriteLine($"{name},{version}");
         }
     }
 }
