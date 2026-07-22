@@ -40,9 +40,6 @@ public class ExpandGenerator : IIncrementalGenerator
             }
         });
 
-        var embeddedDataJsonsProvider = context.AdditionalTextsProvider
-            .Where(a => a.Path.EndsWith(EMBEDDED_FILE_NAME, StringComparison.OrdinalIgnoreCase))
-            .Collect();
 
         var configProvider
             = context.AdditionalTextsProvider
@@ -54,7 +51,7 @@ public class ExpandGenerator : IIncrementalGenerator
 
         var source = context.CompilationProvider
             .Combine(context.ParseOptionsProvider)
-            .Combine(embeddedDataJsonsProvider)
+            .Combine(context.EmbeddedJsonProvider)
             .Combine(configProvider);
 
         context.RegisterImplementationSourceOutput(source, (ctx, source) =>
@@ -87,27 +84,15 @@ public class ExpandGenerator : IIncrementalGenerator
             if (parseOptions is { LanguageVersion: <= LanguageVersion.CSharp3 })
                 return;
 
-            var embeddedDataBuilder = ImmutableArray.CreateBuilder<EmbeddedData>();
-            foreach (var additionalText in embeddedDataJsons)
-                if (additionalText.GetText(ctx.CancellationToken) is { } sourceText)
-                {
-                    try
-                    {
-                        var obj = JsonUtil.ParseJson<EmbeddedData>(sourceText);
-                        if (obj is not null)
-                            embeddedDataBuilder.Add(obj);
-                    }
-                    catch (ParseJsonException)
-                    {
-                        ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0011_InvalidEmbeddedData(additionalText.Path));
-                    }
-                }
+            var (embeddedResult, embeddedError) = embeddedDataJsons.ToEmbeddData(ctx.CancellationToken);
+            foreach (var e in embeddedError)
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0011_InvalidEmbeddedData(e.Path));
 
             ctx.CancellationToken.ThrowIfCancellationRequested();
             var loader = new EmbeddedLoaderWithDiagnostic(
                 compilation,
                 parseOptions,
-                embeddedDataBuilder.ToImmutable(),
+                embeddedResult,
                 ctx, config, ctx.CancellationToken);
             if (loader.IsEmbeddedEmpty)
                 ctx.ReportDiagnostic(DiagnosticDescriptors.EXPAND0003_NotFoundEmbedded());

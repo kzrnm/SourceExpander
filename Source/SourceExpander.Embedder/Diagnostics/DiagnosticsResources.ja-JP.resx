@@ -156,7 +156,13 @@
   <data name="EMBED0012_Body" xml:space="preserve">
     <value>'{0}' はここでは使えません</value>
   </data>
+  <data name="EMBED0013_Body" xml:space="preserve">
+    <value>SourceExpander.Embedded.json が不正です: '{0}'</value>
+  </data>
   <data name="EMBED0012_Title" xml:space="preserve">
     <value>この Attribute はここでは使えません</value>
+  </data>
+  <data name="EMBED0013_Title" xml:space="preserve">
+    <value>SourceExpander.Embedded.json が不正です</value>
   </data>
 </root>

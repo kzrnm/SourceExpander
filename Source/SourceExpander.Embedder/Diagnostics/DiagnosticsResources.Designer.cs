@@ -239,5 +239,23 @@ namespace SourceExpander.Diagnostics {
                 return ResourceManager.GetString("EMBED0012_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   SourceExpander.Embedded.json is invalid: &apos;{0}&apos; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0013_Body {
+            get {
+                return ResourceManager.GetString("EMBED0013_Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   SourceExpander.Embedded.json is invalid に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EMBED0013_Title {
+            get {
+                return ResourceManager.GetString("EMBED0013_Title", resourceCulture);
+            }
+        }
     }
 }
