@@ -30,7 +30,7 @@ namespace SourceExpander
             IDiagnosticReporter reporter,
             CancellationToken cancellationToken)
         {
-            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken);
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(embeddeds, false, cancellationToken);
             var returnDatas = new List<EmbeddedData>(embeddeds.Length + embeddedDatas.Length);
             var ignoreAssemblies = new HashSet<string>(config.IgnoreAssemblies);
             foreach (var (embedded, display, errors) in embeddedDatas)
@@ -61,7 +61,6 @@ namespace SourceExpander
                 }
                 returnDatas.Add(embedded);
             }
-            returnDatas.AddRange(embeddeds);
             return new SourceFileContainer(returnDatas);
         }
     }

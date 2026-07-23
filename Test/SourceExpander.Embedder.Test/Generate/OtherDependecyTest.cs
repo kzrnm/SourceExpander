@@ -16,6 +16,7 @@ public class OtherDependencyTest : EmbedderGeneratorTestBase
                 ["Mine.C"],
                 Array.Empty<string>(),
                 Array.Empty<string>(),
+                // lang=C#
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
             ),
             new SourceFileInfo
@@ -24,6 +25,7 @@ public class OtherDependencyTest : EmbedderGeneratorTestBase
                 ["Mine.Program"],
                 ["using OC = Other.C;"],
                 ["OtherDependency>C.cs", "TestProject>C.cs"],
+                // lang=C#
                 "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
             ),
         ]);
@@ -41,7 +43,9 @@ public class OtherDependencyTest : EmbedderGeneratorTestBase
                     ["Other"] =
                     {
                         Sources = {
+                            // lang=C#
                             """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            // lang=C#
                             """
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
@@ -57,6 +61,7 @@ public class OtherDependencyTest : EmbedderGeneratorTestBase
                 Sources = {
                     (
                         @"/home/mine/C.cs",
+                            // lang=C#
                         """
 namespace Mine{
     public static class C
@@ -68,6 +73,7 @@ namespace Mine{
                     ),
                     (
                         @"/home/mine/Program.cs",
+                            // lang=C#
                         """
 using OC = Other.C;
 
@@ -104,6 +110,7 @@ namespace Mine{
                 ["Mine.C"],
                 Array.Empty<string>(),
                 Array.Empty<string>(),
+                // lang=C#
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
             ),
             new SourceFileInfo
@@ -112,6 +119,7 @@ namespace Mine{
                 ["Mine.Program"],
                 ["using OC = Other.C;"],
                 ["OtherDependency>C.cs", "TestProject>C.cs"],
+                // lang=C#
                 "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
             ),
         ]);
@@ -129,7 +137,9 @@ namespace Mine{
                     ["Other"] =
                     {
                         Sources = {
+                            // lang=C#
                             """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            // lang=C#
                             """
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedNamespaces", "Other")]
 [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode.GZipBase32768",
@@ -146,6 +156,7 @@ namespace Mine{
                 Sources = {
                     (
                         @"/home/mine/C.cs",
+                        // lang=C#
                         """
 namespace Mine{
     public static class C
@@ -157,6 +168,101 @@ namespace Mine{
                     ),
                     (
                         @"/home/mine/Program.cs",
+                        // lang=C#
+                        """
+using OC = Other.C;
+
+namespace Mine{
+    public static class Program
+    {
+        public static void Main()
+        {
+            OC.P();
+            C.P();
+        }
+    }
+}
+"""
+                    ),
+                },
+                ExpectedDiagnostics =
+                {
+                    new DiagnosticResult("EMBED0010", DiagnosticSeverity.Info).WithSpan("/home/mine/Program.cs", 1, 1, 1, 20),
+                },
+            }
+        };
+        await test.RunAsync(cancellationToken);
+    }
+
+    [Test]
+    public async Task OtherJson(CancellationToken cancellationToken)
+    {
+        const string embeddedSourceCode = """[{"CodeBody":"namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}","Dependencies":[],"FileName":"TestProject>C.cs","TypeNames":["Mine.C"],"Usings":[]},{"CodeBody":"namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}","Dependencies":["OtherDependency>C.cs","TestProject>C.cs"],"FileName":"TestProject>Program.cs","TypeNames":["Mine.Program"],"Usings":["using OC = Other.C;"]}]""";
+        await embeddedSourceCode.Should().BeEquivalentToJsonSources([
+            new SourceFileInfo
+            (
+                "TestProject>C.cs",
+                ["Mine.C"],
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                // lang=C#
+                "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
+            ),
+            new SourceFileInfo
+            (
+                "TestProject>Program.cs",
+                ["Mine.Program"],
+                ["using OC = Other.C;"],
+                ["OtherDependency>C.cs", "TestProject>C.cs"],
+                // lang=C#
+                "namespace Mine{public static class Program{public static void Main(){OC.P();C.P();}}}"
+            ),
+        ]);
+
+        var test = new Test(new()
+        {
+            EmbeddedNamespaces = "Mine",
+            EmbeddedSourceCode = embeddedSourceCode,
+        })
+        {
+            TestState =
+            {
+                AdditionalProjects =
+                {
+                    ["Other"] =
+                    {
+                        Sources = {
+                            // lang=C#
+                            """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                        }
+                    },
+                },
+                AdditionalProjectReferences = { "Other" },
+                AdditionalFiles =
+                {
+                    enableMinifyJson,
+                    new InMemorySourceText(
+                        "Other_SourceExpander.Embedded.json",
+                        """
+                        {"AssemblyName":"Other","Sources":[{"CodeBody":"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } ","Dependencies":[],"FileName":"OtherDependency>C.cs","TypeNames":["Other.C"],"Usings":[]}],"EmbedderVersion":"9.1.1.100","EmbeddedNamespaces":["Other"]}
+                        """),
+                },
+                Sources = {
+                    (
+                        @"/home/mine/C.cs",
+                            // lang=C#
+                        """
+namespace Mine{
+    public static class C
+    {
+        public static void P() => System.Console.WriteLine();
+    }
+}
+"""
+                    ),
+                    (
+                        @"/home/mine/Program.cs",
+                            // lang=C#
                         """
 using OC = Other.C;
 
@@ -193,6 +299,7 @@ namespace Mine{
                 ["Mine.C"],
                 Array.Empty<string>(),
                 Array.Empty<string>(),
+                // lang=C#
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
             )
         ]);
@@ -210,7 +317,9 @@ namespace Mine{
                     ["Other"] =
                     {
                         Sources = {
+                            // lang=C#
                             """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            // lang=C#
                             """
                     [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbedderVersion","2147483647.2147483647.2147483647.2147483647")]
                     [assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[{\"CodeBody\":\"namespace Other { public static class C { public static void P() => System.Console.WriteLine(); } } \",\"Dependencies\":[],\"FileName\":\"OtherDependency>C.cs\",\"TypeNames\":[\"Other.C\"],\"Usings\":[]}]")]
@@ -226,6 +335,7 @@ namespace Mine{
                 Sources = {
                     (
                         @"/home/mine/C.cs",
+                        // lang=C#
                         """
 namespace Mine{
     public static class C
@@ -256,6 +366,7 @@ namespace Mine{
                 ["Mine.C"],
                 Array.Empty<string>(),
                 Array.Empty<string>(),
+                // lang=C#
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
             )
         ]);
@@ -273,7 +384,9 @@ namespace Mine{
                     ["Other"] =
                     {
                         Sources = {
+                            // lang=C#
                             """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            // lang=C#
                             """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "[}")]""",
 
                         }
@@ -287,6 +400,7 @@ namespace Mine{
                 Sources = {
                     (
                         @"/home/mine/C.cs",
+                        // lang=C#
                         """
 namespace Mine{
     public static class C
@@ -319,6 +433,7 @@ namespace Mine{
                 ["Mine.C"],
                 Array.Empty<string>(),
                 Array.Empty<string>(),
+                // lang=C#
                 "namespace Mine{public static class C{public static void P()=>System.Console.WriteLine();}}"
             )
         ]);
@@ -336,7 +451,9 @@ namespace Mine{
                     ["Other"] =
                     {
                         Sources = {
+                            // lang=C#
                             """namespace Other{public static class C{public static void P() => System.Console.WriteLine();}}""",
+                            // lang=C#
                             """[assembly: System.Reflection.AssemblyMetadata("SourceExpander.EmbeddedSourceCode", "㘅桠ҠҠҠ俕䎶⣂㹊")]""",
                         }
                     },
@@ -349,6 +466,7 @@ namespace Mine{
                 Sources = {
                     (
                         @"/home/mine/C.cs",
+                        // lang=C#
                         """
 namespace Mine{
     public static class C

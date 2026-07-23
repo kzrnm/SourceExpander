@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/kzrnm/SourceExpander</PackageProjectUrl>
     <RepositoryUrl>https://github.com/kzrnm/SourceExpander</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/kzrnm/SourceExpander/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <VersionPrefix>9.1.1</VersionPrefix>
+    <VersionPrefix>9.1.2</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>

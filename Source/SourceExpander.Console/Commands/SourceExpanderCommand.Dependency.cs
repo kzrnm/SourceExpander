@@ -61,8 +61,11 @@ partial struct SourceExpanderCommand
                 return;
             }
         }
+
+        var (embeddedJson, _) = csProject.AnalyzerOptions.AdditionalFiles.ToEmbeddData(true, cancellationToken);
+
         var metadatas = metadataResolver
-            .GetEmbeddedSourceFiles(true, cancellationToken)
+            .GetEmbeddedSourceFiles(embeddedJson, true, cancellationToken)
             .ToArray();
 
         var infos = metadatas.SelectMany(t => t.Data.Sources)

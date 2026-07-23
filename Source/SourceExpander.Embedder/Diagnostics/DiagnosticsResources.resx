@@ -174,7 +174,13 @@
   <data name="EMBED0012_Body" xml:space="preserve">
     <value>'{0}' cannot be used here</value>
   </data>
+  <data name="EMBED0013_Body" xml:space="preserve">
+    <value>SourceExpander.Embedded.json is invalid: '{0}'</value>
+  </data>
   <data name="EMBED0012_Title" xml:space="preserve">
     <value>The attribute cannot be used here</value>
+  </data>
+  <data name="EMBED0013_Title" xml:space="preserve">
+    <value>SourceExpander.Embedded.json is invalid</value>
   </data>
 </root>

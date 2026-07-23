@@ -47,8 +47,8 @@ namespace SourceExpander
 
         private static SourceFileContainer ResolveEmbeddedData(CSharpCompilation compilation, ImmutableArray<EmbeddedData> embeddeds, CancellationToken cancellationToken)
         {
-            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken);
-            return new SourceFileContainer(embeddedDatas.Select(t => t.Data).Concat(embeddeds));
+            var embeddedDatas = new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(embeddeds, false, cancellationToken);
+            return new SourceFileContainer(embeddedDatas.Select(t => t.Data));
         }
 
 

@@ -114,11 +114,15 @@ public class CommandDependencyTests
             ["ac-library-csharp>Graph/Dsu.cs"],
             ["SampleLibrary.UnionFind"]));
 
-        // `Un` is common prefix!
         await dic.ShouldContainKeyAndValue("SampleLibrary>nsafeBlock.cs",
             new("SampleLibrary>nsafeBlock.cs",
             [],
             ["SampleLibrary.UnsafeBlock"]));
+
+        await dic.ShouldContainKeyAndValue("SampleLibrary>nder" + Path.DirectorySeparatorChar + "BigInt.cs",
+            new("SampleLibrary>nder" + Path.DirectorySeparatorChar + "BigInt.cs",
+            ["BigInteger>BigInteger.cs"],
+            ["SampleLibrary.Under.BigInt"]));
     }
 
 

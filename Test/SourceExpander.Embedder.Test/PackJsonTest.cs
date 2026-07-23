@@ -54,13 +54,13 @@ public class PackJsonTest
                 await File.ReadAllText(Path.Combine(dir.FullName, "Sample.Packing.targets"))
                     .Should().BeEqualTo("""
                     <Project>
-                      <ItemGroup Condition="'$(SourceExpander_Generator)'=='true' And Exists('$(Sample_Packing_Source)')">
+                      <ItemGroup Condition="'$(SourceExpander)'=='true' And Exists('$(Sample_Packing_Source)')">
                         <AdditionalFiles LinkBase="Properties/SourceExpander.Embedded"
                           Include="$(Sample_Packing_Source)"
                           Visible="$(Sample_Packing_Source_Visible)" />
                       </ItemGroup>
 
-                      <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'$(SourceExpander_Generator)'=='true' And '$(DisableCheckSourceExpanderVersion)' != 'true'">
+                      <Target Name="CheckSourceExpanderVersion" BeforeTargets="CoreCompile" Condition="'$(SourceExpander)'=='true' And '$(DisableCheckSourceExpanderVersion)' != 'true'">
                         <GetAssemblyIdentity AssemblyFiles="@(Analyzer)" Condition="'%(Analyzer.Filename)' == 'SourceExpander.Generator'">
                           <Output TaskParameter="Assemblies" ItemName="SourceExpanderIdentity" />
                         </GetAssemblyIdentity>

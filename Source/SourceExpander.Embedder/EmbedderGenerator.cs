@@ -17,6 +17,7 @@ namespace SourceExpander;
 public class EmbedderGenerator : IIncrementalGenerator
 {
     private const string CONFIG_FILE_NAME = "SourceExpander.Embedder.Config.json";
+    private const string EMBEDDED_FILE_NAME = "SourceExpander.Embedded.json";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -36,21 +37,29 @@ public class EmbedderGenerator : IIncrementalGenerator
 
         var source = context.CompilationProvider
             .Combine(context.ParseOptionsProvider)
+            .Combine(context.EmbeddedJsonProvider)
             .Combine(configProvider);
 
         context.RegisterImplementationSourceOutput(source, (ctx, source) =>
         {
-            var ((compilation, parseOptions), (analyzerConfigOptions, configBuilder)) = source;
+            var (((compilation, parseOptions), emmbeddedDataJsons), (analyzerConfigOptions, configBuilder)) = source;
             Execute(
                 new SourceProductionContextWrappter(ctx),
                 (CSharpCompilation)compilation,
                 (CSharpParseOptions)parseOptions,
                 analyzerConfigOptions,
+                emmbeddedDataJsons,
                 configBuilder);
         });
     }
 
-    internal void Execute(IContextWrappter ctx, CSharpCompilation compilation, CSharpParseOptions parseOptions, AnalyzerConfigOptions analyzerConfigOptions, EmbedderConfig.Builder configBuilder)
+    internal void Execute(
+        IContextWrappter ctx,
+        CSharpCompilation compilation,
+        CSharpParseOptions parseOptions,
+        AnalyzerConfigOptions analyzerConfigOptions,
+        ImmutableArray<AdditionalText> embeddedDataJsons,
+        EmbedderConfig.Builder configBuilder)
     {
         try
         {
@@ -86,9 +95,15 @@ public class EmbedderGenerator : IIncrementalGenerator
                 }
             }
 
+
+            var (embeddedResult, embeddedError) = embeddedDataJsons.ToEmbeddData(ctx.CancellationToken);
+            foreach (var e in embeddedError)
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EMBED0013_InvalidEmbeddedData(e.Path));
+
             var resolver = new EmbeddingResolver(
                 compilation,
                 parseOptions,
+                embeddedResult,
                 ctx,
                 config,
                 ctx.CancellationToken);

@@ -110,5 +110,15 @@ namespace SourceExpander
             "Usage",
             DiagnosticSeverity.Warning,
             true);
+
+        public static Diagnostic EMBED0013_InvalidEmbeddedData(string fileName)
+             => Diagnostic.Create(EMBED0013_InvalidEmbeddedData_Descriptor, Location.None, fileName);
+        private static readonly DiagnosticDescriptor EMBED0013_InvalidEmbeddedData_Descriptor = new(
+            "EMBED0013",
+            ResourceString(nameof(DiagnosticsResources.EMBED0013_Title)),
+            ResourceString(nameof(DiagnosticsResources.EMBED0013_Body)),
+            "Error",
+            DiagnosticSeverity.Warning,
+            true);
     }
 }

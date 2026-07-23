@@ -14,6 +14,7 @@ internal class EmbeddingResolver
 {
     private CSharpCompilation compilation;
     private readonly CSharpParseOptions parseOptions;
+    private readonly ImmutableArray<EmbeddedData> embeddeds;
     private readonly IDiagnosticReporter reporter;
     private readonly EmbedderConfig config;
     private readonly bool ConcurrentBuild;
@@ -22,6 +23,7 @@ internal class EmbeddingResolver
     public EmbeddingResolver(
         CSharpCompilation compilation,
         CSharpParseOptions parseOptions,
+        ImmutableArray<EmbeddedData> embeddeds,
         IDiagnosticReporter reporter,
         EmbedderConfig config,
         CancellationToken cancellationToken = default)
@@ -36,6 +38,7 @@ internal class EmbeddingResolver
         this.ConcurrentBuild = opts.ConcurrentBuild;
         this.parseOptions = parseOptions.WithDocumentationMode(DocumentationMode.Diagnose);
         this.compilation = compilation.WithOptions(opts);
+        this.embeddeds = embeddeds;
         this.reporter = reporter;
         this.config = config;
         this.cancellationToken = cancellationToken;
@@ -158,15 +161,13 @@ internal class EmbeddingResolver
             if (_cacheDependantFiles.IsDefault)
             {
                 var depSources = ImmutableArray.CreateBuilder<SourceFileInfo>();
-                foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(false, cancellationToken))
+                foreach (var (embedded, display, errors) in new AssemblyMetadataResolver(compilation).GetEmbeddedSourceFiles(embeddeds, false, cancellationToken))
                 {
                     foreach (var (key, message) in errors)
                     {
                         reporter.ReportDiagnostic(
                             DiagnosticDescriptors.EMBED0006_AnotherAssemblyEmbeddedDataError(display, key, message));
                     }
-                    if (embedded.Sources.IsEmpty)
-                        continue;
                     if (embedded.EmbedderVersion > AssemblyUtil.AssemblyVersion)
                     {
                         reporter.ReportDiagnostic(
